@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.UserMapper">
+  <select id="findUserInfo" resultType="com.hrtx.web.pojo.User">
+    select id, first_name from tb_user t where t.id = 1;
+  </select>
+  
+  <select id="selectByPageAndSelections" resultType="java.util.HashMap">
+  	select id, first_name,login_name,pwd from tb_user t where 1=1 
+  </select>
+  <select id="queryPageList" resultType="User">
+  	select id, name, login_name from tb_user t where t.is_del = 0
+  	<if test="param.name!=null and param.name!=''">and t.name like "%"#{param.name}"%"</if>
+  </select>
+  <select id="getPower" resultType="java.util.HashMap">
+  	select p.id, p.name, p.url, p.id, p.pid, p.grade, p.seq from tb_permission p
+				 where (exists(select 1 from tb_role_permission rp,tb_user_role ur 
+				 where p.id = rp.permission and rp.role_id = ur.role_id and ur.user_id = #{id} )
+				 or exists(select 1 from tb_user_permission up where p.id = up.permission and up.user_id = #{id} )) order by p.seq
+  </select>
+  <select id="findRoles" resultType="java.lang.String">
+  	select r.name from tb_user_role ur, tb_role r where ur.role_id = r.id and ur.user_id = #{id}
+  </select>
+</mapper>
