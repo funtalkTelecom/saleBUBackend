@@ -75,13 +75,13 @@ public class UserController {
     @RequestMapping("/user/query-user")
     @Powers({PowerConsts.SYSTEMMOUULE_USERLIST_LIST})
     public ModelAndView queryUser(User user) {
-    	if(1==1) throw new ServiceException("test"); 
         return new ModelAndView("admin/user/query-user");
     }
     
     @RequestMapping("/list-user")
     @Powers({PowerConsts.SYSTEMMOUULE_USERLIST_LIST})
     public Result listUser(User user) {
-    	return userService.pageUser(user);
+		if(1==1) throw new ServiceException("test");
+		return userService.pageUser(user);
     }
 }

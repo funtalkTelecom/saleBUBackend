@@ -33,7 +33,7 @@
 						<!-- /section:basics/content.searchbox -->
 					</div>
 					
-					<div class="page-content">
+					<div class="page-content" id="isMask">
 						<div class="row">
 							<div class="col-xs-12">
 								<h3 class="header smaller lighter blue">jQuery dataTables</h3>
@@ -63,7 +63,7 @@
 									                    <label>用户名称</label>
 									                    <input type="text" id="username" class="form-control"/>
 									                </div>
-									                <input type="button" id="query" value="查询" class="btn btn-sm btn-info"">
+									                <input type="button" id="query" value="查询" class="btn btn-sm btn-info"/>
 									            </div>
 												<div id="userresult" style="height: 450px;max-height: 450px;overflow-y: scroll;border: 1px solid #ccc"></div>
 											</div>

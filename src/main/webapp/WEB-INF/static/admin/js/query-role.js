@@ -84,6 +84,7 @@
 			$("#sendTip").show();
 //			$(this).attr("disabled",true);
 			var param = {
+				"isMask" : "isMask",
 				"roleId" : $("#roleId").val(),
 				"property" : $("#property").val(),
 				"permissionIds" : selected.join(",")
