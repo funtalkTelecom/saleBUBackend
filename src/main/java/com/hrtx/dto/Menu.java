@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Menu implements Serializable {
 
 	private String name;
-	private String url;
+	private String url; 
 	private long id;
 	private long pid;
 	private int grade;
