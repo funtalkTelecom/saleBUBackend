@@ -81,7 +81,8 @@ public class UserController {
     @RequestMapping("/list-user")
     @Powers({PowerConsts.SYSTEMMOUULE_USERLIST_LIST})
     public Result listUser(User user) {
-		if(1==1) throw new ServiceException("test");
+//		if(1==1) throw new ServiceException("test");
+
 		return userService.pageUser(user);
     }
 }
