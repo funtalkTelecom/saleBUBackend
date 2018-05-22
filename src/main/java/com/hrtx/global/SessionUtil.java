@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hrtx.web.pojo.User;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * session工具类
@@ -23,21 +25,24 @@ public final class SessionUtil {
 	
 	private final static String key = "user";
 	private final static Logger log = LoggerFactory.getLogger(SessionUtil.class);
-	
-	@Autowired
-	HttpServletResponse response;
-	@Autowired
-	HttpServletRequest request;
-	
-	public final HttpSession getSession(){
+
+	public final static HttpServletRequest getRequest(){
+		if(RequestContextHolder.getRequestAttributes()==null)return null;
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+		return request;
+	}
+
+	public final static HttpSession getSession(){
+		HttpServletRequest request = getRequest();
+		if(request==null)return null;
 		return request.getSession();
 	}
-	
+
 	/**
 	 * 获取放在session中的User对象
 	 * @return
 	 */
-	public final User getUser(){
+	public final static User getUser(){
 		Object obj = getSession().getAttribute(key);
 		return obj == null? null:(User)obj ;
 	}
@@ -55,7 +60,7 @@ public final class SessionUtil {
 	 * 获取放在session中的userID
 	 * @return
 	 */
-	public final long getUserId(){
+	public final static long getUserId(){
 		User user = getUser();
 		return user == null ? -1 : user.getId();
 	}
@@ -72,7 +77,7 @@ public final class SessionUtil {
 	 * 获取sesssion中的角色
 	 * 
 	 */
-	public final String getRoles(){
+	public final static String getRoles(){
 		return getUser().getRoles();
 	}
 	
@@ -83,7 +88,7 @@ public final class SessionUtil {
 		return (","+getRoles()+",").indexOf(","+roleStr+",") != -1;
 	}
 	
-	public final boolean hasPower(long id) {
+	public static final boolean hasPower(long id) {
 		Map<Integer,Object> powerMap = getPower();
 		if(powerMap == null)return false;
 		if(powerMap.containsKey(id)){
@@ -92,12 +97,12 @@ public final class SessionUtil {
 		return false;
 	}
 	
-	public final boolean hasPower(PowerConsts power ) {
+	public static final boolean hasPower(PowerConsts power) {
 		return hasPower(power.getId());
 	}
 	
 	@SuppressWarnings("unchecked")
-	public final Map<Integer,Object> getPower(){
+	public static final Map<Integer,Object> getPower(){
 		Object power = getSession().getAttribute("powers");
 		if(power == null)return null;
 		return (Map<Integer, Object>) power;
@@ -113,7 +118,7 @@ public final class SessionUtil {
 	 * 是否是超级管理员
 	 * @return
 	 */
-	public final boolean isSuperAdmin(){
+	public final static boolean isSuperAdmin(){
 		return getUserId() == 1l;
 	}
 	
@@ -121,8 +126,8 @@ public final class SessionUtil {
 	 * 是否以AJAX的方式提交的
 	 * @return
 	 */
-	public final  boolean isAjax(){
-		String requestType = request.getHeader("X-Requested-With");
+	public final static boolean isAjax(){
+		String requestType = getRequest().getHeader("X-Requested-With");
 		if (requestType != null && requestType.equals("XMLHttpRequest")) {
 			return true;
 		} else {
@@ -134,7 +139,8 @@ public final class SessionUtil {
 	 * 返回JSON数据
 	 * @param json
 	 */
-	public final void returnJson(String json){
+	public final static void returnJson(String json){
+		HttpServletResponse response = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
 		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = null;
 		try {
@@ -181,5 +187,25 @@ public final class SessionUtil {
 			return " and "+key+" = "+corp.getId();
 		}
 	}*/
+
+
+	/**
+	 * @return 登陆用户真实Ip
+	 */
+	public static String getUserIp(){
+		HttpServletRequest request = getRequest();
+		if(request==null)return null;
+		String ip = request.getHeader("x-forwarded-for");
+		if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("Proxy-Client-IP");
+		}
+		if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("WL-Proxy-Client-IP");
+		}
+		if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getRemoteAddr();
+		}
+		return ip;
+	}
 	
 }

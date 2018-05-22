@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.MealMapper">
+    <sql id="col_list">
+        a.mid as mid,
+        a.meal_id as mealId,
+        a.meal_name as mealName,
+        a.meal_desc as mealDesc,
+        a.sale_city as saleCity,
+        a.sale_type as saleType,
+        a.create_by as createBy,
+        a.create_date as createDate,
+        a.update_by as updateBy,
+        a.update_date as updateDate,
+        a.is_del as isDel
+    </sql>
+    <select id="findMealInfo" resultType="com.hrtx.web.pojo.Meal">
+        select
+        <include refid="col_list"/>
+        from tb_meal a where a.meal_id = #{mealid};
+    </select>
+
+    <select id="findMealById" resultType="com.hrtx.web.pojo.Meal">
+        select
+        <include refid="col_list"/>
+        from tb_meal a where a.mid = #{mid};
+    </select>
+
+    <select id="queryPageList" resultType="Meal">
+        select
+        <include refid="col_list"/>
+        from tb_meal a where a.is_del = 0
+        <if test="param.mealName!=null and param.mealName!=''">
+            and a.mealName like "%"#{param.mealName}"%"
+        </if>
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_meal(
+            mid,
+            meal_id,
+            meal_name,
+            meal_desc,
+            sale_city,
+            sale_type,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            is_del
+        ) values
+        <foreach collection="mealList" item="meal" separator=",">
+            (
+                #{meal.mid},
+                #{meal.mealId},
+                #{meal.mealName},
+                #{meal.mealDesc},
+                #{meal.saleCity},
+                #{meal.saleType},
+                #{meal.createBy},
+                #{meal.createDate},
+                #{meal.updateBy},
+                #{meal.updateDate},
+                0
+            )
+        </foreach>
+    </insert>
+    <update id="mealEdit">
+        update tb_meal a set
+            a.meal_id = #{mealId},
+            a.meal_name = #{mealName},
+            a.meal_desc = #{mealDesc},
+            a.sale_city = #{saleCity},
+            a.sale_type = #{saleType},
+            a.update_by = #{updateBy},
+            a.update_date = #{updateDate}
+        where
+            a.mid = #{mid} and a.is_del = 0
+    </update>
+
+    <update id="mealDelete">
+        update tb_meal a set a.is_del = 1 where a.mid = #{mid}
+    </update>
+
+    <select id="checkMealIdIsExist" resultType="java.lang.Integer">
+        select count(1) as num from tb_meal a where a.mid != #{mid} and a.meal_id = #{mealId}
+    </select>
+</mapper>

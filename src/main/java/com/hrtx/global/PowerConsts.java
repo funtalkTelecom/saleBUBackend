@@ -33,8 +33,12 @@ public enum PowerConsts {
 	REPORTMODULE_COMMON(60900,"通用报表",60000,0,"searchCommon.htm",2,99),   //通用报表
 	REPORTMODULE_COMMON_QUERY(60901,"查询",60900,1,"",3,1),   //通用查询报表
 	REPORTMODULE_COMMON_EXPORT(60902,"导出",60900,1,"",3,2),   //通用导出报表
-	
-	
+
+	SALEMOUDULE(70000,"销售管理",1,0,"",1,3),//销售管理
+	MEALMOUDULE(70100,"套餐管理",70000,0,"meal/query-meal",2,1),//套餐管理
+	MEALMOUDULE_COMMON_QUEYR(70201,"查询",70100,1,"",3,1),//套餐查询
+	MEALMOUDULE_COMMON_IMPORT(70202,"导入",70100,1,"",3,2),//套餐导入
+	MEALMOUDULE_COMMON_EDIT(70203,"修改",70100,1,"",3,3),//套餐修改
 	;
 	
 	public long getId() {

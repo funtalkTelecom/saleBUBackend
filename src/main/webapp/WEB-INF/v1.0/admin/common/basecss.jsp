@@ -20,6 +20,7 @@
 
 <script src="<%=basePath %>project/js/jquery.js"></script>
 <script src="<%=basePath %>bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="<%=basePath %>project/js/public.js"></script>
 <!-- page specific plugin scripts -->
 <script src="<%=basePath %>ace/js/jquery.dataTables.js"></script>
 <script src="<%=basePath %>ace/js/jquery.dataTables.bootstrap.js"></script>
@@ -30,5 +31,7 @@
 <script type="text/javascript" src="<%=basePath %>project/js/My97DatePicker/WdatePicker.js" defer="defer"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/jquery.loadmask.min.js"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/global.js"></script>
+<script type="text/javascript" src="<%=basePath %>project/js/egtvalidate.js"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/jQuery.dsTable.js"></script>
+<script type="text/javascript" src="<%=basePath %>project/js/jquery.form.js"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/sdmenu.js"></script>
