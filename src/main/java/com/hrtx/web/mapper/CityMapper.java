@@ -14,4 +14,6 @@ public interface CityMapper extends Mapper<Meal>,BaseMapper<Meal>{
     City findCityByName(@Param("name") String name);
 
     List<HashMap> findCityByNameFromThird(@Param("name") String name);
+
+    List queryByThird(@Param("third")  String third);
 }

@@ -5,14 +5,14 @@ $(function() {
 		"url" : '/meal/list-meal',
 		"ct" : "#result",
 		"cm" : [{
-					"header" : "编号",
-					"dataIndex" : "mid"
-				},{
 					"header" : "套餐ID",
 					"dataIndex" : "mealId"
 				},{
 					"header" : "套餐名称",
 					"dataIndex" : "mealName"
+				},{
+					"header" : "销售地市",
+					"dataIndex" : "saleCityName"
 				},{
 					"header" : "创建时间",
 					"dataIndex" : "createDate",
@@ -84,7 +84,14 @@ $(function() {
         $('#importModal form').ajaxSubmit(options);
     });
 
-    citySelect($("#fcity"),17);
+    // citySelect($("#fcity"),17);
+    var option = {
+            url:"",
+            key:"cityId",
+            value:"cityName",
+            param:{t:new Date().getTime()}
+        };
+    thirdCitySelect($("#fcity"),"ly",option);
     $(document).on("click","#mealInfo .modal-footer .btn-success",function() {
         // if(!validate_check($("#mealInfo form"))) return;
         console.log($("#mealInfo form").serialize());

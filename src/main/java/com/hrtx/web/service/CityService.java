@@ -31,4 +31,8 @@ public class CityService {
 		if(list.size()==1) map.put("city_id", list.get(0).get("cityId"));
 		return map;
 	}
+
+	public List queryByThird(String third) {
+		return cityMapper.queryByThird(third);
+	}
 }

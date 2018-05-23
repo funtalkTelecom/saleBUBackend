@@ -61,13 +61,14 @@ function formInit(_tag, _data, ftype){
  * @param {} url 取数url
  * @param {} param 参数
  */
-function selectValue($domId, data){
-	var option = {
-		url:"",
-		key:"id",
-		value:"name",
-		param:{t:new Date().getTime()}
-	}
+function selectValue($domId, data, option){
+	if(!option)
+		option = {
+			url:"",
+			key:"id",
+			value:"name",
+			param:{t:new Date().getTime()}
+		}
 	$.extend(true, option, data);
 	$.ajax({async:false,type : "post", url:option.url, data:option.param, success:function(data){
 		var html="<option value='-1'>请选择...</option>";
@@ -89,6 +90,19 @@ function citySelect($domId, pid){
 		param : {pid:pid}
 	}
 	selectValue($domId, data);
+}
+
+/**
+ * 第三方地市
+ * @param {} $domId 赋值的下拉框
+ * @param {} third 地市来源标识
+ */
+function thirdCitySelect($domId, third, option){
+    var data = {
+        url:"query-third-city",
+        param : {third:third}
+    }
+    selectValue($domId, data, option);
 }
 
 function refresh(url){

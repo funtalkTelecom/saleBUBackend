@@ -18,8 +18,9 @@ public class Meal extends BasePojo implements java.io.Serializable {
 	private String mealId;
 	private String mealName;
 	private String mealDesc;
-	private Long saleCity;
-	private Integer saleType;
+    private Long saleCity;
+    private String saleCityName;
+	private String saleType;
 	private Long createBy;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date createDate;
@@ -31,105 +32,114 @@ public class Meal extends BasePojo implements java.io.Serializable {
 	public Meal() {
 	}
 
-	public Meal(Long mid, String mealId, String mealName, String mealDesc, Long saleCity, Integer saleType, Long createBy, Date createDate, Long updateBy, Date updateDate, Integer isDel) {
-		this.mid = mid;
-		this.mealId = mealId;
-		this.mealName = mealName;
-		this.mealDesc = mealDesc;
-		this.saleCity = saleCity;
-		this.saleType = saleType;
-		this.createBy = createBy;
-		this.createDate = createDate;
-		this.updateBy = updateBy;
-		this.updateDate = updateDate;
-		this.isDel = isDel;
-	}
+    public Meal(Long mid, String mealId, String mealName, String mealDesc, Long saleCity, String saleCityName, String saleType, Long createBy, Date createDate, Long updateBy, Date updateDate, Integer isDel) {
+        this.mid = mid;
+        this.mealId = mealId;
+        this.mealName = mealName;
+        this.mealDesc = mealDesc;
+        this.saleCity = saleCity;
+        this.saleCityName = saleCityName;
+        this.saleType = saleType;
+        this.createBy = createBy;
+        this.createDate = createDate;
+        this.updateBy = updateBy;
+        this.updateDate = updateDate;
+        this.isDel = isDel;
+    }
 
-	public Long getMid() {
-		return mid;
-	}
+    public Long getMid() {
+        return mid;
+    }
 
-	public void setMid(Long mid) {
-		this.mid = mid;
-	}
+    public void setMid(Long mid) {
+        this.mid = mid;
+    }
 
-	public String getMealId() {
-		return mealId;
-	}
+    public String getMealId() {
+        return mealId;
+    }
 
-	public void setMealId(String mealId) {
-		this.mealId = mealId;
-	}
+    public void setMealId(String mealId) {
+        this.mealId = mealId;
+    }
 
-	public String getMealName() {
-		return mealName;
-	}
+    public String getMealName() {
+        return mealName;
+    }
 
-	public void setMealName(String mealName) {
-		this.mealName = mealName;
-	}
+    public void setMealName(String mealName) {
+        this.mealName = mealName;
+    }
 
-	public String getMealDesc() {
-		return mealDesc;
-	}
+    public String getMealDesc() {
+        return mealDesc;
+    }
 
-	public void setMealDesc(String mealDesc) {
-		this.mealDesc = mealDesc;
-	}
+    public void setMealDesc(String mealDesc) {
+        this.mealDesc = mealDesc;
+    }
 
-	public Long getSaleCity() {
-		return saleCity;
-	}
+    public Long getSaleCity() {
+        return saleCity;
+    }
 
-	public void setSaleCity(Long saleCity) {
-		this.saleCity = saleCity;
-	}
+    public void setSaleCity(Long saleCity) {
+        this.saleCity = saleCity;
+    }
 
-	public Integer getSaleType() {
-		return saleType;
-	}
+    public String getSaleCityName() {
+        return saleCityName;
+    }
 
-	public void setSaleType(Integer saleType) {
-		this.saleType = saleType;
-	}
+    public void setSaleCityName(String saleCityName) {
+        this.saleCityName = saleCityName;
+    }
 
-	public Long getCreateBy() {
-		return createBy;
-	}
+    public String getSaleType() {
+        return saleType;
+    }
 
-	public void setCreateBy(Long createBy) {
-		this.createBy = createBy;
-	}
+    public void setSaleType(String saleType) {
+        this.saleType = saleType;
+    }
 
-	public Date getCreateDate() {
-		return createDate;
-	}
+    public Long getCreateBy() {
+        return createBy;
+    }
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
+    public void setCreateBy(Long createBy) {
+        this.createBy = createBy;
+    }
 
-	public Long getUpdateBy() {
-		return updateBy;
-	}
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-	public void setUpdateBy(Long updateBy) {
-		this.updateBy = updateBy;
-	}
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
-	public Date getUpdateDate() {
-		return updateDate;
-	}
+    public Long getUpdateBy() {
+        return updateBy;
+    }
 
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
+    public void setUpdateBy(Long updateBy) {
+        this.updateBy = updateBy;
+    }
 
-	public Integer getIsDel() {
-		return isDel;
-	}
+    public Date getUpdateDate() {
+        return updateDate;
+    }
 
-	public void setIsDel(Integer isDel) {
-		this.isDel = isDel;
-	}
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public Integer getIsDel() {
+        return isDel;
+    }
+
+    public void setIsDel(Integer isDel) {
+        this.isDel = isDel;
+    }
 }

@@ -14,6 +14,9 @@
         a.update_date as updateDate,
         a.is_del as isDel
     </sql>
+    <sql id="ex_col_list">
+        b.city_name as saleCityName,
+    </sql>
     <select id="findMealInfo" resultType="com.hrtx.web.pojo.Meal">
         select
         <include refid="col_list"/>
@@ -28,10 +31,16 @@
 
     <select id="queryPageList" resultType="Meal">
         select
+        <include refid="ex_col_list"/>
         <include refid="col_list"/>
-        from tb_meal a where a.is_del = 0
+        from tb_meal a
+        left join tb_third_city b on a.sale_city=b.city_id
+        where a.is_del = 0
         <if test="param.mealName!=null and param.mealName!=''">
-            and a.mealName like "%"#{param.mealName}"%"
+            and a.meal_name like "%"#{param.mealName}"%"
+        </if>
+        <if test="param.mealId!=null and param.mealId!=''">
+            and a.meal_id like "%"#{param.mealId}"%"
         </if>
     </select>
 

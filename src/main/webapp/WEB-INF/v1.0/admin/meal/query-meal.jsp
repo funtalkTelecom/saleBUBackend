@@ -36,9 +36,6 @@
 					<div class="page-content">
 						<div class="row">
 							<div class="col-xs-12">
-								<c:if test="<%=SessionUtil.hasPower(PowerConsts.MEALMOUDULE_COMMON_IMPORT)%>">
-									<button id="modal-adduser" type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#importModal" >导入</button>
-								</c:if>
 								<%--<h6 class="header smaller lighter blue">--%>
 								<%--</h6>--%>
 							<%--<div class="table-header">--%>
@@ -46,7 +43,26 @@
 								<%--</div>--%>
 								<%--<div class="table-responsive">--%>
 								<%--<div class="dataTables_borderWrap">--%>
-								<br>
+
+								<div class="query" style="margin-bottom: -10px">
+									<form class="form-inline pd5" role="form">
+										<div class="form-group">
+											<label class="control-label">套餐ID</label>
+											<input type="text" class="form-control" style="width:130px;" name="mealId">
+										</div>
+										<div class="form-group">
+											<label class="control-label">套餐名称</label>
+											<input type="text" class="form-control" style="width:130px;" name="mealName">
+										</div>
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
+										<c:if test="<%=SessionUtil.hasPower(PowerConsts.MEALMOUDULE_COMMON_IMPORT)%>">
+											<button id="modal-adduser" type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#importModal" >导入</button>
+										</c:if>
+									</form><!-- /form-panel -->
+								</div>
+
+                                <h6 class="header smaller lighter blue"></h6>
 								<div id="result">
 								</div>
 							</div>
@@ -129,6 +145,7 @@
 								<div class="col-xs-4">
 									<select class="form-control" name="saleCity" id="fcity">
 										<option value="-1">请选择...</option>
+										<option value="0">不区分</option>
 									</select>
 								</div>
 								<label class="col-xs-2 control-label">销售渠道</label>

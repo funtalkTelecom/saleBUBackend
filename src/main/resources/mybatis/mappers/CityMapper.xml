@@ -31,4 +31,7 @@
     <select id="findCityByNameFromThird" resultMap="thirdCityList">
         select * from tb_third_city a where a.third_name = #{name}
     </select>
+    <select id="queryByThird" resultMap="thirdCityList">
+        select * from tb_third_city a where a.third = #{third}
+    </select>
 </mapper>

@@ -11,19 +11,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.global.PowerConsts;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class CommonController extends BaseReturn{
 	@Resource
 	private CityService cityService;
 
-	@RequestMapping("query-city")
-	@Powers( { PowerConsts.NOLOGINPOWER })
-	public String queryCity(HttpServletRequest request) {
-		String pid_=request.getParameter("pid");
-		Object list=cityService.queryByPidList(NumberUtils.toInt(pid_,0));
-		return renderJson(getJsonArray(list));
-	}
+    @RequestMapping("query-city")
+    @Powers( { PowerConsts.NOLOGINPOWER })
+    @ResponseBody
+    public Object queryCity(HttpServletRequest request) {
+        String pid_=request.getParameter("pid");
+        Object list=cityService.queryByPidList(NumberUtils.toInt(pid_,0));
+        return list;
+    }
+
+    @RequestMapping("query-third-city")
+    @Powers( { PowerConsts.NOLOGINPOWER })
+    @ResponseBody
+    public Object queryThirdCity(HttpServletRequest request) {
+        String third=request.getParameter("third");
+        Object list=cityService.queryByThird(third);
+        return list;
+    }
 
 	@RequestMapping("/{str}")
     @Powers({PowerConsts.NOLOGINPOWER})

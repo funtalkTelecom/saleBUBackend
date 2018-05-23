@@ -131,18 +131,24 @@ public class MealController extends BaseReturn{
 			if(mealids.contains(arr.get(0))) {
 				return returnError("数据错误，系统检测到第"+(i+1)+"行的套餐ID在该文件重复。");
 			}
-			thirdCity = cityService.findCityByNameFromThird(arr.get(3));
-			if (Integer.parseInt(thirdCity.get("num").toString())!=1) {
-				return returnError("数据错误，系统检测到第"+(i+1)+"行的销售地市不正确。");
+			if(arr.get(3)==null || "".equals(arr.get(3))){
+				return returnError("数据错误，系统检测到第" + (i + 1) + "行的销售地市为空。");
+			}else if ("不区分".equals(arr.get(3))) {
+				m.setSaleCity(-99l);
+			} else {
+				thirdCity = cityService.findCityByNameFromThird(arr.get(3));
+				if (Integer.parseInt(thirdCity.get("num").toString())!=1) {
+					return returnError("数据错误，系统检测到第"+(i+1)+"行的销售地市不正确。");
+				}
+				m.setSaleCity(Long.parseLong(thirdCity.get("city_id").toString()));
 			}
-			m.setSaleCity(Long.parseLong(thirdCity.get("city_id").toString()));
 			Meal meal = mealService.findMealByMealId(arr.get(0));
 			if(meal != null) {
 				return returnError("数据错误，系统检测到第"+(i+1)+"行在库中已存在。");
 			}
 			mealids.add(arr.get(0));
 			m.setMealDesc(arr.get(2));
-			m.setSaleType(0);
+			m.setSaleType(arr.get(4));
 			m.setCreateBy(SessionUtil.getUserId());
 			m.setCreateDate(now);
 			m.setUpdateBy(SessionUtil.getUserId());
