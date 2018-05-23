@@ -9,7 +9,16 @@ $(function() {
 					"dataIndex" : "mealId"
 				},{
 					"header" : "套餐名称",
-					"dataIndex" : "mealName"
+					"dataIndex" : "mealName",
+					"renderer":function(v,record){
+                        $operate = v;
+                        if(v) {
+                            $operate = $("<span class=\"btn-sm tooltip-info\" data-toggle=\"tooltip\" data-placement=\"bottom\" data-original-title=\"" + record.mealDesc + "\">" + $.trim(v, '--') + "</span>");
+                            $operate.tooltip();
+                        }
+                        console.log($operate);
+						return $operate;
+					}
 				},{
 					"header" : "销售地市",
 					"dataIndex" : "saleCityName"

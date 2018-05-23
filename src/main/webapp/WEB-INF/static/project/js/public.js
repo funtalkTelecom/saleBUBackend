@@ -133,15 +133,18 @@ $(document).ready(function() {
         $(this).find("select").each(function (i, obj) {
             $(obj).val("-1");
         })
+        $(this).find("textarea").each(function (i, obj) {
+            $(obj).val("");
+        })
     });
 	
 	$("#reset").click(function() {
 		$(".query input").each(function(index,v2){ 
 			$(v2).val("");
 		});
-		$(".query select").each(function(index,v2){ 
-			$(v2).val("-1");
-		});
+        $(".query select").each(function(index,v2){
+            $(v2).val("-1");
+        });
 	});
 	
 });

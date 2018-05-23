@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.SystemMapper">
+    <sql id="col_list">
+        a.id as id,
+        a.key_id as keyId,
+        a.key_value as keyValue,
+        a.temp_key_value as tempKeyValue,
+        a.remark as remark,
+        a.is_audit as isAudit
+    </sql>
+    <select id="findSystemInfo" resultType="System">
+        select
+        <include refid="col_list"/>
+        from tb_system a where a.id = #{id};
+    </select>
+
+    <select id="queryPageList" resultType="System">
+        select
+        <include refid="col_list"/>
+        from tb_system a
+        where 1=1
+        <if test="param.keyId!=null and param.keyId!=''">
+            and a.key_id like "%"#{param.keyId}"%"
+        </if>
+        <if test="param.keyValue!=null and param.keyValue!=''">
+            and a.key_value like "%"#{param.keyValue}"%"
+        </if>
+        <if test="param.remark!=null and param.remark!=''">
+            and a.remark like "%"#{param.remark}"%"
+        </if>
+        order by a.key_id
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_system(
+        id,
+        key_id,
+        key_value,
+        remark,
+        is_audit
+        ) values
+        <foreach collection="systemList" item="system" separator=",">
+            (
+            #{system.id},
+            #{system.keyId},
+            #{system.keyValue},
+            #{system.remark},
+            '0'
+            )
+        </foreach>
+    </insert>
+
+    <update id="systemEdit">
+        update tb_system a set
+            a.key_id = #{keyId},
+            a.temp_key_value = #{tempKeyValue},
+            a.remark = #{remark},
+            a.is_audit = '0'
+        where
+            a.id = #{id}
+    </update>
+
+    <update id="systemDelete">
+        delete from a using tb_system a where a.id = #{id}
+    </update>
+
+    <update id="systemAudit">
+        update tb_system a set a.key_value = a.temp_key_value, a.temp_key_value = null, a.is_audit='1' where a.id=#{id};
+    </update>
+
+    <select id="checkSystemKeyIdIsExist" resultType="java.lang.Integer">
+        select count(1) as num from tb_system a where a.id != #{id} and a.key_id = #{keyId}
+    </select>
+</mapper>
