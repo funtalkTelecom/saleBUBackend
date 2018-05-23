@@ -14,8 +14,10 @@ import com.hrtx.global.IdWorker;
 public class BasePojo {
 	@Transient
 	protected int limit = 0;
-	@Transient 
+	@Transient
 	protected int start = 0;
+	@Transient
+	protected int pageNum = 0;
 	@Transient
 	protected List<Object> list = new ArrayList<Object>();
 	@Transient
@@ -28,7 +30,12 @@ public class BasePojo {
 	protected static IdWorker idWorker = new IdWorker(workerId, 0);
 	@Transient
 	private long generalId = idWorker.nextId();
-	
+
+	public int getPageNum() {
+		if(this.limit==0) return 0;
+		return (this.start/this.limit)+1;
+	}
+
 	public long getGeneralId() {
 		return generalId;
 	}
