@@ -5,7 +5,7 @@
 		<title>配置管理</title>
 		<%@ include file="../common/basecss.jsp" %>
 		<%--<script type="text/javascript" src="<%=basePath %>query-meal.js"></script>--%>
-		<script type="text/javascript" src="<%=basePath %>admin/js/system-query.js"></script>
+		<script type="text/javascript" src="<%=basePath %>admin/js/dict-query.js"></script>
 	</head>
 	<body class="no-skin">
 		<!-- #section:basics/navbar.layout -->
@@ -47,11 +47,15 @@
 											<input type="text" class="form-control" style="width:130px;" name="keyValue">
 										</div>
 										<div class="form-group">
-											<label class="control-label">备注</label>
-											<input type="text" class="form-control" style="width:130px;" name="remark">
+											<label class="control-label">key_group</label>
+											<input type="text" class="form-control" style="width:130px;" name="keyGroup">
+										</div>
+										<div class="form-group">
+											<label class="control-label">note</label>
+											<input type="text" class="form-control" style="width:130px;" name="note">
 										</div>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.SYSMOUDULE_COMMON_ADD)%>">
-											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#systemInfo" >添加</button>
+											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#dictInfo" >添加</button>
 										</c:if>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
@@ -83,7 +87,7 @@
 		</div><!-- /.main-container -->
 
 		<!-- 模态框（Modal） -->
-		<div class="modal fade" id="systemInfo" tabindex="-1">
+		<div class="modal fade" id="dictInfo" tabindex="-1">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -106,20 +110,26 @@
 							<div class="form-group">
 								<label class="col-xs-2 control-label">key_value</label>
 								<div class="col-xs-10">
-									<input type="text" class="form-control input-xxlarge" disabled="disabled" name="keyValue">
+									<input type="text" class="form-control input-xxlarge" name="keyValue">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-xs-2 control-label">temp_key_value</label>
+								<label class="col-xs-2 control-label">key_group</label>
 								<div class="col-xs-10">
-									<input type="text" class="form-control input-xxlarge" name="tempKeyValue">
+									<input type="text" class="form-control input-xxlarge" name="keyGroup">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-xs-2 control-label">seq</label>
+								<div class="col-xs-10">
+									<input type="text" class="form-control input-xxlarge" name="seq">
 								</div>
 							</div>
 
 							<div class="form-group">
-								<label class="col-xs-2 control-label">备注</label>
+								<label class="col-xs-2 control-label">note</label>
 								<div class="col-xs-10">
-									<textarea type="text" style="width: 468px" class="form-control input-xxlarge" name="remark" ></textarea>
+									<textarea type="text" style="width: 468px" class="form-control input-xxlarge" name="note" ></textarea>
 								</div>
 							</div>
 						</div>

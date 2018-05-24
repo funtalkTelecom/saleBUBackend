@@ -37,6 +37,7 @@
         id,
         key_id,
         key_value,
+        temp_key_value,
         remark,
         is_audit
         ) values
@@ -45,6 +46,7 @@
             #{system.id},
             #{system.keyId},
             #{system.keyValue},
+            #{system.tempKeyValue},
             #{system.remark},
             '0'
             )

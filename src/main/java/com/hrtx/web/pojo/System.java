@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
-@Table(name = "tb_meal")
+@Table(name = "tb_system")
 public class System extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
