@@ -139,6 +139,11 @@
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal -->
 		</div>
+		<div id="dialog-message" class="ui-dialog-content ui-widget-content hide" style="width: auto; min-height: 30px; max-height: none; height: auto;">
+			<p>
+				确认审核
+			</p>
+		</div>
 		<script type="text/javascript">
             var p_edit = <%=SessionUtil.hasPower(PowerConsts.SYSMOUDULE_COMMON_EDIT)%>;
             var p_audit= <%=SessionUtil.hasPower(PowerConsts.SYSMOUDULE_COMMON_AUDIT)%>;

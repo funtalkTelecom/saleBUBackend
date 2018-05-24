@@ -30,6 +30,7 @@
 
 <script type="text/javascript" src="<%=basePath %>project/js/My97DatePicker/WdatePicker.js" defer="defer"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/jquery.loadmask.min.js"></script>
+<script type="text/javascript" src="<%=basePath %>project/js/bootbox.js"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/global.js"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/egtvalidate.js"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/jQuery.dsTable.js"></script>

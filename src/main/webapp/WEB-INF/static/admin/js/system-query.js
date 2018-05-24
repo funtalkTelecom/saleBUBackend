@@ -25,6 +25,9 @@ $(function() {
                         return $operate;
 					}
 				},{
+					"header" : "remark",
+					"dataIndex" : "remark"
+				},{
 					"header" : "操作",
 					"dataIndex" : "id",
 					"renderer":function(v,record){
@@ -39,28 +42,50 @@ $(function() {
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
                         $operate.find(".update").click(function () {
-                            $.post("system/system-info",{id:v},function(data){
-                                var _data=data.data;
+                            $.post("system/system-info", {id: v}, function (data) {
+                                var _data = data.data;
                                 formInit($("#systemInfo form"), _data);
                                 $('#systemInfo').modal('show');
-                            },"json");
-                        })
+                            }, "json");
+                        });
                         $operate.find(".delete").click(function () {
-                            if(confirm("确认删除？")) {
-                                $.post("system/system-delete",{id:v},function(data){
+                            if (confirm("确认删除？")) {
+                                $.post("system/system-delete", {id: v}, function (data) {
                                     dataList.reload();
                                     alert(data.data);
-                                },"json");
+                                }, "json");
                             }
-                        })
-                        $operate.find(".audit").click(function () {
-                            if(confirm("确认审核通过？")) {
-                                $.post("system/system-audit",{id:v},function(data){
-                                    dataList.reload();
-                                    alert(data.data);
-                                },"json");
-                            }
-                        })
+                        });
+                        $operate.find(".audit").on(ace.click_event, function() {
+                            bootbox.dialog({
+                                message: "<span class='bigger-110'>确认审核</span>",
+                                buttons:
+                                    {
+                                        "success" :
+                                            {
+                                                "label" : "<i class='ace-icon fa fa-check'></i> 审核通过",
+                                                "className" : "btn-sm btn-success",
+                                                "callback": function() {
+                                                    $.post("system/system-audit",{id:v, isAudit:'1'},function(data){
+                                                        dataList.reload();
+                                                        alert(data.data);
+                                                    },"json");
+                                                }
+                                            },
+                                        "danger" :
+                                            {
+                                                "label" : "审核不通过",
+                                                "className" : "btn-sm btn-danger",
+                                                "callback": function() {
+                                                    $.post("system/system-audit",{id:v, isAudit:'0'},function(data){
+                                                        dataList.reload();
+                                                        alert(data.data);
+                                                    },"json");
+                                                }
+                                            }
+                                    }
+                            });
+                        });
 						return $operate;
 					}
 				}],
@@ -89,7 +114,6 @@ $(function() {
 
     $(document).on("click","#systemInfo .modal-footer .btn-success",function() {
         // if(!validate_check($("#systemInfo form"))) return;
-        console.log($("#systemInfo form").serialize());
         $.post("system/system-edit",$("#systemInfo form").serialize(),function(data){
             dataList.reload();
             $('#systemInfo').modal('hide');

@@ -16,7 +16,6 @@ $(function() {
                             $operate = $("<span class=\"btn-sm tooltip-info\" data-toggle=\"tooltip\" data-placement=\"bottom\" data-original-title=\"" + record.mealDesc + "\">" + $.trim(v, '--') + "</span>");
                             $operate.tooltip();
                         }
-                        console.log($operate);
 						return $operate;
 					}
 				},{
@@ -103,7 +102,6 @@ $(function() {
     thirdCitySelect($("#fcity"),"ly",option);
     $(document).on("click","#mealInfo .modal-footer .btn-success",function() {
         // if(!validate_check($("#mealInfo form"))) return;
-        console.log($("#mealInfo form").serialize());
         $.post("meal/meal-edit",$("#mealInfo form").serialize(),function(data){
             dataList.reload();
             $('#mealInfo').modal('hide');
