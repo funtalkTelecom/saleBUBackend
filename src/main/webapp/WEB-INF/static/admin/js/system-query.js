@@ -56,9 +56,12 @@ $(function() {
                                 }, "json");
                             }
                         });
+
                         $operate.find(".audit").on(ace.click_event, function() {
                             bootbox.dialog({
-                                message: "<span class='bigger-110'>确认审核</span>",
+                                boxCss:{"width":"400px"},
+                                title: "<span class='bigger-110'>确认审核</span>",
+                                message: "将key_value修改为:"+record.tempKeyValue+",原值:"+record.keyValue,
                                 buttons:
                                     {
                                         "success" :

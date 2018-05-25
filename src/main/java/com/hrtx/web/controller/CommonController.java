@@ -2,8 +2,10 @@ package com.hrtx.web.controller;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.hrtx.web.service.CityService;
+import com.hrtx.web.service.DictService;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,10 +15,14 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.global.PowerConsts;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.acl.Group;
+
 @Controller
 public class CommonController extends BaseReturn{
 	@Resource
 	private CityService cityService;
+	@Resource
+	private DictService dictService;
 
     @RequestMapping("query-city")
     @Powers( { PowerConsts.NOLOGINPOWER })
@@ -36,6 +42,15 @@ public class CommonController extends BaseReturn{
         return list;
     }
 
+    @RequestMapping("dict-query-group")
+    @Powers( { PowerConsts.NOLOGINPOWER })
+    @ResponseBody
+    public Object dictQueryGroup(HttpServletRequest request) {
+        String group=request.getParameter("group");
+        Object list = dictService.findDictByGroup(group);
+        return list;
+    }
+
 	@RequestMapping("/{str}")
     @Powers({PowerConsts.NOLOGINPOWER})
     public String pageModel(@PathVariable String str, HttpServletRequest request) {
@@ -47,5 +62,22 @@ public class CommonController extends BaseReturn{
 	public String pageModel(@PathVariable String str1, @PathVariable String str2, HttpServletRequest request) {
 		return "admin/"+str1+"/"+str2;
 	}
-	
+
+    @RequestMapping("/get-img/{str:.+}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public void getImg(@PathVariable String str, HttpServletResponse response) {
+        this.downLoadImg(str, response);
+    }
+
+    @RequestMapping("/get-img/{str}/{str1:.+}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public void getImg1(@PathVariable String str, @PathVariable String str1, HttpServletResponse response) {
+        this.downLoadImg(str+"/"+str1, response);
+    }
+
+    @RequestMapping("/get-img/{str}/{str1}/{str2:.+}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public void getImg2(@PathVariable String str, @PathVariable String str1,  @PathVariable String str2, HttpServletResponse response) {
+        this.downLoadImg(str+"/"+str1+"/"+str2, response);
+    }
 }

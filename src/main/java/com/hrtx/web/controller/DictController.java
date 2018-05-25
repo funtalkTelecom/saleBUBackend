@@ -25,18 +25,20 @@ public class DictController extends BaseReturn{
 	private DictService dictService;
 
 	@RequestMapping("/dict-query")
+	@Powers({PowerConsts.DICTMOUDULE_COMMON_QUEYR})
 	public ModelAndView dictQuery(Dict dict){
 		return new ModelAndView("admin/dict/dict-query");
 	}
 
 	@RequestMapping("/dict-list")
-	@Powers({PowerConsts.MEALMOUDULE_COMMON_QUEYR})
+	@Powers({PowerConsts.DICTMOUDULE_COMMON_QUEYR})
 	public Result listDict(Dict dict){
 		return dictService.pageDict(dict);
 	}
 
 	@RequestMapping("/dict-info")
 	@ResponseBody
+	@Powers({PowerConsts.DICTMOUDULE_COMMON_QUEYR})
 	public Map dictInfo(Dict dict){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("code", Result.OK);
@@ -49,9 +51,9 @@ public class DictController extends BaseReturn{
 	public Map groupMaxInfo(Dict dict){
 		Map<String, Object> map = new HashMap<String, Object>();
 		dict = dictService.findGroupMaxInfo(dict.getKeyGroup());
+		dict.setId(null);
 		dict.setKeyId("");
 		dict.setKeyValue("");
-		dict.setNote("");
 		dict.setSeq(dict.getSeq()+1);
 		map.put("code", Result.OK);
 		map.put("data", dict);
@@ -59,17 +61,14 @@ public class DictController extends BaseReturn{
 	}
 
 	@RequestMapping("/dict-edit")
+	@Powers({PowerConsts.DICTMOUDULE_COMMON_EDIT})
 	public void dictEdit(Dict dict){
 		returnResult(dictService.dictEdit(dict));
 	}
 
 	@RequestMapping("/dict-delete")
+	@Powers({PowerConsts.DICTMOUDULE_COMMON_DELETE})
 	public void dictDelete(Dict dict){
 		returnResult(dictService.dictDelete(dict));
-	}
-
-	@RequestMapping("/dict-audit")
-	public void dictAudit(Dict dict){
-		returnResult(dictService.dictAudit(dict));
 	}
 }

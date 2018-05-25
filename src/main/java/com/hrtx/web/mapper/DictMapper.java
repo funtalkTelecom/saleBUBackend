@@ -17,7 +17,7 @@ public interface DictMapper extends Mapper<Dict>,BaseMapper<Dict>{
 
     void insertBatch(@Param("dictList") List<Dict> list);
 
-    void dictAudit(Dict dict);
-
     Dict findGroupMaxInfo(@Param("keyGroup")String keyGroup);
+
+    List findDictByGroup(@Param("keyGroup")String group);
 }

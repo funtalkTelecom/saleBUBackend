@@ -174,6 +174,7 @@
 		<script type="text/javascript">
             var p_edit = <%=SessionUtil.hasPower(PowerConsts.MEALMOUDULE_COMMON_EDIT)%>;
             var p_import = <%=SessionUtil.hasPower(PowerConsts.MEALMOUDULE_COMMON_IMPORT)%>;
+            var p_delete = <%=SessionUtil.hasPower(PowerConsts.MEALMOUDULE_COMMON_DELETE)%>;
 		</script>
 	</body>
 </html>

@@ -5,6 +5,7 @@ import com.hrtx.web.pojo.System;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SystemMapper extends Mapper<System>,BaseMapper<System>{
     System findSystemInfo(@Param("id") Long id);
@@ -18,4 +19,6 @@ public interface SystemMapper extends Mapper<System>,BaseMapper<System>{
     void insertBatch(@Param("systemList") List<System> list);
 
     void systemAudit(System system);
+
+    List<Map> findSystemParam();
 }

@@ -1,22 +1,26 @@
 package com.hrtx.web.controller;
 
 import com.hrtx.dto.Result;
+import com.hrtx.global.ImageUtils;
 import com.hrtx.global.SessionUtil;
+import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class BaseReturn {
@@ -105,12 +109,105 @@ public class BaseReturn {
 		return "error";
     }
 
-    void deleteFile(String path, String sourceServerFileName) {
-        try {
-            FileUtils.forceDelete(new File(path+sourceServerFileName));
-        } catch (IOException e) {
-            log.info("删除文件失败",e);
-        }
-    };
+	protected Result downLoadImg(String path, HttpServletResponse response) {
+		return downLoadFile(path, "image/jpeg", response);
+	}
 
+	/**
+	 * 现在文件
+	 * @param path 子路径
+	 * @param contentType 下载传类型
+	 * @param response
+	 * @return
+	 */
+	protected Result downLoadFile(String path, String contentType, HttpServletResponse response) {
+		InputStream fis = null;
+		OutputStream os = null;
+		try {
+			File file = new File(SystemParam.get("upload_root_path")+File.separator+path);// path是根据日志路径和文件名拼接出来的
+			fis = new BufferedInputStream(new FileInputStream(file));
+			byte[] buffer = new byte[fis.available()];
+			fis.read(buffer);
+//			response.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.replaceAll(" ", "").getBytes("utf-8"),"iso8859-1"));
+//			response.addHeader("Content-Length", "" + file.length());
+			os = new BufferedOutputStream(response.getOutputStream());
+			response.setContentType(contentType);
+			os.write(buffer);// 输出文件
+			return new Result(Result.OK,"success");
+		} catch (Exception e) {
+			log.error("文件下载失败", e);
+			return new Result(Result.ERROR,"文件下载失败");
+		}finally {
+			if(fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					log.error("", e);
+				}
+			}
+			if(os != null) {
+				try {
+					os.flush();
+					os.close();
+				} catch (IOException e) {
+					log.error("", e);
+				}
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param subPath  子路径（最后带“/”）
+	 * @param file_suffix_s "可上传文件类型"
+	 * @param file  文件
+	 * @param isScale 是否进行截图操作（截出300和100的子图）
+	 * @param isDel 是否删除原图
+	 * @return
+	 * @throws Exception
+	 */
+	protected Result uploadFile(String subPath, String file_suffix_s, MultipartFile file, boolean isScale, boolean isDel) throws Exception {
+		String path = SystemParam.get("upload_path");
+		if(StringUtils.isBlank(path)) return new Result(Result.ERROR,"上传根目录未配置，请联系管理员");
+		String projectRealPath = path+File.separator+subPath;
+		// ==========验证文件后缀start==========//
+		if(file == null || file.isEmpty()) return new Result(Result.ERROR, "请选择上传的文件");
+		String originalFilename = file.getOriginalFilename();
+		String suffix_v = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+		if(!(","+file_suffix_s+",").contains(","+suffix_v+",")){
+			return new Result(Result.ERROR, "请上次格式为["+file_suffix_s+"]的文件");
+		}
+		// ==========验证文件后缀end==========//
+		Map<String, Object> map = new HashMap<>();
+		String bname = Utils.randomNoByDateTime();
+		String sourceServerFileName = bname + "."+suffix_v;
+		map.put("sourceServerFileName", sourceServerFileName);  //服务器原文件名称
+		map.put("sourceFileName", originalFilename);			//上传文件名
+		String fullUrl = projectRealPath + sourceServerFileName;
+		File outDir = new File(projectRealPath);
+		if (!outDir.exists())  outDir.mkdirs();
+//        IOUtils.copy(file.getInputStream(), new FileOutputStream(fullUrl));
+		File originalFile = new File(fullUrl);
+		FileUtils.copyInputStreamToFile(file.getInputStream(), originalFile);
+		if(isScale){
+			map.put("thumbnailServerFileName", sourceServerFileName);   //服务器原文件缩略图名称
+			if (!new File(projectRealPath+"/300/").exists())  new File(projectRealPath+"/300/").mkdirs();
+			ImageUtils.scale(fullUrl, projectRealPath+"/300/"+sourceServerFileName, 300, 300, true);
+			if (!new File(projectRealPath+"/1000/").exists())  new File(projectRealPath+"/1000/").mkdirs();
+			ImageUtils.scale(fullUrl, projectRealPath+"/1000/"+sourceServerFileName, 1000, 1000, true);
+//            map.put("width", widthHeight[0]);
+//            map.put("height", widthHeight[1]);
+		}
+		if(isDel) FileUtils.forceDelete(originalFile);
+		return new Result(Result.OK, map);
+	}
+
+	void deleteFile(String subPath, String sourceServerFileName) {
+		try {
+			String path = SystemParam.get("upload_path");
+			FileUtils.forceDelete(new File(path+File.separator+subPath+sourceServerFileName));
+		} catch (IOException e) {
+			log.info("删除文件失败",e);
+		}
+	};
 }

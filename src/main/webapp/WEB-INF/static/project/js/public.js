@@ -61,7 +61,7 @@ function formInit(_tag, _data, ftype){
  * @param {} url 取数url
  * @param {} param 参数
  */
-function selectValue($domId, data, option){
+function selectValue($domId, data, option, def){
 	if(!option)
 		option = {
 			url:"",
@@ -72,6 +72,7 @@ function selectValue($domId, data, option){
 	$.extend(true, option, data);
 	$.ajax({async:false,type : "post", url:option.url, data:option.param, success:function(data){
 		var html="<option value='-1'>请选择...</option>";
+		if(def) html="";
 		for (var index = 0; index < data.length; index++) {
 			html+="<option value='"+data[index][option.key]+"'>"+data[index][option.value]+"</option>";
 		}
@@ -103,6 +104,19 @@ function thirdCitySelect($domId, third, option){
         param : {third:third}
     }
     selectValue($domId, data, option);
+}
+
+/**
+ * 字典生成下拉框
+ * @param {} $domId 赋值的下拉框
+ * @param {} group 字典来源
+ */
+function dictSelect($domId, group, option, def){
+    var data = {
+        url:"dict-query-group",
+        param : {group:group}
+    }
+    selectValue($domId, data, option, def);
 }
 
 function refresh(url){

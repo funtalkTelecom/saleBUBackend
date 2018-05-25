@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Table(name = "tb_Dict")
+@Table(name = "tb_dict")
 public class Dict extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id

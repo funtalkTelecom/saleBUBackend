@@ -79,4 +79,16 @@
     <select id="checkSystemKeyIdIsExist" resultType="java.lang.Integer">
         select count(1) as num from tb_system a where a.id != #{id} and a.key_id = #{keyId}
     </select>
+
+    <resultMap id="systemParam" type="java.util.HashMap">
+        <result column="id" property="id"></result>
+        <result column="key_id" property="key"></result>
+        <result column="key_value" property="value"></result>
+        <result column="remark" property="remark"></result>
+        <result column="is_audit" property="isAudit"></result>
+        <result column="temp_key_value" property="tempKeyValue"></result>
+    </resultMap>
+    <select id="findSystemParam" resultMap="systemParam">
+        select * from tb_system where is_audit = '1'
+    </select>
 </mapper>

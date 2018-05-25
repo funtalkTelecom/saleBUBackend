@@ -89,4 +89,13 @@
         from tb_dict a
         where a.key_group = #{keyGroup} order by a.seq desc limit 1
     </select>
+
+    <resultMap id="dictGroupList" type="java.util.HashMap">
+        <result column="key_id" property="keyId"></result>
+        <result column="key_value" property="keyValue"></result>
+        <result column="key_group" property="keyGroup"></result>
+    </resultMap>
+    <select id="findDictByGroup" resultMap="dictGroupList">
+        select * from tb_dict a where a.is_del = 0 and a.key_group = #{keyGroup} order by a.seq asc
+    </select>
 </mapper>

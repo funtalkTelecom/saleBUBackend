@@ -23,18 +23,20 @@ public class SystemController extends BaseReturn{
 	private SystemService systemService;
 
 	@RequestMapping("/system-query")
+	@Powers({PowerConsts.SYSMOUDULE_COMMON_QUEYR})
 	public ModelAndView systemQuery(System system){
 		return new ModelAndView("admin/system/system-query");
 	}
 
 	@RequestMapping("/system-list")
-	@Powers({PowerConsts.MEALMOUDULE_COMMON_QUEYR})
+	@Powers({PowerConsts.SYSMOUDULE_COMMON_QUEYR})
 	public Result listSystem(System system){
 		return systemService.pageSystem(system);
 	}
 
 	@RequestMapping("/system-info")
 	@ResponseBody
+	@Powers({PowerConsts.SYSMOUDULE_COMMON_QUEYR})
 	public Map systemInfo(System system){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("code", Result.OK);
@@ -43,16 +45,19 @@ public class SystemController extends BaseReturn{
 	}
 
 	@RequestMapping("/system-edit")
+	@Powers({PowerConsts.SYSMOUDULE_COMMON_EDIT})
 	public void systemEdit(System system){
 		returnResult(systemService.systemEdit(system));
 	}
 
 	@RequestMapping("/system-delete")
+	@Powers({PowerConsts.SYSMOUDULE_COMMON_DELETE})
 	public void systemDelete(System system){
 		returnResult(systemService.systemDelete(system));
 	}
 
 	@RequestMapping("/system-audit")
+	@Powers({PowerConsts.SYSMOUDULE_COMMON_AUDIT})
 	public void systemAudit(System system){
 		returnResult(systemService.systemAudit(system));
 	}

@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.SystemParam;
 import com.hrtx.web.mapper.SystemMapper;
 import com.hrtx.web.pojo.System;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -62,6 +64,11 @@ public class SystemService {
 
 	public Result systemAudit(System system) {
 		systemMapper.systemAudit(system);
+		SystemParam.load();
 		return new Result(Result.OK, "审核成功");
+	}
+
+	public List<Map> findSystemParam() {
+		return systemMapper.findSystemParam();
 	}
 }

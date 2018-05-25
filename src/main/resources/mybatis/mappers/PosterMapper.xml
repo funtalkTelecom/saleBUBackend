@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.PosterMapper">
+    <sql id="col_list">
+        a.id as id,
+        a.title as title,
+        a.position as position,
+        a.pic as pic,
+        a.url as url,
+        a.remark as remark,
+        a.start_time as startTime,
+        a.end_time as endTime
+    </sql>
+    <sql id="ex_col_list">
+        b.key_value as positionName,
+    </sql>
+    <select id="findPosterInfo" resultType="Poster">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_poster a left join tb_dict b on a.position=b.key_id
+        where b.key_group='posterPosition' and a.id = #{id};
+    </select>
+
+    <select id="queryPageList" resultType="Poster">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_poster a left join tb_dict b on a.position=b.key_id
+        where b.key_group='posterPosition'
+        <if test="param.title!=null and param.title!=''">
+            and a.title like "%"#{param.title}"%"
+        </if>
+        <if test="param.remark!=null and param.remark!=''">
+            and a.remark like "%"#{param.remark}"%"
+        </if>
+        order by a.start_time desc
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_poster(
+        id,
+        title,
+        position,
+        pic,
+        url,
+        remark,
+        start_time,
+        end_time
+        ) values
+        <foreach collection="posterList" item="poster" separator=",">
+            (
+            #{poster.id},
+            #{poster.title},
+            #{poster.position},
+            #{poster.pic},
+            #{poster.url},
+            #{poster.remark},
+            #{poster.startTime},
+            #{poster.endTime}
+            )
+        </foreach>
+    </insert>
+
+    <update id="posterEdit">
+        update tb_poster a set
+            a.title = #{title},
+            a.position = #{position},
+            a.pic = #{pic},
+            a.url = #{url},
+            a.remark = #{remark},
+            a.start_time = #{startTime},
+            a.end_time = #{endTime}
+        where
+            a.id = #{id}
+    </update>
+
+    <update id="posterDelete">
+        delete from a using tb_poster a where a.id = #{id}
+    </update>
+</mapper>

@@ -303,4 +303,31 @@ public class Utils {
 		}
 
 	}
+
+
+	/**
+	 * C + 26个英文 中的1个(随机)+MMddHHmm(时间格式)+ 1位数字(随机)+3位自增数(超过3位归为零)
+	 * @return
+	 */
+	public static String randomNoByDateTime(){
+		StringBuffer str=new StringBuffer(15);
+		str.append("C");
+		str.append(mapTable[(int)(mapTable.length * Math.random())]);
+		str.append(Utils.getCurrentDate("yy").substring(1, 2));
+		str.append(Utils.getCurrentDate("MMddHHmm"));
+		str.append(new Random().nextInt(9));
+		str.append(StringUtils.leftPad(String.valueOf(countSeq()),3, "0"));
+		return str.toString();
+	}
+
+	/**
+	 * 3位自增数(超过3位归为归零)
+	 * @return
+	 */
+	private static int count = 0;
+	private static synchronized Integer countSeq(){
+		if(count>990)count=0;
+		count++;
+		return count;
+	}
 }

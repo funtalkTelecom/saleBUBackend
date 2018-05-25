@@ -26,8 +26,12 @@ $(function() {
 						var node = [];
 						if(p_edit) {
 							node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">修改</a>');
+                        }
+						if(p_delete) {
 							node.push('<a class="btn btn-success btn-xs delete" href="javascript:void(0);">删除</a>');
-							node.push('<a class="btn btn-success btn-xs addByGroup" href="javascript:void(0);">添加同级</a>');
+                        }
+                        if(p_add) {
+                            node.push('<a class="btn btn-success btn-xs addByGroup" href="javascript:void(0);">添加同级</a>');
                         }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 

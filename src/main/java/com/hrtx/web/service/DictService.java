@@ -61,12 +61,11 @@ public class DictService {
 		return new Result(Result.OK, "删除成功");
 	}
 
-	public Result dictAudit(Dict dict) {
-		dictMapper.dictAudit(dict);
-		return new Result(Result.OK, "审核成功");
-	}
-
 	public Dict findGroupMaxInfo(String keyGroup) {
 		return dictMapper.findGroupMaxInfo(keyGroup);
+	}
+
+	public List findDictByGroup(String group) {
+		return dictMapper.findDictByGroup(group);
 	}
 }

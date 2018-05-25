@@ -54,7 +54,7 @@
 											<label class="control-label">note</label>
 											<input type="text" class="form-control" style="width:130px;" name="note">
 										</div>
-										<c:if test="<%=SessionUtil.hasPower(PowerConsts.SYSMOUDULE_COMMON_ADD)%>">
+										<c:if test="<%=SessionUtil.hasPower(PowerConsts.DICTMOUDULE_COMMON_ADD)%>">
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#dictInfo" >添加</button>
 										</c:if>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
@@ -142,8 +142,9 @@
 			</div><!-- /.modal -->
 		</div>
 		<script type="text/javascript">
-            var p_edit = <%=SessionUtil.hasPower(PowerConsts.SYSMOUDULE_COMMON_EDIT)%>;
-            var p_audit= <%=SessionUtil.hasPower(PowerConsts.SYSMOUDULE_COMMON_AUDIT)%>;
+            var p_add = <%=SessionUtil.hasPower(PowerConsts.DICTMOUDULE_COMMON_ADD)%>;
+            var p_edit = <%=SessionUtil.hasPower(PowerConsts.DICTMOUDULE_COMMON_EDIT)%>;
+            var p_delete = <%=SessionUtil.hasPower(PowerConsts.DICTMOUDULE_COMMON_DELETE)%>;
 		</script>
 	</body>
 </html>
