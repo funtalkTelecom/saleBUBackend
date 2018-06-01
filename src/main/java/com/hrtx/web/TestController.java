@@ -8,16 +8,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.hrtx.dto.Result;
 import net.sf.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hrtx.config.Utils;
 import com.hrtx.config.annotation.Powers;
@@ -103,6 +99,7 @@ public class TestController {
     	String p=request.getParameter("p");
         return "admin/"+p;
     }
+
     @RequestMapping("/page-demo")
     @Powers({PowerConsts.NOLOGINPOWER})
      @ResponseBody
@@ -124,9 +121,64 @@ public class TestController {
         rmap.put("aaData",list);
         System.out.println("page-demo  over ");
         return rmap;
-//        JSONObject jobj = JSONObject.fromObject(rmap);
-//        Utils.renderJson(response,jobj.toString());
-//        System.out.println("page-demo  over ");
-//        return pm;
     }
+
+    @GetMapping("/hello-world-info")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public Result helloworld4(HttpServletRequest request) {
+        Result result=new Result(Result.OK,"SS");
+        return result;
+    }
+
+    @PostMapping("/hello-world-user")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld5(HttpServletRequest request) {
+        String id=request.getParameter("id");
+        String name=request.getParameter("name");
+        String age=request.getParameter("age");
+        System.out.println(String.format("新增用户信息 收到一个请求id[%s],name[%s],age[%s]",id,name,age));
+        Result result=new Result(Result.OK,"添加成功");
+        return result;
+    }
+    @PutMapping("/hello-world-user/{id}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld6(HttpServletRequest request,@PathVariable("id") String id) {
+        String name=request.getParameter("name");
+        String age=request.getParameter("age");
+        System.out.println(String.format("修改用户信息，收到一个请求id[%s],name[%s],age[%s]",id,name,age));
+        Result result=new Result(Result.OK,"修改成功");
+        return result;
+    }
+    @DeleteMapping("/hello-world-user/{id}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld7(HttpServletRequest request,@PathVariable("id") String id) {
+        System.out.println(String.format("删除用户信息，收到一个请求id[%s]",id));
+        Result result=new Result(Result.OK,"删除成功");
+        return result;
+    }
+    @GetMapping("/hello-world-user/{id}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld8(HttpServletRequest request,@PathVariable("id") String id) {
+        System.out.println(String.format("获取用户信息，收到一个请求id[%s]",id));
+        Map<String,Object> _map=new HashMap<>();
+        _map.put("id",2);
+        _map.put("name","HS");
+        _map.put("age",24);
+        Result result=new Result(Result.OK,_map);
+        return result;
+    }
+    @GetMapping("/hello-world-users")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld9(HttpServletRequest request) {
+        System.out.println("获取用户列表！");
+        Result result=new Result(Result.OK,"[]");
+        return result;
+//        return "[]";
+    }
+
 }
