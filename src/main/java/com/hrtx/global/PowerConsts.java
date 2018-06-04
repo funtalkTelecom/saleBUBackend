@@ -41,6 +41,11 @@ public enum PowerConsts {
 	MEALMOUDULE_COMMON_EDIT(70203,"修改",70100,1,"",3,3),//套餐修改
 	MEALMOUDULE_COMMON_DELETE(70204,"删除",70100,1,"",3,4),//套餐删除
 
+	ACCOUNTMOUDULE(70400,"收款账号管理",70000,0,"account/query-account",2,1),//收款账号管理
+	ACCOUNTMOUDULE_COMMON_QUEYR(70401,"查询",70400,1,"",3,1),//查询
+	ACCOUNTMOUDULE_COMMON_EDIT(70402,"修改",70400,1,"",3,2),//修改
+	ACCOUNTMOUDULE_COMMON_DELETE(70403,"删除",70400,1,"",3,3),//删除
+
 	SYSMOUDULE(90300,"配置管理",90000,0,"system/system-query",2,1),//配置管理
 	SYSMOUDULE_COMMON_QUEYR(90301,"查询",90300,1,"",3,1),//配置查询
 	SYSMOUDULE_COMMON_EDIT(90302,"修改",90300,1,"",3,2),//配置修改
