@@ -98,4 +98,16 @@
     <select id="findDictByGroup" resultMap="dictGroupList">
         select * from tb_dict a where a.is_del = 0 and a.key_group = #{keyGroup} order by a.seq asc
     </select>
+
+    <resultMap id="typeGroupDictList" type="java.util.HashMap">
+        <result column="gtp_group" property="gtpGroup"></result>
+        <result column="key_id" property="keyId"></result>
+        <result column="key_value" property="keyValue"></result>
+        <result column="key_group" property="keyGroup"></result>
+    </resultMap>
+    <select id="findDictByTypeGroup" resultMap="typeGroupDictList">
+        select a.gtp_group, b.key_id, b.key_value, b.key_group from tb_goods_type_property a
+        left join  tb_dict b on a.gtp_dict_group_key = b.key_group
+        where a.g_type2 = #{keyGroup} order by a.seq, b.seq asc
+    </select>
 </mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.GoodsMapper">
+    <sql id="col_list">
+        a.g_id as gId,
+        a.g_type1 as gType1,
+        a.g_type2 as gType2,
+        a.g_name as gName,
+        a.g_ad as gAd,
+        a.g_start_time as gStartTime,
+        a.g_end_time as gEndTime,
+        a.g_sale_city as gSaleCity,
+        a.g_is_auc as gIsAuc,
+        a.g_active as gActive,
+        a.g_is_pack as gIsPack
+    </sql>
+    <select id="findGoodsInfo" resultType="Goods">
+        select
+        <include refid="col_list"/>
+        from tb_goods a where a.g_id = #{id}
+    </select>
+
+    <select id="queryPageList" resultType="Goods">
+        select
+        <include refid="col_list"/>
+        from tb_goods a
+        where 1=1
+        order by a.g_start_time
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_goods(
+            g_id,
+            g_type1,
+            g_type2,
+            g_name,
+            g_ad,
+            g_start_time,
+            g_end_time,
+            g_sale_city,
+            g_is_auc,
+            g_active,
+            g_is_pack
+        ) values
+        <foreach collection="goodsList" item="goods" separator=",">
+            (
+            #{goods.gId},
+            #{goods.gType1},
+            #{goods.gType2},
+            #{goods.gName},
+            #{goods.gAd},
+            #{goods.gStartTime},
+            #{goods.gEndTime},
+            #{goods.gSaleCity},
+            #{goods.gIsAuc},
+            #{goods.gActive},
+            #{goods.gIsPack}
+            )
+        </foreach>
+    </insert>
+
+    <update id="goodsEdit">
+        update tb_goods a set
+            a.g_type1 = #{gType1},
+            a.g_type2 = #{gType2},
+            a.g_name = #{gName},
+            a.g_ad = #{gAd},
+            a.g_start_time = #{gStartTime},
+            a.g_end_time = #{gEndTime},
+            a.g_sale_city = #{gSaleCity},
+            a.g_is_auc = #{gIsAuc},
+            a.g_active = #{gActive},
+            a.g_is_pack = #{gIsPack}
+        where
+            a.g_id = #{gId}
+    </update>
+
+    <update id="goodsDelete">
+        delete from tb_goods where g_id = #{gId}
+    </update>
+
+</mapper>

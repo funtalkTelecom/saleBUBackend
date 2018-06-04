@@ -12,9 +12,24 @@
         <result column="area_code" property="area_code"></result>
         <result column="seq" property="seq"></result>
     </resultMap>
+    <resultMap id="cityZtree" type="java.util.HashMap">
+        <result column="id" property="id"></result>
+        <result column="pid" property="pId"></result>
+        <result column="open" property="open"></result>
+        <result column="name" property="name"></result>
+        <result column="fullName" property="fullName"></result>
+    </resultMap>
 
     <select id="queryByPidList" resultMap="cityList">
         select * from tb_city c where c.pid=#{pid}
+    </select>
+
+    <select id="queryByPidListForZtree" resultMap="cityZtree">
+        select c.id, c.pid, c.name, c.full_Name, #{isopen} as open from tb_city c where 1=1
+        <if test="pid!=null and pid !=''">
+            and c.pid=#{pid} or c.id=#{pid}
+        </if>
+        order by id asc
     </select>
 
     <select id="findCityByName" resultType="com.hrtx.web.pojo.City">

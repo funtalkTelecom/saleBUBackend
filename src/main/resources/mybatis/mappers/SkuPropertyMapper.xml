@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.SkuPropertyMapper">
+    <sql id="col_list">
+        a.skup_id as skupId,
+        a.sku_id as skuId,
+        a.skup_key as skupKey,
+        a.skup_value as skupValue,
+        a.seq as seq
+    </sql>
+    <select id="findSkuPropertyInfo" resultType="SkuProperty">
+        select
+        <include refid="col_list"/>
+        from tb_sku_property a where a.sku_id = #{skuId}
+    </select>
+
+    <select id="findSkuPropertyByGid" resultType="SkuProperty">
+        select
+        <include refid="col_list"/>
+        from tb_sku_property a where a.g_id = #{gId}
+        order by a.sku_id,a.seq asc
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_sku_property(
+            skup_id,
+            sku_id,
+            g_id,
+            skup_key,
+            skup_value,
+            seq
+        ) values
+        <foreach collection="skuPropertyList" item="skuProperty" separator=",">
+            (
+            #{skuProperty.skupId},
+            #{skuProperty.skuId},
+            #{skuProperty.gId},
+            #{skuProperty.skupKey},
+            #{skuProperty.skupValue},
+            #{skuProperty.seq}
+            )
+        </foreach>
+    </insert>
+
+    <update id="skuPropertyDelete">
+        delete from tb_sku_property where skup_id = #{skupId}
+    </update>
+
+    <update id="deleteSkuPropertyBySkuid">
+        delete from tb_sku_property where sku_id = #{skuId}
+    </update>
+
+    <update id="deleteSkuPropertyByGid">
+        delete from tb_sku_property where g_id = #{gId}
+    </update>
+
+</mapper>
