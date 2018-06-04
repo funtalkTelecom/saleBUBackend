@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.SkuMapper">
+    <sql id="col_list">
+        a.sku_id as skuId,
+        a.g_id as gId,
+        a.sku_tob_price as skuTobPrice,
+        a.sku_toc_price as skuTocPrice,
+        a.sku_is_num as skuIsNum,
+        a.sku_sale_num as skuSaleNum,
+        a.sku_goods_type as skuGoodsType,
+        a.sku_repo_goods as skuRepoGoods
+    </sql>
+    <select id="findSkuInfo" resultType="Sku">
+        select
+        <include refid="col_list"/>
+        from tb_sku a where a.g_id = #{gId}
+        order by a.sku_id asc
+    </select>
+
+    <select id="queryPageList" resultType="Sku">
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_sku(
+            sku_id,
+            g_id,
+            sku_tob_price,
+            sku_toc_price,
+            sku_is_num,
+            sku_sale_num,
+            sku_goods_type,
+            sku_repo_goods
+        ) values
+        <foreach collection="skuList" item="sku" separator=",">
+            (
+            #{sku.skuId},
+            #{sku.gId},
+            #{sku.skuTobPrice},
+            #{sku.skuTocPrice},
+            #{sku.skuIsNum},
+            #{sku.skuSaleNum},
+            #{sku.skuGoodsType},
+            #{sku.skuRepoGoods}
+            )
+        </foreach>
+    </insert>
+
+    <update id="skuDelete">
+        delete from tb_sku where sku_id = #{skuId}
+    </update>
+
+    <update id="deleteSkuByGid">
+        delete from tb_sku where g_id = #{gId}
+    </update>
+
+</mapper>

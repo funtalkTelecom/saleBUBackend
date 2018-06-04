@@ -16,4 +16,6 @@ public interface CityMapper extends Mapper<Meal>,BaseMapper<Meal>{
     List<HashMap> findCityByNameFromThird(@Param("name") String name);
 
     List queryByThird(@Param("third")  String third);
+
+    List queryByPidListForZtree(@Param("pid") int pid, @Param("isopen") String isopen);
 }

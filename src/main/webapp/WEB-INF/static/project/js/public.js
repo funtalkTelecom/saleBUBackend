@@ -45,12 +45,20 @@ function formInit(_tag, _data, ftype){
         var value=_data[key];
         key = key.toUpperCase();
         var _select="[name='"+_obj[(ftype ? ftype+"." : "")+key]+"']";
-        var _type=_tag.find(_select).attr("type");
+        var _type=_tag.find(_select).attr("type")?_tag.find(_select).attr("type").toLowerCase():_tag.find(_select).attr("type");
+        var _t =_tag.find(_select).prop("tagName")?_tag.find(_select).prop("tagName").toLowerCase():_tag.find(_select).prop("tagName");
         if(_type=='checkbox'){
-            _tag.find(_select).removeAttr("checked");
+            _tag.find(_select).prop("checked","");
             if(value==_tag.find(_select).val())_tag.find(_select).prop("checked","checked");
+        }else if(_type=='radio'){
+            _tag.find(_select).prop("checked","");
+            _tag.find(_select).each(function(){
+                if(value==$(this).val())$(this).prop("checked","checked");
+			});
         }else{
             _tag.find(_select).val(value);
+            //是下拉框就出发onchange事件
+            if(_t=='select')_tag.find(_select).change();
         }
     }
 }
@@ -116,7 +124,50 @@ function dictSelect($domId, group, option, def){
         url:"dict-query-group",
         param : {group:group}
     }
+    if(option.onchange) {
+    	$domId.off("change").on("change",option.onchange);
+    	// $domId.change(option.onchange);
+    }
     selectValue($domId, data, option, def);
+}
+
+/**
+ * 字典生成checkbox
+ * @param $domId 赋值的checkbox父节点
+ * @param group 属性来源
+ * @param option 参数
+ */
+function dictCheckBox($domId, group, option) {
+    var data = {
+        url:"type-group-dict",
+        param : {group:group}
+    }
+
+    if(!option)
+        option = {
+            url:"",
+            key:"id",
+            value:"name",
+            param:{t:new Date().getTime()}
+        }
+    $.extend(true, option, data);
+    $.ajax({async:false,type : "post", url:option.url, data:option.param, success:function(data){
+		var html="";
+		var preGroup="";
+		for (var index = 0; index < data.length; index++) {
+			if(index==0) {
+				html+='<label class="col-xs-2 control-label">'+data[index]['gtpGroup']+'</label><div class="row">';
+            }else if(preGroup!=data[index]['gtpGroup']) {
+				html+='</div><label class="col-xs-2 control-label">'+data[index]['gtpGroup']+'</label><div class="row">';
+            }
+			html+='<div class="checkbox col-xs-2" style="width: auto;"><label>' +
+                '<input name="'+data[index]['keyGroup']+'" class="ace ace-checkbox-2" type="checkbox" value="'+data[index][option.key]+'"><span class="lbl">'+data[index][option.value]+'</span></label></div>';
+            if(index==data.length-1) html+='</div>';
+            preGroup = data[index]['gtpGroup'];
+        }
+		$domId.html(html);
+		$domId.find("span").off("click").on("click",option.onclick);
+	}});
 }
 
 function refresh(url){
@@ -142,8 +193,20 @@ $(document).ready(function() {
     $('.modal').on('hide.bs.modal', function () {
         // $(this).find("form")[0].reset();
         $(this).find("input").each(function (i, obj) {
-            $(obj).val("");
+			var tag = obj.tagName.toLowerCase();
+            var t = obj.type;
+            //添加单选按钮恢复默认值
+			if(t=="radio"){
+				if($(obj).attr("checked")=="checked"){
+                    $(obj).prop("checked", "checked");
+                }else{
+                    $(obj).prop("checked", "");
+				}
+			}
+			else
+            	$(obj).val("");
         })
+		$(this).find("button.btn-success").removeAttr("disabled");
         $(this).find("select").each(function (i, obj) {
             $(obj).val("-1");
         })
