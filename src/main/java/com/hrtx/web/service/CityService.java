@@ -35,8 +35,4 @@ public class CityService {
 	public List queryByThird(String third) {
 		return cityMapper.queryByThird(third);
 	}
-
-    public List queryByPidListForZtree(int pid, String isopen) {
-		return cityMapper.queryByPidListForZtree(pid, isopen);
-    }
 }
