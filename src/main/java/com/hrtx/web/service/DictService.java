@@ -68,8 +68,4 @@ public class DictService {
 	public List findDictByGroup(String group) {
 		return dictMapper.findDictByGroup(group);
 	}
-
-    public List findDictByTypeGroup(String group) {
-		return dictMapper.findDictByTypeGroup(group);
-    }
 }

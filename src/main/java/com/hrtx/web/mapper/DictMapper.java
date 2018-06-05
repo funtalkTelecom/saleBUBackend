@@ -20,6 +20,4 @@ public interface DictMapper extends Mapper<Dict>,BaseMapper<Dict>{
     Dict findGroupMaxInfo(@Param("keyGroup")String keyGroup);
 
     List findDictByGroup(@Param("keyGroup")String group);
-
-    List findDictByTypeGroup(@Param("keyGroup")String group);
 }
