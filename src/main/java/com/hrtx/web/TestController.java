@@ -8,16 +8,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.hrtx.dto.Result;
 import net.sf.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hrtx.config.Utils;
 import com.hrtx.config.annotation.Powers;
@@ -37,14 +33,14 @@ import com.hrtx.web.service.UserService;
  * 五、消息--事件  异步
  * 六、日志-log4j
  * 七、模板 Thymeleaf
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  *
  */
 
@@ -52,40 +48,40 @@ import com.hrtx.web.service.UserService;
 //@RestController
 public class TestController {
 
-	@Autowired private UserService userService;
-	@Autowired private EventService eventService;
-	
-	@RequestMapping("/")
+    @Autowired private UserService userService;
+    @Autowired private EventService eventService;
+
+    @RequestMapping("/")
     @Powers({PowerConsts.NOLOGINPOWER})
     public String helloworld1(HttpServletRequest request) {
-		eventService.testEvent("==========================","99999");
-		System.out.println("我主线程完成了");
+        eventService.testEvent("==========================","99999");
+        System.out.println("我主线程完成了");
         return "=======";
     }
- 
- 
+
+
     @RequestMapping("/helloworld")
     @Powers({PowerConsts.NOLOGINPOWER})
     public String helloworld(HttpServletRequest request) {
-    	String key="abcdeeedddddd";
-    	request.getSession().setAttribute("userinfo12",key);
-    	System.out.println("添加了一个session");
-    	userService.test();
+        String key="abcdeeedddddd";
+        request.getSession().setAttribute("userinfo12",key);
+        System.out.println("添加了一个session");
+        userService.test();
 //    	if("1".equals("1"))throw new RuntimeException("this test!");
         return key;
     }
-    
+
     @GetMapping("/helloworld2")
     @ResponseBody
     @Powers({PowerConsts.NOLOGINPOWER})
     public String helloworld2(HttpServletRequest request) {
-    	String userinfo=String.valueOf(request.getSession().getAttribute("userinfo12"));
-    	System.out.println("添加了一个session："+userinfo);
+        String userinfo=String.valueOf(request.getSession().getAttribute("userinfo12"));
+        System.out.println("添加了一个session："+userinfo);
 //    	if("1".equals("1"))throw new RuntimeException("this test!");
         return "index";
     }
-    
-    
+
+
     @GetMapping("/error")
     @Powers({PowerConsts.NOLOGINPOWER})
     public String error(HttpServletRequest request) {
@@ -96,18 +92,19 @@ public class TestController {
 //    public String loginIndex(HttpServletRequest request) {
 //        return "index";
 //    }
-   
+
     @GetMapping("/helloworld3")
     @Powers({PowerConsts.NOLOGINPOWER})
     public String helloworld3(HttpServletRequest request) {
-    	String p=request.getParameter("p");
+        String p=request.getParameter("p");
         return "admin/"+p;
     }
+
     @RequestMapping("/page-demo")
     @Powers({PowerConsts.NOLOGINPOWER})
-     @ResponseBody
+    @ResponseBody
     public Object helloworld4(HttpServletRequest request,HttpServletResponse response) {
-    	List<Map<String,String>> list=new ArrayList<Map<String,String>>();
+        List<Map<String,String>> list=new ArrayList<Map<String,String>>();
         Map<String,String> map=new HashMap<String, String>();
         map.put("id", "1");
         map.put("created", "2");
@@ -124,9 +121,64 @@ public class TestController {
         rmap.put("aaData",list);
         System.out.println("page-demo  over ");
         return rmap;
-//        JSONObject jobj = JSONObject.fromObject(rmap);
-//        Utils.renderJson(response,jobj.toString());
-//        System.out.println("page-demo  over ");
-//        return pm;
     }
+
+    @GetMapping("/hello-world-info")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public Result helloworld4(HttpServletRequest request) {
+        Result result=new Result(Result.OK,"SS");
+        return result;
+    }
+
+    @PostMapping("/hello-world-user")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld5(HttpServletRequest request) {
+        String id=request.getParameter("id");
+        String name=request.getParameter("name");
+        String age=request.getParameter("age");
+        System.out.println(String.format("新增用户信息 收到一个请求id[%s],name[%s],age[%s]",id,name,age));
+        Result result=new Result(Result.OK,"添加成功");
+        return result;
+    }
+    @PutMapping("/hello-world-user/{id}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld6(HttpServletRequest request,@PathVariable("id") String id) {
+        String name=request.getParameter("name");
+        String age=request.getParameter("age");
+        System.out.println(String.format("修改用户信息，收到一个请求id[%s],name[%s],age[%s]",id,name,age));
+        Result result=new Result(Result.OK,"修改成功");
+        return result;
+    }
+    @DeleteMapping("/hello-world-user/{id}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld7(HttpServletRequest request,@PathVariable("id") String id) {
+        System.out.println(String.format("删除用户信息，收到一个请求id[%s]",id));
+        Result result=new Result(Result.OK,"删除成功");
+        return result;
+    }
+    @GetMapping("/hello-world-user/{id}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld8(HttpServletRequest request,@PathVariable("id") String id) {
+        System.out.println(String.format("获取用户信息，收到一个请求id[%s]",id));
+        Map<String,Object> _map=new HashMap<>();
+        _map.put("id",2);
+        _map.put("name","HS");
+        _map.put("age",24);
+        Result result=new Result(Result.OK,_map);
+        return result;
+    }
+    @GetMapping("/hello-world-users")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld9(HttpServletRequest request) {
+        System.out.println("获取用户列表！");
+        Result result=new Result(Result.OK,"[]");
+        return result;
+//        return "[]";
+    }
+
 }
