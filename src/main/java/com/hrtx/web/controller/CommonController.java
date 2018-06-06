@@ -41,6 +41,7 @@ public class CommonController extends BaseReturn{
         String isopen=request.getParameter("isopen");
         Object list=cityService.queryByPidListForZtree(NumberUtils.toInt(pid_,0), isopen);
         return list;
+
     }
 
     @RequestMapping("query-third-city")
