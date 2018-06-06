@@ -24,7 +24,6 @@ public class CommonController extends BaseReturn{
 	@Resource
 	private DictService dictService;
 
-
     @RequestMapping("query-city")
     @Powers( { PowerConsts.NOLOGINPOWER })
     @ResponseBody
@@ -32,6 +31,17 @@ public class CommonController extends BaseReturn{
         String pid_=request.getParameter("pid");
         Object list=cityService.queryByPidList(NumberUtils.toInt(pid_,0));
         return list;
+    }
+
+    @RequestMapping("query-city-ztree")
+    @Powers( { PowerConsts.NOLOGINPOWER })
+    @ResponseBody
+    public Object queryCityZtree(HttpServletRequest request) {
+        String pid_=request.getParameter("pid");
+        String isopen=request.getParameter("isopen");
+        Object list=cityService.queryByPidListForZtree(NumberUtils.toInt(pid_,0), isopen);
+        return list;
+
     }
 
     @RequestMapping("query-third-city")
@@ -49,6 +59,15 @@ public class CommonController extends BaseReturn{
     public Object dictQueryGroup(HttpServletRequest request) {
         String group=request.getParameter("group");
         Object list = dictService.findDictByGroup(group);
+        return list;
+    }
+
+    @RequestMapping("type-group-dict")
+    @Powers( { PowerConsts.NOLOGINPOWER })
+    @ResponseBody
+    public Object typeGroupDict(HttpServletRequest request) {
+        String group=request.getParameter("group");
+        Object list = dictService.findDictByTypeGroup(group);
         return list;
     }
 
