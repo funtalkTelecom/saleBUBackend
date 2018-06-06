@@ -30,7 +30,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/goods")
 public class GoodsController extends BaseReturn{
-
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private GoodsService goodsService;

@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface GoodsMapper extends Mapper<Goods>,BaseMapper<Goods>{
     Goods findGoodsInfo(@Param("id") Long id);
-
     void goodsEdit(Goods goods);
 
     void goodsDelete(Goods goods);

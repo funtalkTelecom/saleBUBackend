@@ -32,7 +32,6 @@ import java.util.Map;
 
 @Service
 public class GoodsService {
-	
 	@Autowired
 	private GoodsMapper goodsMapper;
 	@Autowired

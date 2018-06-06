@@ -23,6 +23,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Date;
+
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -63,44 +65,81 @@ public class TestDemo {
         System.out.println(content+"   ====================");
 //        System.out.println(content().string());
 */
+/*        deliveryAddress.setAddress("收货地此测此...");
+        deliveryAddress.setPersonName("收货人林林");
+        deliveryAddress.setPersonTel("18989123456");
+        deliveryAddress.setAddUserId(1);
+        deliveryAddress.setCity(String.valueOf(212));
+        deliveryAddress.setProvince(String.valueOf(17));
+        deliveryAddress.setDistrict(String.valueOf(1911));
+        deliveryAddress.setCreateDate(new Date());
+        deliveryAddress.setUpdateDate(new Date());
+        deliveryAddress.setNote("备注");*/
 
-        //列表
-        RequestBuilder request = get("/hello-world-users");
+        //列表deliveryAddres s
+        //RequestBuilder request = get("/hello-world-users");
+        RequestBuilder request = get("/api/deliveryAddresss/1");
+       // .param("addUserId", "1");
         ResultActions resultActions=mvc.perform(request);
-        resultActions.andDo(MockMvcResultHandlers.print())
-                .andExpect(status().isOk());
+        resultActions.andDo(MockMvcResultHandlers.print()).andExpect(status().isOk());
         MvcResult result= resultActions.andReturn();
         String result1 = result.getResponse().getContentAsString();
-        System.out.println("返回值字符串  =================    "+result1);
+        System.out.println("deliveryAddress-s**addUserId=1***返回值字符串  =================    "+result);
+       // resultActions.andExpect(jsonPath("code").value("200"));//校验值
+
+        //插入一个数据 deliveryAddress id=null or id=""
+        request = post("/api/deliveryAddress").
+                param("address", "收货地此测此...").param("personName", "收货人林林")
+                .param("personTel", "18989123456") .
+                        param("city", "212").param("province", "17")
+                .param("district", "1911").param("note", "备注")/*.
+                        param("createDate", "2018-06-01 16:22:07")
+                .param("updateDate", "2018-06-01 16:22:07").param("addUserId", "1")*/;
+        resultActions=mvc.perform(request);
+        resultActions.andExpect(status().isOk());
+        // resultActions.andDo(MockMvcResultHandlers.print());
         resultActions.andExpect(jsonPath("code").value("200"));//校验值
 
-        //插入一个数据
-        request = post("/hello-world-user").param("id", "2").param("name", "HS").param("age", "24");
+
+        //测试put方法 deliveryAddress id>0
+        //request = put("/deliveryAddress/deliveryAddress").
+        request = post("/api/deliveryAddress").
+                param("id", "1002389671017185280").param("address", "收货地此测此...")
+                .param("personName", "林林收货人林林")
+                .param("personTel", "18989123456").
+                        param("cityId", "212").param("provinceId", "17")
+                .param("districtId", "1911").param("note", "备注")
+                /*.param("createDate", "2018-06-01 17:22:07")
+                .param("updateDate", "2018-06-01 17:22:07") .param("addUserId", "1")*/;
         resultActions=mvc.perform(request);
         resultActions.andExpect(status().isOk());
-//        resultActions.andDo(MockMvcResultHandlers.print());
         resultActions.andExpect(jsonPath("code").value("200"));//校验值
-        //测试put方法
-        request = put("/hello-world-user/2")
-                .param("name", "HGod")
-                .param("age", "24");
-        resultActions=mvc.perform(request);
-        resultActions.andExpect(status().isOk());
-        resultActions.andExpect(jsonPath("code").value("200"));//校验值
-        //测试获得一个用户的get方法
-        request=get("/hello-world-user/2");
+        MvcResult result4= resultActions.andReturn();
+        String resultStr4= result4.getResponse().getContentAsString();
+        System.out.println("deliveryAddress/1002389671017185280记录修改*****返回值字符串  =================    "+resultStr4);
+
+        //测试获得一个用户的get方法  deliveryAddress/5000
+        request=get("/api/deliveryAddress/1002477799878950912");
         resultActions=mvc.perform(request);
         resultActions.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
 //        resultActions .andExpect(content().string(equalTo("{\"code\":200,\"data\":{id:2,name:\"HS\",age:24})}")));
-        resultActions.andExpect(jsonPath("code").value("200"));//校验值
-        resultActions.andExpect(jsonPath("data.age").value(24));//校验值
+        //resultActions.andExpect(jsonPath("code").value("200"));//校验值
+        //resultActions.andExpect(jsonPath("data.age").value(24));//校验值
+        MvcResult result2= resultActions.andReturn();
+        String resultStr= result2.getResponse().getContentAsString();
+        System.out.println("deliveryAddress/1002477799878950912记录信息*****返回值字符串  =================    "+resultStr);
+
+
+
         //测试删除用户
-        request=delete("/hello-world-user/2");
+        request=delete("/api/deliveryAddress/5000");
         resultActions=mvc.perform(request);
         resultActions.andExpect(status().isOk());
         resultActions.andExpect(jsonPath("code").value("200"));//校验值
-
+        MvcResult result3= resultActions.andReturn();
+        String resultStr2= result3.getResponse().getContentAsString();
+        System.out.println("deliveryAddress/5000删除*****返回值字符串  =================    "+resultStr2);
     }
 
 }
