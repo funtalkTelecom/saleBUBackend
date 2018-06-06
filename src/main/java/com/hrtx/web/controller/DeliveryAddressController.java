@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Date;
 @RestController
-//@RequestMapping("/deliveryAddress")
+@RequestMapping("/api")
 public class DeliveryAddressController extends BaseReturn{
 
 	@Resource
@@ -37,7 +37,7 @@ public class DeliveryAddressController extends BaseReturn{
 		return new ModelAndView("admin/deliveryAddress/deliveryAddress-query");
 	}
 
-	@GetMapping("/api/deliveryAddresss/{addUserId}")
+	@GetMapping("/deliveryAddresss/{addUserId}")
 	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_QUEYR})
 	@Powers({PowerConsts.NOLOGINPOWER})
 	@ResponseBody
@@ -45,7 +45,7 @@ public class DeliveryAddressController extends BaseReturn{
 		return deliveryAddressService.findDeliveryAddressListByUserId(Long.valueOf(addUserId));
 	}
 
-	@GetMapping("/api/deliveryAddress/{id}")
+	@GetMapping("/deliveryAddress/{id}")
 	@ResponseBody
 	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_QUEYR})
 	@Powers({PowerConsts.NOLOGINPOWER})
@@ -61,7 +61,7 @@ public class DeliveryAddressController extends BaseReturn{
 		return map;
 	}
 
-	@PostMapping("/api/deliveryAddress")
+	@PostMapping("/deliveryAddress")
 	@ResponseBody
 	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_EDIT})
 	@Powers({PowerConsts.NOLOGINPOWER})
@@ -69,7 +69,7 @@ public class DeliveryAddressController extends BaseReturn{
             returnResult(deliveryAddressService.deliveryAddressEdit(deliveryAddress,request));
 	}
 
-	@DeleteMapping("/api/deliveryAddress/{id}")
+	@DeleteMapping("/deliveryAddress/{id}")
 	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_DELETE})
 	@Powers({PowerConsts.NOLOGINPOWER})
 	public void deliveryAddressDelete(DeliveryAddress deliveryAddress, HttpServletRequest request,@PathVariable("id") String id){
