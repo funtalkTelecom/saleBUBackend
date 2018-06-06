@@ -534,7 +534,7 @@ $(function() {
             if(pcount==0) html += '<div class="form-group" style="padding-bottom: 10px; padding-top:10px;">';
             html += '<div class="col-xs-4">';
 
-            for(var j=0; j<picList.length; j++){
+            for(var j=0; picList!=null && j<picList.length; j++){
                 if(picList[j] && picList[j].seq==(i+1)+"") {
                     style = '';
                     refid = picList[j].refId;
