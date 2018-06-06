@@ -24,6 +24,7 @@ public class CommonController extends BaseReturn{
 	@Resource
 	private DictService dictService;
 
+
     @RequestMapping("query-city")
     @Powers( { PowerConsts.NOLOGINPOWER })
     @ResponseBody

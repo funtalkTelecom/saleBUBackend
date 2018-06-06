@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface AccountMapper extends Mapper<Account>,BaseMapper<Account>{
-
     void accountEdit(Account account);
 
     void insertAccount(@Param("accountList") List<Account> list);

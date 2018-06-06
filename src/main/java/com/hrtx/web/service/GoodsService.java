@@ -24,7 +24,6 @@ import java.util.List;
 
 @Service
 public class GoodsService {
-	
 	@Autowired
 	private GoodsMapper goodsMapper;
 	@Autowired

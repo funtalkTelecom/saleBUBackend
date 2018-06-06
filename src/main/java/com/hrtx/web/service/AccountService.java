@@ -17,7 +17,6 @@ import java.util.List;
 
 @Service
 public class AccountService {
-	
 	@Autowired SessionUtil sessionUtil;
 	@Autowired private AccountMapper accountMapper;
 

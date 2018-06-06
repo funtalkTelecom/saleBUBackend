@@ -36,7 +36,6 @@ public class AccountController extends BaseReturn{
 	@Autowired
 	CityService cityService;
 
-
 	@RequestMapping("/query-account")
 	@Powers({PowerConsts.ACCOUNTMOUDULE_COMMON_QUEYR})
 	public ModelAndView queryMeal(Account account){
