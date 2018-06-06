@@ -36,6 +36,10 @@ public class BasePojo {
 		return (this.start/this.limit)+1;
 	}
 
+	public void setPageNum(int pageNum) {
+		this.pageNum = pageNum;
+	}
+
 	public long getGeneralId() {
 		return generalId;
 	}

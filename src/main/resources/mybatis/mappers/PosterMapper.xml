@@ -34,6 +34,28 @@
         <if test="param.remark!=null and param.remark!=''">
             and a.remark like "%"#{param.remark}"%"
         </if>
+        <if test="param.position!=null and param.position!=''">
+            and a.position = #{param.position}
+        </if>
+        order by a.start_time desc
+    </select>
+
+    <select id="queryPageListApi" resultType="Poster">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_poster a left join tb_dict b on a.position=b.key_id
+        where b.key_group='posterPosition'
+        <if test="param.title!=null and param.title!=''">
+            and a.title like "%"#{param.title}"%"
+        </if>
+        <if test="param.remark!=null and param.remark!=''">
+            and a.remark like "%"#{param.remark}"%"
+        </if>
+        <if test="param.position!=null and param.position!=''">
+            and a.position = #{param.position}
+        </if>
+        and SYSDATE() BETWEEN a.start_time and a.end_time
         order by a.start_time desc
     </select>
 

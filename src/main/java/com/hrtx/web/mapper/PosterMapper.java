@@ -1,6 +1,7 @@
 package com.hrtx.web.mapper;
 
 import com.github.abel533.mapper.Mapper;
+import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.Poster;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,4 +17,6 @@ public interface PosterMapper extends Mapper<Poster>,BaseMapper<Poster>{
     void posterDelete(Poster poster);
 
     void insertBatch(@Param("posterList") List<Poster> list);
+
+    Page<Object> queryPageListApi(@Param("param") Poster poster);
 }
