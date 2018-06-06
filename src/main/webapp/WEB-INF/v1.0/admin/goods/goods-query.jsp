@@ -9,11 +9,14 @@
 
 		<link rel="stylesheet" href="<%=basePath %>project/js/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
 		<link rel="stylesheet" href="<%=basePath %>project/js/kindeditor/themes/default/default.css" type="text/css">
+		<link rel="stylesheet" href="<%=basePath %>project/js/picUploader/css/globle.css" type="text/css">
 
 		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/checkboxTree.js"></script>
 		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.core.js"></script>
 		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.excheck.js"></script>
 		<script type="text/javascript" src="<%=basePath %>project/js/kindeditor/kindeditor-all.js"></script>
+		<script type="text/javascript" src="<%=basePath %>project/js/picUploader/js/diyUpload.js"></script>
+		<script type="text/javascript" src="<%=basePath %>project/js/picUploader/js/webuploader.min.js"></script>
 	</head>
 	<body class="no-skin">
 		<!-- #section:basics/navbar.layout -->
