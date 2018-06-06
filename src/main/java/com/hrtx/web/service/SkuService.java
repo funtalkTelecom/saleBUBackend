@@ -30,6 +30,7 @@ public class SkuService {
 		if (skuList != null && skuList.size() > 0) {
 			for (Sku sku : skuList) {
 				LinkedHashMap<String, String> skuMap = new LinkedHashMap<String, String>();
+				skuMap.put("skuId", String.valueOf(sku.getSkuId()));
 				skuMap.put("skuTobPrice", sku.getSkuTobPrice());
 				skuMap.put("skuTocPrice", sku.getSkuTocPrice());
 				skuMap.put("skuIsNum", sku.getSkuIsNum());

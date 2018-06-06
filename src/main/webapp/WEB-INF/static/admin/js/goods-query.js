@@ -316,22 +316,32 @@ $(function() {
         }
     }
     var titleStrObj = {
+        "skuId":{
+            "isShow":false,
+            "title":"skuId",
+            "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
+            "titleClass":"col-xs-1"
+        },
         "skuTobPrice":{
+            "isShow":true,
             "title":"2B价格",
             "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
             "titleClass":"col-xs-1"
         },
         "skuTocPrice":{
+            "isShow":true,
             "title":"2C价格",
             "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
             "titleClass":"col-xs-1"
         },
         "skuIsNum":{
+            "isShow":true,
             "title":"是否号码",
             "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">是</option><option value="2">否</option></select>',
             "titleClass":""
         },
         "skuSaleNum":{
+            "isShow":true,
             "title":"所售号码",
             "type":'<textarea tag="sku_skuindex" class="col-xs-12" style="height:34px;resize: none;width:150px" type="text" onclick="selectSaleNum(this)" name="skukey" textareaValue="skuvalue" class="col-xs-12" readonly></textarea>',
             "titleClass":"col-xs-1"
@@ -342,11 +352,13 @@ $(function() {
             "titleClass":""
         },
         "skuRepoGoods":{
+            "isShow":true,
             "title":"关联仓库商品",
             "type":'<select tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
             "titleClass":""
         },
         "operation":{
+            "isShow":true,
             "title":"操作",
             "type":'<a class="btn btn-danger btn-xs delete" href="javascript:void(0);" onclick="deleteSkuRow(this)">删除</a>',
             "titleClass":""

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.NumberMapper">
+    <sql id="col_list">
+        a.id as id,
+        a.city_id as cityId,
+        a.city_name as cityName,
+        a.net_type as netType,
+        a.num_resource as numResource,
+        a.num_type as numType,
+        a.num_level as numLevel,
+        a.low_consume as lowConsume,
+        a.with4 as with4,
+        a.feature as feature,
+        a.section_no as sectionNo,
+        a.more_digit as moreDigit,
+        a.seller_id as sellerId,
+        a.seller as seller,
+        a.buyer_id as buyerId,
+        a.buyer as buyer,
+        a.iccid as iccid,
+        a.status as status,
+        a.sku_id as skuId
+    </sql>
+    <sql id="ex_col_list">
+    </sql>
+
+    <select id="queryPageList" resultType="Number">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_num a
+        where 1=1
+    </select>
+
+    <select id="queryPageListApi" resultType="Number">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_num a
+        where 1=1
+    </select>
+
+    <select id="checkNumberIsOk" resultType="java.lang.Integer">
+        select count(1) as num from tb_num a
+        where a.status = 1
+        <if test="numResource!=null and numResource!=''">
+            and a.num_resource = #{numResource}
+        </if>
+    </select>
+
+    <update id="updateStatus">
+        update tb_num a set
+        <if test="status==1">
+            a.status=1
+            where
+            a.sku_id = #{skuId}
+        </if>
+        <if test="status==2">
+            a.sku_id=#{skuId},
+            a.status=2
+            where
+            a.num_resource = #{numResource}
+        </if>
+    </update>
+</mapper>
