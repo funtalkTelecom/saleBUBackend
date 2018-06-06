@@ -2,6 +2,7 @@ package com.hrtx.config;
 
 import java.util.concurrent.Executor;
 
+import com.hrtx.config.interceptors.APIInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
@@ -27,12 +28,17 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter{
 	private String[] powerExcludePath;
 	
 	@Autowired private PowerInterceptor powerInterceptor;
+    @Autowired private APIInterceptor apiInterceptor;
 	
     public void addInterceptors(InterceptorRegistry registry) {
-    	InterceptorRegistration ir=registry.addInterceptor(powerInterceptor).addPathPatterns("/**");//拦截
+    	InterceptorRegistration ir=registry.addInterceptor(powerInterceptor).addPathPatterns("/**").excludePathPatterns("/api/**");//拦截
     	for (String value : powerExcludePath) {
     		ir.excludePathPatterns(value);//排除拦截
 		}
+        ir=registry.addInterceptor(apiInterceptor).addPathPatterns("/api/**");//拦截
+        for (String value : powerExcludePath) {
+            ir.excludePathPatterns(value);//排除拦截
+        }
         super.addInterceptors(registry);
     }
     

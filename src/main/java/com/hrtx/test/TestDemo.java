@@ -2,6 +2,7 @@ package com.hrtx.test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrtx.dto.Result;
 import com.hrtx.web.pojo.City;
+import net.sf.json.JSONObject;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,6 +48,31 @@ public class TestDemo {
     }
 
     @Test
+    public void testApiSession() throws Exception{
+        //测试删除用户
+        RequestBuilder request =get("/api/hello-world-login");
+        ResultActions resultActions=mvc.perform(request);
+        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(jsonPath("code").value("200"));//校验值
+//        resultActions.andExpect(MockMvcResultMatchers.jsonPath("code").value("200"));
+        MvcResult result3= resultActions.andReturn();
+        String resultStr2= result3.getResponse().getContentAsString();
+        JSONObject json=JSONObject.fromObject(resultStr2);
+        String token=json.getString("data");
+        System.out.println("deliveryAddress/5000删除*****返回值字符串  =================    "+resultStr2);
+
+
+        request =get("/api/hello-world-user?__sessid="+token);
+        resultActions=mvc.perform(request);
+        MvcResult result4= resultActions.andReturn();
+        String resultStr4= result4.getResponse().getContentAsString();
+        System.out.println("deliveryAddress/5000删除*****返回值字符串  =================    "+resultStr4);
+        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(jsonPath("code").value("200"));//校验值
+
+    }
+
+//    @Test
     public void girlList() throws Exception {
         /*mvc.perform(MockMvcRequestBuilders.get("/hello-world-info"))
                 .andExpect(MockMvcResultMatchers.status().isOk())//返回状态值200

@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.hrtx.dto.Result;
+import com.hrtx.global.ApiSessionUtil;
+import com.hrtx.global.TokenGenerator;
+import com.hrtx.web.pojo.User;
 import net.sf.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +53,7 @@ public class TestController {
 
     @Autowired private UserService userService;
     @Autowired private EventService eventService;
+    @Autowired private ApiSessionUtil apiSessionUtil;
 
     @RequestMapping("/")
     @Powers({PowerConsts.NOLOGINPOWER})
@@ -123,7 +127,7 @@ public class TestController {
         return rmap;
     }
 
-    @GetMapping("/hello-world-info")
+    @GetMapping("/api/hello-world-info")
     @Powers({PowerConsts.NOLOGINPOWER})
     public Result helloworld4(HttpServletRequest request) {
         Result result=new Result(Result.OK,"SS");
@@ -141,7 +145,7 @@ public class TestController {
         Result result=new Result(Result.OK,"添加成功");
         return result;
     }
-    @PutMapping("/hello-world-user/{id}")
+    @PutMapping("/api/hello-world-user/{id}")
     @Powers({PowerConsts.NOLOGINPOWER})
     @ResponseBody
     public Result helloworld6(HttpServletRequest request,@PathVariable("id") String id) {
@@ -176,6 +180,34 @@ public class TestController {
     @ResponseBody
     public Result helloworld9(HttpServletRequest request) {
         System.out.println("获取用户列表！");
+        Result result=new Result(Result.OK,"[]");
+        return result;
+//        return "[]";
+    }
+
+    @GetMapping("/api/hello-world-login")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld10(HttpServletRequest request) {
+        User user= this.apiSessionUtil.getUser();
+        System.out.println("获取用户  "+user);
+        user=new User();
+        user.setId(1234567890l);
+        user.setLoginName("test-test");
+        String token=TokenGenerator.generateValue();
+        this.apiSessionUtil.saveOrUpdate(token,user);
+        System.out.println("method{login}  "+user.getLoginName());
+        Result result=new Result(Result.OK,token);
+        return result;
+//        return "[]";
+    }
+
+    @GetMapping("/api/hello-world-user")
+    @Powers({PowerConsts.NOPOWER})
+    @ResponseBody
+    public Result helloworld11(HttpServletRequest request) {
+        User user= this.apiSessionUtil.getUser();
+        System.out.println("method{user}  "+user.getLoginName());
         Result result=new Result(Result.OK,"[]");
         return result;
 //        return "[]";
