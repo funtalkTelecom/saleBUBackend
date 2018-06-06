@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
+
     void deleteSkuByGid(Sku sku);
 
     void insertBatch(@Param("skuList") List<Sku> skuList);

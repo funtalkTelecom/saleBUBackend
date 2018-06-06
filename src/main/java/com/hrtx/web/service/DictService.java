@@ -20,7 +20,6 @@ public class DictService {
 	private DictMapper dictMapper;
 
 	public Result pageDict(Dict dict) {
-		int a=2;
 		PageHelper.startPage(dict.getPageNum(),dict.getLimit());
 		Page<Object> ob=this.dictMapper.queryPageList(dict);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
@@ -69,4 +68,8 @@ public class DictService {
 	public List findDictByGroup(String group) {
 		return dictMapper.findDictByGroup(group);
 	}
+
+    public List findDictByTypeGroup(String group) {
+		return dictMapper.findDictByTypeGroup(group);
+    }
 }

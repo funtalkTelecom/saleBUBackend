@@ -14,6 +14,7 @@ import java.util.List;
 
 @Service
 public class SkuService {
+	
 	@Autowired
 	private SkuMapper skuMapper;
 	@Autowired
