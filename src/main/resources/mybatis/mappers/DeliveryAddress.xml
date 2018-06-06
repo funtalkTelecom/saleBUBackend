@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.DeliveryAddressMapper">
+
+    <select id="queryPageList" resultType="com.hrtx.web.pojo.DeliveryAddress">
+        select t.id,person_name as personName,t.person_tel as personTel ,province.name as province,city.name as city,district.name as  district,
+        t.address,t.create_date as createDate,t.update_date as updateDate,t.add_user_id as addUserId,t.is_del as isDel,t.is_defaultl as isDefaultl,t.note
+        from tb_delivery_address t
+        inner join tb_city  province on province.id=t.province
+        inner join tb_city city on city.id=t.city
+        inner join tb_city district on district.id=t.district
+        where t.is_del = 0
+        and t.add_user_id = #{param.addUserId};
+    </select>
+
+    <select id="findDeliveryAddressListByUserId" resultType="java.util.HashMap">
+        select t.id,
+		person_name as personName,
+		t.person_tel as personTel ,
+		province.name as provinceName,
+		city.name as cityName,
+		district.name as  districtName,
+		province.id as provinceId,
+		city.id as cityId,
+		district.id as  districtId,
+        t.address,
+		t.add_user_id as addUserId,
+		t.is_defaultl as isDefaultl,t.note
+		from tb_delivery_address t
+        inner join tb_city  province on province.id=t.province
+        inner join tb_city city on city.id=t.city
+        inner join tb_city district on district.id=t.district
+        where t.is_del = 0
+        and t.add_user_id = #{addUserId};
+    </select>
+
+    <select id="findDeliveryAddressById" resultType="java.util.HashMap">
+      select t.id,
+	  person_name as personName,
+	  t.person_tel as personTel ,
+	  province.name as provinceName,
+	  city.name as cityName,
+	  district.name as  districtName,
+	  province.id as provinceId,
+	  city.id as cityId,
+	  district.id as  districtId,
+      t.address,
+	  t.add_user_id as addUserId,
+	  t.is_defaultl as isDefaultl,t.note
+      from tb_delivery_address t
+      inner join tb_city  province on province.id=t.province
+      inner join tb_city city on city.id=t.city
+      inner join tb_city district on district.id=t.district
+      where t.is_del = 0 and t.id = #{id};
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_delivery_address(
+        id,
+        person_name,
+        person_tel,
+        province,
+        city,
+        district,
+        address,
+        create_date,
+        update_date,
+        note,
+        add_user_id
+        ) values
+        <foreach collection="deliveryAddressList" item="deliveryAddress" separator=",">
+            (
+            #{deliveryAddress.id},
+            #{deliveryAddress.personName},
+            #{deliveryAddress.personTel},
+            #{deliveryAddress.provinceId},
+            #{deliveryAddress.cityId},
+            #{deliveryAddress.districtId},
+            #{deliveryAddress.address},
+            #{deliveryAddress.createDate},
+            #{deliveryAddress.updateDate},
+            #{deliveryAddress.note},
+            #{deliveryAddress.addUserId}
+            )
+        </foreach>
+    </insert>
+
+    <update id="deliveryAddressEdit">
+        update tb_delivery_address t set
+         t.person_name=#{personName},
+         t.person_tel=#{personTel} ,
+         t.province=#{provinceId} ,
+         t.city=#{cityId} ,
+         t.district=#{districtId} ,
+         t.address=#{address} ,
+         t.update_date=#{updateDate},
+         t.note=#{note}
+        where
+            t.id = #{id}
+    </update>
+
+    <update id="deliveryAddressDelete">
+         update tb_delivery_address a set
+            a.is_del =1
+        where
+            a.id = #{id}
+    </update>
+</mapper>
