@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.FileMapper">
+    <sql id="col_list">
+        a.file_id as fileId,
+        a.ref_id as refId,
+        a.file_name as fileName,
+        a.file_group as fileGroup,
+        a.seq as seq
+    </sql>
+    <select id="findFileInfo" resultType="File">
+        select
+        <include refid="col_list"/>
+        from tb_file_info a where a.id = #{id};
+    </select>
+
+    <select id="queryPageList" resultType="File">
+        select
+        <include refid="col_list"/>
+        from tb_file_info a
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_file_info(
+        file_id,
+        ref_id,
+        file_name,
+        file_group,
+        seq
+        ) values
+        <foreach collection="fileList" item="file" separator=",">
+            (
+            #{file.fileId},
+            #{file.refId},
+            #{file.fileName},
+            #{file.fileGroup},
+            #{file.seq}
+            )
+        </foreach>
+    </insert>
+
+    <update id="fileDelete">
+        update tb_file_info a set a.is_del = 1 where a.id = #{id}
+    </update>
+
+    <update id="deleteFilesByRefid">
+        delete from tb_file_info where ref_id = #{refid}
+        <if test="picSeqs!=null and picSeqs!=''">
+            and seq in (${picSeqs})
+        </if>
+    </update>
+
+    <select id="findFilesByRefid" resultType="File">
+        select * from tb_file_info where ref_id = #{refid} order by seq asc;
+    </select>
+</mapper>

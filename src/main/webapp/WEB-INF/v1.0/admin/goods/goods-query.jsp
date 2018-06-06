@@ -8,9 +8,12 @@
 		<script type="text/javascript" src="<%=basePath %>admin/js/goods-query.js"></script>
 
 		<link rel="stylesheet" href="<%=basePath %>project/js/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
+		<link rel="stylesheet" href="<%=basePath %>project/js/kindeditor/themes/default/default.css" type="text/css">
+
 		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/checkboxTree.js"></script>
 		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.core.js"></script>
 		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.excheck.js"></script>
+		<script type="text/javascript" src="<%=basePath %>project/js/kindeditor/kindeditor-all.js"></script>
 	</head>
 	<body class="no-skin">
 		<!-- #section:basics/navbar.layout -->
@@ -95,7 +98,7 @@
 							添加/修改商品
 						</h4>
 					</div>
-					<form role="form" class="form-horizontal">
+					<form role="form" class="form-horizontal" enctype="multipart/form-data">
 						<input name="gId" id="gId" type="hidden">
 						<div class="modal-body">
 							<div class="form-group">
@@ -137,7 +140,7 @@
 							</div>
 							<div class="form-group">
 								<label class="col-xs-2 control-label">是否竞拍</label>
-								<div class="col-xs-4">
+								<div class="col-xs-10">
 									<div class="control-group">
 										<div class="radio col-xs-2" style="width: auto;">
 											<label>
@@ -152,6 +155,28 @@
 												<span class="lbl">否</span>
 											</label>
 										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group" style="display: none" id="isAucContent">
+								<div class="control-group">
+									<label class="col-xs-2 control-label">轮询时间(分钟)</label>
+									<div class="col-xs-1" style="width:100px">
+										<select class="form-control" name="gLoopTime" id="gLoopTime">
+											<option value="-1">请选择...</option>
+										</select>
+									</div>
+									<label class="col-xs-1 control-label" style="width:100px">起拍人数</label>
+									<div class="col-xs-1" style="width:100px">
+										<input type="text" class="form-control" name="gStartNum">
+									</div>
+									<label class="col-xs-1 control-label" style="width:100px">保证金</label>
+									<div class="col-xs-1" style="width:100px">
+										<input type="text" class="form-control" name="gDeposit">
+									</div>
+									<label class="col-xs-1 control-label" style="width:100px">每次加价</label>
+									<div class="col-xs-1" style="width:100px">
+										<input type="text" class="form-control" name="gPriceUp">
 									</div>
 								</div>
 							</div>
@@ -191,15 +216,30 @@
 									</div>
 								</div>
 							</div>
-							<h3 class="header smaller lighter green">商品属性</h3>
+							<h3 class="header smaller lighter blue">商品属性</h3>
 							<div class="form-group" id="gProperty">
 							</div>
 
+							<%--sku列表--%>
 							<input type="hidden" name="skuJson" id="skuJson">
-							<h3 class="header smaller lighter green">SKU</h3>
+							<h3 class="header smaller lighter blue">SKU</h3>
 							<div id="skuResult" style="overflow: auto;">
 							</div>
-
+							<%--图片上传--%>
+							<h3 class="header smaller lighter blue">图片上传</h3>
+							<div id="picUpload">
+								<div class="form-group">
+									<div class="col-xs-8">
+										<div class="control-group">
+										</div>
+									</div>
+								</div>
+							</div>
+							<%--富文本编辑--%>
+							<h3 class="header smaller lighter blue">文本编辑</h3>
+							<div id="kindeditor" style="overflow: auto;">
+                                <textarea name="kindeditorContent" style="width:100%;height:200px;visibility:hidden;"></textarea>
+							</div>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-success">提交</button>
@@ -223,7 +263,6 @@
 						</h4>
 					</div>
 					<form role="form" class="form-horizontal">
-						<input name="gId" id="gId" type="hidden">
 						<div class="modal-body">
 							<div class="form-group">
 								<div class="col-xs-12">
@@ -240,6 +279,7 @@
 			</div><!-- /.modal -->
 		</div>
 		<script type="text/javascript">
+            var basePath = "<%=basePath %>";
             var p_add = <%=SessionUtil.hasPower(PowerConsts.GOODSMOUDULE_COMMON_ADD)%>;
             var p_edit = <%=SessionUtil.hasPower(PowerConsts.GOODSMOUDULE_COMMON_EDIT)%>;
             var p_delete = <%=SessionUtil.hasPower(PowerConsts.GOODSMOUDULE_COMMON_DELETE)%>;

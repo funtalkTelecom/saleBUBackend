@@ -29,11 +29,15 @@ public class Goods extends BasePojo implements java.io.Serializable {
     private String gIsAuc;
     private String gActive;
     private String gIsPack;
+    private String gLoopTime;
+    private String gDeposit;
+    private String gStartNum;
+    private String gPriceUp;
 
     public Goods() {
     }
 
-    public Goods(Long gId, String gType1, String gType2, String gName, String gAd, Date gStartTime, Date gEndTime, String gSaleCity, String gIsAuc, String gActive, String gIsPack) {
+    public Goods(Long gId, String gType1, String gType2, String gName, String gAd, Date gStartTime, Date gEndTime, String gSaleCity, String gIsAuc, String gActive, String gIsPack, String gLoopTime, String gDeposit, String gStartNum, String gPriceUp) {
         this.gId = gId;
         this.gType1 = gType1;
         this.gType2 = gType2;
@@ -45,6 +49,10 @@ public class Goods extends BasePojo implements java.io.Serializable {
         this.gIsAuc = gIsAuc;
         this.gActive = gActive;
         this.gIsPack = gIsPack;
+        this.gLoopTime = gLoopTime;
+        this.gDeposit = gDeposit;
+        this.gStartNum = gStartNum;
+        this.gPriceUp = gPriceUp;
     }
 
     public Long getgId() {
@@ -133,5 +141,37 @@ public class Goods extends BasePojo implements java.io.Serializable {
 
     public void setgIsPack(String gIsPack) {
         this.gIsPack = gIsPack;
+    }
+
+    public String getgLoopTime() {
+        return gLoopTime;
+    }
+
+    public void setgLoopTime(String gLoopTime) {
+        this.gLoopTime = gLoopTime;
+    }
+
+    public String getgDeposit() {
+        return gDeposit;
+    }
+
+    public void setgDeposit(String gDeposit) {
+        this.gDeposit = gDeposit;
+    }
+
+    public String getgStartNum() {
+        return gStartNum;
+    }
+
+    public void setgStartNum(String gStartNum) {
+        this.gStartNum = gStartNum;
+    }
+
+    public String getgPriceUp() {
+        return gPriceUp;
+    }
+
+    public void setgPriceUp(String gPriceUp) {
+        this.gPriceUp = gPriceUp;
     }
 }

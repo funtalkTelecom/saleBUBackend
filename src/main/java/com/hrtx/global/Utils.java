@@ -1,15 +1,6 @@
 package com.hrtx.global;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -329,5 +320,44 @@ public class Utils {
 		if(count>990)count=0;
 		count++;
 		return count;
+	}
+
+	public static boolean kindeditorWriter(final String content, final String fileName, final String filePath) {
+		boolean b = false;
+
+		try {
+			File file = new File(filePath);
+			if(!file.isDirectory()){
+				file.mkdir();
+			}
+			file = new File(filePath + fileName);
+			FileWriter fileWriter = new FileWriter(file);
+			fileWriter.write(content);
+			fileWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			b = false;
+		}
+		b=true;
+
+		return b;
+	}
+
+	public static String kindeditorReader(final String fileName, final String filePath) {
+		String content;
+		StringBuffer result = new StringBuffer();
+
+		try {
+			FileReader fr = new FileReader(filePath + fileName);
+			BufferedReader br = new BufferedReader(fr);
+			while ((content = br.readLine())!=null){
+				result.append(content);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			result.insert(0,"<<><>>"+e.getMessage().toString());
+		}
+
+		return result.toString();
 	}
 }

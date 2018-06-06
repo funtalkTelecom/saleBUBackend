@@ -12,7 +12,11 @@
         a.g_sale_city as gSaleCity,
         a.g_is_auc as gIsAuc,
         a.g_active as gActive,
-        a.g_is_pack as gIsPack
+        a.g_is_pack as gIsPack,
+        a.g_loop_time as gLoopTime,
+        a.g_deposit as gDeposit,
+        a.g_start_num as gStartNum,
+        a.g_price_up as gPriceUp
     </sql>
     <select id="findGoodsInfo" resultType="Goods">
         select
@@ -25,6 +29,12 @@
         <include refid="col_list"/>
         from tb_goods a
         where 1=1
+        <if test="param.gName !=null and param.gName!=''">
+            and a.g_name like "%"#{param.gName}"%"
+        </if>
+        <if test="param.gAd !=null and param.gAd!=''">
+            and a.g_ad like "%"#{param.gAd}"%"
+        </if>
         order by a.g_start_time
     </select>
 
@@ -40,7 +50,11 @@
             g_sale_city,
             g_is_auc,
             g_active,
-            g_is_pack
+            g_is_pack,
+            g_loop_time,
+            g_deposit,
+            g_start_num,
+            g_price_up
         ) values
         <foreach collection="goodsList" item="goods" separator=",">
             (
@@ -54,15 +68,19 @@
             #{goods.gSaleCity},
             #{goods.gIsAuc},
             #{goods.gActive},
-            #{goods.gIsPack}
+            #{goods.gIsPack},
+            #{goods.gLoopTime},
+            #{goods.gDeposit},
+            #{goods.gStartNum},
+            #{goods.gPriceUp}
             )
         </foreach>
     </insert>
-
+    <!--a.g_type1 = #{gType1},
+    a.g_type2 = #{gType2},-->
     <update id="goodsEdit">
         update tb_goods a set
-            a.g_type1 = #{gType1},
-            a.g_type2 = #{gType2},
+
             a.g_name = #{gName},
             a.g_ad = #{gAd},
             a.g_start_time = #{gStartTime},
@@ -70,7 +88,11 @@
             a.g_sale_city = #{gSaleCity},
             a.g_is_auc = #{gIsAuc},
             a.g_active = #{gActive},
-            a.g_is_pack = #{gIsPack}
+            a.g_is_pack = #{gIsPack},
+            a.g_loop_time = #{gLoopTime},
+            a.g_deposit = #{gDeposit},
+            a.g_start_num = #{gStartNum},
+            a.g_price_up = #{gPriceUp}
         where
             a.g_id = #{gId}
     </update>

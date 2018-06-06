@@ -5,9 +5,9 @@ $(function() {
 		"url" : '/goods/goods-list',
 		"ct" : "#result",
 		"cm" : [{
-					"header" : "商品名称",
-					"dataIndex" : "gName"
-				},{
+                    "header" : "商品名称",
+                    "dataIndex" : "gName"
+                },{
 					"header" : "宣传语",
 					"dataIndex" : "gAd"
 				},{
@@ -32,6 +32,8 @@ $(function() {
                         $operate.find(".update").click(function () {
                             $.post("goods/goods-info", {gId: v}, function (data) {
                                 var _data = data.data;
+                                initGoodsPics(data.goodsPics);
+                                editor.html(data.kindeditor);
                                 $.fn.zTree.init($("#cityTree"), setting, zNodes);
                                 formInit($("#goodsInfo form"), _data);
                                 //给cityTree赋值
@@ -40,9 +42,11 @@ $(function() {
                                 var node=null;
                                 for(var i=1; i<gSaleCitys.length-1; i++){
                                     node = zTree.getNodeByParam("id",gSaleCitys[i], null);//根据节点数据的属性(id)获取条件完全匹配的节点数据 JSON 对象集合
-                                    if(node) zTree.checkNode(node,true,false,false);//根据节点数据选中指定节点,false表示单独选中，之前选中的节点会被取消选中状态，为true 表示追加选中
+                                    if(node) zTree.checkNode(node,true,true,false);//根据节点数据选中指定节点,false表示单独选中，之前选中的节点会被取消选中状态，为true 表示追加选中
                                 }
                                 onCheck(null, "cityTree");
+
+                                gIsAucOnClick();
 
                                 //获取sku列表
                                 $.post("sku/sku-list-gid", {gId: v}, function (data) {
@@ -129,13 +133,27 @@ $(function() {
     $(document).on("click","#goodsInfo .modal-footer .btn-success",function() {
         var skuJson = getSkuJson();
         $("#skuJson").val(skuJson);
+        editor.sync();
         // if(!validate_check($("#goodsInfo form"))) return;
-        $.post("goods/goods-edit",$("#goodsInfo form").serialize(),function(data){
-            $("#goodsInfo .modal-footer .btn-success").attr("disabled", "disabled");
-            dataList.reload();
-            $('#goodsInfo').modal('hide');
-            alert(data.data);
-        },"json");
+        // $.post("goods/goods-edit",$("#goodsInfo form").serialize(),function(data){
+        //     $("#goodsInfo .modal-footer .btn-success").attr("disabled", "disabled");
+        //     dataList.reload();
+        //     $('#goodsInfo').modal('hide');
+        //     alert(data.data);
+        // },"json");
+
+        var options = {
+            // target:  null,
+            type : "post",
+            url: "goods/goods-edit",
+            success : function(data) {
+                dataList.load();
+                $('#goodsInfo').modal('hide');
+                alert("提交成功");
+            }
+        };
+        // 将options传给ajaxForm
+        $('#goodsInfo form').ajaxSubmit(options);
     });
 
 	function getSkuJson(){
@@ -268,6 +286,7 @@ $(function() {
     }
     var rowCount=0;
     function createBody(ret, type) {
+        if(ret == null) return;
         var colIndex=0;
         for (var i = 0; i < ret.length; i++) {
             if(type==0) {
@@ -326,6 +345,11 @@ $(function() {
             "title":"关联仓库商品",
             "type":'<select tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
             "titleClass":""
+        },
+        "operation":{
+            "title":"操作",
+            "type":'<a class="btn btn-danger btn-xs delete" href="javascript:void(0);" onclick="deleteSkuRow(this)">删除</a>',
+            "titleClass":""
         }
     };
     function createSkuTable(data){
@@ -364,11 +388,14 @@ $(function() {
                 }
                 colIndex++;
             }
+            growContent += '<td>'+titleStrObj["operation"]["type"]+'</td>';
+
             rowContent += growContent+rowSuf;
             index++;
             growContent = "";
             colIndex = 0;
         }
+            gtitleContent += '<td class="'+titleStrObj["operation"]["titleClass"]+'" nowrap="" key="operation"><strong>'+titleStrObj["operation"]["title"]+'</strong></td>';
     }
 
     function doExchange(doubleArrays) {
@@ -406,6 +433,7 @@ $(function() {
     }
     //点击上架商品重置
     $("button[data-target=#goodsInfo]").bind("click", function () {
+        gIsAucOnClick();
         //重置类别
         gType2.change();
         gType1.change();
@@ -415,12 +443,12 @@ $(function() {
         $.fn.zTree.init($("#cityTree"), setting, zNodes);
         $("#gProperty").show();
         $("#gProperty").prev().show();
+        editor.html('');
+        initGoodsPics();
     });
     //大类小类下拉框end
 
     //销售地市下拉框
-
-
     var zNodes;
     $.post("query-city-ztree", {pid: 0, isopen:false}, function (data) {
         zNodes = data;
@@ -458,8 +486,102 @@ $(function() {
         //滚动条消失问题
         // $("#goodsInfo").css({"overflow-y": "auto"});
     });
-});
+    //富文本编辑器
+    var editor;
+    KindEditor.ready(function(K) {
+        editor = K.create('textarea[name="kindeditorContent"]', {
+            resizeType : 1,
+            allowPreviewEmoticons : false,
+            allowImageUpload : false,
+            afterBlur: function () { editor.sync(); },
+            items : [
+                'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                'insertunorderedlist', '|', 'emoticons', 'link']
+        });
+    });
+    //解决编辑器弹出层文本框不能输入的问题
+    $('#goodsInfo').off('shown.bs.modal').on('shown.bs.modal', function (e) {
+        $(document).off('focusin.modal');
+    });
 
+    //轮询时间下拉框
+    option = {
+        url:"",
+        key:"keyId",
+        value:"keyValue",
+        onclick:"",
+        param:{t:new Date().getTime()}
+    };
+    dictSelect($("#gLoopTime"), "gLoopTime", option, true);
+    $("input[name=gIsAuc]").off("click").on("click", gIsAucOnClick);
+    function gIsAucOnClick(){
+        var isAucContent = $("#isAucContent");
+        if($("input[name=gIsAuc]:checked").val()=="1"){
+            isAucContent.show();
+        }else{
+            isAucContent.hide();
+        }
+    }
+    function initGoodsPics(picList){
+        var html = '<span style="color:red; font-size: 12px;">注:重新上传将删除之前的图片</span>' +
+            '<input type="hidden" id="delPicSeqs" name="delPicSeqs">' +
+            '<input type="hidden" id="picSeqs" name="picSeqs">';
+        var style = 'visibility: hidden;';
+        var refid,filename;
+        var pcount=0;
+        for(var i=0;i<6;i++){
+            if(pcount==0) html += '<div class="form-group" style="padding-bottom: 10px; padding-top:10px;">';
+            html += '<div class="col-xs-4">';
+
+            for(var j=0; j<picList.length; j++){
+                if(picList[j] && picList[j].seq==(i+1)+"") {
+                    style = '';
+                    refid = picList[j].refId;
+                    filename = picList[j].fileName;
+                    break;
+                }
+            }
+            html+='<input style="float:left" type="file" name="file" seq="'+(i+1)+'" onchange="fileChange('+(i+1)+')">';
+            html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;"><i title="删除图片" class="raty-cancel cancel-off-png" data-alt="x"></i></div>';
+            html+='<img style="width:100%;'+style+'" src="'+basePath+'get-img/goodsPics/'+refid+'/'+filename+'">';
+
+            html+='</div>';
+
+            pcount++;
+            if(pcount==3 || i==5) {
+                html+='</div>';
+                pcount=0;
+            }
+            style = 'visibility: hidden;';
+            refid = '';
+            filename = '';
+        }
+        $("#picUpload").html(html);
+    }
+});
+function deletePic(obj){
+    if($("#delPicSeqs").val().indexOf($(obj).prev().attr("seq"))==-1) $("#delPicSeqs").val($("#delPicSeqs").val()+'"'+$(obj).prev().attr("seq")+'",');
+    $(obj).parent().find("img").eq(0).css("visibility","hidden");
+}
+var allowFileType = ".png,.jpg,.gif";
+function fileChange(i){
+    var picSeqs = "";
+    var fileType;
+    $("input[type=file]").each(function(){
+        if($(this).val()!="") {
+            fileType = $(this).val().substring($(this).val().lastIndexOf("."));
+            if(allowFileType.indexOf(fileType)==-1){
+                $(this).val('');
+                alert("请上传"+allowFileType+"格式的图片");
+            }else{
+                picSeqs+='"'+$(this).attr("seq")+'",';
+            }
+        }
+    });
+
+    $("#picSeqs").val(picSeqs);
+}
 var clickSaleNumObj;
 function selectSaleNum(obj){
     if($("select[tag="+$(obj).attr("tag")+"][name=skuIsNum]").val()!=1) return false;
@@ -472,4 +594,12 @@ function selectSaleNum(obj){
 }
 function skuIsNumChange(obj){
     if($(obj).val()!=1) $("textarea[tag="+$(obj).attr("tag")+"][name=skuSaleNum]").val("");
+}
+//sku列表删除行
+function deleteSkuRow(obj){
+    if($("#skuResult tr.sku_row").length<=1){
+        alert("至少保留一条记录");
+        return false;
+    }
+    $(obj).parent().parent().remove();
 }
