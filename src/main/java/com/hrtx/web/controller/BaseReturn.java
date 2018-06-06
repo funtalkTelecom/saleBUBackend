@@ -166,7 +166,7 @@ public class BaseReturn {
 	 * @return
 	 * @throws Exception
 	 */
-	protected Result uploadFile(String subPath, String file_suffix_s, MultipartFile file, boolean isScale, boolean isDel) throws Exception {
+	public static Result uploadFile(String subPath, String file_suffix_s, MultipartFile file, boolean isScale, boolean isDel) throws Exception {
 		String path = SystemParam.get("upload_root_path");
 		if(StringUtils.isBlank(path)) return new Result(Result.ERROR,"上传根目录未配置，请联系管理员");
 		String projectRealPath = path+File.separator+subPath;

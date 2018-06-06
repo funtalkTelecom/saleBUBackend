@@ -4,9 +4,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.SystemParam;
+import com.hrtx.global.Utils;
+import com.hrtx.web.controller.BaseReturn;
+import com.hrtx.web.mapper.FileMapper;
 import com.hrtx.web.mapper.GoodsMapper;
 import com.hrtx.web.mapper.SkuMapper;
 import com.hrtx.web.mapper.SkuPropertyMapper;
+import com.hrtx.web.pojo.File;
 import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.pojo.Sku;
 import com.hrtx.web.pojo.SkuProperty;
@@ -15,11 +20,14 @@ import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -31,6 +39,8 @@ public class GoodsService {
 	private SkuMapper skuMapper;
 	@Autowired
 	private SkuPropertyMapper skuPropertyMapper;
+    @Autowired
+    private FileMapper fileMapper;
 
 	public Result pageGoods(Goods goods) {
 		PageHelper.startPage(goods.getPageNum(),goods.getLimit());
@@ -44,7 +54,7 @@ public class GoodsService {
 		return goods;
 	}
 
-	public Result goodsEdit(Goods goods, HttpServletRequest request) {
+	public Result goodsEdit(Goods goods, HttpServletRequest request, MultipartFile[] files) {
         try {
             String ignoreKey = ",skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuGoodsType,skuRepoGoods,";
             //商品主表操作
@@ -114,6 +124,44 @@ public class GoodsService {
                     skuList.add(sku);
                 }
                 skuMapper.insertBatch(skuList);
+
+                //富文本信息获取
+                String kindeditorContent = request.getParameter("kindeditorContent");
+                Utils.kindeditorWriter(kindeditorContent, goods.getgId()+".txt", SystemParam.get("kindedtiorDir"));
+
+            }
+            //图片保存
+            Result result = null;
+            String picSeqs = request.getParameter("picSeqs")==null?"":request.getParameter("picSeqs");
+            String delPicSeqs = request.getParameter("delPicSeqs")==null?"":request.getParameter("delPicSeqs");
+            if(!picSeqs.equals("")){
+                fileMapper.deleteFilesByRefid(goods.getgId().toString(), picSeqs.equals("")?"":picSeqs.substring(0, picSeqs.length()-1));
+            }
+            if(!delPicSeqs.equals("")){
+                fileMapper.deleteFilesByRefid(goods.getgId().toString(), delPicSeqs.equals("")?"":delPicSeqs.substring(0, delPicSeqs.length()-1));
+            }
+            if(files!=null && files.length>0){
+                try {
+                    List<File> fileList = new ArrayList<File>();
+                    for (int i=0; i<files.length; i++) {
+                        MultipartFile file = files[i];
+                        File f = new File();
+                        f.setFileId(f.getGeneralId());
+                        f.setFileGroup("goodsPic");
+                        result = BaseReturn.uploadFile(SystemParam.get("goodsPics")+goods.getgId()+"\\", "jpg,png,gif", file, false, false);
+                        f.setFileName(((Map)result.getData()).get("sourceServerFileName").toString());
+                        f.setRefId(goods.getgId());
+                        f.setSeq(Integer.parseInt(picSeqs.replaceAll("\"","").split(",")[i]));
+                        fileList.add(f);
+                    }
+                    if(fileList!=null && fileList.size()>0) {
+                        fileMapper.insertBatch(fileList);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if(result==null) result = new Result(Result.ERROR, "保存图片异常");
+                    return result;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
