@@ -69,7 +69,7 @@ public class PowerInterceptor implements HandlerInterceptor {
      * @param handler
      * @return	true 不需要，false 需要
      */
-    public final boolean hasNologin(Object handler){
+    public static final boolean hasNologin(Object handler){
     	if(handler == null)return false;
 		if(!(handler instanceof HandlerMethod))return false;
 		HandlerMethod m=(HandlerMethod) handler;
@@ -84,20 +84,24 @@ public class PowerInterceptor implements HandlerInterceptor {
 	}
 	
 //	当前用户是否有权限操作此方法
-	public final boolean hasPower(HttpServletRequest request,Object handler){
+	public static final boolean hasPower(HttpServletRequest request,Object handler){
+		Map<Integer, Object> userPower = SessionUtil.getPower(request);
+		return hasPower(request,handler,userPower);
+	}
+	//	当前用户是否有权限操作此方法
+	public static final boolean hasPower(HttpServletRequest request,Object handler,Map<Integer, Object> userPower){
 //		if(SessionUtil.isSuperAdmin())return true;//是超级管理员
 		if(handler == null)return false;
 		if(!(handler instanceof HandlerMethod))return false;
 		HandlerMethod m=(HandlerMethod) handler;
-    	Powers powers =m.getMethodAnnotation(Powers.class);
-    	if(powers == null)return true;
-    	PowerConsts[] powerConsts=powers.value();
-    	Map<Integer, Object> userPower = SessionUtil.getPower(request);
-    	Set<Integer> user_power_set=userPower.keySet();
-    	for (PowerConsts pc :powerConsts) {
-    		if(user_power_set.contains(pc.getId()))return true;
-    		if(pc.getId()==PowerConsts.NOLOGINPOWER.getId())return true;
-    		if(pc.getId()==PowerConsts.NOPOWER.getId())return true;//powerArray.length == 1
+		Powers powers =m.getMethodAnnotation(Powers.class);
+		if(powers == null)return true;
+		PowerConsts[] powerConsts=powers.value();
+		Set<Integer> user_power_set=userPower.keySet();
+		for (PowerConsts pc :powerConsts) {
+			if(user_power_set.contains(pc.getId()))return true;
+			if(pc.getId()==PowerConsts.NOLOGINPOWER.getId())return true;
+			if(pc.getId()==PowerConsts.NOPOWER.getId())return true;//powerArray.length == 1
 		}
 		return false;
 	}
