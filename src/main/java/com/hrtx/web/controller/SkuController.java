@@ -15,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/sku")
 public class SkuController extends BaseReturn{
+
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private SkuService skuService;

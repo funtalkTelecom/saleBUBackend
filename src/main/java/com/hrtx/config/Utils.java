@@ -26,6 +26,7 @@ public class Utils {
 	private static String returnJson(int code, Object data){
 		Result res = new Result(code, data);
 		JSONObject jobj = JSONObject.fromObject(res);
+		
 		return render(jobj.toString(), "text/json;charset=UTF-8");
 	}
 	

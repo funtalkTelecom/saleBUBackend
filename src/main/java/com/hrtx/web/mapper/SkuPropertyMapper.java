@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface SkuPropertyMapper extends Mapper<SkuProperty>,BaseMapper<SkuProperty>{
     void deleteSkuPropertyBySkuid(SkuProperty skuProperty);
+
     void insertBatch(@Param("skuPropertyList") List<SkuProperty> skuPropertyList);
 
     List<SkuProperty> findSkuPropertyByGid(@Param("gId") Long gId);
