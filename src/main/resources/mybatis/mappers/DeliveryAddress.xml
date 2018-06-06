@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hrtx.web.mapper.DeliveryAddressMapper">
 
-
     <select id="queryPageList" resultType="com.hrtx.web.pojo.DeliveryAddress">
         select t.id,person_name as personName,t.person_tel as personTel ,province.name as province,city.name as city,district.name as  district,
         t.address,t.create_date as createDate,t.update_date as updateDate,t.add_user_id as addUserId,t.is_del as isDel,t.is_defaultl as isDefaultl,t.note
