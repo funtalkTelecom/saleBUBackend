@@ -44,6 +44,18 @@
         </if>
     </select>
 
+    <select id="queryPageListApi" resultType="Meal">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_meal a
+        left join tb_third_city b on a.sale_city=b.city_id
+        where a.is_del = 0
+        <if test="createBy!=null and createBy!=''">
+            and a.create_by = #{createBy}
+        </if>
+    </select>
+
     <insert id="insertBatch">
         insert into tb_meal(
             mid,

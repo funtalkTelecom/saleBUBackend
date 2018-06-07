@@ -38,6 +38,52 @@
         order by a.g_start_time
     </select>
 
+    <sql id="col_file">
+        b.file_id as fileId,
+        b.ref_id as refId,
+        b.file_name as fileName,
+        b.file_group as fileGroup,
+        b.seq as seq,
+    </sql>
+    <resultMap id="ApiGoodsList" type="java.util.HashMap">
+        <result property="gId" column="g_id"></result>
+        <result property="gType1" column="g_type1"></result>
+        <result property="gType2" column="g_type2"></result>
+        <result property="gName" column="g_name"></result>
+        <result property="gAd" column="g_ad"></result>
+        <result property="gStartTime" column="g_start_time"></result>
+        <result property="gEndTime" column="g_end_time"></result>
+        <result property="gSaleCity" column="g_sale_city"></result>
+        <result property="gIsAuc" column="g_is_auc"></result>
+        <result property="gActive" column="g_active"></result>
+        <result property="gIsPack" column="g_is_pack"></result>
+        <result property="gLoopTime" column="g_loop_time"></result>
+        <result property="gDeposit" column="g_deposit"></result>
+        <result property="gStartNum" column="g_start_num"></result>
+        <result property="gPriceUp" column="g_price_up"></result>
+        <result property="fileId" column="file_id"></result>
+        <result property="refId" column="ref_id"></result>
+        <result property="fileName" column="file_name"></result>
+        <result property="fileGroup" column="file_group"></result>
+        <result property="seq" column="seq"></result>
+    </resultMap>
+
+    <select id="queryPageListApi" resultMap="ApiGoodsList">
+        select * from (
+            select
+            <include refid="col_file"/>
+            <include refid="col_list"/>
+            from tb_goods a left join tb_file_info b on a.g_id=b.ref_id where b.seq = 1
+            union all
+            select
+            <include refid="col_file"/>
+            <include refid="col_list"/>
+            from tb_goods a left join tb_file_info b on a.g_id=b.ref_id where b.seq is null
+        ) t
+        where SYSDATE() between t.gStartTime and t.gEndTime
+        order by t.gStartTime
+    </select>
+
     <insert id="insertBatch">
         insert into tb_goods(
             g_id,
