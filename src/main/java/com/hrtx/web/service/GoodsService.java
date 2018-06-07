@@ -97,7 +97,8 @@ public class GoodsService {
                     sku.setSkuIsNum(((JSONObject) obj.get("skuIsNum")).get("value")==null||((JSONObject) obj.get("skuIsNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuIsNum")).get("value"));
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
 //                    验证号码可用性之前赋值旧的skuId,便于tb_num表复原状态
-                    sku.setSkuId(Long.parseLong(((JSONObject) obj.get("skuId")).get("value")==null||((JSONObject) obj.get("skuId")).get("value").equals("null")?"9999": (String) ((JSONObject) obj.get("skuId")).get("value")));
+                    String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));
+                    sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?"9999": tskuId));
 
                     skuSaleNum = checkSkuSaleNum(skuSaleNum, sku);
 //                    验证完之后赋予新的skuId

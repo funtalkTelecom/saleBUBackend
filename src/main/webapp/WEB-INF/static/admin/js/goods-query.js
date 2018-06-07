@@ -281,7 +281,7 @@ $(function() {
            }
         });
         for(var k in titleStrObj){
-            titleContent += '<td class="'+titleStrObj[k]["titleClass"]+'" nowrap="" key="'+k+'"><strong>'+titleStrObj[k].title+'</strong></td>';
+            titleContent += '<td style="'+(titleStrObj[k]==undefined?"":(titleStrObj[k]["isShow"]?"":"display:none"))+'" class="'+titleStrObj[k]["titleClass"]+'" nowrap="" key="'+k+'"><strong>'+titleStrObj[k].title+'</strong></td>';
         }
     }
     var rowCount=0;
@@ -308,7 +308,7 @@ $(function() {
                 for(var k in titleStrObj){
                     var cObj = titleStrObj[k]["type"].replace(/skukey/g, k).replace(/skuvalue/g, "").replace(/skuindex/g, i+1);
                     cObj += '<input type="hidden" tag="index_"'+(i+1)+' name="seq" value="'+(colIndex+1)+'">';
-                    rowContent += '<td>'+cObj+'</td>';
+                    rowContent += '<td style="'+(titleStrObj[k]["isShow"]?"":"display:none")+'">'+cObj+'</td>';
                 }
                 rowContent += rowSuf;
             }
@@ -347,6 +347,7 @@ $(function() {
             "titleClass":"col-xs-1"
         },
         "skuGoodsType":{
+            "isShow":true,
             "title":"商品类型",
             "type":'<select tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
             "titleClass":""
@@ -380,7 +381,7 @@ $(function() {
                     var titleStr = "";
                     if(titleStrObj.hasOwnProperty(k)){
                         titleStr = titleStrObj[k]["title"];
-                        gtitleContent += '<td class="'+titleStrObj[k]["titleClass"]+'" nowrap="" key="'+k+'"><strong>'+titleStr+'</strong></td>';
+                        gtitleContent += '<td style="'+(titleStrObj[k]["isShow"]?"":"display:none")+'" class="'+titleStrObj[k]["titleClass"]+'" nowrap="" key="'+k+'"><strong>'+titleStr+'</strong></td>';
                     }else{
                         titleStr = $("input[name="+k+"][value="+data[key][k]+"][type=checkbox]").parents(".row").prev().html();
                         titleContent += '<td nowrap="" key="'+k+'"><strong>'+titleStr+'</strong></td>';
@@ -392,7 +393,7 @@ $(function() {
                     // rowContent += '<input type="hidden" tag="sku_'+(index+1)+'" name="'+k+'" value="'+data[key][k]+'">';
                     var cObj = titleStrObj[k]["type"].replace(/skukey/g, k).replace(/skuvalue/g, svalue).replace(/skuindex/g, index+1);
                     cObj += '<input type="hidden" tag="index_"'+(index+1)+' name="seq" value="'+(colIndex+1)+'">';
-                    growContent += '<td>'+cObj+'</td>';
+                    growContent += '<td style="'+(titleStrObj[k]["isShow"]?"":"display:none")+'">'+cObj+'</td>';
                 }else{
                     rowContent += '<input type="hidden" tag="sku_'+(index+1)+'" name="'+k+'" value="'+data[key][k]+'">';
                     rowContent += '<input type="hidden" tag="index_"'+(index+1)+' name="seq" value="'+(colIndex+1)+'">';
@@ -556,7 +557,7 @@ $(function() {
             }
             html+='<input style="float:left" type="file" name="file" seq="'+(i+1)+'" onchange="fileChange('+(i+1)+')">';
             html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;"><i title="删除图片" class="raty-cancel cancel-off-png" data-alt="x"></i></div>';
-            html+='<img style="width:100%;'+style+'" src="'+basePath+'get-img/goodsPics/'+refid+'/'+filename+'">';
+            html+='<img style="width:150px;'+style+'" src="'+basePath+'get-img/goodsPics/'+refid+'/'+filename+'">';
 
             html+='</div>';
 
