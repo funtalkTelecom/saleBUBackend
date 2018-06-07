@@ -5,9 +5,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.global.PowerConsts;
-import com.hrtx.global.SessionUtil;
-import com.hrtx.web.mapper.PosterMapper;
-import com.hrtx.web.pojo.Poster;
+import com.hrtx.web.mapper.GoodsMapper;
+import com.hrtx.web.pojo.Goods;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,29 +20,29 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api")
-public class ApiPosterController extends BaseReturn{
+public class ApiGoodsController extends BaseReturn{
 
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	private PosterMapper posterMapper;
+	private GoodsMapper goodsMapper;
 
 	/**
-	 * 海报接口-根据海报位置查询有效海报
-	 * @param poster
+	 * 在售商品列表
+	 * @param goods
 	 * @param request
 	 * @return
 	 */
-	@GetMapping("/poster")
+	@GetMapping("/goods")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public String posterList(Poster poster, HttpServletRequest request){
+	public String goodsList(Goods goods, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
-			poster.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-			poster.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
+			goods.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
+			goods.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
 
-			PageHelper.startPage(poster.getPageNum(),poster.getLimit());
-			Page<Object> ob=this.posterMapper.queryPageListApi(poster);
+			PageHelper.startPage(goods.getPageNum(),goods.getLimit());
+			Page<Object> ob=this.goodsMapper.queryPageListApi(goods);
 			pm = new PageInfo<Object>(ob);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();

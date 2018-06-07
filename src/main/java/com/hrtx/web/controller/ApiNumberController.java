@@ -30,12 +30,18 @@ public class ApiNumberController extends BaseReturn{
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public String numberList(Number number, HttpServletRequest request){
-		number.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-		number.setLimit(request.getParameter("limit")==null?1: Integer.parseInt(request.getParameter("limit")));
+		PageInfo<Object> pm = null;
+		try {
+			number.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
+			number.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
 
-		PageHelper.startPage(number.getPageNum(),number.getLimit());
-		Page<Object> ob=this.numberMapper.queryPageListApi(number);
-		PageInfo<Object> pm = new PageInfo<Object>(ob);
+			PageHelper.startPage(number.getPageNum(),number.getLimit());
+			Page<Object> ob=this.numberMapper.queryPageListApi(number);
+			pm = new PageInfo<Object>(ob);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			pm = new PageInfo<Object>(null);
+		}
 
 		return JSONObject.fromObject(pm).toString();
 	}

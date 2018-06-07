@@ -1,6 +1,7 @@
 package com.hrtx.web.mapper;
 
 import com.github.abel533.mapper.Mapper;
+import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.Meal;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,4 +20,6 @@ public interface MealMapper extends Mapper<Meal>,BaseMapper<Meal>{
     int checkMealIdIsExist(Meal meal);
 
     void mealDelete(Meal meal);
+
+    Page<Object> queryPageListApi(Meal meal);
 }
