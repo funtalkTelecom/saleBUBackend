@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -38,9 +39,21 @@ public class ApiNumberController extends BaseReturn{
 		try {
 			number.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
 			number.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
+			String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
+			tags = "'"+ tags.replaceAll(",", "','") +"'";
 
 			PageHelper.startPage(number.getPageNum(),number.getLimit());
-			Page<Object> ob=this.numberMapper.queryPageListApi(number);
+			Page<Object> ob=this.numberMapper.queryPageListApi(tags);
+			if(ob!=null && ob.size()>0){
+				//处理号码,生成号码块字段(numBlock)
+				for (int i = 0; i < ob.size(); i++) {
+					Map obj= (Map) ob.get(i);
+					StringBuffer num = new StringBuffer((String) obj.get("numResource"));
+					num.insert(3, ",");
+					num.insert(8, ",");
+					obj.put("numBlock", num.toString().split(","));
+				}
+			}
 			pm = new PageInfo<Object>(ob);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
