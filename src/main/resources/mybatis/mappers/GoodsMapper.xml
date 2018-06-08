@@ -16,7 +16,8 @@
         a.g_loop_time as gLoopTime,
         a.g_deposit as gDeposit,
         a.g_start_num as gStartNum,
-        a.g_price_up as gPriceUp
+        a.g_price_up as gPriceUp,
+        a.g_is_sale as gIsSale
     </sql>
     <select id="findGoodsInfo" resultType="Goods">
         select
@@ -61,6 +62,7 @@
         <result property="gDeposit" column="g_deposit"></result>
         <result property="gStartNum" column="g_start_num"></result>
         <result property="gPriceUp" column="g_price_up"></result>
+        <result property="gIsSale" column="g_is_sale"></result>
         <result property="fileId" column="file_id"></result>
         <result property="refId" column="ref_id"></result>
         <result property="fileName" column="file_name"></result>
@@ -69,7 +71,25 @@
     </resultMap>
 
     <select id="queryPageListApi" resultMap="ApiGoodsList">
-        select * from (
+        select distinct * from (
+        <if test="gSaleCityArr!=null and gSaleCityArr.length>0">
+            <foreach collection="gSaleCityArr" item="saleCity" separator="union all">
+
+                select
+                <include refid="col_file"/>
+                <include refid="col_list"/>
+                from tb_goods a left join tb_file_info b on a.g_id=b.ref_id where b.seq = 1
+                and FIND_IN_SET(#{saleCity},a.g_sale_city)
+                union all
+                select
+                <include refid="col_file"/>
+                <include refid="col_list"/>
+                from tb_goods a left join tb_file_info b on a.g_id=b.ref_id where b.seq is null
+                and FIND_IN_SET(#{saleCity},a.g_sale_city)
+
+            </foreach>
+        </if>
+        <if test="gSaleCityArr==null or gSaleCityArr.length==0">
             select
             <include refid="col_file"/>
             <include refid="col_list"/>
@@ -79,8 +99,9 @@
             <include refid="col_file"/>
             <include refid="col_list"/>
             from tb_goods a left join tb_file_info b on a.g_id=b.ref_id where b.seq is null
+        </if>
         ) t
-        where SYSDATE() between t.gStartTime and t.gEndTime
+        where SYSDATE() between t.gStartTime and t.gEndTime and t.gIsSale='1'
         order by t.gStartTime
     </select>
 
@@ -100,7 +121,8 @@
             g_loop_time,
             g_deposit,
             g_start_num,
-            g_price_up
+            g_price_up,
+            g_is_sale
         ) values
         <foreach collection="goodsList" item="goods" separator=",">
             (
@@ -118,7 +140,8 @@
             #{goods.gLoopTime},
             #{goods.gDeposit},
             #{goods.gStartNum},
-            #{goods.gPriceUp}
+            #{goods.gPriceUp},
+            '1'
             )
         </foreach>
     </insert>
@@ -138,13 +161,20 @@
             a.g_loop_time = #{gLoopTime},
             a.g_deposit = #{gDeposit},
             a.g_start_num = #{gStartNum},
-            a.g_price_up = #{gPriceUp}
+            a.g_price_up = #{gPriceUp},
+            a.g_is_sale = '1'
         where
             a.g_id = #{gId}
     </update>
 
     <update id="goodsDelete">
         delete from tb_goods where g_id = #{gId}
+    </update>
+
+    <update id="goodsUnsale">
+        update tb_goods a set
+            a.g_is_sale = '2'
+        where a.g_id = #{gId}
     </update>
 
 </mapper>

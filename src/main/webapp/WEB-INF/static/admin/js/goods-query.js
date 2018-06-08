@@ -23,6 +23,8 @@ $(function() {
 						var node = [];
 						if(p_edit) {
 							node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">修改</a>');
+							if(record.gIsSale=="1")
+							    node.push('<a class="btn btn-success btn-xs unsale" href="javascript:void(0);">下架</a>');
                         }
 						if(p_delete) {
 							node.push('<a class="btn btn-success btn-xs delete" href="javascript:void(0);">删除</a>');
@@ -91,6 +93,14 @@ $(function() {
                         $operate.find(".delete").click(function () {
                             if (confirm("确认删除？")) {
                                 $.post("goods/goods-delete", {gId: v}, function (data) {
+                                    dataList.reload();
+                                    alert(data.data);
+                                }, "json");
+                            }
+                        });
+                        $operate.find(".unsale").click(function () {
+                            if (confirm("确认下架？")) {
+                                $.post("goods/goods-unsale", {gId: v}, function (data) {
                                     dataList.reload();
                                     alert(data.data);
                                 }, "json");

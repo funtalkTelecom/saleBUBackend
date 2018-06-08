@@ -34,12 +34,12 @@ public class Number extends BasePojo implements java.io.Serializable {
     private String iccid;
     private int status;
     private Long skuId;
+    private String teleType;
 
     public Number() {
     }
 
-    public Number(Long id, Long cityId, String cityName, String netType, String numResource, String numType, String numLevel, BigDecimal lowConsume, int with4, String feature, String sectionNo, String moreDigit, Long sellerId, String seller, Long buyerId, String buyer, String iccid, int status, Long skuId) {
-        this.id = id;
+    public Number(Long cityId, String cityName, String netType, String numResource, String numType, String numLevel, BigDecimal lowConsume, int with4, String feature, String sectionNo, String moreDigit, Long sellerId, String seller, Long buyerId, String buyer, String iccid, int status, Long skuId, String teleType) {
         this.cityId = cityId;
         this.cityName = cityName;
         this.netType = netType;
@@ -58,6 +58,7 @@ public class Number extends BasePojo implements java.io.Serializable {
         this.iccid = iccid;
         this.status = status;
         this.skuId = skuId;
+        this.teleType = teleType;
     }
 
     public Long getId() {
@@ -210,5 +211,13 @@ public class Number extends BasePojo implements java.io.Serializable {
 
     public void setSkuId(Long skuId) {
         this.skuId = skuId;
+    }
+
+    public String getTeleType() {
+        return teleType;
+    }
+
+    public void setTeleType(String teleType) {
+        this.teleType = teleType;
     }
 }

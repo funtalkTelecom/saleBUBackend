@@ -20,7 +20,8 @@
         a.buyer as buyer,
         a.iccid as iccid,
         a.status as status,
-        a.sku_id as skuId
+        a.sku_id as skuId,
+        a.tele_type as teleType
     </sql>
     <sql id="ex_col_list">
     </sql>

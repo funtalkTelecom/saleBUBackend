@@ -219,4 +219,9 @@ public class GoodsService {
 
         return new Result(Result.OK, "删除成功");
 	}
+
+    public Result goodsUnsale(Goods goods, HttpServletRequest request) {
+        goodsMapper.goodsUnsale(goods);
+        return new Result(Result.OK, "下架成功");
+    }
 }

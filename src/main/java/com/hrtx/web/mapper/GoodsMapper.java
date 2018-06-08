@@ -16,5 +16,7 @@ public interface GoodsMapper extends Mapper<Goods>,BaseMapper<Goods>{
 
     void insertBatch(@Param("goodsList") List<Goods> list);
 
-    Page<Object> queryPageListApi(Goods goods);
+    Page<Object> queryPageListApi(Goods goods, @Param("gSaleCityArr") String[] gSaleCityArr);
+
+    void goodsUnsale(Goods goods);
 }

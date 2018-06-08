@@ -28,6 +28,7 @@ public class ApiGoodsController extends BaseReturn{
 
 	/**
 	 * 在售商品列表
+	 * 根据传入的地市进行查询
 	 * @param goods
 	 * @param request
 	 * @return
@@ -42,7 +43,7 @@ public class ApiGoodsController extends BaseReturn{
 			goods.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
 
 			PageHelper.startPage(goods.getPageNum(),goods.getLimit());
-			Page<Object> ob=this.goodsMapper.queryPageListApi(goods);
+			Page<Object> ob=this.goodsMapper.queryPageListApi(goods, goods.getgSaleCity().split(","));
 			pm = new PageInfo<Object>(ob);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
