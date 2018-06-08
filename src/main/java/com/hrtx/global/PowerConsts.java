@@ -48,8 +48,8 @@ public enum PowerConsts {
 	GOODSMOUDULE_COMMON_ADD(70304,"添加",70200,1,"",3,4),//商品添加
 
 	NUMBERMOUDULE(70300,"号码管理",70000,0,"number/number-query",2,1),//号码管理
-	NUMBERMOUDULE_COMMON_QUEYR(70301,"查询",70300,1,"",3,1),//号码查询
-	NUMBERMOUDULE_COMMON_ADDTAG(70302,"号码添加标签",70300,1,"",3,2),//号码添加标签
+	NUMBERMOUDULE_COMMON_QUEYR(70401,"查询",70300,1,"",3,1),//号码查询
+	NUMBERMOUDULE_COMMON_ADDTAG(70402,"号码添加标签",70300,1,"",3,2),//号码添加标签
 
 	SYSMOUDULE(90300,"配置管理",90000,0,"system/system-query",2,1),//配置管理
 	SYSMOUDULE_COMMON_QUEYR(90301,"查询",90300,1,"",3,1),//配置查询
