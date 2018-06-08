@@ -29,19 +29,19 @@ public class NumberController extends BaseReturn{
 	private NumberService numberService;
 
 	@RequestMapping("/number-query")
-	@Powers({PowerConsts.DICTMOUDULE_COMMON_QUEYR})
+	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_QUEYR})
 	public ModelAndView numberQuery(Number number){
 		return new ModelAndView("admin/number/number-query");
 	}
 
 	@RequestMapping("/number-list")
-	@Powers({PowerConsts.DICTMOUDULE_COMMON_QUEYR})
+	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_QUEYR})
 	public Result listNumber(Number number){
 		return numberService.pageNumber(number);
 	}
 
 	@RequestMapping("/numRule-addTags")
-	@Powers({PowerConsts.GOODSMOUDULE_COMMON_EDIT})
+	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG})
 	public void addTags(Number number, HttpServletRequest request){
 		returnResult(numberService.addTags(number, request));
 	}
