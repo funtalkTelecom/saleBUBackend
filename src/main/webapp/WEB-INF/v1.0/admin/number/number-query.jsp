@@ -42,7 +42,7 @@
 											<label class="form-control">商品名称</label>
 											<%--<input type="text" class="form-control" style="width:130px;" name="gName">--%>
 										</div>
-										<c:if test="<%=SessionUtil.hasPower(PowerConsts.DICTMOUDULE_COMMON_ADD)%>">
+										<c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>">
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#editTags" >设置标签</button>
 										</c:if>
 										<%--<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>--%>
@@ -161,7 +161,7 @@
 			</div><!-- /.modal -->
 		</div>
 		<script type="text/javascript">
-            var p_addTag = <%=SessionUtil.hasPower(PowerConsts.DICTMOUDULE_COMMON_ADD)%>;
+            var p_addTag = <%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>;
 		</script>
 	</body>
 </html>
