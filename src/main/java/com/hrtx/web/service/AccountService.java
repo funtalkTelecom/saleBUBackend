@@ -53,4 +53,9 @@ public class AccountService {
 		accountMapper.accountDelete(account);
 		return new Result(Result.OK, "删除成功");
 	}
+
+
+	public Result findAccountListByUserId(Long userId) {
+		return new Result(Result.OK,  accountMapper.findAccountListByUserId( userId));
+	}
 }

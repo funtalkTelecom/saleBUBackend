@@ -60,6 +60,7 @@ $(function() {
                 var name=$(v2).attr("name");
                 obj[name]=$(v2).val();
             });
+            obj.addUserId =addUserId;
             return obj;
         }
     });

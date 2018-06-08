@@ -25,6 +25,15 @@
         <if test="param.bankAccount!=null and param.bankAccount!=''">
             and a.bank_account like "%"#{param.bankAccount}"%"
         </if>
+        and a.add_user_id =  #{param.addUserId}
+    </select>
+
+    <select id="findAccountListByUserId" resultType="java.util.HashMap">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_account a left  join tb_dict t on a.card_bank = t.key_id and t.key_group='brank' where  1=1 and a.is_del=0
+        and a.add_user_id = #{addUserId}
     </select>
 
     <insert id="insertAccount">
@@ -65,4 +74,5 @@
     <update id="accountDelete">
         update tb_account a set a.is_del = 1 where a.id = #{id}
     </update>
+
 </mapper>

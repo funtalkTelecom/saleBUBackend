@@ -1,11 +1,13 @@
 package com.hrtx.web.mapper;
 
 import com.github.abel533.mapper.Mapper;
+import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.Account;
 import com.hrtx.web.pojo.Meal;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AccountMapper extends Mapper<Account>,BaseMapper<Account>{
 
@@ -16,5 +18,7 @@ public interface AccountMapper extends Mapper<Account>,BaseMapper<Account>{
     Account findAccountInfo(@Param("id") Long id);
 
     void accountDelete(Account account);
+
+    List<Map> findAccountListByUserId(@Param("addUserId") Long addUserId);
 
 }

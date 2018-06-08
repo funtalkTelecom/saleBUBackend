@@ -132,6 +132,7 @@
 <script type="text/javascript">
     var p_edit = <%=SessionUtil.hasPower(PowerConsts.ACCOUNTMOUDULE_COMMON_EDIT)%>;
     var p_delete = <%=SessionUtil.hasPower(PowerConsts.ACCOUNTMOUDULE_COMMON_DELETE)%>;
+    var addUserId =<%=SessionUtil.getUserId()%>
 </script>
 </body>
 </html>

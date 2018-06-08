@@ -6,6 +6,7 @@ import java.util.Map;
 import com.github.abel533.mapper.Mapper;
 import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.User;
+import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper extends Mapper<User>,BaseMapper<User>{
 
@@ -16,5 +17,6 @@ public interface UserMapper extends Mapper<User>,BaseMapper<User>{
 	public List<Map> getPower(Long id);
 
 	public List<String> findRoles(Long id);
+
 
 }

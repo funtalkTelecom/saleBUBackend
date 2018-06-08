@@ -3,8 +3,10 @@ package com.hrtx.web.controller;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.web.pojo.Account;
 import com.hrtx.web.pojo.DeliveryAddress;
 import com.hrtx.web.pojo.System;
+import com.hrtx.web.service.AccountService;
 import com.hrtx.web.service.CityService;
 import com.hrtx.web.service.DeliveryAddressService;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -27,6 +29,8 @@ public class DeliveryAddressController extends BaseReturn{
 
 	@Resource
 	private CityService cityService;
+	@Autowired
+	AccountService accountService;
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private DeliveryAddressService deliveryAddressService;
@@ -75,5 +79,12 @@ public class DeliveryAddressController extends BaseReturn{
 	public void deliveryAddressDelete(DeliveryAddress deliveryAddress, HttpServletRequest request,@PathVariable("id") String id){
 		deliveryAddress.setId(Long.valueOf(id));
 		returnResult(deliveryAddressService.deliveryAddressDelete(deliveryAddress));
+	}
+
+	@GetMapping("/account-list/{addUserId}")
+	@Powers({PowerConsts.NOLOGINPOWER})
+	@ResponseBody
+	public Result listDeliveryAddress(Account account, @PathVariable("addUserId") String addUserId){
+		return accountService.findAccountListByUserId(Long.valueOf(addUserId));
 	}
 }

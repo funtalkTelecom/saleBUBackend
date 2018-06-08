@@ -1,13 +1,16 @@
 package com.hrtx.web.service;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
+import com.hrtx.global.ApiSessionUtil;
+import com.hrtx.global.TokenGenerator;
+import com.hrtx.web.mapper.ConsumerLogMapper;
+import com.hrtx.web.mapper.ConsumerMapper;
+import com.hrtx.web.pojo.Consumer;
+import com.hrtx.web.pojo.ConsumerLog;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +32,10 @@ public class UserService {
 	
 	@Autowired SessionUtil sessionUtil;
 	@Autowired private UserMapper userMapper;
-	
+	@Autowired private ConsumerLogMapper consumerLogMapper;
+	@Autowired private ConsumerMapper consumerMapper;
+	@Autowired private ApiSessionUtil apiSessionUtil;
+
 	public void test() {
 		List<User> list=this.userMapper.select(null);
 		for (User user : list) {
@@ -100,4 +106,5 @@ public class UserService {
 		info.put("user", u);
 		return info;
 	}
+
 }
