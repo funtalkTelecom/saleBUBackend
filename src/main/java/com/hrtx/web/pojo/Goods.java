@@ -33,12 +33,12 @@ public class Goods extends BasePojo implements java.io.Serializable {
     private String gDeposit;
     private String gStartNum;
     private String gPriceUp;
+    private String gIsSale;
 
     public Goods() {
     }
 
-    public Goods(Long gId, String gType1, String gType2, String gName, String gAd, Date gStartTime, Date gEndTime, String gSaleCity, String gIsAuc, String gActive, String gIsPack, String gLoopTime, String gDeposit, String gStartNum, String gPriceUp) {
-        this.gId = gId;
+    public Goods(String gType1, String gType2, String gName, String gAd, Date gStartTime, Date gEndTime, String gSaleCity, String gIsAuc, String gActive, String gIsPack, String gLoopTime, String gDeposit, String gStartNum, String gPriceUp, String gIsSale) {
         this.gType1 = gType1;
         this.gType2 = gType2;
         this.gName = gName;
@@ -53,6 +53,7 @@ public class Goods extends BasePojo implements java.io.Serializable {
         this.gDeposit = gDeposit;
         this.gStartNum = gStartNum;
         this.gPriceUp = gPriceUp;
+        this.gIsSale = gIsSale;
     }
 
     public Long getgId() {
@@ -173,5 +174,13 @@ public class Goods extends BasePojo implements java.io.Serializable {
 
     public void setgPriceUp(String gPriceUp) {
         this.gPriceUp = gPriceUp;
+    }
+
+    public String getgIsSale() {
+        return gIsSale;
+    }
+
+    public void setgIsSale(String gIsSale) {
+        this.gIsSale = gIsSale;
     }
 }

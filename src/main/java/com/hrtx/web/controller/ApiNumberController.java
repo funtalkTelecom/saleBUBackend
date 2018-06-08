@@ -4,9 +4,11 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
+import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.mapper.NumberMapper;
 import com.hrtx.web.pojo.Number;
+import com.hrtx.web.pojo.User;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,8 @@ public class ApiNumberController extends BaseReturn{
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private NumberMapper numberMapper;
+	@Autowired
+	private ApiSessionUtil apiSessionUtil;
 
 	@GetMapping("/number")
     @Powers(PowerConsts.NOLOGINPOWER)

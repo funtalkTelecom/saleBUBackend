@@ -132,7 +132,36 @@ function dictSelect($domId, group, option, def){
 }
 
 /**
- * 字典生成checkbox
+ * 字典生成checkbox(商品属性使用)
+ * @param $domId 赋值的checkbox父节点
+ * @param group 属性来源
+ * @param option 参数
+ */
+function dictCheckBoxDefault($domId, group, option) {
+    var data = {
+        url:"dict-query-group",
+        param : {group:group}
+    }
+    $.extend(true, option, data);
+    $.ajax({async:false,type : "post", url:option.url, data:option.param, success:function(data){
+            var html="";
+            var preGroup="";
+            for (var index = 0; index < data.length; index++) {
+                if(index==0) {
+                    html+='<label class="col-xs-2 control-label">'+data[index]['note']+'</label>';
+                }
+                html+='<div class="checkbox col-xs-2" style="width: auto;"><label>' +
+                    '<input name="'+data[index]['keyGroup']+'" class="ace ace-checkbox-2" type="checkbox" value="'+data[index][option.key]+'"><span class="lbl">'+data[index][option.value]+'</span></label></div>';
+                if(index==data.length-1) html+='</div>';
+                preGroup = data[index]['note'];
+            }
+            $domId.html(html);
+            $domId.find("span").off("click").on("click",option.onclick);
+        }});
+}
+
+/**
+ * 字典生成checkbox(商品属性使用)
  * @param $domId 赋值的checkbox父节点
  * @param group 属性来源
  * @param option 参数

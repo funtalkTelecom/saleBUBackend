@@ -67,6 +67,12 @@ public class GoodsController extends BaseReturn{
         returnResult(goodsService.goodsEdit(goods, request, files));
 	}
 
+	@RequestMapping("/goods-unsale")
+	@Powers({PowerConsts.GOODSMOUDULE_COMMON_EDIT})
+	public void goodsUnsale(Goods goods, HttpServletRequest request){
+        returnResult(goodsService.goodsUnsale(goods, request));
+	}
+
 	@RequestMapping("/goods-delete")
 	@Powers({PowerConsts.GOODSMOUDULE_COMMON_DELETE})
 	public void goodsDelete(Goods goods){

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.NumRuleMapper">
+    <sql id="col_list">
+        a.id as id,
+        a.rule_type as ruleType,
+        a.num_id as numId,
+        a.num as num,
+        a.value as value
+    </sql>
+    <sql id="ex_col_list">
+    </sql>
+
+    <select id="queryPageList" resultType="NumRule">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_num_rule a
+        where 1=1
+    </select>
+
+    <select id="getNumRuleByNum" resultType="NumRule">
+        select
+            b.id as id,
+            b.rule_type as ruleType,
+            a.id as numId,
+            a.num_resource as num,
+            b.value as value
+        from tb_num a left join tb_num_rule b on a.id = b.num_id
+        where a.num_resource = #{num}
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_num_rule(
+        id,
+        rule_type,
+        num_id,
+        num,
+        value
+        ) values
+        <foreach collection="numRuleList" item="numRule" separator=",">
+            (
+            #{numRule.id},
+            #{numRule.ruleType},
+            #{numRule.numId},
+            #{numRule.num},
+            #{numRule.value}
+            )
+        </foreach>
+    </insert>
+</mapper>
