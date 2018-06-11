@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.EPSaleMapper">
+
+    <select id="queryPageList" resultType="EPSale">
+       select t.id,
+       t.title,
+       t.ep_rule as epRule,
+       t.start_time as  startTime,
+       t.end_time as  endTime,
+       t.last_pay_time as lastPayTime,
+       t.is_show as isShow,
+       t.create_date as createDate,
+       t.update_date as updateDate,
+       t.add_user_id as addUserId,
+       t.is_del as isDel,
+       t.note as note
+       from tb_ep_sale t
+       where t.is_del = 0
+        <if test="param.title!=null and param.title!=''">
+            and t.title like "%"#{param.title}"%"
+        </if>
+        order by t.id desc
+    </select>
+
+    <select id="findDeliveryAddressListByUserId" resultType="java.util.HashMap">
+        select t.id,
+		person_name as personName,
+		t.person_tel as personTel ,
+		province.name as provinceName,
+		city.name as cityName,
+		district.name as  districtName,
+		province.id as provinceId,
+		city.id as cityId,
+		district.id as  districtId,
+        t.address,
+		t.add_user_id as addUserId,
+		t.is_defaultl as isDefaultl,t.note
+		from tb_delivery_address t
+        inner join tb_city  province on province.id=t.province
+        inner join tb_city city on city.id=t.city
+        inner join tb_city district on district.id=t.district
+        where t.is_del = 0
+        and t.add_user_id = #{addUserId};
+    </select>
+
+    <select id="findEPSaleById" resultType="EPSale">
+      select t.id,
+       t.title,
+       t.ep_rule as epRule,
+       t.start_time as  startTime,
+       t.end_time as  endTime,
+       t.last_pay_time as lastPayTime,
+       t.is_show as isShow,
+       t.create_date as createDate,
+       t.update_date as updateDate,
+       t.add_user_id as addUserId,
+       t.is_del as isDel,
+       t.note as note
+       from tb_ep_sale t
+       where t.is_del = 0 and t.id = #{id};
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_ep_sale(
+        id,
+        title,
+        ep_rule,
+        start_time,
+        end_time,
+        last_pay_time,
+        is_show,
+        create_date,
+        update_date,
+        add_user_id
+        ) values
+        <foreach collection="epSaleList" item="EPSale" separator=",">
+            (
+            #{EPSale.id},
+            #{EPSale.title},
+            #{EPSale.epRule},
+            #{EPSale.startTime},
+            #{EPSale.endTime},
+            #{EPSale.lastPayTime},
+            #{EPSale.isShow},
+            #{EPSale.createDate},
+            #{EPSale.updateDate},
+            #{EPSale.addUserId}
+            )
+        </foreach>
+    </insert>
+
+    <update id="epSaleEdit">
+        update tb_ep_sale t set
+         t.title=#{title},
+         t.ep_rule=#{epRule} ,
+         t.start_time=#{startTime} ,
+         t.end_time=#{endTime} ,
+         t.last_pay_time=#{lastPayTime} ,
+         t.is_show=#{isShow} ,
+         t.update_date=#{updateDate}
+        where
+            t.id = #{id}
+    </update>
+
+    <update id="epSaleDelete">
+         update tb_ep_sale a set
+            a.is_del =1
+        where
+            a.id = #{id}
+    </update>
+</mapper>
