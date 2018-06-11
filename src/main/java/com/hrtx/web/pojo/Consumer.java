@@ -18,6 +18,7 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 	private String city;
 	private Integer status;
 	private Date regDate;
+	private Integer isAgent;
 
 	public Consumer() {
 	}
@@ -28,7 +29,7 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 		this.regDate = regDate;
 	}
 	private Consumer(Long id, String name, String phone, String nickName,
-					 String img, String province, String city, Integer status, Date regDate) {
+					 String img, String province, String city, Integer status, Date regDate,Integer isAgent) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -40,6 +41,7 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 		this.city = city;
 		this.status = status;
 		this.regDate = regDate;
+		this.isAgent = isAgent;
 	}
 
 	public Long getId() {
@@ -112,5 +114,13 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 
 	public void setRegDate(Date regDate) {
 		this.regDate = regDate;
+	}
+
+	public Integer getIsAgent() {
+		return isAgent;
+	}
+
+	public void setIsAgent(Integer isAgent) {
+		this.isAgent = isAgent;
 	}
 }

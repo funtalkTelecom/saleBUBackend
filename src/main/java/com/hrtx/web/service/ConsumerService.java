@@ -46,15 +46,16 @@ public class ConsumerService {
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String token=TokenGenerator.generateValue();
-		ConsumerLog userlog =null;
+		ConsumerLog consumerLog =null;
 		ConsumerLog param = new ConsumerLog();
 		param.setOpenid(openid);
-		userlog = consumerLogMapper.selectOne(param);
-		if(userlog == null){
+		consumerLog = consumerLogMapper.selectOne(param);
+		if(consumerLog == null){
 			//向userclient，userclientlog存数据
 			Consumer userC = new Consumer();
 			userC.setId(userC.getGeneralId());
 			userC.setStatus(1);
+			userC.setIsAgent(1);
 			userC.setRegDate(new Date());
 			consumerMapper.insert(userC);
 			Long userid = userC.getId();
@@ -69,9 +70,13 @@ public class ConsumerService {
 			log.setAddDate(new Date());
 			consumerLogMapper.insert(log);
 
-			this.apiSessionUtil.saveOrUpdate(token,log);
+			this.apiSessionUtil.saveOrUpdate(token,userC);
 		}else {
-			this.apiSessionUtil.saveOrUpdate(token,userlog);
+			Consumer Cparam = new Consumer();
+			Long id = consumerLog.getUserId();
+			Cparam.setId(id);
+			Consumer consumer = consumerMapper.selectOne(Cparam);
+			this.apiSessionUtil.saveOrUpdate(token,consumer);
 		}
 		return new Result(Result.OK, token);
 
@@ -80,8 +85,8 @@ public class ConsumerService {
 
 	public Result insertConsumer(String loginName,String livePhone,String nickName,long sex,String img,String province,String city){
 		//姓名,电话,昵称,性别 1男2女0未知,// 头像,//省份,//地市
-		ConsumerLog userlog= this.apiSessionUtil.getUserClient();
-		long userid = userlog.getUserId();
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		long userid = consumer.getId();
 		ConsumerLog param = new ConsumerLog();
 		param.setUserId(userid);
 		ConsumerLog log = consumerLogMapper.selectOne(param);
