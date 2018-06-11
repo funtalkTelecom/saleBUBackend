@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.OrderMapper">
+    <sql id="col_list">
+        a.order_id as orderId,
+        a.consumer as consumer,
+        a.consumer_name as consumerName,
+        a.status as status,
+        a.req_user_agent as reqUserAgent,
+        a.req_ip as reqIp,
+        a.add_date as addDate,
+        a.order_type as orderType,
+        a.shipping_menthod_id as shippingMenthodId,
+        a.shipping_menthod as shippingMenthod,
+        a.address_id as addressId,
+        a.person_name as personName,
+        a.person_tel as personTel,
+        a.address as address,
+        a.notice_shipment_date as noticeShipmentDate,
+        a.pay_menthod_id as payMenthodId,
+        a.pay_menthod as payMenthod,
+        a.pay_date as payDate,
+        a.express_id as expressId,
+        a.express_name as expressName,
+        a.express_number as expressNumber,
+        a.deliver_date as deliverDate,
+        a.pickup_date as pickupDate,
+        a.sign_type as signType,
+        a.sign_date as signDate,
+        a.commission as commission,
+        a.shipping_total as shippingTotal,
+        a.sub_total as subTotal,
+        a.total as total,
+        a.conment as conment,
+        a.is_del as isDel
+    </sql>
+    <select id="findOrderInfo" resultType="Order">
+        select
+        <include refid="col_list"/>
+        from tb_order a where a.id = #{id};
+    </select>
+
+    <select id="queryPageList" resultType="Order">
+        select
+        <include refid="col_list"/>
+        from tb_order a
+        where 1=1 and a.is_del=0
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_order(
+            order_id,
+            consumer,
+            consumer_name,
+            status,
+            req_user_agent,
+            req_ip,
+            add_date,
+            order_type,
+            shipping_menthod_id,
+            shipping_menthod,
+            address_id,
+            person_name,
+            person_tel,
+            address,
+            notice_shipment_date,
+            pay_menthod_id,
+            pay_menthod,
+            pay_date,
+            express_id,
+            express_name,
+            express_number,
+            deliver_date,
+            pickup_date,
+            sign_type,
+            sign_date,
+            commission,
+            shipping_total,
+            sub_total,
+            total,
+            conment,
+            is_del
+        ) values
+        <foreach collection="orderList" item="order" separator=",">
+            (
+            #{order.orderId},
+            #{order.consumer},
+            #{order.consumerName},
+            1,
+            #{order.reqUserAgent},
+            #{order.reqIp},
+            #{order.addDate},
+            #{order.orderType},
+            #{order.shippingMenthodId},
+            #{order.shippingMenthod},
+            #{order.addressId},
+            #{order.personName},
+            #{order.personTel},
+            #{order.address},
+            #{order.noticeShipmentDate},
+            #{order.payMenthodId},
+            #{order.payMenthod},
+            #{order.payDate},
+            #{order.expressId},
+            #{order.expressName},
+            #{order.expressNumber},
+            #{order.deliverDate},
+            #{order.pickupDate},
+            #{order.signType},
+            #{order.signDate},
+            #{order.commission},
+            #{order.shippingTotal},
+            #{order.subTotal},
+            #{order.total},
+            #{order.conment},
+            0
+            )
+        </foreach>
+    </insert>
+
+    <update id="orderDelete">
+        update tb_order a set a.is_del = 1 where a.id = #{id}
+    </update>
+</mapper>

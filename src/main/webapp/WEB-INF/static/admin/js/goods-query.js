@@ -356,6 +356,12 @@ $(function() {
             "type":'<textarea tag="sku_skuindex" class="col-xs-12" style="height:34px;resize: none;width:150px" type="text" onclick="selectSaleNum(this)" name="skukey" textareaValue="skuvalue" class="col-xs-12" readonly></textarea>',
             "titleClass":"col-xs-1"
         },
+        "skuNum":{
+            "isShow":true,
+            "title":"数量",
+            "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
+            "titleClass":"col-xs-1"
+        },
         "skuGoodsType":{
             "isShow":true,
             "title":"商品类型",

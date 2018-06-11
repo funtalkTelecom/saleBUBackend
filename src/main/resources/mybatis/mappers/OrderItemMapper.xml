@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.OrderItemMapper">
+    <sql id="col_list">
+        a.item_id as itemId,
+        a.order_id as orderId,
+        a.goods_id as goodsId,
+        a.sku_id as skuId,
+        a.sku_property as skuProperty,
+        a.num_id as numId,
+        a.num as num,
+        a.is_shipment as isShipment,
+        a.seller_id as sellerId,
+        a.seller_name as sellerName,
+        a.shipment_api as shipmentApi,
+        a.companystock_id as companystockId,
+        a.quantity as quantity,
+        a.price as price,
+        a.total as total
+    </sql>
+    <select id="findOrderItemInfo" resultType="OrderItem">
+        select
+        <include refid="col_list"/>
+        from tb_order_item a where a.id = #{id};
+    </select>
+
+    <select id="queryPageList" resultType="OrderItem">
+        select
+        <include refid="col_list"/>
+        from tb_order_item a
+        where 1=1
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_order_item(
+        item_id,
+        order_id,
+        goods_id,
+        sku_id,
+        sku_property,
+        num_id,
+        num,
+        is_shipment,
+        seller_id,
+        seller_name,
+        shipment_api,
+        companystock_id,
+        quantity,
+        price,
+        total
+        ) values
+        <foreach collection="orderItemList" item="orderItem" separator=",">
+            (
+            #{orderItem.itemId},
+            #{orderItem.orderId},
+            #{orderItem.goodsId},
+            #{orderItem.skuId},
+            #{orderItem.skuProperty},
+            #{orderItem.numId},
+            #{orderItem.num},
+            #{orderItem.isShipment},
+            #{orderItem.sellerId},
+            #{orderItem.sellerName},
+            #{orderItem.shipmentApi},
+            #{orderItem.companystockId},
+            #{orderItem.quantity},
+            #{orderItem.price},
+            #{orderItem.total}
+            )
+        </foreach>
+    </insert>
+</mapper>

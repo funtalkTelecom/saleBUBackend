@@ -4,15 +4,13 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
 import com.hrtx.web.controller.BaseReturn;
 import com.hrtx.web.mapper.*;
-import com.hrtx.web.pojo.File;
-import com.hrtx.web.pojo.Goods;
+import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
-import com.hrtx.web.pojo.Sku;
-import com.hrtx.web.pojo.SkuProperty;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
@@ -56,13 +54,16 @@ public class GoodsService {
 
 	public Result goodsEdit(Goods goods, HttpServletRequest request, MultipartFile[] files) {
         try {
-            String ignoreKey = "skuId,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuGoodsType,skuRepoGoods,";
+            String ignoreKey = "skuId,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuNum,skuGoodsType,skuRepoGoods,";
             //商品主表操作
             if (goods.getgId() != null && goods.getgId() > 0) {
                 goodsMapper.goodsEdit(goods);
             } else {
                 List<Goods> list = new ArrayList<Goods>();
+                User user = SessionUtil.getUser();
                 goods.setgId(goods.getGeneralId());
+                goods.setgSellerId(user.getId());
+                goods.setgSellerName(user.getName());
                 list.add(goods);
                 goodsMapper.insertBatch(list);
             }
@@ -95,6 +96,7 @@ public class GoodsService {
                     sku.setSkuTobPrice(((JSONObject) obj.get("skuTobPrice")).get("value")==null||((JSONObject) obj.get("skuTobPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value"));
                     sku.setSkuTocPrice(((JSONObject) obj.get("skuTocPrice")).get("value")==null||((JSONObject) obj.get("skuTocPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTocPrice")).get("value"));
                     sku.setSkuIsNum(((JSONObject) obj.get("skuIsNum")).get("value")==null||((JSONObject) obj.get("skuIsNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuIsNum")).get("value"));
+                    sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
 //                    验证号码可用性之前赋值旧的skuId,便于tb_num表复原状态
                     String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));

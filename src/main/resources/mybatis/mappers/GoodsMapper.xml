@@ -17,6 +17,8 @@
         a.g_deposit as gDeposit,
         a.g_start_num as gStartNum,
         a.g_price_up as gPriceUp,
+        a.g_seller_id as gSellerId,
+        a.g_seller_name as gSellerName,
         a.g_is_sale as gIsSale
     </sql>
     <select id="findGoodsInfo" resultType="Goods">
@@ -62,6 +64,8 @@
         <result property="gDeposit" column="g_deposit"></result>
         <result property="gStartNum" column="g_start_num"></result>
         <result property="gPriceUp" column="g_price_up"></result>
+        <result property="gSellerId" column="g_seller_id"></result>
+        <result property="gSellerName" column="g_seller_name"></result>
         <result property="gIsSale" column="g_is_sale"></result>
         <result property="fileId" column="file_id"></result>
         <result property="refId" column="ref_id"></result>
@@ -122,6 +126,8 @@
             g_deposit,
             g_start_num,
             g_price_up,
+            g_seller_id,
+            g_seller_name,
             g_is_sale
         ) values
         <foreach collection="goodsList" item="goods" separator=",">
@@ -141,6 +147,8 @@
             #{goods.gDeposit},
             #{goods.gStartNum},
             #{goods.gPriceUp},
+            #{goods.gSellerId},
+            #{goods.gSellerName},
             '1'
             )
         </foreach>
