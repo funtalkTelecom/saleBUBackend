@@ -23,9 +23,9 @@ public class WxinController {
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired ConsumerService consumerService;
-    @GetMapping("/get_open_id/{getcode}")
+    @GetMapping("/get_open_id")
     @Powers({PowerConsts.NOLOGINPOWER})
-	public Result getOpenid(@RequestParam(value="code",required=false)String getcode) {
+	public Result getOpenid(@RequestParam(value="getcode",required=false)String getcode) {
 		String code=getcode;
 		String appid="wxb6164ee4e09e26e1";
 		String appsecret="69e84ba556b7c4cad2926537650c7415";
@@ -37,11 +37,12 @@ public class WxinController {
 		String params = "appid=" + appid + "&secret=" + appsecret + "&js_code=" + code + "&grant_type=" + grant_type;
 		//发送请求
 		 String data = HttpUtil.get(requestUrl, params);
-		//        //解析相应内容（转换成json对象）
 		JSONObject json = JSONObject.fromObject(data);
-		//用户的唯一标识（openid）
+//		用户的唯一标识（openid）
 		String Openid =String.valueOf(json.get("openid"));
 //		String sessionkey=String.valueOf(json.get("session_key"));
+//		JSONObject jsonObject  = HttpUtil.doGetStr(requestUrl, params);
+//		String Openid =String.valueOf(jsonObject.getString("openid"));
 		Result s  = consumerService.isOpenid(Openid);
 		return s;
 	}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.AgentMapper">
+
+
+    <update id="updateAgent">
+        update tb_agent a set
+            a.commpay_name=#{commpayName},
+            a.person= #{person},
+            a.phone=#{phone},
+            a.province=#{province},
+            a.city=#{city},
+            a.district =#{district},
+            a.address =#{address},
+            a.trading_img=#{tradingImg},
+            a.status= #{status},
+            a.add_user_id=#{addUserId},
+            a.add_date =#{addDate},
+            a.is_del=#{isDel}
+        where a.id = #{id}
+    </update>
+
+
+    <update id="agentDelete">
+        update tb_agent a set a.is_del = 1 where a.id = #{id}
+    </update>
+
+</mapper>

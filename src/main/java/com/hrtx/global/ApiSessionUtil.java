@@ -4,6 +4,7 @@ package com.hrtx.global;
 
 
 import com.hrtx.config.utils.RedisUtil;;
+import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.User;
 import com.hrtx.web.pojo.ConsumerLog;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,16 +58,16 @@ public class ApiSessionUtil {
     /***
      * by zdh
      * @param apiKey
-     * @param userClientLog
+     * @param consumer
      */
-    public void saveOrUpdate(String apiKey,ConsumerLog userClientLog) {
+    public void saveOrUpdate(String apiKey,Consumer consumer) {
         if(apiKey == null) return ;
         String key1 = getApiKey(apiKey);
-        redisUtils.set(key1,userClientLog,expire_time);
+        redisUtils.set(key1,consumer,expire_time);
     }
 
-    public ConsumerLog getUserClient(){
+    public Consumer getConsumer(){
         String key = getApiKey(this.getTokenStr());
-        return (ConsumerLog) (redisUtils.get(key));
+        return (Consumer) (redisUtils.get(key));
     }
 }

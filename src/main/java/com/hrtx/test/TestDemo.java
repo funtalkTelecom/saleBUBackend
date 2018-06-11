@@ -168,4 +168,25 @@ public class TestDemo {
         System.out.println("deliveryAddress/5000删除*****返回值字符串  =================    "+resultStr2);
     }
 
+    @Test
+    public void insetagent () throws Exception {
+        RequestBuilder  request = put("/api/save-or-update-agent").
+                param("id", "1006091350984097792")
+                .param("commpayName", "福建华瑞11")
+                .param("person", "林林22")
+                .param("phone", "189891234560")
+                .param("province", "1711")
+                .param("city", "21211")
+                .param("district", "1911111")
+                .param("address", "五一南路111号111")
+                .param("tradingImg", "222222888.jsp");
+        ResultActions resultActions=mvc.perform(request);
+        resultActions.andExpect(status().isOk());
+        // resultActions.andDo(MockMvcResultHandlers.print());
+        resultActions.andExpect(jsonPath("code").value("200"));//校验值
+        MvcResult result4= resultActions.andReturn();
+        String resultStr4= result4.getResponse().getContentAsString();
+        System.out.println(" =================    "+resultStr4);
+    }
+
 }
