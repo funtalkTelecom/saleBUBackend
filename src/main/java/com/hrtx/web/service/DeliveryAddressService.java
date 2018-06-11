@@ -34,7 +34,7 @@ public class DeliveryAddressService {
 		PageHelper.startPage(deliveryAddress.getPageNum(),deliveryAddress.getLimit());
 		Page<Object> ob=this.deliveryAddressMapper.queryPageList(deliveryAddress);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
-		return new Result(Result.OK, pm.getList());
+		return new Result(Result.OK, pm);
 	}
 
 	public Result findDeliveryAddressListByUserId(Long userId) {
@@ -47,7 +47,7 @@ public class DeliveryAddressService {
 
 	public Result deliveryAddressEdit(DeliveryAddress deliveryAddress, HttpServletRequest request) {
 
-		deliveryAddress.setAddUserId(1);
+		deliveryAddress.setAddUserId(Long.valueOf(String.valueOf(1)));
 		if (deliveryAddress.getId() != null && deliveryAddress.getId() > 0) {
 			deliveryAddress.setUpdateDate(new Date());
 			deliveryAddressMapper.deliveryAddressEdit(deliveryAddress);

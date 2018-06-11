@@ -30,7 +30,7 @@ public class DeliveryAddress extends BasePojo implements java.io.Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date  updateDate;//修改日期
-    private int  addUserId;//添加人ID
+    private Long  addUserId;//添加人ID
     private int  isDel;//是否删除
     private int   isDefaultl;//是否默认
     private String  note;//备注
@@ -41,7 +41,7 @@ public class DeliveryAddress extends BasePojo implements java.io.Serializable {
 	}
 
     public DeliveryAddress(Long id, String personName,String personTel,String provinceName,String cityName,String districtName,String address, Date createDate, Date updateDate
-            ,int addUserId ,int isDel ,int isDefaultl,String note) {
+            ,Long addUserId ,int isDel ,int isDefaultl,String note) {
         this.id = id;
         this.personName = personName;
         this.personTel = personTel;
@@ -129,11 +129,11 @@ public class DeliveryAddress extends BasePojo implements java.io.Serializable {
         this.updateDate = updateDate;
     }
 
-    public int getAddUserId() {
+    public Long getAddUserId() {
         return addUserId;
     }
 
-    public void setAddUserId(int addUserId) {
+    public void setAddUserId(Long addUserId) {
         this.addUserId = addUserId;
     }
 

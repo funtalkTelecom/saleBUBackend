@@ -4,6 +4,7 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.DeliveryAddress;
+import com.hrtx.web.pojo.Poster;
 import com.hrtx.web.pojo.System;
 import com.hrtx.web.service.CityService;
 import com.hrtx.web.service.DeliveryAddressService;
@@ -14,15 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Date;
+
 @RestController
-@RequestMapping("/api")
+//@RequestMapping("/api")
 public class DeliveryAddressController extends BaseReturn{
 
 	@Resource
@@ -31,13 +32,19 @@ public class DeliveryAddressController extends BaseReturn{
 	@Autowired
 	private DeliveryAddressService deliveryAddressService;
 
-	@RequestMapping("/deliveryAddress-query")
+	@RequestMapping("/deliveryAddress/deliveryAddress-query")
 	@Powers({PowerConsts.DELIVERYADDRESSMOUDULE})
-	public ModelAndView posterQuery(DeliveryAddress deliveryAddress){
+	public ModelAndView deliveryAddressQuery(DeliveryAddress deliveryAddress){
 		return new ModelAndView("admin/deliveryAddress/deliveryAddress-query");
 	}
 
-	@GetMapping("/deliveryAddresss/{addUserId}")
+	@RequestMapping("/deliveryAddress/deliveryAddress-list")
+	@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_QUEYR})
+	public Result listDeliveryAddress(DeliveryAddress deliveryAddress){
+		return deliveryAddressService.pageDeliveryAddress(deliveryAddress);
+	}
+
+	@GetMapping("/api/deliveryAddresss/{addUserId}")
 	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_QUEYR})
 	@Powers({PowerConsts.NOLOGINPOWER})
 	@ResponseBody
@@ -45,7 +52,7 @@ public class DeliveryAddressController extends BaseReturn{
 		return deliveryAddressService.findDeliveryAddressListByUserId(Long.valueOf(addUserId));
 	}
 
-	@GetMapping("/deliveryAddress/{id}")
+	@GetMapping("/api/deliveryAddress/{id}")
 	@ResponseBody
 	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_QUEYR})
 	@Powers({PowerConsts.NOLOGINPOWER})
@@ -61,7 +68,7 @@ public class DeliveryAddressController extends BaseReturn{
 		return map;
 	}
 
-	@PostMapping("/deliveryAddress")
+	@PostMapping("/api/deliveryAddress")
 	@ResponseBody
 	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_EDIT})
 	@Powers({PowerConsts.NOLOGINPOWER})
@@ -69,7 +76,7 @@ public class DeliveryAddressController extends BaseReturn{
             returnResult(deliveryAddressService.deliveryAddressEdit(deliveryAddress,request));
 	}
 
-	@DeleteMapping("/deliveryAddress/{id}")
+	@DeleteMapping("/api/deliveryAddress/{id}")
 	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_DELETE})
 	@Powers({PowerConsts.NOLOGINPOWER})
 	public void deliveryAddressDelete(DeliveryAddress deliveryAddress, HttpServletRequest request,@PathVariable("id") String id){
