@@ -18,19 +18,21 @@ public class Sku extends BasePojo implements java.io.Serializable {
     private String skuTocPrice;
     private String skuIsNum;
     private String skuSaleNum;
+    private int skuNum;
     private String skuGoodsType;
     private String skuRepoGoods;
 
     public Sku() {
     }
 
-    public Sku(Long skuId, Long gId, String skuTobPrice, String skuTocPrice, String skuIsNum, String skuSaleNum, String skuGoodsType, String skuRepoGoods) {
+    public Sku(Long skuId, Long gId, String skuTobPrice, String skuTocPrice, String skuIsNum, String skuSaleNum, int skuNum, String skuGoodsType, String skuRepoGoods) {
         this.skuId = skuId;
         this.gId = gId;
         this.skuTobPrice = skuTobPrice;
         this.skuTocPrice = skuTocPrice;
         this.skuIsNum = skuIsNum;
         this.skuSaleNum = skuSaleNum;
+        this.skuNum = skuNum;
         this.skuGoodsType = skuGoodsType;
         this.skuRepoGoods = skuRepoGoods;
     }
@@ -81,6 +83,14 @@ public class Sku extends BasePojo implements java.io.Serializable {
 
     public void setSkuSaleNum(String skuSaleNum) {
         this.skuSaleNum = skuSaleNum;
+    }
+
+    public int getSkuNum() {
+        return skuNum;
+    }
+
+    public void setSkuNum(int skuNum) {
+        this.skuNum = skuNum;
     }
 
     public String getSkuGoodsType() {
