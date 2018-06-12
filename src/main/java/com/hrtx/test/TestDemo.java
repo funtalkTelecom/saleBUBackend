@@ -49,6 +49,20 @@ public class TestDemo {
 
     @Test
     public void testApiSession() throws Exception{
+
+        //列表epSales s
+        //RequestBuilder request = get("/hello-world-users");
+        RequestBuilder request7= get("/api/epSales");
+        // .param("addUserId", "1");
+        ResultActions resultActions7=mvc.perform(request7);
+        resultActions7.andDo(MockMvcResultHandlers.print()).andExpect(status().isOk());
+        MvcResult result7= resultActions7.andReturn();
+        String resultStr7= result7.getResponse().getContentAsString();
+        System.out.println("epSales列表***返回值字符串  =================    "+resultStr7);
+
+
+        // resultActions.andExpect(jsonPath("code").value("200"));//校验值
+
         //测试删除用户
         RequestBuilder request =get("/api/hello-world-login");
         ResultActions resultActions=mvc.perform(request);
@@ -102,6 +116,19 @@ public class TestDemo {
         deliveryAddress.setUpdateDate(new Date());
         deliveryAddress.setNote("备注");*/
 
+
+        //列表epSales s
+        //RequestBuilder request = get("/hello-world-users");
+        RequestBuilder request7= get("/api/epSales");
+        // .param("addUserId", "1");
+        ResultActions resultActions7=mvc.perform(request7);
+        resultActions7.andDo(MockMvcResultHandlers.print()).andExpect(status().isOk());
+        MvcResult result7= resultActions7.andReturn();
+        String resultStr7= result7.getResponse().getContentAsString();
+        System.out.println("epSales=1***返回值字符串  =================    "+resultStr7);
+        // resultActions.andExpect(jsonPath("code").value("200"));//校验值
+
+
         //列表deliveryAddres s
         //RequestBuilder request = get("/hello-world-users");
         RequestBuilder request = get("/api/deliveryAddresss/1");
@@ -153,8 +180,8 @@ public class TestDemo {
         //resultActions.andExpect(jsonPath("code").value("200"));//校验值
         //resultActions.andExpect(jsonPath("data.age").value(24));//校验值
         MvcResult result2= resultActions.andReturn();
-        String resultStr= result2.getResponse().getContentAsString();
-        System.out.println("deliveryAddress/1002477799878950912记录信息*****返回值字符串  =================    "+resultStr);
+        String resultStr3= result2.getResponse().getContentAsString();
+        System.out.println("deliveryAddress/1002477799878950912记录信息*****返回值字符串  =================    "+resultStr3);
 
 
 
@@ -166,27 +193,6 @@ public class TestDemo {
         MvcResult result3= resultActions.andReturn();
         String resultStr2= result3.getResponse().getContentAsString();
         System.out.println("deliveryAddress/5000删除*****返回值字符串  =================    "+resultStr2);
-    }
-
-    @Test
-    public void insetagent () throws Exception {
-        RequestBuilder  request = put("/api/save-or-update-agent").
-                param("id", "1006091350984097792")
-                .param("commpayName", "福建华瑞11")
-                .param("person", "林林22")
-                .param("phone", "189891234560")
-                .param("province", "1711")
-                .param("city", "21211")
-                .param("district", "1911111")
-                .param("address", "五一南路111号111")
-                .param("tradingImg", "222222888.jsp");
-        ResultActions resultActions=mvc.perform(request);
-        resultActions.andExpect(status().isOk());
-        // resultActions.andDo(MockMvcResultHandlers.print());
-        resultActions.andExpect(jsonPath("code").value("200"));//校验值
-        MvcResult result4= resultActions.andReturn();
-        String resultStr4= result4.getResponse().getContentAsString();
-        System.out.println(" =================    "+resultStr4);
     }
 
 }

@@ -35,8 +35,8 @@ public class EPSaleService {
 		return new Result(Result.OK, pm);
 	}
 
-	public Result findEPSaleListByUserId(Long userId) {
-		return new Result(Result.OK,  epSaleMapper.findEPSaleListByUserId( userId));
+	public Result findEPSaleList() {
+		return new Result(Result.OK,  epSaleMapper.findEPSaleList());
 	}
 
 	public EPSale finEPSaleById(Long id) {
