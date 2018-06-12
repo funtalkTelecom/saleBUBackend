@@ -44,12 +44,17 @@ public class EPSaleController extends BaseReturn{
 		return epSaleService.pageEPSale(epSale);
 	}
 
-	@GetMapping("/epSale/epSale/{addUserId}")
-	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})
-	//@Powers({PowerConsts.NOLOGINPOWER})
+	/**
+	 * 查询未过期的竟拍活动
+	 * @param epSale
+	 * @return
+	 */
+	@GetMapping("/api/epSales")
+	//@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})
+	@Powers({PowerConsts.NOLOGINPOWER})
 	@ResponseBody
-	public Result listEPSale(EPSale epSale, @PathVariable("addUserId") String addUserId){
-		return epSaleService.findEPSaleListByUserId(Long.valueOf(addUserId));
+	public Result findEPSaleList(EPSale epSale){
+		return epSaleService.findEPSaleList();
 	}
 
 	@RequestMapping("/epSale/epSale-info")

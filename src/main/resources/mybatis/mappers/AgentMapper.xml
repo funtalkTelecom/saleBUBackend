@@ -14,7 +14,7 @@
             a.address =#{address},
             a.trading_img=#{tradingImg},
             a.status= #{status},
-            a.add_user_id=#{addUserId},
+            a.add_consumer_id=#{addConsumerId},
             a.add_date =#{addDate},
             a.is_del=#{isDel}
         where a.id = #{id}
@@ -24,5 +24,41 @@
     <update id="agentDelete">
         update tb_agent a set a.is_del = 1 where a.id = #{id}
     </update>
+
+
+    <select id="findAgentListByConsumerId" resultType="java.util.HashMap">
+        select t.commpay_name,t.person,t.phone,y.name,c.name,d.name,t.address,u.name,
+        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,
+        t.trading_img from tb_agent t left join tb_city y on t.province = y.id
+        left join tb_city c on t.city = y.id
+        left join tb_city d on t.district = d.id
+        left join tb_user u on t.add_consumer_id = u.id
+        where t.is_del=0
+        and t.add_consumer_id=#{ConsumerId}
+    </select>
+
+    <select id="queryPageList" resultType="Agent">
+        select t.commpay_name,t.person,t.phone,
+        y.name as provinceName ,c.name as cityName,d.name as districtName,
+        t.address,u.name as userName,
+        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,
+        t.trading_img,t.status as status,
+				case
+				when t.status =1 then '待审核'
+				when t.status =2 then '审核通过'
+				else '未知'
+				end as statustext
+				from tb_agent t left join tb_city y on t.province = y.id
+        left join tb_city c on t.city = y.id
+        left join tb_city d on t.district = d.id
+        left join tb_user u on t.add_consumer_id = u.id
+        where t.is_del=0
+        <if test="param.commpayName!=null and param.commpayName!=''">
+            and  t.commpay_name  like "%"#{param.commpayName}"%"
+        </if>
+        <if test="param.person!=null and param.person!=''">
+            and t.person like "%"#{param.person}"%"
+        </if>
+    </select>
 
 </mapper>

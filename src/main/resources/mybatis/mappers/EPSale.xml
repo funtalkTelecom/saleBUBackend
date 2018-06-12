@@ -23,25 +23,20 @@
         order by t.id desc
     </select>
 
-    <select id="findDeliveryAddressListByUserId" resultType="java.util.HashMap">
-        select t.id,
-		person_name as personName,
-		t.person_tel as personTel ,
-		province.name as provinceName,
-		city.name as cityName,
-		district.name as  districtName,
-		province.id as provinceId,
-		city.id as cityId,
-		district.id as  districtId,
-        t.address,
-		t.add_user_id as addUserId,
-		t.is_defaultl as isDefaultl,t.note
-		from tb_delivery_address t
-        inner join tb_city  province on province.id=t.province
-        inner join tb_city city on city.id=t.city
-        inner join tb_city district on district.id=t.district
-        where t.is_del = 0
-        and t.add_user_id = #{addUserId};
+    <select id="findEPSaleList" resultType="java.util.HashMap">
+    select
+    ep.id,
+    ep.title,
+    ep.ep_rule as erRule,
+    ep.start_time as startTime,
+    ep.end_time as endTime,
+    concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) as epImg
+    from tb_ep_sale ep
+    inner join
+    tb_file_info epImg
+    on epImg.ref_id=ep.id
+    where ep.is_del=0
+    and TIMESTAMPDIFF(second, now(),ep.end_time)>0
     </select>
 
     <select id="findEPSaleById" resultType="EPSale">

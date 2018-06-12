@@ -16,6 +16,8 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     List<Map> findEPSaleListByUserId(@Param("addUserId") Long addUserId);
 
+    List<Map> findEPSaleList();
+
     int checkEPSaleKeyIdIsExist(EPSale epSale);
 
     void epSaleEdit(EPSale epSale);
