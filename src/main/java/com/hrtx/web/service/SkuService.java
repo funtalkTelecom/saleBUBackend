@@ -33,7 +33,7 @@ public class SkuService {
 				skuMap.put("skuId", String.valueOf(sku.getSkuId()));
 				skuMap.put("skuTobPrice", sku.getSkuTobPrice());
 				skuMap.put("skuTocPrice", sku.getSkuTocPrice());
-				skuMap.put("skuIsNum", sku.getSkuIsNum());
+//				skuMap.put("skuIsNum", sku.getSkuIsNum());
 				skuMap.put("skuSaleNum", sku.getSkuSaleNum());
 				skuMap.put("skuNum", String.valueOf(sku.getSkuNum()));
 				skuMap.put("skuGoodsType", sku.getSkuGoodsType());

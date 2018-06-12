@@ -35,6 +35,7 @@
     </select>
 
     <resultMap id="saleNumber" type="java.util.HashMap">
+        <result column="id" property="id"></result>
         <result column="num_resource" property="numResource"></result>
         <result column="sku_tob_price" property="skuTobPrice"></result>
         <result column="sku_toc_price" property="skuTocPrice"></result>
@@ -47,6 +48,7 @@
     </resultMap>
     <select id="queryPageListApi" resultMap="saleNumber">
         select
+            a.id,
             a.num_resource,
             b.sku_tob_price,
             b.sku_toc_price,
