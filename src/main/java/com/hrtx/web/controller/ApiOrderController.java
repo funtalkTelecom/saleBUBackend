@@ -8,10 +8,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.mapper.*;
-import com.hrtx.web.pojo.Goods;
-import com.hrtx.web.pojo.Order;
-import com.hrtx.web.pojo.Sku;
-import com.hrtx.web.pojo.User;
+import com.hrtx.web.pojo.*;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +27,8 @@ public class ApiOrderController extends BaseReturn{
 
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
+	private ApiSessionUtil apiSessionUtil;
+	@Autowired
 	private GoodsMapper goodsMapper;
 	@Autowired
 	private SkuMapper skuMapper;
@@ -43,7 +42,7 @@ public class ApiOrderController extends BaseReturn{
 	@ResponseBody
 	public Result createOrder(HttpServletRequest request){
 		Order order = new Order();
-		User user = new ApiSessionUtil().getUser();
+		ConsumerLog user = apiSessionUtil.getUserClient();
 		//获取传入的商品ID
 		String goodsId = request.getParameter("goodsId");
 		goodsId = goodsId==null?"":goodsId;
@@ -54,6 +53,10 @@ public class ApiOrderController extends BaseReturn{
 //			List goodsList = goodsMapper.getListByGid(goodsId);
 //			if (goodsList != null && goodsList.size() > 0) {
 //
+//				//判断商品类型:
+//				switch (){
+//
+//				}
 //			}
 
 		}else{
