@@ -51,10 +51,14 @@ public enum PowerConsts {
 	NUMBERMOUDULE_COMMON_QUEYR(70301,"查询",70300,1,"",3,1),//号码查询
 	NUMBERMOUDULE_COMMON_ADDTAG(70302,"号码添加标签",70300,1,"",3,2),//号码添加标签
 
-	MEALMOUDULE_ACCOUNT(70400,"收款账号管理",70000,0,"account/query-account",2,1),
+	ACCOUNTMOUDULE(70400,"收款账号管理",70000,0,"account/query-account",2,1),
 	ACCOUNTMOUDULE_COMMON_QUEYR(70401,"查询",70400,1,"",3,1),//收款账号管理查询
 	ACCOUNTMOUDULE_COMMON_EDIT(70402,"修改",70400,1,"",3,2),//收款账号管理修改
 	ACCOUNTMOUDULE_COMMON_DELETE(70403,"删除",70400,1,"",3,3),//收款账号管理删除
+
+	AGENTMOUDULE(70500,"代理商理管理",70000,0,"agent/query-agent",2,1),
+	AGENTMOUDULE_COMMON_QUEYR(70501,"查询",70500,1,"",3,1),//管代理商理查询
+	AGENTMOUDULE_COMMON_CHECK(70502,"审核",70500,1,"",3,2),//管代理商理审核
 
 	SYSMOUDULE(90300,"配置管理",90000,0,"system/system-query",2,1),//配置管理
 	SYSMOUDULE_COMMON_QUEYR(90301,"查询",90300,1,"",3,1),//配置查询

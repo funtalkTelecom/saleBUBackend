@@ -66,6 +66,7 @@ public class ApiSessionUtil {
         redisUtils.set(key1,consumer,expire_time);
     }
 
+
     public Consumer getConsumer(){
         String key = getApiKey(this.getTokenStr());
         return (Consumer) (redisUtils.get(key));
