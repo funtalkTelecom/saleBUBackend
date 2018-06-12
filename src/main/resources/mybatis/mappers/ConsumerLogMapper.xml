@@ -3,8 +3,8 @@
 <mapper namespace="com.hrtx.web.mapper.ConsumerLogMapper">
     <update id="insertConsumerLog">
         update tb_consumer_log t set
-         t.login_name=#{livePhone},
-         t.live_phone =#{city},
+         t.login_name=#{loginName},
+         t.live_phone =#{livePhone},
          t.nick_name=#{nickName},
          t.sex=#{sex}
          where
