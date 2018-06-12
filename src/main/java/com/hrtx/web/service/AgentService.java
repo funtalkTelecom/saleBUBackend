@@ -29,10 +29,10 @@ public class AgentService {
 	public Result SaveOrUpdateAgent(Long id,String commpayName,String person,String phone,long province,long city,long district,
 									String address,String tradingImg){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
-		long userid = consumer.getId();
+		long consumerId = consumer.getId();
 //		long userid = 10001;
 		Agent agent = new Agent();
-		Agent ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,1,userid, new Date(),0);
+		Agent ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0);
 		if(ag.getId()==null || ag.getId()==0){  //添加
 			ag.setId(agent.getGeneralId());
 			agentMapper.insert(ag);
@@ -41,4 +41,15 @@ public class AgentService {
 		}
 		return new Result(Result.OK, "提交成功");
 	}
+
+	public Result findAgentListByaddConsumerId(Long ConsumerId) {
+		return new Result(Result.OK,  agentMapper.findAgentListByConsumerId( ConsumerId));
+	}
+
+    public Result pageAgent(Agent agent) {
+        PageHelper.startPage(agent.getPageNum(),agent.getLimit());
+        Page<Object> ob=this.agentMapper.queryPageList(agent);
+        PageInfo<Object> pm = new PageInfo<Object>(ob);
+        return new Result(Result.OK, pm);
+    }
 }

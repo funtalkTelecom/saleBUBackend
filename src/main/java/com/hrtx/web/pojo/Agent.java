@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 @Table(name = "tb_agent")
@@ -23,16 +24,27 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	private String address;
 	private String tradingImg;
 	private Integer status;
-	private Long addUserId;
+	private Long addConsumerId;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date addDate;
 	private Integer isDel;
+
+	@Transient
+	private String  provinceName;// 所属省份
+	@Transient
+	private String  cityName;   //所属地市
+	@Transient
+	private String  districtName;//所属区县
+	@Transient
+	private String  statustext;//
+	@Transient
+	private String  userName;//
 
 	public Agent() {
 	}
 
 	public Agent(Long id, String commpayName, String person,String phone,Long province,Long city,Long district
-				 , String address,String tradingImg, Integer status, Long addUserId, Date addDate, Integer isDel) {
+				 , String address,String tradingImg, Integer status, Long addConsumerId, Date addDate, Integer isDel) {
 		this.id = id;
 		this.commpayName = commpayName;
 		this.person = person;
@@ -43,7 +55,7 @@ public class Agent extends BasePojo implements java.io.Serializable {
 		this.address = address;
 		this.tradingImg =tradingImg;
 		this.status = status;
-		this.addUserId = addUserId;
+		this.addConsumerId = addConsumerId;
 		this.addDate = addDate;
 		this.isDel = isDel;
 	}
@@ -121,12 +133,11 @@ public class Agent extends BasePojo implements java.io.Serializable {
 		this.status = status;
 	}
 
-	public Long getAddUserId() {
-		return addUserId;
+	public Long getAddConsumerId() {
+		return addConsumerId;
 	}
-
-	public void setAddUserId(Long addUserId) {
-		this.addUserId = addUserId;
+	public void setAddConsumerId(Long addConsumerId) {
+		this.addConsumerId = addConsumerId;
 	}
 
 	public Date getAddDate() {
@@ -151,5 +162,45 @@ public class Agent extends BasePojo implements java.io.Serializable {
 
 	public void setTradingImg(String tradingImg) {
 		this.tradingImg = tradingImg;
+	}
+
+	public String getProvinceName() {
+		return provinceName;
+	}
+
+	public void setProvinceName(String provinceName) {
+		this.provinceName = provinceName;
+	}
+
+	public String getCityName() {
+		return cityName;
+	}
+
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+
+	public String getDistrictName() {
+		return districtName;
+	}
+
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
+	}
+
+	public String getStatustext() {
+		return statustext;
+	}
+
+	public void setStatustext(String statustext) {
+		this.statustext = statustext;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 }
