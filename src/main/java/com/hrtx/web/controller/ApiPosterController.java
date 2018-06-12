@@ -7,6 +7,7 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SessionUtil;
+import com.hrtx.global.SystemParam;
 import com.hrtx.web.mapper.PosterMapper;
 import com.hrtx.web.pojo.Poster;
 import net.sf.json.JSONObject;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -45,6 +47,12 @@ public class ApiPosterController extends BaseReturn{
 
 			PageHelper.startPage(poster.getPageNum(),poster.getLimit());
 			Page<Object> ob=this.posterMapper.queryPageListApi(poster);
+            if(ob!=null && ob.size()>0){
+                for (Object obj : ob) {
+                	Poster p = (Poster) obj;
+					p.setPic("http://" + request.getRemoteHost() + ":" + request.getServerPort() + "/get-img/posterImages/" + p.getPic());
+                }
+            }
 			pm = new PageInfo<Object>(ob);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();

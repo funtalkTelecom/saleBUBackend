@@ -42,7 +42,7 @@ public class ApiOrderController extends BaseReturn{
 	@ResponseBody
 	public Result createOrder(HttpServletRequest request){
 		Order order = new Order();
-		ConsumerLog user = apiSessionUtil.getUserClient();
+		Consumer user = apiSessionUtil.getConsumer();
 		//获取传入的商品ID
 		String goodsId = request.getParameter("goodsId");
 		goodsId = goodsId==null?"":goodsId;
