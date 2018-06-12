@@ -12,13 +12,4 @@
          where t.id=#{userid}
     </update>
 
-    <update id="insertConsumerLog">
-        update tb_consumer_log t set
-         t.login_name=#{livePhone},
-         t.live_phone =#{city},
-         t.nick_name=#{nickName},
-         t.sex=#{sex}
-         where
-         t.user_id=#{userid}
-    </update>
 </mapper>
