@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
+import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.mapper.NumberMapper;
@@ -34,7 +35,7 @@ public class ApiNumberController extends BaseReturn{
 	@GetMapping("/number")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public String numberList(Number number, HttpServletRequest request){
+	public Result numberList(Number number, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
 			number.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
@@ -58,8 +59,9 @@ public class ApiNumberController extends BaseReturn{
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			pm = new PageInfo<Object>(null);
+			return new Result(Result.ERROR, pm);
 		}
 
-		return JSONObject.fromObject(pm).toString();
+		return new Result(Result.OK, pm);
 	}
 }

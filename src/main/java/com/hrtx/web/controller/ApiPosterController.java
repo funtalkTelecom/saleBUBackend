@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
+import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.web.mapper.PosterMapper;
@@ -36,7 +37,7 @@ public class ApiPosterController extends BaseReturn{
 	@GetMapping("/poster")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public String posterList(Poster poster, HttpServletRequest request){
+	public Result posterList(Poster poster, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
 			poster.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
@@ -48,8 +49,9 @@ public class ApiPosterController extends BaseReturn{
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			pm = new PageInfo<Object>(null);
+			return new Result(Result.ERROR, pm);
 		}
 
-		return JSONObject.fromObject(pm).toString();
+		return new Result(Result.OK, pm);
 	}
 }
