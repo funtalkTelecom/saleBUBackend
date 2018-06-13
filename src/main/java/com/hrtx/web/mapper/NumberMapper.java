@@ -5,6 +5,8 @@ import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.Number;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Map;
+
 public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
     void updateStatus(Number number);
 
@@ -12,5 +14,5 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
 
     Page<Object> queryPageListApi(@Param("tags") String tags);
 
-    Number getNumInfoById(@Param("id") String id);
+    Map getNumInfoById(@Param("id") String id);
 }

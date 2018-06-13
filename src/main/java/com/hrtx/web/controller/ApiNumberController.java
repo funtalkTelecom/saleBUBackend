@@ -9,14 +9,13 @@ import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.mapper.NumberMapper;
 import com.hrtx.web.pojo.Number;
-import com.hrtx.web.pojo.User;
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -52,10 +51,7 @@ public class ApiNumberController extends BaseReturn{
 				//处理号码,生成号码块字段(numBlock)
 				for (int i = 0; i < ob.size(); i++) {
 					Map obj= (Map) ob.get(i);
-					StringBuffer num = new StringBuffer((String) obj.get("numResource"));
-					num.insert(3, ",");
-					num.insert(8, ",");
-					obj.put("numBlock", num.toString().split(","));
+					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
 				}
 			}
 			pm = new PageInfo<Object>(ob);
@@ -72,14 +68,22 @@ public class ApiNumberController extends BaseReturn{
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Result numberInfo(@PathVariable("id") String id, HttpServletRequest request){
-		Number number = new Number();
+		Map number = new HashMap();
 		try {
 			number = numberMapper.getNumInfoById(id);
+			number.put("numBlock", getNumBlock((String) number.get("numResource")));
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
-			return new Result(Result.ERROR, new Number());
+			return new Result(Result.ERROR, new HashMap());
 		}
 
 		return new Result(Result.OK, number);
+	}
+
+	private String[] getNumBlock(String num) {
+		StringBuffer numResource = new StringBuffer(num);
+		numResource.insert(3, ",");
+		numResource.insert(8, ",");
+		return numResource.toString().split(",");
 	}
 }
