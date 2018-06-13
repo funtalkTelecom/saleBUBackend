@@ -21,6 +21,13 @@
         order by a.sku_id,a.seq asc
     </select>
 
+    <select id="findSkuPropertyBySkuid" resultType="SkuProperty">
+        select
+        <include refid="col_list"/>
+        from tb_sku_property a where a.sku_id = #{skuid}
+        order by a.sku_id,a.seq asc
+    </select>
+
     <insert id="insertBatch">
         insert into tb_sku_property(
             skup_id,

@@ -26,11 +26,13 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
     private int quantity;
     private double price;
     private double total;
+    private Long mealId;
+    private String iccid;
 
     public OrderItem() {
     }
 
-    public OrderItem(Long itemId, Long orderId, Long goodsId, Long skuId, String skuProperty, Long numId, String num, int isShipment, Long sellerId, String sellerName, String shipmentApi, Long companystockId, int quantity, double price, double total) {
+    public OrderItem(Long itemId, Long orderId, Long goodsId, Long skuId, String skuProperty, Long numId, String num, int isShipment, Long sellerId, String sellerName, String shipmentApi, Long companystockId, int quantity, double price, double total, Long mealId, String iccid) {
         this.itemId = itemId;
         this.orderId = orderId;
         this.goodsId = goodsId;
@@ -46,6 +48,8 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
         this.quantity = quantity;
         this.price = price;
         this.total = total;
+        this.mealId = mealId;
+        this.iccid = iccid;
     }
 
     public Long getItemId() {
@@ -166,5 +170,21 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public Long getMealId() {
+        return mealId;
+    }
+
+    public void setMealId(Long mealId) {
+        this.mealId = mealId;
+    }
+
+    public String getIccid() {
+        return iccid;
+    }
+
+    public void setIccid(String iccid) {
+        this.iccid = iccid;
     }
 }

@@ -29,6 +29,32 @@
         order by a.sku_id asc
     </select>
 
+    <resultMap id="skuListForOrder" type="java.util.HashMap">
+        <result property="skuId" column="sku_id" javaType="java.lang.String"></result>
+        <result property="gId" column="g_id" javaType="java.lang.String"></result>
+        <result property="skuTobPrice" column="sku_tob_price"></result>
+        <result property="skuTocPrice" column="sku_toc_price"></result>
+        <result property="skuIsNum" column="sku_is_num"></result>
+        <result property="skuSaleNum" column="sku_sale_num"></result>
+        <result property="skuGoodsType" column="sku_goods_type"></result>
+        <result property="skuRepoGoods" column="sku_repo_goods"></result>
+        <result property="skuNum" column="sku_num"></result>
+        <result property="gStartTime" column="g_start_time"></result>
+        <result property="gEndTime" column="g_end_time"></result>
+        <result property="gSellerId" column="g_seller_id" javaType="java.lang.String"></result>
+        <result property="gSellerName" column="g_seller_name"></result>
+    </resultMap>
+    <select id="getSkuListBySkuids" resultMap="skuListForOrder">
+        select
+            a.*,
+            b.g_start_time,
+            b.g_end_time,
+            b.g_seller_id,
+            b.g_seller_name
+        from tb_sku a left join tb_goods b on b.g_id = a.g_id
+        where a.sku_id in (${skuids})
+    </select>
+
     <insert id="insertBatch">
         insert into tb_sku(
             sku_id,
