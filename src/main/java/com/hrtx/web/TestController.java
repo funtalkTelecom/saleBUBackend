@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.TokenGenerator;
+import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.User;
 import net.sf.json.JSONObject;
 
@@ -189,14 +190,14 @@ public class TestController {
     @Powers({PowerConsts.NOLOGINPOWER})
     @ResponseBody
     public Result helloworld10(HttpServletRequest request) {
-        User user= this.apiSessionUtil.getUser();
+        Consumer user= this.apiSessionUtil.getConsumer();
         System.out.println("获取用户  "+user);
-        user=new User();
+        user=new Consumer();
         user.setId(1234567890l);
-        user.setLoginName("test-test");
+        user.setName("zjc");
         String token=TokenGenerator.generateValue();
         this.apiSessionUtil.saveOrUpdate(token,user);
-        System.out.println("method{login}  "+user.getLoginName());
+        System.out.println("method{login}  "+user.getName());
         Result result=new Result(Result.OK,token);
         return result;
 //        return "[]";

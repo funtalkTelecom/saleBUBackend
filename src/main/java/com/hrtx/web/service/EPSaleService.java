@@ -39,6 +39,14 @@ public class EPSaleService {
 		return new Result(Result.OK,  epSaleMapper.findEPSaleList());
 	}
 
+	public List<Map> findEPSaleByEPSaleId(Long ePSaleId) {
+		return epSaleMapper.findEPSaleByEPSaleId(ePSaleId);
+	}
+
+	public List<Map> findEPSaleGoodsListByEPSaleId(Long ePSaleId) {
+		return epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
+	}
+
 	public EPSale finEPSaleById(Long id) {
 		EPSale epSale = epSaleMapper.findEPSaleById(id);
 		return epSale;
