@@ -19,7 +19,7 @@ public class ZyqTest {
     @Test
     public void addUser()  {
         userService.paytest1();
-        int a = 3;
+        int a = 4;
         Assert.assertEquals("a","a");
     }
 }
