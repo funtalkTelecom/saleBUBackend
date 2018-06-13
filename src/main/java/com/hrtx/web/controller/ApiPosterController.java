@@ -50,7 +50,7 @@ public class ApiPosterController extends BaseReturn{
             if(ob!=null && ob.size()>0){
                 for (Object obj : ob) {
                 	Poster p = (Poster) obj;
-					p.setPic("http://" + request.getRemoteHost() + ":" + request.getServerPort() + "/get-img/posterImages/" + p.getPic());
+					p.setPic(SystemParam.get("domain-full") + "/get-img/posterImages/" + p.getPic());
                 }
             }
 			pm = new PageInfo<Object>(ob);
