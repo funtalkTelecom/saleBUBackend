@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.DeliveryAddressMapper;
@@ -29,7 +30,8 @@ public class DeliveryAddressService {
 	
 	@Autowired
 	private DeliveryAddressMapper deliveryAddressMapper;
-
+	@Autowired
+	private ApiSessionUtil apiSessionUtil;
 	public Result pageDeliveryAddress(DeliveryAddress deliveryAddress) {
 		PageHelper.startPage(deliveryAddress.getPageNum(),deliveryAddress.getLimit());
 		Page<Object> ob=this.deliveryAddressMapper.queryPageList(deliveryAddress);
@@ -41,13 +43,24 @@ public class DeliveryAddressService {
 		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressListByUserId( userId));
 	}
 
+	public Result findDeliveryAddressList() {
+		long kk=this.apiSessionUtil.getConsumer().getId();
+		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressListByUserId(this.apiSessionUtil.getConsumer().getId()));
+	}
+
+	public Result findDeliveryAddressDefault() {
+		long kk=this.apiSessionUtil.getConsumer().getId();
+		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressDefaultByUserId(this.apiSessionUtil.getConsumer().getId()));
+	}
+
 	public  List<Map> findDeliveryAddressById(Long id) {
 		return  deliveryAddressMapper.findDeliveryAddressById(id);
 	}
 
 	public Result deliveryAddressEdit(DeliveryAddress deliveryAddress, HttpServletRequest request) {
 
-		deliveryAddress.setAddUserId(Long.valueOf(String.valueOf(1)));
+		deliveryAddress.setAddUserId(apiSessionUtil.getConsumer().getId());
+
 		if (deliveryAddress.getId() != null && deliveryAddress.getId() > 0) {
 			deliveryAddress.setUpdateDate(new Date());
 			deliveryAddressMapper.deliveryAddressEdit(deliveryAddress);

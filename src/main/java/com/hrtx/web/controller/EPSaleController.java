@@ -57,6 +57,26 @@ public class EPSaleController extends BaseReturn{
 		return epSaleService.findEPSaleList();
 	}
 
+	/**
+	 * 查询竟拍活动的商品列表
+	 * 未过期
+	 * @param
+	 * @return
+	 */
+	@GetMapping("/api/epSaleGoodss/{ePSaleId}")
+	//@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})
+	@Powers({PowerConsts.NOLOGINPOWER})
+	@ResponseBody
+	public Map findEPSaleGoodss(@PathVariable("ePSaleId") String ePSaleId){
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Map> epSaleMap=epSaleService.findEPSaleByEPSaleId(Long.valueOf(ePSaleId));
+		List<Map> goodsList=epSaleService.findEPSaleGoodsListByEPSaleId(Long.valueOf(ePSaleId));
+		epSaleMap.get(0).put("goodsList",goodsList);
+		map.put("code", Result.OK);
+		map.put("data", epSaleMap);
+		return map;
+	}
+
 	@RequestMapping("/epSale/epSale-info")
 	@ResponseBody
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})

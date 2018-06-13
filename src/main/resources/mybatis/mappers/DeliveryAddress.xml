@@ -48,6 +48,27 @@
         and t.add_user_id = #{addUserId};
     </select>
 
+    <select id="findDeliveryAddressDefaultByUserId" resultType="java.util.HashMap">
+        select t.id,
+		person_name as personName,
+		t.person_tel as personTel ,
+		province.name as provinceName,
+		city.name as cityName,
+		district.name as  districtName,
+		province.id as provinceId,
+		city.id as cityId,
+		district.id as  districtId,
+        t.address,
+		t.add_user_id as addUserId,
+		t.is_defaultl as isDefaultl,t.note
+		from tb_delivery_address t
+        inner join tb_city  province on province.id=t.province
+        inner join tb_city city on city.id=t.city
+        inner join tb_city district on district.id=t.district
+        where t.is_del = 0 and t.is_defaultl=1
+        and t.add_user_id = #{addUserId};
+    </select>
+
     <select id="findDeliveryAddressById" resultType="java.util.HashMap">
       select t.id,
 	  person_name as personName,
