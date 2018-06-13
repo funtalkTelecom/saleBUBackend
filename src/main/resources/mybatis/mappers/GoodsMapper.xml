@@ -49,7 +49,7 @@
         b.seq as seq,
     </sql>
     <resultMap id="ApiGoodsList" type="java.util.HashMap">
-        <result property="gId" column="g_id"></result>
+        <result property="gId" column="g_id" javaType="java.lang.String"></result>
         <result property="gType1" column="g_type1"></result>
         <result property="gType2" column="g_type2"></result>
         <result property="gName" column="g_name"></result>
@@ -68,7 +68,7 @@
         <result property="gSellerName" column="g_seller_name"></result>
         <result property="gIsSale" column="g_is_sale"></result>
         <result property="fileId" column="file_id"></result>
-        <result property="refId" column="ref_id"></result>
+        <result property="refId" column="ref_id" javaType="java.lang.String"></result>
         <result property="fileName" column="file_name"></result>
         <result property="fileGroup" column="file_group"></result>
         <result property="seq" column="seq"></result>
