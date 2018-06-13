@@ -153,6 +153,12 @@
 									<input type="text" class="form-control" name="saleType" >
 								</div>
 							</div>
+							<div class="form-group">
+								<label class="col-xs-2 control-label">运营商</label>
+								<div class="col-xs-4">
+									<input type="text" class="form-control" name="teleType" >
+								</div>
+							</div>
 
 							<div class="form-group">
 								<label class="col-xs-2 control-label">套餐描述</label>

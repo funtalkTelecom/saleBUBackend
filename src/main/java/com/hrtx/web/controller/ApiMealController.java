@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -51,5 +53,27 @@ public class ApiMealController extends BaseReturn{
 		}
 
 		return new Result(Result.OK, pm);
+	}
+
+	/**
+	 * 套餐接口-根据号码id查询相关运营商套餐
+	 * @param id
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/meal/n{id}")
+    @Powers(PowerConsts.NOLOGINPOWER)
+	@ResponseBody
+	public Result mealListForNum(@PathVariable("id") String id, HttpServletRequest request){
+		List mealList = new ArrayList();
+		try {
+			mealList = mealMapper.getMealListByNum(id);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			mealList = new ArrayList();
+			return new Result(Result.ERROR, mealList);
+		}
+
+		return new Result(Result.OK, mealList);
 	}
 }
