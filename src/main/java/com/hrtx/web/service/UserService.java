@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.hrtx.config.advice.ServiceException;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.TokenGenerator;
 import com.hrtx.web.mapper.ConsumerLogMapper;
@@ -36,13 +37,23 @@ public class UserService {
 	@Autowired private ConsumerMapper consumerMapper;
 	@Autowired private ApiSessionUtil apiSessionUtil;
 
-	public void test() {
-		List<User> list=this.userMapper.select(null);
-		for (User user : list) {
-			System.out.println(user.getName());
-		}
+	public void paytest1() {
+		User u = new User(10l);
+		userMapper.insert(u);
+		this.paytest();
+		if(1==1) throw new ServiceException("手动异常");
+//		List<User> list=this.userMapper.select(null);
+//		for (User user : list) {
+//			System.out.println("----"+user.getName());
+//		}
 	}
-	
+
+	public void paytest() {
+		User u = new User(11l);
+		userMapper.insert(u);
+//		if(1==1) throw new ServiceException("手动异常");
+	}
+
 	public Result pageUser(User user) {
 		PageHelper.startPage(user.getStart(),user.getLimit());
 		Page<Object> ob=this.userMapper.queryPageList(user);

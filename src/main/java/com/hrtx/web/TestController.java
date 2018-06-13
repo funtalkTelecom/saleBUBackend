@@ -70,7 +70,7 @@ public class TestController {
         String key="abcdeeedddddd";
         request.getSession().setAttribute("userinfo12",key);
         System.out.println("添加了一个session");
-        userService.test();
+//        userService.test();
 //    	if("1".equals("1"))throw new RuntimeException("this test!");
         return key;
     }
