@@ -88,8 +88,8 @@ public class PinganService {
 			return new Result(Result.ERROR,"接口返回数据错误");
 //			return new Result("B0007","接口返回数据错误",null);
 		}
-		//只有返回数据有data节点时才需要验证签名
-		if(!respObject.containsKey("data"))return new Result(Result.ERROR,respObject.getString("msg"));//return new Result("B0008",respObject.getString("msg"),null);
+//		if(!respObject.containsKey("data"))return new Result(Result.ERROR,respObject.getString("msg"));//return new Result("B0008",respObject.getString("msg"),null);
+//		if(!"0".equals(respObject.getString("errcode"))) return new Result(Result.ERROR,respObject.getString("msg"));//return new Result("B0008",respObject.getString("msg"),null);
 		if (!TLinx2Util.verifySign(respObject)) {
 			log.info("=====验签失败=====");
 			return new Result(Result.PARAM,"验签失败");
@@ -220,7 +220,7 @@ public class PinganService {
 		return this.payRefund(outNo, refundOutNo, refundOrdName, refundAmount, null, null, null, null, remark,TLinxSHA1.SHA1("123456"));
 	}
 
-	public Result saveDateReq(Map<String, String> datamap,Class<?> bean_name) {
+	private Result saveDateReq(Map<String, String> datamap,Class<?> bean_name) {
 		Map<String,Object> _resp=new HashMap<>();
 		Iterator<?> iterator=datamap.keySet().iterator();
 		while (iterator.hasNext()) {
@@ -229,7 +229,7 @@ public class PinganService {
 		}
 		return this.saveDate(_resp,bean_name);
 	}
-	public Result saveDateResp(Result result,String rspStr,Class<?> bean_name) {
+    private Result saveDateResp(Result result,String rspStr,Class<?> bean_name) {
 		Map<String,Object> _resp=new HashMap<>();
 		JSONObject respObject=JSONObject.fromObject(rspStr);
 		Iterator<?> iterator=respObject.keySet().iterator();
@@ -242,7 +242,7 @@ public class PinganService {
 		else _resp.put("check_sign",2);
 		return this.saveDate(_resp,bean_name);
 	}
-	public Result saveDate(Map<String, Object> datamap,Class<?> bean_name) {
+    private Result saveDate(Map<String, Object> datamap,Class<?> bean_name) {
 		Object bean=null;
 		log.info(String.format("实例化[%s]对象",bean_name.getName()));
 		try {
@@ -351,7 +351,7 @@ public class PinganService {
 		 * 2 请求参数签名 按A~z排序，串联成字符串，先进行sha1加密(小写)，再进行md5加密(小写)，得到签名
 		 */
 		TLinx2Util.handleSign(postmap);
-		/**
+		 /**
 		 * 3 请求、响应
 		 */
 		String rspStr=null;
