@@ -59,7 +59,7 @@ public class ApiGoodsController extends BaseReturn{
 			if(ob!=null && ob.size()>0){
 				for(int i=0; i<ob.size(); i++){
 					Map g = (Map) ob.get(i);
-					g.put("fileName", "http://" + request.getRemoteHost() + ":" + request.getServerPort() + "/get-img"+SystemParam.get("goodsPics") +g.get("gId")+"/"+ g.get("fileName"));
+					g.put("fileName", SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +g.get("gId")+"/"+ g.get("fileName"));
 				}
 			}
 			pm = new PageInfo<Object>(ob);
@@ -100,7 +100,7 @@ public class ApiGoodsController extends BaseReturn{
 			fileList = fileMapper.findFilesByRefid(id);
 			if (fileList != null && fileList.size() > 0) {
 				for (File file : fileList) {
-					file.setFileName("http://" + request.getRemoteHost() + ":" + request.getServerPort() + "/get-img"+SystemParam.get("goodsPics") +goods.getgId()+"/"+ file.getFileName());
+					file.setFileName(SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +goods.getgId()+"/"+ file.getFileName());
 				}
 			}
 			returnMap.put("code", Result.OK);
