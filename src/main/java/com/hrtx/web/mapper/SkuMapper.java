@@ -13,4 +13,6 @@ public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
     void insertBatch(@Param("skuList") List<Sku> skuList);
 
     List<Sku> findSkuInfo(@Param("gId") Long gId);
+
+    List getSkuListBySkuids(@Param("skuids") String skuids);
 }

@@ -27,6 +27,13 @@
         from tb_goods a where a.g_id = #{id}
     </select>
 
+    <select id="findGoodsInfoBySkuid" resultType="Goods">
+        select
+        <include refid="col_list"/>
+        from tb_sku b left join tb_goods a on a.g_id = b.g_id
+        where b.sku_id = #{skuid}
+    </select>
+
     <select id="queryPageList" resultType="Goods">
         select
         <include refid="col_list"/>

@@ -19,4 +19,6 @@ public interface GoodsMapper extends Mapper<Goods>,BaseMapper<Goods>{
     Page<Object> queryPageListApi(Goods goods, @Param("gSaleCityArr") String[] gSaleCityArr);
 
     void goodsUnsale(Goods goods);
+
+    Goods findGoodsInfoBySkuid(@Param("skuid") String skuid);
 }
