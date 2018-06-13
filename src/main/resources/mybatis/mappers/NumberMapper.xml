@@ -34,6 +34,14 @@
         where 1=1
     </select>
 
+    <select id="getNumInfoById" resultType="Number">
+        select
+        <include refid="col_list"/>
+        from tb_num a
+        where 1=1
+        and a.id = #{id}
+    </select>
+
     <resultMap id="saleNumber" type="java.util.HashMap">
         <result column="id" property="id"></result>
         <result column="num_resource" property="numResource"></result>

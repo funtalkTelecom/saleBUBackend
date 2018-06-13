@@ -14,10 +14,7 @@ import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -32,6 +29,12 @@ public class ApiNumberController extends BaseReturn{
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 
+	/**
+	 * 根据tags获取号码
+	 * @param number
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/number")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
@@ -63,5 +66,20 @@ public class ApiNumberController extends BaseReturn{
 		}
 
 		return new Result(Result.OK, pm);
+	}
+
+	@GetMapping("/number/{id}")
+	@Powers(PowerConsts.NOLOGINPOWER)
+	@ResponseBody
+	public Result numberInfo(@PathVariable("id") String id, HttpServletRequest request){
+		Number number = new Number();
+		try {
+			number = numberMapper.getNumInfoById(id);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			return new Result(Result.ERROR, new Number());
+		}
+
+		return new Result(Result.OK, number);
 	}
 }

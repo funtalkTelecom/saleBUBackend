@@ -11,4 +11,6 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
     int checkNumberIsOk(Number number);
 
     Page<Object> queryPageListApi(@Param("tags") String tags);
+
+    Number getNumInfoById(@Param("id") String id);
 }
