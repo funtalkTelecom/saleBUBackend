@@ -36,6 +36,8 @@
 
     <resultMap id="saleNumber" type="java.util.HashMap">
         <result column="id" property="id" javaType="java.lang.String"></result>
+        <result column="city_id" property="cityId" javaType="java.lang.String"></result>
+        <result column="city_name" property="cityName"></result>
         <result column="num_resource" property="numResource"></result>
         <result column="sku_tob_price" property="skuTobPrice"></result>
         <result column="sku_toc_price" property="skuTocPrice"></result>
@@ -49,6 +51,8 @@
     <select id="queryPageListApi" resultMap="saleNumber">
         select
             a.id,
+            a.city_id,
+            a.city_name,
             a.num_resource,
             b.sku_tob_price,
             b.sku_toc_price,
@@ -74,6 +78,8 @@
     <select id="getNumInfoById" resultMap="saleNumber">
         select
         a.id,
+        a.city_id,
+        a.city_name,
         a.num_resource,
         b.sku_tob_price,
         b.sku_toc_price,
