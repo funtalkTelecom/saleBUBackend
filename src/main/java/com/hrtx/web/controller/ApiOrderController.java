@@ -37,30 +37,33 @@ public class ApiOrderController extends BaseReturn{
 	@Autowired
 	private OrderItemMapper orderItemMapper;
 
+	/**
+	 * 根据商品id创建订单
+	 * @param request
+	 * @param type 1:普靓和超靓:skuid, numid, 地址id, 支付方式, 套餐id
+	 *             2:白卡和普号:skuid,数量,地址
+	 * @return
+	 */
 	@PostMapping("/order")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Result createOrder(HttpServletRequest request){
 		Order order = new Order();
-		Consumer user = apiSessionUtil.getConsumer();
-		//获取传入的商品ID
-		String goodsId = request.getParameter("goodsId");
-		goodsId = goodsId==null?"":goodsId;
-		String[] goodsIds = goodsId.split(",");
+		String type = request.getParameter("type");
 
-		if(!goodsId.equals("") && goodsIds.length>0){
-			//获取商品列表
-//			List goodsList = goodsMapper.getListByGid(goodsId);
-//			if (goodsList != null && goodsList.size() > 0) {
-//
-//				//判断商品类型:
-//				switch (){
-//
-//				}
-//			}
+		try {
+			switch (type){
+//				type:1  普通靓号和超级靓号    skuid, numid, 地址id, 支付方式, 套餐id
+				case "1":
 
-		}else{
-			return new Result(Result.PARAM, "未获取到参数");
+
+//				type:2  白卡和普号		skuid,数量,地址
+				case "2":
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Result(Result.ERROR, "未获取到参数");
 		}
 
 		return new Result(Result.OK, order.getOrderId());
