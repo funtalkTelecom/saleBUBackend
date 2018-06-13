@@ -27,12 +27,13 @@ public class Meal extends BasePojo implements java.io.Serializable {
 	private Long updateBy;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date updateDate;
+	private String teleType;
 	private Integer isDel;
 
 	public Meal() {
 	}
 
-    public Meal(Long mid, String mealId, String mealName, String mealDesc, Long saleCity, String saleCityName, String saleType, Long createBy, Date createDate, Long updateBy, Date updateDate, Integer isDel) {
+    public Meal(Long mid, String mealId, String mealName, String mealDesc, Long saleCity, String saleCityName, String saleType, Long createBy, Date createDate, Long updateBy, Date updateDate, String teleType, Integer isDel) {
         this.mid = mid;
         this.mealId = mealId;
         this.mealName = mealName;
@@ -44,6 +45,7 @@ public class Meal extends BasePojo implements java.io.Serializable {
         this.createDate = createDate;
         this.updateBy = updateBy;
         this.updateDate = updateDate;
+        this.teleType = teleType;
         this.isDel = isDel;
     }
 
@@ -133,6 +135,14 @@ public class Meal extends BasePojo implements java.io.Serializable {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getTeleType() {
+        return teleType;
+    }
+
+    public void setTeleType(String teleType) {
+        this.teleType = teleType;
     }
 
     public Integer getIsDel() {

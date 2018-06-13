@@ -73,14 +73,14 @@ public class MealController extends BaseReturn{
 	@Powers( {PowerConsts.MEALMOUDULE_COMMON_IMPORT })
 	public void downloadRecCardTemplate() throws Exception {
 		List list = new ArrayList();
-		String[] title = new String[]{"套餐ID","套餐名称","套餐描述","销售地市","销售渠道"};
+		String[] title = new String[]{"套餐ID","套餐名称","套餐描述","销售地市","销售渠道","运营商"};
 		list.add(title);
 //		List<City> provinces = cityService.queryByPidList(0);
 //		List ps = new ArrayList();
 //		for (City city:provinces) {
 //			ps.add(city.getName());
 //		}
-		list.add(new Object[]{"X0000001","xxxxx","xxxxxx","",""});
+		list.add(new Object[]{"X0000001","xxxxx","xxxxxx","","",""});
 		List<List<?>> list1 = new ArrayList();
 		list1.add(list);
 		Utils.export("套餐导入模板.xls",list1, null, null, new String[]{"套餐"});
@@ -137,6 +137,7 @@ public class MealController extends BaseReturn{
 			mealids.add(arr.get(0));
 			m.setMealDesc(arr.get(2));
 			m.setSaleType(arr.get(4));
+			m.setSaleType(arr.get(5));
 			m.setCreateBy(SessionUtil.getUserId());
 			m.setCreateDate(now);
 			m.setUpdateBy(SessionUtil.getUserId());
