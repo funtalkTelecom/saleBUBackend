@@ -43,7 +43,7 @@
     </select>
 
     <resultMap id="saleNumber" type="java.util.HashMap">
-        <result column="id" property="id"></result>
+        <result column="id" property="id" javaType="java.lang.String"></result>
         <result column="num_resource" property="numResource"></result>
         <result column="sku_tob_price" property="skuTobPrice"></result>
         <result column="sku_toc_price" property="skuTocPrice"></result>
