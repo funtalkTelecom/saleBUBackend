@@ -41,11 +41,14 @@ public class DeliveryAddress extends BasePojo implements java.io.Serializable {
 	}
 
     public DeliveryAddress(Long id, String personName,String personTel,String provinceName,String cityName,String districtName,String address, Date createDate, Date updateDate
-            ,Long addUserId ,int isDel ,int isDefaultl,String note) {
+            ,Long addUserId ,int isDel ,int isDefaultl,String note,int provinceId,int cityId,int districtId ) {
         this.id = id;
         this.personName = personName;
         this.personTel = personTel;
         this.provinceName = provinceName;
+        this.provinceId=provinceId;
+        this.cityId=cityId;
+        this.districtId=districtId;
         this.cityName = cityName;
         this.districtName = districtName;
         this.address = address;
@@ -103,6 +106,30 @@ public class DeliveryAddress extends BasePojo implements java.io.Serializable {
 
     public void setDistrictName(String districtName) {
         this.districtName = districtName;
+    }
+
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
+    public int getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(int districtId) {
+        this.districtId = districtId;
     }
 
     public String getAddress() {

@@ -50,7 +50,6 @@ public class EPSaleController extends BaseReturn{
 	 * @return
 	 */
 	@GetMapping("/api/epSales")
-	//@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})
 	@Powers({PowerConsts.NOLOGINPOWER})
 	@ResponseBody
 	public Result findEPSaleList(EPSale epSale){
@@ -64,8 +63,7 @@ public class EPSaleController extends BaseReturn{
 	 * @return
 	 */
 	@GetMapping("/api/epSaleGoodss/{ePSaleId}")
-	//@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Map findEPSaleGoodss(@PathVariable("ePSaleId") String ePSaleId){
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -80,7 +78,6 @@ public class EPSaleController extends BaseReturn{
 	@RequestMapping("/epSale/epSale-info")
 	@ResponseBody
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})
-	//@Powers({PowerConsts.NOLOGINPOWER})
 	public Map epSaleInfo(EPSale epSale, HttpServletRequest request){
 		Map<String, Object> map = new HashMap<String, Object>();
 		//Object list=cityService.queryByPidList(0);
@@ -97,14 +94,12 @@ public class EPSaleController extends BaseReturn{
 	@PostMapping("/epSale/epSale-edit")
 	@ResponseBody
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_EDIT})
-	//@Powers({PowerConsts.NOLOGINPOWER})
 	public void epSaleEdit(EPSale epSale, @RequestParam(name = "file",required = false) MultipartFile[] files, HttpServletRequest request){
             returnResult(epSaleService.epSaleEdit(epSale,request, files));
 	}
 
 	@RequestMapping("/epSale/epSale-delete")
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_DELETE})
-	//@Powers({PowerConsts.NOLOGINPOWER})
 	public void epSaleDelete(EPSale epSale){
 		returnResult(epSaleService.epSaleDelete(epSale));
 	}
