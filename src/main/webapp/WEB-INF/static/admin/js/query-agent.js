@@ -35,26 +35,36 @@ $(function() {
             "header" : "营业执照",
             "dataIndex" : "tradingImg",
             "renderer" : function (v, record) {
-                return"<a ><img src='get-img/reg/300/'+record.tradingImg> </a>";
+                return"<a href='get-img/reg/1000/"+record.tradingImg+"' data-lightbox='tradingImg'><img src='get-img/reg/300/"+record.tradingImg+"' style='max-width: 40px;max-height: 40px;'> </a>";
             }
         },{
             "header" : "操作",
             "dataIndex" : "id",
             "renderer":function(v,record){
                 var node = [];
-                if(p_edit) {
-                    node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">修改</a>')
-                }
-                if(p_delete) {
-                    node.push('<a class="btn btn-success btn-xs delete" href="javascript:void(0);">删除</a>')
+                if(record.status ==1){
+                    if(p_check) {
+                        node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">审核</a>')
+                    }
+                    // if(p_delete) {
+                    //     node.push('<a class="btn btn-success btn-xs delete" href="javascript:void(0);">删除</a>')
+                    // }
                 }
                 $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
                 $operate.find(".update").click(function () {
-                    $.post("account/account-info",{id:v},function(data){
+                    $.post("/find-agent-by-id",{id:v},function(data){
                         var _data=data.data;
-                        formInit($("#accountInfo form"), _data);
-                        $('#accountInfo').modal('show');
+                        $(".scomm").html(_data.commpayName);
+                        $(".person").html(_data.person);
+                        $(".phone").html(_data.phone);
+                        var addresss = _data.provinceName+_data.cityName+_data.districtName+_data.address;
+                        $(".address").html(addresss);
+                        $("#tradingImg").attr("src","get-img/reg/300/"+_data.tradingImg);
+                        $("#adtradingImg").attr("href","get-img/reg/1000/"+_data.tradingImg);
+                        $("#id").val(_data.id);
+                        $("#addConsumerId").val(_data.addConsumerId);
+                        $('#checkModal').modal('show');
                     },"json");
                 })
                 $operate.find(".delete").click(function () {
@@ -91,31 +101,24 @@ $(function() {
         dataList.reload();
     }
 
-    // citySelect($("#fcity"),17);
-    var option = {
-        url:"",
-        key:"keyId",
-        value:"keyValue",
-        param:{t:new Date().getTime()}
-    };
-    // thirdCitySelect($("#fcity"),"ly",option);
-    //银行list
-    dictSelect($("#cardBankP"), "brank", option, true);
 
-
-    $(document).on("click","#accountInfo .modal-footer .btn-success",function() {
-        // 准备好Options对象
-        var options = {
-            // target:  null,
-            type : "post",
-            url: "account/account-edit",
-            success : function(data) {
-                dataList.load();
-                $('#accountInfo').modal('hide');
-                alert(data.data);
+    $(document).on("click","#checkModal .modal-footer .btn-success",function() {
+        var status= parseInt($("#checkModal .status").val()) || 0;
+        if(status ==-1){
+            alert("请选择是否通过");
+            return;
+        }
+        if(status == 3) {
+            var remark = $("#checkModal form textarea[name='checkRemark']").val();
+            if($.trim(remark) == '') {
+                alert("请填写审核备注");
+                return;
             }
-        };
-        // 将options传给ajaxForm
-        $('#accountInfo form').ajaxSubmit(options);
+        }
+        $.post("check-agent",$("#checkModal form").serialize(),function(data){
+            alert(data.data);
+            dataList.load();
+            $('#checkModal').modal('hide');
+        },"json");
     });
 });

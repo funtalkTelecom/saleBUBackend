@@ -77,7 +77,7 @@
 </div><!-- /.main-container -->
 
 <!-- 模态框（Modal） -->
-<div class="modal fade" id="accountInfo" tabindex="-1">
+<div class="modal fade" id="checkModal" tabindex="-1">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -85,36 +85,56 @@
 					&times;
 				</button>
 				<h4 class="modal-title">
-					添加/修改收款账号
+					审核
 				</h4>
 			</div>
 			<form role="form" class="form-horizontal">
-				<input name="id" type="hidden">
+				<input id="id" name="id" type="hidden">
+				<input id="addConsumerId" name="addConsumerId" type="hidden">
 				<div class="modal-body">
 					<div class="form-group">
-						<label class="col-xs-2 control-label">户名</label>
+						<label class="col-xs-2 control-label">公司名称</label>
 						<div class="col-xs-10">
-							<input type="text" class="form-control input-xxlarge" name="bankAccount">
+							<span class="scomm"></span>
 						</div>
 					</div>
 					<div class="form-group">
 
-						<label class="col-xs-2 control-label">银行</label>
+						<label class="col-xs-2 control-label">法人</label>
 						<div class="col-xs-4">
-							<select class="form-control" name="cardBank" id="cardBankP">
-								<option value="-1">请选择...</option>
+							<span class="person"></span>
+						</div>
+						<label class="col-xs-2 control-label">电话</label>
+						<div class="col-xs-4">
+							<span class="phone"></span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">注册地址</label>
+						<div class="col-xs-10">
+							<span class="address"></span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">营业执照</label>
+						<div class="col-xs-10">
+							<a id="adtradingImg" data-lightbox="tradingImg"><img id="tradingImg" style="max-width: 80px;max-height: 80px;"></a>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">是否通过</label>
+						<div class="col-xs-10">
+							<select name="status" class="status">
+								<option value="-1">请选择</option>
+								<option value="2">通过</option>
+								<option value="3">不通过</option>
 							</select>
 						</div>
-						<label class="col-xs-2 control-label">支行</label>
-						<div class="col-xs-4">
-							<input type="text" class="form-control" name="subbranchBank">
-						</div>
 					</div>
-
 					<div class="form-group">
-						<label class="col-xs-2 control-label">账号</label>
+						<label class="col-xs-2 control-label">审核备注</label>
 						<div class="col-xs-10">
-							<input type="text" class="form-control input-xxlarge" name="cardAccount">
+							<textarea name="checkRemark"></textarea>
 						</div>
 					</div>
 				</div>
@@ -127,8 +147,7 @@
 	</div><!-- /.modal -->
 </div>
 <script type="text/javascript">
-    var p_edit = <%=SessionUtil.hasPower(PowerConsts.ACCOUNTMOUDULE_COMMON_EDIT)%>;
-    var p_delete = <%=SessionUtil.hasPower(PowerConsts.ACCOUNTMOUDULE_COMMON_DELETE)%>;
+    var p_check = <%=SessionUtil.hasPower(PowerConsts.AGENTMOUDULE_COMMON_CHECK)%>;
 </script>
 </body>
 </html>

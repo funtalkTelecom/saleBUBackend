@@ -24,11 +24,15 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	private String address;
 	private String tradingImg;
 	private Integer status;
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long addConsumerId;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date addDate;
 	private Integer isDel;
-
+	private String checkRemark;  //备注信息
+	private String loginName;
+	private String pwd;
+	private Integer type;
 	@Transient
 	private String  provinceName;// 所属省份
 	@Transient
@@ -44,7 +48,7 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	}
 
 	public Agent(Long id, String commpayName, String person,String phone,Long province,Long city,Long district
-				 , String address,String tradingImg, Integer status, Long addConsumerId, Date addDate, Integer isDel) {
+				 , String address,String tradingImg, Integer status, Long addConsumerId, Date addDate, Integer isDel,Integer type) {
 		this.id = id;
 		this.commpayName = commpayName;
 		this.person = person;
@@ -58,6 +62,7 @@ public class Agent extends BasePojo implements java.io.Serializable {
 		this.addConsumerId = addConsumerId;
 		this.addDate = addDate;
 		this.isDel = isDel;
+		this.type = type;
 	}
 
 	public Long getId() {
@@ -202,5 +207,35 @@ public class Agent extends BasePojo implements java.io.Serializable {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getCheckRemark() {
+		return checkRemark;
+	}
+
+	public void setCheckRemark(String checkRemark) {
+		this.checkRemark = checkRemark;
+	}
+
+	public String getLoginName() {
+		return loginName;
+	}
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
+	}
+	public String getPwd() {
+		return pwd;
+	}
+
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
 	}
 }

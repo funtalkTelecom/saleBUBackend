@@ -1,5 +1,8 @@
 package com.hrtx.web.pojo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -9,6 +12,7 @@ import java.util.Date;
 public class Consumer extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 	private String name;
 	private String phone;
@@ -19,6 +23,13 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 	private Integer status;
 	private Date regDate;
 	private Integer isAgent;
+
+	private String commpayName;
+	private Long agentProvince;
+	private Long agentCity;
+	private Long agentDistrict;
+	private String agentAddress;
+	private String tradingImg;
 
 	public Consumer() {
 	}
@@ -122,5 +133,53 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 
 	public void setIsAgent(Integer isAgent) {
 		this.isAgent = isAgent;
+	}
+
+	public String getCommpayName() {
+		return commpayName;
+	}
+
+	public void setCommpayName(String commpayName) {
+		this.commpayName = commpayName;
+	}
+
+	public Long getAgentProvince() {
+		return agentProvince;
+	}
+
+	public void setAgentProvince(Long agentProvince) {
+		this.agentProvince = agentProvince;
+	}
+
+	public Long getAgentCity() {
+		return agentCity;
+	}
+
+	public void setAgentCity(Long agentCity) {
+		this.agentCity = agentCity;
+	}
+
+	public Long getAgentDistrict() {
+		return agentDistrict;
+	}
+
+	public void setAgentDistrict(Long agentDistrict) {
+		this.agentDistrict = agentDistrict;
+	}
+
+	public String getAgentAddress() {
+		return agentAddress;
+	}
+
+	public void setAgentAddress(String agentAddress) {
+		this.agentAddress = agentAddress;
+	}
+
+	public String getTradingImg() {
+		return tradingImg;
+	}
+
+	public void setTradingImg(String tradingImg) {
+		this.tradingImg = tradingImg;
 	}
 }

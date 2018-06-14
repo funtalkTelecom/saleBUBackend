@@ -12,4 +12,17 @@
          where t.id=#{userid}
     </update>
 
+    <update id="insertAgentToConsumer">
+          update tb_consumer c set
+            c.is_agent=#{isAgent},
+            c.name=#{name},
+            c.phone=#{phone},
+            c.commpay_name=#{commpayName},
+            c.agent_province=#{agentProvince},
+            c.agent_city=#{agentCity},
+            c.agent_district=#{agentDistrict},
+            c.agent_address=#{agentAddress},
+            c.trading_img=#{tradingImg}
+            where c.id=#{id}
+    </update>
 </mapper>

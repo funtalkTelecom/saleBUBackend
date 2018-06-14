@@ -28,11 +28,11 @@ $.extend(true, jQuery.ajaxSettings, {
                 return false;
             }
             if(code == 300){
-                alert(c_timeout);
+                alert(json.data);
                 return false;
             }
             if(code == 250){
-                alert(c_nopower);
+                alert(json.data);
                 return false;
             }
             if(code == 999 || code == 800){

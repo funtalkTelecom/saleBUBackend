@@ -2,8 +2,10 @@ package com.hrtx.web.controller;
 
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
+import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.Agent;
+import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.service.AgentService;
 import com.hrtx.web.service.ConsumerService;
 import org.slf4j.Logger;
@@ -12,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 public class AgentController {
 
@@ -19,6 +25,7 @@ public class AgentController {
 
 	@Autowired
 	AgentService agentService;
+	@Autowired private ApiSessionUtil apiSessionUtil;
     @PutMapping(value = "/api/save-or-update-agent")
     @Powers({PowerConsts.NOLOGINPOWER})
 	public Result SaveOrUpdateAgent(@RequestParam(value="id",required=false) Long id,
@@ -33,11 +40,22 @@ public class AgentController {
 		return agentService.SaveOrUpdateAgent(id,commpayName,person,phone,province,city,district,address,tradingImg);
 	}
 
-	@GetMapping("/api/agent-list/")
+	@PutMapping(value = "/api/save-agent-leyu")
+	@Powers({PowerConsts.NOLOGINPOWER})
+	public Result SaveAgentLeyu(@RequestParam(value="loginName",required=false) String loginName,
+									@RequestParam(value="pwd",required=false) String pwd) {
+		return agentService.SaveAgentLeyu(loginName,pwd);
+	}
+
+	@GetMapping("/api/query-agent_by_consumerid")
 	@Powers({PowerConsts.NOLOGINPOWER})
 	@ResponseBody
-	public Result listAgent(Agent agent, @PathVariable("addConsumerId") String addConsumerId){
-		return agentService.findAgentListByaddConsumerId(Long.valueOf(addConsumerId));
+	public Result listAgent(){
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		long consumerId =consumer.getId();
+//		String  a = "1006420771322462209";
+//		long consumerId =Long.valueOf(a);
+		return agentService.findAgentListByaddConsumerId(consumerId);
 	}
 
 
@@ -51,5 +69,23 @@ public class AgentController {
 	@Powers({PowerConsts.AGENTMOUDULE_COMMON_QUEYR})
 	public Result listAgent(Agent agent){
 		return agentService.pageAgent(agent);
+	}
+
+
+	@PostMapping("/find-agent-by-id")
+	@ResponseBody
+	@Powers({PowerConsts.AGENTMOUDULE_COMMON_CHECK})
+	public Map findAgentById(Agent agent){
+		Map<String, Object> map = new HashMap<String, Object>();
+		Agent ag=agentService.findAgentById(agent.getId());
+		map.put("code", Result.OK);
+		map.put("data", ag);
+		return map;
+	}
+	@PostMapping("/check-agent")
+	@ResponseBody
+	@Powers({PowerConsts.AGENTMOUDULE_COMMON_CHECK})
+	public Result checkAgent(Agent agent){
+		return agentService.checkAgent(agent);
 	}
 }

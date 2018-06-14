@@ -12,6 +12,7 @@
 <!-- ace styles -->
 <link rel="stylesheet" href="<%=basePath %>ace/css/ace.css" class="ace-main-stylesheet" id="main-ace-style" />
 <link href="<%=basePath %>project/css/jquery.loadmask.css" rel="stylesheet">
+<link href="<%=basePath %>project/css/lightbox.css" rel="stylesheet">
 <script src="<%=basePath %>ace/js/ace-extra.js"></script>
 <!--[if lte IE 8]>
 <script src="<%=basePath %>plugins/html5shiv.js"></script>
@@ -36,3 +37,4 @@
 <script type="text/javascript" src="<%=basePath %>project/js/jQuery.dsTable.js"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/jquery.form.js"></script>
 <script type="text/javascript" src="<%=basePath %>project/js/sdmenu.js"></script>
+<script type="text/javascript" src="<%=basePath %>project/js/lightbox.js"></script>

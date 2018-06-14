@@ -13,4 +13,12 @@ public interface AgentMapper extends Mapper<Agent>,BaseMapper<Agent>{
 
     List<Map> findAgentListByConsumerId(@Param("ConsumerId") Long ConsumerId);
 
+//    List<Map> findAgentById(@Param("id") Long id);
+
+    Agent findAgentById(@Param("id") Long id);
+
+    void updateAgentStatus(Agent agent);
+
+    void updateAgentStatusToLeyu(Agent agent);
+
 }

@@ -171,7 +171,7 @@ public class TestDemo {
     @Test
     public void insetagent () throws Exception {
         RequestBuilder  request = put("/api/save-or-update-agent").
-                param("id", "1006091350984097792")
+                param("id", "1006091350984097793")
                 .param("commpayName", "福建华瑞11")
                 .param("person", "林林22")
                 .param("phone", "189891234560")
@@ -189,4 +189,46 @@ public class TestDemo {
         System.out.println(" =================    "+resultStr4);
     }
 
+    @Test
+    public void queryAgent () throws Exception {
+        RequestBuilder  request=get("/api/query-agent_by_consumerid");
+        ResultActions resultActions=mvc.perform(request);
+        resultActions.andExpect(status().isOk());
+        resultActions.andDo(MockMvcResultHandlers.print()).andExpect(status().isOk());
+        MvcResult result4= resultActions.andReturn();
+        String resultStr4= result4.getResponse().getContentAsString();
+        System.out.println("queryAgent/1006420771322462209记录信息*****返回值字符串  =================    "+resultStr4);
+    }
+    @Test
+    public void SaveAgentLeyu () throws Exception {
+        RequestBuilder  request = put("/api/save-agent-leyu").
+                param("loginName", "18965902601")
+                .param("pwd", "1234567");
+        ResultActions resultActions=mvc.perform(request);
+        resultActions.andExpect(status().isOk());
+        // resultActions.andDo(MockMvcResultHandlers.print());
+        resultActions.andExpect(jsonPath("code").value("200"));//校验值
+        MvcResult result4= resultActions.andReturn();
+        String resultStr4= result4.getResponse().getContentAsString();
+        System.out.println(" =================    "+resultStr4);
+    }
+    @Test
+    public void insertCu () throws Exception {
+        RequestBuilder  request = put("/api/Consumer")
+                .param("loginName", "")
+                .param("livePhone", "18965902601")
+                .param("nickName", "18965902601")
+                .param("sex", "1")
+                .param("img", "1212121.jsp")
+                .param("province", "17")
+                .param("city", "212")
+                ;
+        ResultActions resultActions=mvc.perform(request);
+        resultActions.andExpect(status().isOk());
+        // resultActions.andDo(MockMvcResultHandlers.print());
+        resultActions.andExpect(jsonPath("code").value("200"));//校验值
+        MvcResult result4= resultActions.andReturn();
+        String resultStr4= result4.getResponse().getContentAsString();
+        System.out.println(" =================    "+resultStr4);
+    }
 }
