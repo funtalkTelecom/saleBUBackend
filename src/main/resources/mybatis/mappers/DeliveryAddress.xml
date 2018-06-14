@@ -101,7 +101,8 @@
         create_date,
         update_date,
         note,
-        add_user_id
+        add_user_id,
+        is_defaultl
         ) values
         <foreach collection="deliveryAddressList" item="deliveryAddress" separator=",">
             (
@@ -115,7 +116,8 @@
             #{deliveryAddress.createDate},
             #{deliveryAddress.updateDate},
             #{deliveryAddress.note},
-            #{deliveryAddress.addUserId}
+            #{deliveryAddress.addUserId},
+            #{deliveryAddress.isDefaultl}
             )
         </foreach>
     </insert>

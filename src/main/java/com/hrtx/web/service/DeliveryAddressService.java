@@ -44,12 +44,10 @@ public class DeliveryAddressService {
 	}
 
 	public Result findDeliveryAddressList() {
-		long kk=this.apiSessionUtil.getConsumer().getId();
 		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressListByUserId(this.apiSessionUtil.getConsumer().getId()));
 	}
 
 	public Result findDeliveryAddressDefault() {
-		long kk=this.apiSessionUtil.getConsumer().getId();
 		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressDefaultByUserId(this.apiSessionUtil.getConsumer().getId()));
 	}
 
@@ -58,14 +56,22 @@ public class DeliveryAddressService {
 	}
 
 	public Result deliveryAddressEdit(DeliveryAddress deliveryAddress, HttpServletRequest request) {
-
-		deliveryAddress.setAddUserId(apiSessionUtil.getConsumer().getId());
-
 		if (deliveryAddress.getId() != null && deliveryAddress.getId() > 0) {
 			deliveryAddress.setUpdateDate(new Date());
 			deliveryAddressMapper.deliveryAddressEdit(deliveryAddress);
 		} else {
+			Long kk=this.apiSessionUtil.getConsumer().getId();
+			//List<Map> defaultMap= deliveryAddressMapper.findDeliveryAddressDefaultByUserId(this.apiSessionUtil.getConsumer().getId());
+			List<Map> listDeliveryAddress=deliveryAddressMapper.findDeliveryAddressListByUserId(this.apiSessionUtil.getConsumer().getId());
+			if(listDeliveryAddress.size()>0)
+			{
+				deliveryAddress.setIsDefaultl(0);
+			}else
+			{
+				deliveryAddress.setIsDefaultl(1);
+			}
 			List<DeliveryAddress> list = new ArrayList<DeliveryAddress>();
+			deliveryAddress.setAddUserId(apiSessionUtil.getConsumer().getId());
 			deliveryAddress.setId(deliveryAddress.getGeneralId());
 			deliveryAddress.setCreateDate(new Date());
 			deliveryAddress.setUpdateDate(new Date());
