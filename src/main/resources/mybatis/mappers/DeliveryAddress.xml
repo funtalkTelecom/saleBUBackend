@@ -3,7 +3,7 @@
 <mapper namespace="com.hrtx.web.mapper.DeliveryAddressMapper">
 
     <select id="queryPageList" resultType="DeliveryAddress">
-        select t.id,
+        select concat(t.id,'')as id,
 		t.person_name as personName,
 		t.person_tel as personTel ,
 		province.name as provinceName,
@@ -28,7 +28,7 @@
     </select>
 
     <select id="findDeliveryAddressListByUserId" resultType="java.util.HashMap">
-        select t.id,
+        select concat(t.id,'')as id,
 		person_name as personName,
 		t.person_tel as personTel ,
 		province.name as provinceName,
@@ -49,7 +49,7 @@
     </select>
 
     <select id="findDeliveryAddressDefaultByUserId" resultType="java.util.HashMap">
-        select t.id,
+        select concat(t.id,'')as id,
 		person_name as personName,
 		t.person_tel as personTel ,
 		province.name as provinceName,
@@ -70,7 +70,7 @@
     </select>
 
     <select id="findDeliveryAddressById" resultType="java.util.HashMap">
-      select t.id,
+      select concat(t.id,'')as id,
 	  person_name as personName,
 	  t.person_tel as personTel ,
 	  province.name as provinceName,
