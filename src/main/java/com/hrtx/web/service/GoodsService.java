@@ -132,7 +132,7 @@ public class GoodsService {
                     skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, true);
 
                     sku.setSkuId(sku.getGeneralId());
-                    sku.setSkuSaleNum(skuSaleNum.split("★")[0]);
+                    sku.setSkuSaleNum(skuSaleNum.split("★")[0].split("\n")[0]);
                     sku.setSkuGoodsType(((JSONObject) obj.get("skuGoodsType")).get("value")==null||((JSONObject) obj.get("skuGoodsType")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuGoodsType")).get("value"));
                     sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
 

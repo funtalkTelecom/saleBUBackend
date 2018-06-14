@@ -1,7 +1,9 @@
 package com.hrtx.web.service;
 
+import com.hrtx.web.mapper.NumberMapper;
 import com.hrtx.web.mapper.SkuMapper;
 import com.hrtx.web.mapper.SkuPropertyMapper;
+import com.hrtx.web.pojo.Number;
 import com.hrtx.web.pojo.Sku;
 import com.hrtx.web.pojo.SkuProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ public class SkuService {
 	
 	@Autowired
 	private SkuMapper skuMapper;
+	@Autowired
+	private NumberMapper numberMapper;
 	@Autowired
 	private SkuPropertyMapper skuPropertyMapper;
 
@@ -34,7 +38,8 @@ public class SkuService {
 				skuMap.put("skuTobPrice", sku.getSkuTobPrice());
 				skuMap.put("skuTocPrice", sku.getSkuTocPrice());
 //				skuMap.put("skuIsNum", sku.getSkuIsNum());
-				skuMap.put("skuSaleNum", sku.getSkuSaleNum());
+				skuMap.put("skuSaleNum", concatSaleNumBySkuid(String.valueOf(sku.getSkuId())));
+//				skuMap.put("skuSaleNum", sku.getSkuSaleNum().replaceAll(",", "\n"));
 				skuMap.put("skuNum", String.valueOf(sku.getSkuNum()));
 				skuMap.put("skuGoodsType", sku.getSkuGoodsType());
 				skuMap.put("skuRepoGoods", sku.getSkuRepoGoods());
@@ -56,4 +61,17 @@ public class SkuService {
 
 		return skuidMap;
 	}
+
+    private String concatSaleNumBySkuid(String skuid) {
+        String result = "";
+        List<Number> list = numberMapper.getListBySkuid(skuid);
+        if(list!=null && list.size()>0){
+            for(int i=0; i<list.size(); i++){
+                Number number = list.get(i);
+                result += number.getNumResource() + "\n";
+            }
+        }
+
+        return "".equals(result)?"":result.substring(0, result.length()-1);
+    }
 }

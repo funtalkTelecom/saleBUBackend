@@ -6,10 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
-import com.hrtx.global.ApiSessionUtil;
-import com.hrtx.global.PowerConsts;
-import com.hrtx.global.SessionUtil;
-import com.hrtx.global.TokenGenerator;
+import com.hrtx.global.*;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
 import net.sf.json.JSONArray;
@@ -101,13 +98,26 @@ public class ApiOrderController extends BaseReturn{
 //						不出货		出货
 //				type:2  普通靓号3或超级靓号4    skuid, numid, addrid, payType, mealid
 				case "2":
+					String skuid, numid = null, addrid, payType, mealid;
+					Map number = null;
 					try {
-						String skuid = request.getParameter("skuid");
-						String numid = request.getParameter("numid");
-						String addrid = request.getParameter("addrid");//普通靓号可不填
-						String payType = request.getParameter("pauMethod");
-						String mealid = request.getParameter("mealid")==null?"":request.getParameter("mealid");
+						skuid = request.getParameter("skuid");
+						numid = request.getParameter("numid");
+						addrid = request.getParameter("addrid");//普通靓号可不填
+						payType = request.getParameter("pauMethod");
+						mealid = request.getParameter("mealid")==null?"":request.getParameter("mealid");
 
+						//获取号码
+						number = numberMapper.getNumInfoById(numid);
+						//冻结号码
+						if(!LockUtils.tryLock(numid)) return new Result(Result.ERROR, "请稍后再试!");
+						try {
+							//验证号码是否可下单,2:销售中
+							if(number==null || !"2".equals(String.valueOf(number.get("status")))) return new Result(Result.ERROR, "号码已被购买!");
+							freezeNum(numid, "3");
+						} finally {
+							LockUtils.unLock(numid);
+						}
 						//获取sku列表
 						List skulist = skuMapper.getSkuListBySkuids("'"+ skuid.replaceAll(",", "','") +"'");
 						for (int i = 0; i < skulist.size(); i++) {
@@ -123,8 +133,6 @@ public class ApiOrderController extends BaseReturn{
 							orderItem.setGoodsId(goods.getgId());
 							orderItem.setSkuId(Long.parseLong(skuid));
 							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
-							//获取号码
-							Map number = numberMapper.getNumInfoById(numid);
 							orderItem.setNumId(Long.parseLong(numid));
 							orderItem.setNum((String) number.get("numResource"));
 							orderItem.setIsShipment("3".equals(sku.get("skuGoodsType"))?0:1);//普通靓号不发货
@@ -177,6 +185,8 @@ public class ApiOrderController extends BaseReturn{
 						e.printStackTrace();
 						//清除已生成的订单
 						deleteOrder(orderList);
+						//解冻号码,把冻结之前的状态还原
+						freezeNum(numid, String.valueOf(number.get("status")));
 						return new Result(Result.ERROR, "获取数据异常");
 					}
 
@@ -195,5 +205,14 @@ public class ApiOrderController extends BaseReturn{
 		for (Order o : orderList) {
 			orderMapper.deleteByOrderid(o.getOrderId());
 		}
+	}
+
+	/**
+	 *
+	 * @param numid
+	 * @param status 1在库、2销售中、3冻结(下单未付款)、4待配卡(已付款 针对2C或电销无需购买卡时、代理商买号而未指定白卡时)、5待受理(代理商已提交或仓库已发货，待提交乐语BOSS)、6已受理(乐语BOSS处理成功)、7受理失败(BOSS受理失败，需要人介入解决)、8已失效(乐语BOSS提示号码已非可用)
+	 */
+	private void freezeNum(String numid, String status) {
+		numberMapper.freezeNum(numid, status);
 	}
 }
