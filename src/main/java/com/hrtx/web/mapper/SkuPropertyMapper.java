@@ -16,4 +16,6 @@ public interface SkuPropertyMapper extends Mapper<SkuProperty>,BaseMapper<SkuPro
     void deleteSkuPropertyByGid(SkuProperty skuProperty);
 
     List findSkuPropertyBySkuid(@Param("skuid") Long skuid);
+
+    List findSkuPropertyBySkuidForOrder(@Param("skuid") Long skuid);
 }
