@@ -42,8 +42,10 @@ public class ApiPosterController extends BaseReturn{
 	public Result posterList(Poster poster, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
-			poster.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-			poster.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
+			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+			poster.setStart(limit*(pageNum-1)+1);
+			poster.setLimit(limit);
 
 			PageHelper.startPage(poster.getPageNum(),poster.getLimit());
 			Page<Object> ob=this.posterMapper.queryPageListApi(poster);
