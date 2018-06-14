@@ -27,6 +27,18 @@
         from tb_sku_property a where a.sku_id = #{skuid}
         order by a.sku_id,a.seq asc
     </select>
+    <resultMap id="SkuPropertyListForOrder" type="java.util.HashMap">
+        <result column="key_value" property="keyValue"></result>
+        <result column="skup_key" property="skupKey"></result>
+        <result column="skup_value" property="skupValue"></result>
+    </resultMap>
+    <select id="findSkuPropertyBySkuidForOrder" resultMap="SkuPropertyListForOrder">
+        select b.key_value, a.skup_key, a.skup_value
+        from tb_sku_property a left join tb_dict b on b.key_group = a.skup_key and b.key_id = a.skup_value
+        where a.sku_id = #{skuid}
+        order by a.sku_id,a.seq asc
+
+    </select>
 
     <insert id="insertBatch">
         insert into tb_sku_property(

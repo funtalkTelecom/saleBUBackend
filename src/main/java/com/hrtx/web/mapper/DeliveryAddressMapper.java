@@ -22,4 +22,6 @@ public interface DeliveryAddressMapper extends Mapper<DeliveryAddress>,BaseMappe
     void deliveryAddressDelete(DeliveryAddress deliveryAddress);
 
     void insertBatch(@Param("deliveryAddressList") List<DeliveryAddress> list);
+
+    DeliveryAddress findDeliveryAddressByIdForOrder(@Param("id") Long id);
 }

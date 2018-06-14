@@ -17,6 +17,7 @@ import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +45,8 @@ public class ApiOrderController extends BaseReturn{
 	@Autowired
 	private OrderItemMapper orderItemMapper;
 	@Autowired
+	private DeliveryAddressMapper deliveryAddressMapper;
+	@Autowired
 	private RedisUtil redisUtil;
 
 	/**
@@ -58,9 +61,19 @@ public class ApiOrderController extends BaseReturn{
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Result createOrder(HttpServletRequest request){
+		//子项小计
+		double sub_total = 0;
+		//合计
+		double total = 0;
+		//折扣
+		double commission = 1;
+		//运费
+		double shipping_total = 0;
+
 		Order order = new Order();
 		order.setOrderId(order.getGeneralId());
 		List<OrderItem> orderItems = new ArrayList<OrderItem>();
+		List<Order> orderList = new ArrayList<Order>();
 		String type = null;
 
 		//模拟登陆
@@ -92,7 +105,7 @@ public class ApiOrderController extends BaseReturn{
 						String skuid = request.getParameter("skuid");
 						String numid = request.getParameter("numid");
 						String addrid = request.getParameter("addrid");//普通靓号可不填
-						String payType = request.getParameter("payType");
+						String payType = request.getParameter("pauMethod");
 						String mealid = request.getParameter("mealid")==null?"":request.getParameter("mealid");
 
 						//获取sku列表
@@ -100,7 +113,7 @@ public class ApiOrderController extends BaseReturn{
 						for (int i = 0; i < skulist.size(); i++) {
                             OrderItem orderItem = new OrderItem();
 							Map sku = (Map) skulist.get(i);
-                            List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuid(Long.parseLong(skuid));
+                            List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 
 							orderItem.setItemId(orderItem.getGeneralId());
 							orderItem.setOrderId(order.getOrderId());
@@ -114,7 +127,7 @@ public class ApiOrderController extends BaseReturn{
 							Map number = numberMapper.getNumInfoById(numid);
 							orderItem.setNumId(Long.parseLong(numid));
 							orderItem.setNum((String) number.get("numResource"));
-							orderItem.setIsShipment("3".equals(sku.get("skuGoodsType"))?0:1);
+							orderItem.setIsShipment("3".equals(sku.get("skuGoodsType"))?0:1);//普通靓号不发货
 							orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
 							orderItem.setSellerName((String) sku.get("gSellerName"));
 							orderItem.setShipmentApi("egt");
@@ -125,6 +138,7 @@ public class ApiOrderController extends BaseReturn{
 							orderItem.setPrice(twobPrice);
 							orderItem.setTotal(twobPrice*num);
 							orderItem.setMealId(Long.parseLong(mealid));
+							sub_total += orderItem.getTotal();
 
                             orderItems.add(orderItem);
 						}
@@ -135,18 +149,51 @@ public class ApiOrderController extends BaseReturn{
 						order.setReqUserAgent(request.getHeader("user-agent"));
 						order.setReqIp(SessionUtil.getUserIp());
 						order.setAddDate(new Date());
+						order.setOrderType(2);
+						if(addrid==null) order.setAddressId(null);
+						else{
+							//获取收货地址信息
+							DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
+							order.setAddressId(deliveryAddress.getId());
+							order.setPersonName(deliveryAddress.getPersonName());
+							order.setPersonTel(deliveryAddress.getPersonTel());
+							order.setAddress(deliveryAddress.getAddress());
+						}
+						order.setCommission(commission);
+						order.setShippingTotal(shipping_total);
+						order.setSubTotal(sub_total);
+						//子项小计打折之后减去运费
+						total = sub_total*commission-shipping_total;
+						order.setTotal(total);
 
+
+						//调用仓储接口成功之后写入
+						order.setNoticeShipmentDate(new Date());
+
+						orderList.add(order);
+						orderMapper.insertBatch(orderList);
+						orderItemMapper.insertBatch(orderItems);
 					} catch (Exception e) {
 						e.printStackTrace();
+						//清除已生成的订单
+						deleteOrder(orderList);
 						return new Result(Result.ERROR, "获取数据异常");
 					}
 
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			//清除已生成的订单
+			deleteOrder(orderList);
 			return new Result(Result.ERROR, "创建订单异常");
 		}
 
 		return new Result(Result.OK, order.getOrderId());
+	}
+
+	private void deleteOrder(List<Order> orderList) {
+		for (Order o : orderList) {
+			orderMapper.deleteByOrderid(o.getOrderId());
+		}
 	}
 }
