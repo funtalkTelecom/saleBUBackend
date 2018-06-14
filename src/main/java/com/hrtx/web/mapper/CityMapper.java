@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.HashMap;
 import java.util.List;
 
-public interface CityMapper extends Mapper<Meal>,BaseMapper<Meal>{
+public interface CityMapper extends Mapper<City>,BaseMapper<City>{
     List<City> queryByPidList(@Param("pid") int pid);
 
     City findCityByName(@Param("name") String name);
