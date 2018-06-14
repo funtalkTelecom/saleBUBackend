@@ -8,6 +8,7 @@ import com.hrtx.web.service.CityService;
 import com.hrtx.web.service.DictService;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -40,6 +41,14 @@ public class CommonController extends BaseReturn{
         String pid_=request.getParameter("pid");
         String isopen=request.getParameter("isopen");
         Object list=cityService.queryByPidListForZtree(NumberUtils.toInt(pid_,0), isopen);
+        return list;
+    }
+
+    @GetMapping("/api/citys")
+    @Powers( { PowerConsts.NOLOGINPOWER })
+    @ResponseBody
+    public Object ApiCitys(HttpServletRequest request) {
+        Object list=cityService.queryCitys();
         return list;
     }
 
