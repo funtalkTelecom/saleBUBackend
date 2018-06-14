@@ -39,8 +39,10 @@ public class ApiMealController extends BaseReturn{
 	public Result mealList(Meal meal, @PathVariable("supplier") String supplier, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
-			meal.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-			meal.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
+			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+			meal.setStart(limit*(pageNum-1)+1);
+			meal.setLimit(limit);
 			meal.setCreateBy(Long.parseLong(supplier));
 
 			PageHelper.startPage(meal.getPageNum(),meal.getLimit());

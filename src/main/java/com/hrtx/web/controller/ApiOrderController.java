@@ -8,6 +8,7 @@ import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.global.TokenGenerator;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
@@ -21,10 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.Number;
 import java.lang.System;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -130,6 +128,13 @@ public class ApiOrderController extends BaseReturn{
 
                             orderItems.add(orderItem);
 						}
+						//设置订单
+						order.setConsumer(user.getId());
+						order.setConsumerName(user.getName());
+						order.setStatus(1);//设置成待付款
+						order.setReqUserAgent(request.getHeader("user-agent"));
+						order.setReqIp(SessionUtil.getUserIp());
+						order.setAddDate(new Date());
 
 					} catch (Exception e) {
 						e.printStackTrace();
