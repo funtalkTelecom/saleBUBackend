@@ -34,6 +34,14 @@
         where 1=1
     </select>
 
+    <select id="getListBySkuid" resultType="Number">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_num a
+        where a.sku_id = #{skuid}
+    </select>
+
     <resultMap id="saleNumber" type="java.util.HashMap">
         <result column="id" property="id" javaType="java.lang.String"></result>
         <result column="city_id" property="cityId" javaType="java.lang.String"></result>
@@ -88,6 +96,7 @@
         a.with4,
         a.low_consume,
         a.net_type,
+        a.status,
         if(a.tele_type is null,'',a.tele_type) as tele_type
         from tb_num a
         left join tb_sku b on b.sku_id = a.sku_id
@@ -119,5 +128,9 @@
             where
             a.num_resource = #{numResource}
         </if>
+    </update>
+
+    <update id="freezeNum">
+        update tb_num a set a.status = #{status} where a.id = #{id}
     </update>
 </mapper>
