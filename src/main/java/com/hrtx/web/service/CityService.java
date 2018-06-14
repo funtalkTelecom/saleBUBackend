@@ -5,9 +5,7 @@ import com.hrtx.web.pojo.City;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service
@@ -39,4 +37,29 @@ public class CityService {
     public List queryByPidListForZtree(int pid, String isopen) {
 		return cityMapper.queryByPidListForZtree(pid, isopen);
     }
+
+	public List<Object> queryCitys() {
+		List<Object> list=queryCityByPid(0);
+		return list;
+	}
+	public List<Object> queryCityByPid(int pid) {
+		List<Object> list=new ArrayList<>();
+		List<City> _list=this.cityMapper.queryByPidList(pid);
+		for (City city: _list) {
+			TreeMap<String,Object> _map=new TreeMap<>();
+			_map.put("id",city.getId());
+			_map.put("name",city.getName());
+			_map.put("pid",city.getPid());
+			if(city.getGrade()==1) {
+				List<Object> _list1=queryCityByPid(city.getId());
+				_map.put("cityList",_list1)	;
+			}
+			if(city.getGrade()==2) {
+				List<Object> _list1=queryCityByPid(city.getId());
+				_map.put("districtList",_list1)	;
+			}
+			list.add(_map);
+		}
+		return list;
+	}
 }
