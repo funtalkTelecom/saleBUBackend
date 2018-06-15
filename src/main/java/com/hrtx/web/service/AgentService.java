@@ -50,20 +50,19 @@ public class AgentService {
 			e.printStackTrace();
 			return new Result(Result.ERROR, "图片保存异常,请稍后再试");
 		}
-//		String a = "1006420771322462208";
+//		String a = "1006420771322462210";
 //		long consumerId = Long.valueOf(a);
-		Agent agent = new Agent();
-		agent.setId(id);
-		Agent agg = agentMapper.selectOne(agent);
-		Agent ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1);
-		if(agg==null){  //添加
+		Agent ag ;
+		if(id==null){  //添加
 			Agent param = new Agent();
 			param.setAddConsumerId(consumerId);
 			Agent ap = agentMapper.selectOne(param);
 			if(ap !=null) return new Result(Result.ERROR, "已申请注册过代理商或已经绑定了乐语账号");
-			ag.setId(agent.getGeneralId());
+			ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1);
+			ag.setId(param.getGeneralId());
 			agentMapper.insert(ag);
 		}else {  //修改
+			ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1);
 			agentMapper.updateAgent(ag);
 		}
 		return new Result(Result.OK, "提交成功");
