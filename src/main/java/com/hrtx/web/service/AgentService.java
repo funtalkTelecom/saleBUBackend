@@ -75,7 +75,26 @@ public class AgentService {
 		params.setAddConsumerId(consumerId);
 		Agent ag = agentMapper.selectOne(params);
 		if(ag!=null) return new Result(Result.ERROR, "已经绑定乐语的账号");
-		agentMapper.updateAgentStatus(ag);
+
+		Consumer consparam = new Consumer();
+		consparam.setId(consumerId);
+		consparam.setStatus(1);
+		Consumer  consumer = consumerMapper.selectOne(consparam);
+		if(consumer ==null ) return new Result(Result.ERROR, "当前客商已是代理商，无法绑定");
+		//更新agent 状态2，客商id
+		agent.setStatus(2);
+		agentMapper.updateAgentStatusToLeyu(agent);
+		consumer.setIsAgent(2);
+		consumer.setCommpayName(agent.getCommpayName());
+		consumer.setName(agent.getPerson());
+		consumer.setPhone(agent.getPhone());
+		consumer.setAgentProvince(agent.getProvince());
+		consumer.setAgentCity(agent.getCity());
+		consumer.setAgentDistrict(agent.getDistrict());
+		consumer.setAgentAddress(agent.getAddress());
+		consumer.setTradingImg(agent.getTradingImg());
+		consumerMapper.insertAgentToConsumer(consumer);
+
 		return new Result(Result.OK, "绑定成功");
 	}
 	public Result findAgentListByaddConsumerId(Long ConsumerId) {
