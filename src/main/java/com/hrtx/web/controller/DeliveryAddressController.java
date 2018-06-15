@@ -84,6 +84,14 @@ public class DeliveryAddressController extends BaseReturn{
 		returnResult(deliveryAddressService.deliveryAddressEdit(deliveryAddress, request));
 	}
 
+	@PostMapping("/api/deliveryAddressDefault/{id}")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public void deliveryAddressDefault(DeliveryAddress deliveryAddress, HttpServletRequest request,@PathVariable("id") String id) {
+		deliveryAddress.setId(Long.valueOf(id));
+		returnResult(deliveryAddressService.deliveryAddressDefault(deliveryAddress, request));
+	}
+
 	@DeleteMapping("/api/deliveryAddress/{id}")
 	@Powers({PowerConsts.NOPOWER})
 	public void deliveryAddressDelete(DeliveryAddress deliveryAddress, HttpServletRequest request,@PathVariable("id") String id){

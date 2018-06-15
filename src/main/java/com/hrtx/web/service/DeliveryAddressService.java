@@ -81,6 +81,20 @@ public class DeliveryAddressService {
 		return new Result(Result.OK, "提交成功");
 	}
 
+	public Result deliveryAddressDefault(DeliveryAddress deliveryAddress, HttpServletRequest request) {
+		List<Map> deliveryAddressDefault=deliveryAddressMapper.findDeliveryAddressDefaultByUserId(this.apiSessionUtil.getConsumer().getId());
+		if(deliveryAddressDefault.size()>0)
+		{
+			DeliveryAddress addressDefault=new DeliveryAddress();
+			addressDefault.setId(Long.valueOf(deliveryAddressDefault.get(0).get("id").toString()));
+			addressDefault.setIsDefaultl(0);
+			deliveryAddressMapper.deliveryAddressDefault(addressDefault);
+		}
+		deliveryAddress.setIsDefaultl(1);
+		deliveryAddressMapper.deliveryAddressDefault(deliveryAddress);
+		return new Result(Result.OK, "提交成功");
+	}
+
     public Result deliveryAddressDelete(DeliveryAddress deliveryAddress) {
         deliveryAddressMapper.deliveryAddressDelete(deliveryAddress);
         return new Result(Result.OK, "删除成功");
