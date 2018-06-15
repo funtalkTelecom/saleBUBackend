@@ -4,10 +4,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.hrtx.dto.Result;
 import com.hrtx.web.service.CityService;
 import com.hrtx.web.service.DictService;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -41,6 +43,20 @@ public class CommonController extends BaseReturn{
         String isopen=request.getParameter("isopen");
         Object list=cityService.queryByPidListForZtree(NumberUtils.toInt(pid_,0), isopen);
         return list;
+    }
+
+    @GetMapping("/api/citys")
+    @Powers( { PowerConsts.NOLOGINPOWER })
+    @ResponseBody
+    public Object ApiCitys(HttpServletRequest request) {
+        Object list= null;
+        try {
+            list = cityService.queryCitys();
+        } catch (Exception e) {
+            log.error("获取地市异常",e);
+            return new Result(Result.ERROR,"暂时无法获取地市");
+        }
+        return new Result(Result.OK,list);
     }
 
     @RequestMapping("query-third-city")

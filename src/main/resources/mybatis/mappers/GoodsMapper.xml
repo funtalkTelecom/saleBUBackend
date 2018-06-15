@@ -27,6 +27,13 @@
         from tb_goods a where a.g_id = #{id}
     </select>
 
+    <select id="findGoodsInfoBySkuid" resultType="Goods">
+        select
+        <include refid="col_list"/>
+        from tb_sku b left join tb_goods a on a.g_id = b.g_id
+        where b.sku_id = #{skuid}
+    </select>
+
     <select id="queryPageList" resultType="Goods">
         select
         <include refid="col_list"/>
@@ -49,7 +56,7 @@
         b.seq as seq,
     </sql>
     <resultMap id="ApiGoodsList" type="java.util.HashMap">
-        <result property="gId" column="g_id"></result>
+        <result property="gId" column="g_id" javaType="java.lang.String"></result>
         <result property="gType1" column="g_type1"></result>
         <result property="gType2" column="g_type2"></result>
         <result property="gName" column="g_name"></result>
@@ -68,7 +75,7 @@
         <result property="gSellerName" column="g_seller_name"></result>
         <result property="gIsSale" column="g_is_sale"></result>
         <result property="fileId" column="file_id"></result>
-        <result property="refId" column="ref_id"></result>
+        <result property="refId" column="ref_id" javaType="java.lang.String"></result>
         <result property="fileName" column="file_name"></result>
         <result property="fileGroup" column="file_group"></result>
         <result property="seq" column="seq"></result>
@@ -106,6 +113,7 @@
         </if>
         ) t
         where SYSDATE() between t.gStartTime and t.gEndTime and t.gIsSale='1'
+        and t.gIsAuc = '0'
         order by t.gStartTime
     </select>
 

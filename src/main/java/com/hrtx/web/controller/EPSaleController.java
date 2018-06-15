@@ -44,18 +44,40 @@ public class EPSaleController extends BaseReturn{
 		return epSaleService.pageEPSale(epSale);
 	}
 
-	@GetMapping("/epSale/epSale/{addUserId}")
-	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})
-	//@Powers({PowerConsts.NOLOGINPOWER})
+	/**
+	 * 查询未过期的竟拍活动
+	 * @param epSale
+	 * @return
+	 */
+	@GetMapping("/api/epSales")
+	@Powers({PowerConsts.NOLOGINPOWER})
 	@ResponseBody
-	public Result listEPSale(EPSale epSale, @PathVariable("addUserId") String addUserId){
-		return epSaleService.findEPSaleListByUserId(Long.valueOf(addUserId));
+	public Result findEPSaleList(EPSale epSale){
+		return epSaleService.findEPSaleList();
+	}
+
+	/**
+	 * 查询竟拍活动的商品列表
+	 * 未过期
+	 * @param
+	 * @return
+	 */
+	@GetMapping("/api/epSaleGoodss/{ePSaleId}")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public Map findEPSaleGoodss(@PathVariable("ePSaleId") String ePSaleId){
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Map> epSaleMap=epSaleService.findEPSaleByEPSaleId(Long.valueOf(ePSaleId));
+		List<Map> goodsList=epSaleService.findEPSaleGoodsListByEPSaleId(Long.valueOf(ePSaleId));
+		epSaleMap.get(0).put("goodsList",goodsList);
+		map.put("code", Result.OK);
+		map.put("data", epSaleMap);
+		return map;
 	}
 
 	@RequestMapping("/epSale/epSale-info")
 	@ResponseBody
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})
-	//@Powers({PowerConsts.NOLOGINPOWER})
 	public Map epSaleInfo(EPSale epSale, HttpServletRequest request){
 		Map<String, Object> map = new HashMap<String, Object>();
 		//Object list=cityService.queryByPidList(0);
@@ -72,14 +94,12 @@ public class EPSaleController extends BaseReturn{
 	@PostMapping("/epSale/epSale-edit")
 	@ResponseBody
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_EDIT})
-	//@Powers({PowerConsts.NOLOGINPOWER})
 	public void epSaleEdit(EPSale epSale, @RequestParam(name = "file",required = false) MultipartFile[] files, HttpServletRequest request){
             returnResult(epSaleService.epSaleEdit(epSale,request, files));
 	}
 
 	@RequestMapping("/epSale/epSale-delete")
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_DELETE})
-	//@Powers({PowerConsts.NOLOGINPOWER})
 	public void epSaleDelete(EPSale epSale){
 		returnResult(epSaleService.epSaleDelete(epSale));
 	}

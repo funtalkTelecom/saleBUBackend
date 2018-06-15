@@ -121,4 +121,9 @@
     <update id="orderDelete">
         update tb_order a set a.is_del = 1 where a.id = #{id}
     </update>
+
+    <update id="deleteByOrderid">
+        delete from tb_order where order_id = #{orderid};
+        delete from tb_order_item where order_id = #{orderid};
+    </update>
 </mapper>

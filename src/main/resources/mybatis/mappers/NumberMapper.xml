@@ -34,7 +34,18 @@
         where 1=1
     </select>
 
+    <select id="getListBySkuid" resultType="Number">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_num a
+        where a.sku_id = #{skuid}
+    </select>
+
     <resultMap id="saleNumber" type="java.util.HashMap">
+        <result column="id" property="id" javaType="java.lang.String"></result>
+        <result column="city_id" property="cityId" javaType="java.lang.String"></result>
+        <result column="city_name" property="cityName"></result>
         <result column="num_resource" property="numResource"></result>
         <result column="sku_tob_price" property="skuTobPrice"></result>
         <result column="sku_toc_price" property="skuTocPrice"></result>
@@ -47,6 +58,9 @@
     </resultMap>
     <select id="queryPageListApi" resultMap="saleNumber">
         select
+            a.id,
+            a.city_id,
+            a.city_name,
             a.num_resource,
             b.sku_tob_price,
             b.sku_toc_price,
@@ -65,6 +79,30 @@
             select d.num_id from tb_num_rule d where d.`value` in (${tags}) and d.rule_type = 'tag'
         )
         </if>
+        and a.status in ('1', '2')
+        and c.g_is_sale = '1'
+    </select>
+
+    <select id="getNumInfoById" resultMap="saleNumber">
+        select
+        a.id,
+        a.city_id,
+        a.city_name,
+        a.num_resource,
+        b.sku_tob_price,
+        b.sku_toc_price,
+        (select GROUP_CONCAT(`value`) from tb_num_rule where num_id = a.id GROUP BY num_id) as tags,
+        a.num_level,
+        a.with4,
+        a.low_consume,
+        a.net_type,
+        a.status,
+        if(a.tele_type is null,'',a.tele_type) as tele_type
+        from tb_num a
+        left join tb_sku b on b.sku_id = a.sku_id
+        left join tb_goods c on c.g_id = b.g_id
+        where 1=1
+            and a.id = #{id}
         and a.status in ('1', '2')
         and c.g_is_sale = '1'
     </select>
@@ -90,5 +128,9 @@
             where
             a.num_resource = #{numResource}
         </if>
+    </update>
+
+    <update id="freezeNum">
+        update tb_num a set a.status = #{status} where a.id = #{id}
     </update>
 </mapper>

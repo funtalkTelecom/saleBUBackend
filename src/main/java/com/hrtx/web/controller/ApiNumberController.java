@@ -4,21 +4,18 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
+import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.mapper.NumberMapper;
 import com.hrtx.web.pojo.Number;
-import com.hrtx.web.pojo.User;
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -31,14 +28,22 @@ public class ApiNumberController extends BaseReturn{
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 
+	/**
+	 * 根据tags获取号码
+	 * @param number
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/number")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public String numberList(Number number, HttpServletRequest request){
+	public Result numberList(Number number, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
-			number.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-			number.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
+			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+			number.setStart(limit*(pageNum-1)+1);
+			number.setLimit(limit);
 			String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
 			tags = "'"+ tags.replaceAll(",", "','") +"'";
 
@@ -48,18 +53,39 @@ public class ApiNumberController extends BaseReturn{
 				//处理号码,生成号码块字段(numBlock)
 				for (int i = 0; i < ob.size(); i++) {
 					Map obj= (Map) ob.get(i);
-					StringBuffer num = new StringBuffer((String) obj.get("numResource"));
-					num.insert(3, ",");
-					num.insert(8, ",");
-					obj.put("numBlock", num.toString().split(","));
+					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
 				}
 			}
 			pm = new PageInfo<Object>(ob);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			pm = new PageInfo<Object>(null);
+			return new Result(Result.ERROR, pm);
 		}
 
-		return JSONObject.fromObject(pm).toString();
+		return new Result(Result.OK, pm);
+	}
+
+	@GetMapping("/number/{id}")
+	@Powers(PowerConsts.NOLOGINPOWER)
+	@ResponseBody
+	public Result numberInfo(@PathVariable("id") String id, HttpServletRequest request){
+		Map number = new HashMap();
+		try {
+			number = numberMapper.getNumInfoById(id);
+			number.put("numBlock", getNumBlock((String) number.get("numResource")));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			return new Result(Result.ERROR, new HashMap());
+		}
+
+		return new Result(Result.OK, number);
+	}
+
+	private String[] getNumBlock(String num) {
+		StringBuffer numResource = new StringBuffer(num);
+		numResource.insert(3, ",");
+		numResource.insert(8, ",");
+		return numResource.toString().split(",");
 	}
 }

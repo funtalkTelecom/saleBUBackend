@@ -12,6 +12,7 @@
         a.create_date as createDate,
         a.update_by as updateBy,
         a.update_date as updateDate,
+        a.tele_type as teleType,
         a.is_del as isDel
     </sql>
     <sql id="ex_col_list">
@@ -56,6 +57,17 @@
         </if>
     </select>
 
+    <select id="getMealListByNum" resultType="Meal">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_meal a
+        left join tb_third_city b on a.sale_city=b.city_id
+        left join tb_num c on c.tele_type = a.tele_type
+        where a.is_del = 0
+        and c.id = #{id}
+    </select>
+
     <insert id="insertBatch">
         insert into tb_meal(
             mid,
@@ -68,6 +80,7 @@
             create_date,
             update_by,
             update_date,
+            tele_type,
             is_del
         ) values
         <foreach collection="mealList" item="meal" separator=",">
@@ -82,6 +95,7 @@
                 #{meal.createDate},
                 #{meal.updateBy},
                 #{meal.updateDate},
+                #{meal.teleType},
                 0
             )
         </foreach>
@@ -94,7 +108,8 @@
             a.sale_city = #{saleCity},
             a.sale_type = #{saleType},
             a.update_by = #{updateBy},
-            a.update_date = #{updateDate}
+            a.update_date = #{updateDate},
+            a.tele_type = #{teleType}
         where
             a.mid = #{mid} and a.is_del = 0
     </update>

@@ -344,12 +344,12 @@ $(function() {
             "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
             "titleClass":"col-xs-1"
         },
-        "skuIsNum":{
-            "isShow":true,
-            "title":"是否号码",
-            "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">是</option><option value="2">否</option></select>',
-            "titleClass":""
-        },
+        // "skuIsNum":{
+        //     "isShow":true,
+        //     "title":"是否号码",
+        //     "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">是</option><option value="2">否</option></select>',
+        //     "titleClass":""
+        // },
         "skuSaleNum":{
             "isShow":true,
             "title":"所售号码",
@@ -365,7 +365,7 @@ $(function() {
         "skuGoodsType":{
             "isShow":true,
             "title":"商品类型",
-            "type":'<select tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
+            "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">普号</option><option value="3">普靓</option><option value="4">超靓</option></select>',
             "titleClass":""
         },
         "skuRepoGoods":{
@@ -613,7 +613,10 @@ function fileChange(i){
 }
 var clickSaleNumObj;
 function selectSaleNum(obj){
-    if($("select[tag="+$(obj).attr("tag")+"][name=skuIsNum]").val()!=1) return false;
+    if($("select[tag="+$(obj).attr("tag")+"][name=skuGoodsType]").val()==1) {
+        $("#saleNum").val($(obj).val());
+        return false;
+    }
     clickSaleNumObj = obj;
     $("#saleNum").val($(obj).val());
     $('#saleNumInfo').modal('show');
@@ -622,7 +625,7 @@ function selectSaleNum(obj){
     },500);
 }
 function skuIsNumChange(obj){
-    if($(obj).val()!=1) $("textarea[tag="+$(obj).attr("tag")+"][name=skuSaleNum]").val("");
+    if($(obj).val()==1) $("textarea[tag="+$(obj).attr("tag")+"][name=skuSaleNum]").val("");
 }
 //sku列表删除行
 function deleteSkuRow(obj){

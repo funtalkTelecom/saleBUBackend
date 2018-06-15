@@ -48,18 +48,23 @@ public class DeliveryAddressController extends BaseReturn{
 		return deliveryAddressService.pageDeliveryAddress(deliveryAddress);
 	}
 
-	@GetMapping("/api/deliveryAddresss/{addUserId}")
-	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_QUEYR})
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@GetMapping("/api/deliveryAddresss")
+	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
-	public Result listDeliveryAddress(DeliveryAddress deliveryAddress,@PathVariable("addUserId") String addUserId){
-		return deliveryAddressService.findDeliveryAddressListByUserId(Long.valueOf(addUserId));
+	public Result listDeliveryAddress(){
+		return deliveryAddressService.findDeliveryAddressList();
+	}
+
+	@GetMapping("/api/deliveryAddressDefault")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public Result DeliveryAddressDefault(){
+		return deliveryAddressService.findDeliveryAddressDefault();
 	}
 
 	@GetMapping("/api/deliveryAddress/{id}")
 	@ResponseBody
-	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_QUEYR})
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	public Map deliveryAddressInfo(DeliveryAddress deliveryAddress, HttpServletRequest request,@PathVariable("id") String id){
 		Map<String, Object> map = new HashMap<String, Object>();
 		//Object list=cityService.queryByPidList(0);
@@ -73,23 +78,21 @@ public class DeliveryAddressController extends BaseReturn{
 	}
 
 	@PostMapping("/api/deliveryAddress")
+	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
-	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_EDIT})
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public void deliveryAddressEdit(DeliveryAddress deliveryAddress, HttpServletRequest request){
-            returnResult(deliveryAddressService.deliveryAddressEdit(deliveryAddress,request));
+	public void deliveryAddressEdit(DeliveryAddress deliveryAddress, HttpServletRequest request) {
+		returnResult(deliveryAddressService.deliveryAddressEdit(deliveryAddress, request));
 	}
 
 	@DeleteMapping("/api/deliveryAddress/{id}")
-	//@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_DELETE})
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	public void deliveryAddressDelete(DeliveryAddress deliveryAddress, HttpServletRequest request,@PathVariable("id") String id){
 		deliveryAddress.setId(Long.valueOf(id));
 		returnResult(deliveryAddressService.deliveryAddressDelete(deliveryAddress));
 	}
 
 	@GetMapping("/account-list/{addUserId}")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result listDeliveryAddress(Account account, @PathVariable("addUserId") String addUserId){
 		return accountService.findAccountListByUserId(Long.valueOf(addUserId));

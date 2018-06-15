@@ -35,8 +35,16 @@ public class EPSaleService {
 		return new Result(Result.OK, pm);
 	}
 
-	public Result findEPSaleListByUserId(Long userId) {
-		return new Result(Result.OK,  epSaleMapper.findEPSaleListByUserId( userId));
+	public Result findEPSaleList() {
+		return new Result(Result.OK,  epSaleMapper.findEPSaleList());
+	}
+
+	public List<Map> findEPSaleByEPSaleId(Long ePSaleId) {
+		return epSaleMapper.findEPSaleByEPSaleId(ePSaleId);
+	}
+
+	public List<Map> findEPSaleGoodsListByEPSaleId(Long ePSaleId) {
+		return epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
 	}
 
 	public EPSale finEPSaleById(Long id) {

@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.DeliveryAddressMapper;
@@ -29,7 +30,8 @@ public class DeliveryAddressService {
 	
 	@Autowired
 	private DeliveryAddressMapper deliveryAddressMapper;
-
+	@Autowired
+	private ApiSessionUtil apiSessionUtil;
 	public Result pageDeliveryAddress(DeliveryAddress deliveryAddress) {
 		PageHelper.startPage(deliveryAddress.getPageNum(),deliveryAddress.getLimit());
 		Page<Object> ob=this.deliveryAddressMapper.queryPageList(deliveryAddress);
@@ -41,18 +43,35 @@ public class DeliveryAddressService {
 		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressListByUserId( userId));
 	}
 
+	public Result findDeliveryAddressList() {
+		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressListByUserId(this.apiSessionUtil.getConsumer().getId()));
+	}
+
+	public Result findDeliveryAddressDefault() {
+		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressDefaultByUserId(this.apiSessionUtil.getConsumer().getId()));
+	}
+
 	public  List<Map> findDeliveryAddressById(Long id) {
 		return  deliveryAddressMapper.findDeliveryAddressById(id);
 	}
 
 	public Result deliveryAddressEdit(DeliveryAddress deliveryAddress, HttpServletRequest request) {
-
-		deliveryAddress.setAddUserId(Long.valueOf(String.valueOf(1)));
 		if (deliveryAddress.getId() != null && deliveryAddress.getId() > 0) {
 			deliveryAddress.setUpdateDate(new Date());
 			deliveryAddressMapper.deliveryAddressEdit(deliveryAddress);
 		} else {
+			Long kk=this.apiSessionUtil.getConsumer().getId();
+			//List<Map> defaultMap= deliveryAddressMapper.findDeliveryAddressDefaultByUserId(this.apiSessionUtil.getConsumer().getId());
+			List<Map> listDeliveryAddress=deliveryAddressMapper.findDeliveryAddressListByUserId(this.apiSessionUtil.getConsumer().getId());
+			if(listDeliveryAddress.size()>0)
+			{
+				deliveryAddress.setIsDefaultl(0);
+			}else
+			{
+				deliveryAddress.setIsDefaultl(1);
+			}
 			List<DeliveryAddress> list = new ArrayList<DeliveryAddress>();
+			deliveryAddress.setAddUserId(apiSessionUtil.getConsumer().getId());
 			deliveryAddress.setId(deliveryAddress.getGeneralId());
 			deliveryAddress.setCreateDate(new Date());
 			deliveryAddress.setUpdateDate(new Date());

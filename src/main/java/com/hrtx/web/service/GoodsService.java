@@ -69,16 +69,43 @@ public class GoodsService {
             }
             //商品子表操作
             Sku sku = new Sku();
-            sku.setgId(goods.getgId());
-            skuMapper.deleteSkuByGid(sku);
+            Sku dsku = new Sku();
+            dsku.setgId(goods.getgId());
 
             SkuProperty skuProperty = new SkuProperty();
-            skuProperty.setgId(sku.getgId());
-            skuPropertyMapper.deleteSkuPropertyByGid(skuProperty);
+            SkuProperty dskuProperty = new SkuProperty();
+            dskuProperty.setgId(dsku.getgId());
 
 
             String skuPropertyJsonStr = request.getParameter("skuJson") == null ? "" : request.getParameter("skuJson");
             JSONArray skuPropertyJsonArr = JSONArray.fromObject(skuPropertyJsonStr);
+            //删除之前先验证
+            if(!skuPropertyJsonArr.isEmpty()){
+                List<SkuProperty> skuPropertyList = new ArrayList<SkuProperty>();
+                List<Sku> skuList = new ArrayList<Sku>();
+                String skuSaleNum = "";
+                for(int i=0; i<skuPropertyJsonArr.size(); i++){
+                    //sku表操作
+                    sku = new Sku();
+                    sku.setgId(goods.getgId());
+
+                    //sku属性表操作
+                    JSONObject obj = (JSONObject) skuPropertyJsonArr.get(i);
+                    Iterator it = obj.keySet().iterator();
+
+                    skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
+                    String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));
+                    sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?"9999": tskuId));
+                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false);
+                    //有错误号码
+                    if(skuSaleNum.split("★").length>1){
+                        return new Result(Result.ERROR, "第"+(i+1)+"行,以下号码不符合,请重新确认\n"+skuSaleNum.split("★")[1]);
+                    }
+                }
+            }
+            //验证通过之后删除数据,重新写入
+            skuMapper.deleteSkuByGid(dsku);
+            skuPropertyMapper.deleteSkuPropertyByGid(dskuProperty);
             if(!skuPropertyJsonArr.isEmpty()){
                 List<SkuProperty> skuPropertyList = new ArrayList<SkuProperty>();
                 List<Sku> skuList = new ArrayList<Sku>();
@@ -95,17 +122,17 @@ public class GoodsService {
                     //,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuGoodsType,skuRepoGoods,
                     sku.setSkuTobPrice(((JSONObject) obj.get("skuTobPrice")).get("value")==null||((JSONObject) obj.get("skuTobPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value"));
                     sku.setSkuTocPrice(((JSONObject) obj.get("skuTocPrice")).get("value")==null||((JSONObject) obj.get("skuTocPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTocPrice")).get("value"));
-                    sku.setSkuIsNum(((JSONObject) obj.get("skuIsNum")).get("value")==null||((JSONObject) obj.get("skuIsNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuIsNum")).get("value"));
+//                    sku.setSkuIsNum(((JSONObject) obj.get("skuIsNum")).get("value")==null||((JSONObject) obj.get("skuIsNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuIsNum")).get("value"));
                     sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
 //                    验证号码可用性之前赋值旧的skuId,便于tb_num表复原状态
                     String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));
                     sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?"9999": tskuId));
 
-                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku);
-//                    验证完之后赋予新的skuId
+                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, true);
+
                     sku.setSkuId(sku.getGeneralId());
-                    sku.setSkuSaleNum(skuSaleNum);
+                    sku.setSkuSaleNum(skuSaleNum.split("★")[0].split("\n")[0]);
                     sku.setSkuGoodsType(((JSONObject) obj.get("skuGoodsType")).get("value")==null||((JSONObject) obj.get("skuGoodsType")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuGoodsType")).get("value"));
                     sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
 
@@ -178,34 +205,36 @@ public class GoodsService {
         return new Result(Result.OK, "提交成功");
 	}
 
-    private String checkSkuSaleNum(String skuSaleNum, Sku sku) {
+    private String checkSkuSaleNum(String skuSaleNum, Sku sku, boolean isUpdate) {
 	    //把tb_num里面skuid下的所有状态改成1
+        String errorNum = "";
         Number number = new Number();
         number.setSkuId(sku.getSkuId());
         number.setStatus(1);
         numberMapper.updateStatus(number);
 
 	    String[] skuSaleNumbs = skuSaleNum.split("\\r?\\n");
-	    if(skuSaleNumbs!=null && skuSaleNumbs.length>0){
+	    if(skuSaleNumbs!=null && skuSaleNumbs.length>0 && !"".equals(skuSaleNumbs[0])){
             skuSaleNum = "";
             for (int i = 0; i < skuSaleNumbs.length; i++) {
                 //验证号码可用性
                 number = new Number();
                 number.setNumResource(skuSaleNumbs[i]);
+                number.setSkuId(sku.getSkuId());
                 if(numberMapper.checkNumberIsOk(number) > 0) {
                     skuSaleNum += skuSaleNumbs[i]+"\n";
                     //更新状态
                     number.setSkuId(sku.getGeneralId());
                     number.setStatus(2);
-                    numberMapper.updateStatus(number);
+                    if(isUpdate) numberMapper.updateStatus(number);
                 }else{
-
+                    errorNum += skuSaleNumbs[i] + "\n";
                 }
             }
         }else return "";
 
 	    if(skuSaleNum.length()!=0) skuSaleNum = skuSaleNum.substring(0, skuSaleNum.length()-1);
-	    return skuSaleNum;
+	    return skuSaleNum+"★"+errorNum;
     }
 
     public Result goodsDelete(Goods goods) {

@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
+import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.mapper.MealMapper;
 import com.hrtx.web.pojo.Meal;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -33,11 +36,13 @@ public class ApiMealController extends BaseReturn{
 	@GetMapping("/meal/{supplier}")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public String mealList(Meal meal, @PathVariable("supplier") String supplier, HttpServletRequest request){
+	public Result mealList(Meal meal, @PathVariable("supplier") String supplier, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
-			meal.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-			meal.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
+			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+			meal.setStart(limit*(pageNum-1)+1);
+			meal.setLimit(limit);
 			meal.setCreateBy(Long.parseLong(supplier));
 
 			PageHelper.startPage(meal.getPageNum(),meal.getLimit());
@@ -46,8 +51,31 @@ public class ApiMealController extends BaseReturn{
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			pm = new PageInfo<Object>(null);
+			return new Result(Result.ERROR, pm);
 		}
 
-		return JSONObject.fromObject(pm).toString();
+		return new Result(Result.OK, pm);
+	}
+
+	/**
+	 * 套餐接口-根据号码id查询相关运营商套餐
+	 * @param id
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/meal/n{id}")
+    @Powers(PowerConsts.NOLOGINPOWER)
+	@ResponseBody
+	public Result mealListForNum(@PathVariable("id") String id, HttpServletRequest request){
+		List mealList = new ArrayList();
+		try {
+			mealList = mealMapper.getMealListByNum(id);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			mealList = new ArrayList();
+			return new Result(Result.ERROR, mealList);
+		}
+
+		return new Result(Result.OK, mealList);
 	}
 }

@@ -13,6 +13,8 @@ public interface DeliveryAddressMapper extends Mapper<DeliveryAddress>,BaseMappe
 
     List<Map> findDeliveryAddressListByUserId(@Param("addUserId") Long addUserId);
 
+    List<Map> findDeliveryAddressDefaultByUserId(@Param("addUserId") Long addUserId);
+
     int checkDeliveryAddressKeyIdIsExist(DeliveryAddress deliveryAddress);
 
     void deliveryAddressEdit(DeliveryAddress deliveryAddress);
@@ -20,4 +22,6 @@ public interface DeliveryAddressMapper extends Mapper<DeliveryAddress>,BaseMappe
     void deliveryAddressDelete(DeliveryAddress deliveryAddress);
 
     void insertBatch(@Param("deliveryAddressList") List<DeliveryAddress> list);
+
+    DeliveryAddress findDeliveryAddressByIdForOrder(@Param("id") Long id);
 }

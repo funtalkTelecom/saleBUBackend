@@ -8,18 +8,19 @@ import static javax.persistence.GenerationType.SEQUENCE;
  * City entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "TB_CITY")
+@Table(name = "tb_city")
 public class City implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
-	private int id;
+	private Integer id;
 	private String name;
 	private String fullName;
 	private String acronym;
-	private int pid;
-	private int grade;
+	private Integer pid;
+	private Integer grade;
 	private String zip_code;
 	private String area_code;
-	private Integer seq;
+	private Integer is_del;
+//	private Integer seq;
 
 	// Constructors
 
@@ -39,24 +40,24 @@ public class City implements java.io.Serializable {
 	}
 
 	// Property accessors
-	@SequenceGenerator(name = "generator", allocationSize=1, sequenceName="SYS_SEQ")
+//	@SequenceGenerator(name = "generator", allocationSize=1, sequenceName="SYS_SEQ")
+	//	@GeneratedValue(strategy = SEQUENCE, generator = "generator")
 	@Id
-	@GeneratedValue(strategy = SEQUENCE, generator = "generator")
-	@Column(name = "ID", unique = true, nullable = false, precision = 10, scale = 0)
+	@Column(name = "id", unique = true, nullable = false, precision = 10, scale = 0)
 	public int getId() {
 		return this.id;
 	}
 	public void setId(int id) {
 		this.id = id;
 	}
-	@Column(name = "NAME", length = 50)
+	@Column(name = "name", length = 50)
 	public String getName() {
 		return this.name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
-	@Column(name = "FULL_NAME", length = 200)
+	@Column(name = "full_name", length = 200)
 	public String getFullName() {
 		return this.fullName;
 	}
@@ -65,7 +66,7 @@ public class City implements java.io.Serializable {
 		this.fullName = fullName;
 	}
 
-	@Column(name = "ACRONYM", length = 50)
+	@Column(name = "acronym", length = 50)
 	public String getAcronym() {
 		return this.acronym;
 	}
@@ -74,7 +75,7 @@ public class City implements java.io.Serializable {
 		this.acronym = acronym;
 	}
 
-	@Column(name = "PID", precision = 10, scale = 0)
+	@Column(name = "pid", precision = 10, scale = 0)
 	public int getPid() {
 		return this.pid;
 	}
@@ -83,7 +84,7 @@ public class City implements java.io.Serializable {
 		this.pid = pid;
 	}
 
-	@Column(name = "GRADE", precision = 10, scale = 0)
+	@Column(name = "grade", precision = 10, scale = 0)
 	public int getGrade() {
 		return this.grade;
 	}
@@ -107,13 +108,21 @@ public class City implements java.io.Serializable {
 	public void setArea_code(String areaCode) {
 		area_code = areaCode;
 	}
-	@Column(name = "seq")
-	public Integer getSeq() {
-		return seq;
+//	@Column(name = "seq")
+//	public Integer getSeq() {
+//		return seq;
+//	}
+//
+//	public void setSeq(Integer seq) {
+//		this.seq = seq;
+//	}
+
+	@Column(name = "is_del")
+	public int getIs_del() {
+		return is_del;
 	}
 
-	public void setSeq(Integer seq) {
-		this.seq = seq;
+	public void setIs_del(int is_del) {
+		this.is_del = is_del;
 	}
-	
 }

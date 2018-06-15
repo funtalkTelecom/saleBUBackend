@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -210,4 +211,21 @@ public class BaseReturn {
 			log.info("删除文件失败",e);
 		}
 	};
+
+    protected Map<String,String> getParamMap(HttpServletRequest request) {
+		Map<String,String> params = new HashMap<>();
+		Enumeration<?> e= request.getParameterNames();
+		while (e.hasMoreElements()) {
+			String object = (String) e.nextElement();
+			String[] values = (String[])request.getParameterValues(object);
+			String valueStr = "";
+			for (int i = 0; i < values.length; i++) {
+				valueStr = (i == values.length - 1) ? valueStr + values[i]: valueStr + values[i] + ",";
+			}
+			//乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
+			//valueStr = new String(valueStr.getBytes("ISO-8859-1"), "gbk");
+			params.put(object, valueStr);
+		}
+		return params;
+    }
 }

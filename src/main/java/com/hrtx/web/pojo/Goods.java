@@ -27,7 +27,7 @@ public class Goods extends BasePojo implements java.io.Serializable {
     private Date gEndTime;
     private String gSaleCity;
     private String gIsAuc;
-    private String gActive;
+    private Long gActive;
     private String gIsPack;
     private String gLoopTime;
     private String gDeposit;
@@ -40,7 +40,7 @@ public class Goods extends BasePojo implements java.io.Serializable {
     public Goods() {
     }
 
-    public Goods(Long gId, String gType1, String gType2, String gName, String gAd, Date gStartTime, Date gEndTime, String gSaleCity, String gIsAuc, String gActive, String gIsPack, String gLoopTime, String gDeposit, String gStartNum, String gPriceUp, Long gSellerId, String gSellerName, String gIsSale) {
+    public Goods(Long gId, String gType1, String gType2, String gName, String gAd, Date gStartTime, Date gEndTime, String gSaleCity, String gIsAuc, Long gActive, String gIsPack, String gLoopTime, String gDeposit, String gStartNum, String gPriceUp, Long gSellerId, String gSellerName, String gIsSale) {
         this.gId = gId;
         this.gType1 = gType1;
         this.gType2 = gType2;
@@ -133,11 +133,11 @@ public class Goods extends BasePojo implements java.io.Serializable {
         this.gIsAuc = gIsAuc;
     }
 
-    public String getgActive() {
+    public Long getgActive() {
         return gActive;
     }
 
-    public void setgActive(String gActive) {
+    public void setgActive(Long gActive) {
         this.gActive = gActive;
     }
 

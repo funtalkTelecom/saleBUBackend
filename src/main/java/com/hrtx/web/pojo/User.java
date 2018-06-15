@@ -26,8 +26,12 @@ public class User extends BasePojo implements java.io.Serializable {
 	public User() {
 	}
 
+	public User(Long id) {
+		this.id = id;
+	}
+
 	private User(Long id, String loginName, String pwd, String name,
-			Long corpId, String phone, Long addUserId, Date addDate, Integer status) {
+				 Long corpId, String phone, Long addUserId, Date addDate, Integer status) {
 		super();
 		this.id = id;
 		this.loginName = loginName;

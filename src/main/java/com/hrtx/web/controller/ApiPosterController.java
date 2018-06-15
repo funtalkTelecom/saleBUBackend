@@ -4,8 +4,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
+import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SessionUtil;
+import com.hrtx.global.SystemParam;
 import com.hrtx.web.mapper.PosterMapper;
 import com.hrtx.web.pojo.Poster;
 import net.sf.json.JSONObject;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -36,20 +39,29 @@ public class ApiPosterController extends BaseReturn{
 	@GetMapping("/poster")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public String posterList(Poster poster, HttpServletRequest request){
+	public Result posterList(Poster poster, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
-			poster.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-			poster.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
+			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+			poster.setStart(limit*(pageNum-1)+1);
+			poster.setLimit(limit);
 
 			PageHelper.startPage(poster.getPageNum(),poster.getLimit());
 			Page<Object> ob=this.posterMapper.queryPageListApi(poster);
+            if(ob!=null && ob.size()>0){
+                for (Object obj : ob) {
+                	Poster p = (Poster) obj;
+					p.setPic(SystemParam.get("domain-full") + "/get-img/posterImages/" + p.getPic());
+                }
+            }
 			pm = new PageInfo<Object>(ob);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			pm = new PageInfo<Object>(null);
+			return new Result(Result.ERROR, pm);
 		}
 
-		return JSONObject.fromObject(pm).toString();
+		return new Result(Result.OK, pm);
 	}
 }

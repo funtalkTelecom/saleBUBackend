@@ -7,4 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
+    void insertBatch(@Param("orderList") List<Order> orderList);
+
+    void deleteByOrderid(@Param("orderid") Long orderId);
 }

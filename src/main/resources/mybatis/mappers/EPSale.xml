@@ -23,25 +23,37 @@
         order by t.id desc
     </select>
 
-    <select id="findDeliveryAddressListByUserId" resultType="java.util.HashMap">
-        select t.id,
-		person_name as personName,
-		t.person_tel as personTel ,
-		province.name as provinceName,
-		city.name as cityName,
-		district.name as  districtName,
-		province.id as provinceId,
-		city.id as cityId,
-		district.id as  districtId,
-        t.address,
-		t.add_user_id as addUserId,
-		t.is_defaultl as isDefaultl,t.note
-		from tb_delivery_address t
-        inner join tb_city  province on province.id=t.province
-        inner join tb_city city on city.id=t.city
-        inner join tb_city district on district.id=t.district
-        where t.is_del = 0
-        and t.add_user_id = #{addUserId};
+    <select id="findEPSaleList" resultType="java.util.HashMap">
+    select
+    ep.id,
+    ep.title,
+    ep.ep_rule as erRule,
+    ep.start_time as startTime,
+    ep.end_time as endTime,
+    concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) as epImg
+    from tb_ep_sale ep
+    inner join
+    tb_file_info epImg
+    on epImg.ref_id=ep.id
+    where ep.is_del=0
+    and TIMESTAMPDIFF(second, now(),ep.end_time)>0
+    </select>
+
+    <select id="findEPSaleByEPSaleId" resultType="java.util.HashMap">
+    select
+    ep.id,
+    ep.title,
+    ep.ep_rule as erRule,
+    ep.start_time as startTime,
+    ep.end_time as endTime,
+    concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) as epImg
+    from tb_ep_sale ep
+    inner join
+    tb_file_info epImg
+    on epImg.ref_id=ep.id
+    where ep.is_del=0
+    and TIMESTAMPDIFF(second, now(),ep.end_time)>0
+    and ep.id = #{epSaleId};
     </select>
 
     <select id="findEPSaleById" resultType="EPSale">
@@ -59,6 +71,55 @@
        t.note as note
        from tb_ep_sale t
        where t.is_del = 0 and t.id = #{id};
+    </select>
+
+    <select id="findEPSaleGoodsListByEPSaleId" resultType="java.util.HashMap">
+        select
+        goodsInfo.gId,
+        goodsInfo.gName,
+        goodsInfo.gAd,
+        goodsInfo.gImg,
+        goodsInfo.gSatus,
+        goodsInfo.gStartPrice,
+        numSaleInfo.PriceCount,
+        numSaleInfo.CurrentPrice
+        from
+        (
+        select
+        tb_num.id as numId,
+        tb_goods.g_active as gEPSaleId,
+        tb_goods.g_id as gId,
+        tb_goods.g_start_time,
+        tb_goods.g_end_time,
+        case
+        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice,
+        concat("get-img","/",tb_file_info.file_group,"/",tb_file_info.ref_id,"/",tb_file_info.file_name) as gImg
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        inner join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and tb_file_info.file_group='goodsPic'
+        and tb_file_info.seq=1
+        ) goodsInfo
+        left join
+        (select count(tb_auction.id) as PriceCount,
+        max(tb_auction.price) as  CurrentPrice,
+        tb_auction.num_id as numId
+        from tb_auction
+        group by tb_auction.num_id) numSaleInfo
+        on     numSaleInfo.numId=goodsInfo.numId
+        where  goodsInfo.gEPSaleId = #{ePSaleId}
     </select>
 
     <insert id="insertBatch">
