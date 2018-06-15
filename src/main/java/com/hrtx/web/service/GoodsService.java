@@ -4,6 +4,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.dto.StorageInterfaceRequest;
+import com.hrtx.global.HttpUtil;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
@@ -254,5 +256,17 @@ public class GoodsService {
     public Result goodsUnsale(Goods goods, HttpServletRequest request) {
         goodsMapper.goodsUnsale(goods);
         return new Result(Result.OK, "下架成功");
+    }
+
+    public Result repoGoods(HttpServletRequest request) {
+        try {
+            Result res = HttpUtil.doHttpPost("http://192.168.7.1:21401/DS_Storage/dispatchRequests.htm",
+                    JSONArray.fromObject(new StorageInterfaceRequest("1001", "HK0006", Utils.randomNoByDateTime(), "123456", new Object())).toString(),
+                    "application/json",
+                    "UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new Result(Result.OK, "");
     }
 }
