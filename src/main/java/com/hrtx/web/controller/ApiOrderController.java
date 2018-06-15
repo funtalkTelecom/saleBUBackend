@@ -411,11 +411,21 @@ public class ApiOrderController extends BaseReturn{
 	}
 
     public static void main(String[] args) throws Exception {
+        Map param = new HashMap();
+//        仓库：10656635
+//        卖家：10007016
+        param.put("storage_id", "10656635");
+        param.put("company_id", "10007016");
         Result res = HttpUtil.doHttpPost("http://192.168.7.1:21401/DS_Storage/dispatchRequests.htm",
-                JSONArray.fromObject(new StorageInterfaceRequest("1001", "HK0006", Utils.randomNoByDateTime(), "123456", new Object())).toString(),
+                JSONObject.fromObject(new StorageInterfaceRequest(
+                        "1001",
+                        "HK0001",
+                        Utils.randomNoByDateTime(),
+                        "123456",
+                        param
+                )).toString(),
                 "application/json",
                 "UTF-8");
-        System.out.println(res);
     }
     /**
      * 字符串转换成日期

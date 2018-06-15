@@ -78,4 +78,10 @@ public class GoodsController extends BaseReturn{
 	public void goodsDelete(Goods goods){
 		returnResult(goodsService.goodsDelete(goods));
 	}
+
+	@RequestMapping("/goods-repoGoods")
+	@Powers({PowerConsts.GOODSMOUDULE_COMMON_QUEYR})
+	public void repoGoods(HttpServletRequest request){
+		returnResult(goodsService.repoGoods(request));
+	}
 }
