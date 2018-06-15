@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.FieldError;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -227,5 +229,13 @@ public class BaseReturn {
 			params.put(object, valueStr);
 		}
 		return params;
+    }
+
+    protected Map getErrors(List<FieldError> fieldErrors) {
+    	Map errors = new HashMap();
+		for (FieldError fieldError:fieldErrors) {
+			errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+		}
+		return errors;
     }
 }

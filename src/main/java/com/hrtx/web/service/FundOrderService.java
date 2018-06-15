@@ -15,10 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FundOrderService extends BaseService {
@@ -28,33 +25,46 @@ public class FundOrderService extends BaseService {
 	@Autowired private ApiSessionUtil apiSessionUtil;
 
     /**
-     * 支付订单下单
-     * @param busi_type  业务类型
+     * 平安微信小程序支付订单下单
      * @param amt 支付金额
      * @param payer 付款方
      * @param order_name 订单描述
      * @param sourceId  业务来源编码
      * @return
      */
-    public Result payAddOrder(String busi_type, int amt, String payer, String order_name, String sourceId) {
-        return payAddOrder(sourceId+"", busi_type, amt, "", payer, order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
+    public Result payPinganWxxOrder(int amt, String payer, String order_name, String sourceId) {
+        return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, "", payer, order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
     }
 
-	public Result payAddOrder(String contractno, String busi_type, int amt, String payee, String payer, String order_name, String third, String sourceId, String remark){
-        if(!LockUtils.tryLock(contractno)) return new Result(Result.ERROR, "正在支付，请勿重复请求");
+    /**
+     *
+     * @param busi_type 业务类型
+     * @param amt  付款金额
+     * @param payee 收款方
+     * @param payer 付款方
+     * @param order_name 支付订单描述
+     * @param third 支付方式
+     * @param sourceId 支付订单来源
+     * @param remark 备注
+     * @return
+     */
+	public Result payAddOrder(String busi_type, int amt, String payee, String payer, String order_name, String third, String sourceId, String remark){
+	    String orderMark = busi_type+"-"+sourceId;
+        if(!LockUtils.tryLock(orderMark)) return new Result(Result.ERROR, "正在支付，请勿重复请求");
         try {
-            FundOrder fundOrder = new FundOrder();
-            fundOrder.setContractno(contractno);
-            fundOrder = fundOrderMapper.selectOne(fundOrder);
-            if(fundOrder != null && fundOrder.getStatus() == 3) return new Result(Result.ERROR, "已支付，请勿重复提交");
-//            String contractno = "PAY"+Utils.randomNoByDateTime();
-            fundOrder = new FundOrder(0l, busi_type, amt, payee, payer, 1, order_name, contractno, third, amt, remark, sourceId);
+            Example example = new Example(FundOrder.class);
+            example.createCriteria().andEqualTo("busi", busi_type).andEqualTo("sourceId", sourceId).andIn("status",Arrays.asList(new int[]{}));
+            List fundOrders = fundOrderMapper.selectByExample(example);
+            if(fundOrders.size()>0) return new Result(Result.ERROR, "订单已支付");
+            String contractno = "PAY"+Utils.randomNoByDateTime();
+            FundOrder fundOrder = new FundOrder(0l, busi_type, amt, payee, payer, 1, order_name, contractno, third, amt, remark, sourceId);
             fundOrder.setId(fundOrder.getGeneralId());
             fundOrderMapper.insert(fundOrder);
             Long req_user = apiSessionUtil.getUser() == null ? 0l:apiSessionUtil.getUser().getId();
             FundDetail fundDetail = new FundDetail(0l, fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_ADD, 1);
             fundDetail.setId(fundDetail.getGeneralId());
             fundDetailMapper.insert(fundDetail);
+
             String notify_url = SystemParam.get("pay_call_back_url");
             String sub_appid = SystemParam.get("wxx_appid");
             Result result = null;
@@ -105,7 +115,7 @@ public class FundOrderService extends BaseService {
             log.error("下单请求前未知异常", e);
             return new Result(Result.ERROR, "请求前未知异常");
         } finally {
-            LockUtils.unLock(contractno);
+            LockUtils.unLock(orderMark);
         }
 
 	}
