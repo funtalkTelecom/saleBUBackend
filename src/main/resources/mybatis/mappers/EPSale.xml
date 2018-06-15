@@ -81,8 +81,11 @@
         goodsInfo.gImg,
         goodsInfo.gSatus,
         goodsInfo.gStartPrice,
-        numSaleInfo.PriceCount,
-        numSaleInfo.CurrentPrice
+        numSaleInfo.priceCount,
+        numSaleInfo.currentPrice,
+        goodsInfo.numId,
+        goodsInfo.skuId,
+        goodsInfo.num
         from
         (
         select
@@ -103,23 +106,96 @@
         tb_goods.g_name as gName,
         tb_goods.g_ad as gAd,
         tb_sku.sku_tob_price as gStartPrice,
-        concat("get-img","/",tb_file_info.file_group,"/",tb_file_info.ref_id,"/",tb_file_info.file_name) as gImg
+        concat("get-img","/",tb_file_info.file_group,"/",tb_file_info.ref_id,"/",tb_file_info.file_name) as gImg,
+        tb_sku.sku_id as  skuId,
+        tb_num.num_resource as num
         from
         tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
         inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
         inner join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
         and tb_file_info.file_group='goodsPic'
-        and tb_file_info.seq=1
+        and tb_file_info.seq=1  and  tb_num.status=2
         ) goodsInfo
         left join
-        (select count(tb_auction.id) as PriceCount,
-        max(tb_auction.price) as  CurrentPrice,
+        (select count(tb_auction.id) as priceCount,
+        max(tb_auction.price) as  currentPrice,
         tb_auction.num_id as numId
         from tb_auction
         group by tb_auction.num_id) numSaleInfo
         on     numSaleInfo.numId=goodsInfo.numId
         where  goodsInfo.gEPSaleId = #{ePSaleId}
+    </select>
+
+    <select id="findEPSaleGoodsByGoodsId" resultType="java.util.HashMap">
+        select
+        goodsInfo.gId,
+        goodsInfo.gName,
+        goodsInfo.gAd,
+        goodsInfo.gSatus,
+        goodsInfo.gStartPrice,
+        numSaleInfo.priceCount,
+        numSaleInfo.currentPrice
+        from
+        (
+        select
+        tb_num.id as numId,
+        tb_goods.g_active as gEPSaleId,
+        tb_goods.g_id as gId,
+        tb_goods.g_start_time,
+        tb_goods.g_end_time,
+        case
+        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        inner join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1  and  tb_num.status=2
+        ) goodsInfo
+        left join
+        (select count(tb_auction.id) as priceCount,
+        max(tb_auction.price) as  currentPrice,
+        tb_auction.num_id as numId
+        from tb_auction
+        group by tb_auction.num_id) numSaleInfo
+        on     numSaleInfo.numId=goodsInfo.numId
+        where  goodsInfo.gId = #{goodsId}
+    </select>
+
+    <select id="findEPSaleGoodsByGoodsId2" resultType="java.util.HashMap">
+        select
+        tb_num.id as numId,
+        tb_goods.g_id as gId,
+        case
+        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice,
+        tb_sku.sku_id as  skuId,
+        tb_num.num_resource as num
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and  tb_num.status=2
+        and  tb_goods.g_id = #{goodsId}
     </select>
 
     <insert id="insertBatch">

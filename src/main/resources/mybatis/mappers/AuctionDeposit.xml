@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.AuctionDepositMapper">
+     <select id="findAuctionDepositSumEPSaleGoodsByNumId" resultType="java.util.HashMap">
+      select count(tb_auction.id) as priceCount,
+	  max(tb_auction.price) as  currentPrice,
+	  tb_auction.num_id as numId
+	  from tb_auction
+	  where  tb_auction.status=2 and tb_auction.num_id = #{numId}
+	  group by tb_auction.num_id
+    </select>
+	<select id="findAuctionDepositListByNumId" resultType="java.util.HashMap">
+	  select * from 	tb_auction_deposit
+	  where  tb_auction_deposit.num_id = #{numId}
+    </select>
+
+	<select id="findAuctionDepositListByNumIdAndConsumerIdAndStatus" resultType="java.util.HashMap">
+	  select * from 	tb_auction_deposit
+	  where  tb_auction_deposit.num_id = #{numId}
+	       and tb_auction_deposit.consumer_id=#{consumerId}
+	       and tb_auction_deposit.status=#{status}
+    </select>
+
+	<insert id="insertBatch">
+		insert into tb_auction_deposit(
+		id,
+		sku_id,
+		num_id,
+		num,
+		amt,
+		status,
+		add_date,
+		consumer_id,
+		add_ip,
+		pay_snn,
+		pay_date,
+		refund_amt,
+		refund_snn,
+		refund_date
+		) values
+		<foreach collection="auctionDepositList" item="AuctionDeposit" separator=",">
+			(
+			#{AuctionDeposit.id},
+			#{AuctionDeposit.skuId},
+			#{AuctionDeposit.numId},
+			#{AuctionDeposit.num},
+			#{AuctionDeposit.amt},
+			#{AuctionDeposit.status},
+			#{AuctionDeposit.addDate},
+			#{AuctionDeposit.consumerId},
+			#{AuctionDeposit.addIp},
+			#{AuctionDeposit.paySnn},
+			#{AuctionDeposit.payDate},
+			#{AuctionDeposit.refundAmt},
+			#{AuctionDeposit.refundSnn},
+			#{AuctionDeposit.refundDate}
+			)
+		</foreach>
+	</insert>
+
+</mapper>

@@ -45,7 +45,8 @@
         inner join tb_city city on city.id=t.city
         inner join tb_city district on district.id=t.district
         where t.is_del = 0
-        and t.add_user_id = #{addUserId};
+        and t.add_user_id = #{addUserId}
+        order by  t.is_defaultl desc;
     </select>
 
     <select id="findDeliveryAddressDefaultByUserId" resultType="java.util.HashMap">
@@ -152,6 +153,13 @@
          t.address=#{address} ,
          t.update_date=#{updateDate},
          t.note=#{note}
+        where
+            t.id = #{id}
+    </update>
+
+    <update id="deliveryAddressDefault">
+        update tb_delivery_address t set
+         t.is_defaultl=#{isDefaultl}
         where
             t.id = #{id}
     </update>

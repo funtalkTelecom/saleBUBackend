@@ -19,6 +19,8 @@ public interface DeliveryAddressMapper extends Mapper<DeliveryAddress>,BaseMappe
 
     void deliveryAddressEdit(DeliveryAddress deliveryAddress);
 
+    void deliveryAddressDefault(DeliveryAddress deliveryAddress);
+
     void deliveryAddressDelete(DeliveryAddress deliveryAddress);
 
     void insertBatch(@Param("deliveryAddressList") List<DeliveryAddress> list);
