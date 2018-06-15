@@ -21,7 +21,7 @@ public class HttpUtil {
 	 *
 	 * HTTP协议POST请求方法
 	 */
-	public static String sendPost(String url, String params, String charet) {
+	public static String sendPost(String url, String params, String charet) throws IOException {
 		if (null == charet || "".equals(charet)) {
 			charet = "UTF-8";
 		}
@@ -29,6 +29,7 @@ public class HttpUtil {
 		URL urls;
 		HttpURLConnection uc = null;
 		BufferedReader in = null;
+        DataOutputStream out = null;
 		try {
 			urls = new URL(url);
 			uc = (HttpURLConnection) urls.openConnection();
@@ -36,28 +37,24 @@ public class HttpUtil {
 			uc.setDoOutput(true);
 			uc.setDoInput(true);
 			uc.setUseCaches(false);
-			uc.setRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded");
+			uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 			uc.connect();
-			DataOutputStream out = new DataOutputStream(uc.getOutputStream());
+			out = new DataOutputStream(uc.getOutputStream());
 			out.write(params.getBytes(charet));
 			out.flush();
-			out.close();
 			in = new BufferedReader(new InputStreamReader(uc.getInputStream(),
 					charet));
 			String readLine = "";
 			while ((readLine = in.readLine()) != null) {
 				sb.append(readLine);
 			}
-			if (in != null) {
-				in.close();
-			}
-			if (uc != null) {
-				uc.disconnect();
-			}
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
 		} finally {
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
 			if (uc != null) {
 				uc.disconnect();
 			}
