@@ -35,8 +35,8 @@ public class AgentService {
 
 	public Result SaveOrUpdateAgent(Long id,String commpayName,String person,String phone,long province,long city,long district,
 									String address, MultipartFile file){
-//		Consumer consumer= this.apiSessionUtil.getConsumer();
-//		long consumerId = consumer.getId();
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		long consumerId = consumer.getId();
 		//图片保存
 		String tradingImg="";
 		try {
@@ -50,8 +50,8 @@ public class AgentService {
 			e.printStackTrace();
 			return new Result(Result.ERROR, "图片保存异常,请稍后再试");
 		}
-		String a = "1006420771322462208";
-		long consumerId = Long.valueOf(a);
+//		String a = "1006420771322462208";
+//		long consumerId = Long.valueOf(a);
 		Agent agent = new Agent();
 		agent.setId(id);
 		Agent agg = agentMapper.selectOne(agent);
