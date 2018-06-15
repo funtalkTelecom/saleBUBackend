@@ -6,6 +6,8 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.SessionUtil;
+import com.hrtx.global.SystemParam;
+import com.hrtx.web.controller.BaseReturn;
 import com.hrtx.web.mapper.AccountMapper;
 import com.hrtx.web.mapper.AgentMapper;
 import com.hrtx.web.mapper.ConsumerMapper;
@@ -15,7 +17,9 @@ import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.ConsumerLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,11 +34,24 @@ public class AgentService {
 	@Autowired private ConsumerMapper consumerMapper;
 
 	public Result SaveOrUpdateAgent(Long id,String commpayName,String person,String phone,long province,long city,long district,
-									String address,String tradingImg){
-		Consumer consumer= this.apiSessionUtil.getConsumer();
-		long consumerId = consumer.getId();
-//		String a = "1006420771322462208";
-//		long consumerId = Long.valueOf(a);
+									String address, MultipartFile file){
+//		Consumer consumer= this.apiSessionUtil.getConsumer();
+//		long consumerId = consumer.getId();
+		//图片保存
+		String tradingImg="";
+		try {
+			if(file!=null){
+				String path = SystemParam.get("trading_url");
+				Result result = BaseReturn.uploadFile(path, "jpg,png,gif", file, false, false);
+				if(result.getCode()==Result.OK) tradingImg = ((Map)result.getData()).get("sourceServerFileName").toString();
+				else return result;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Result(Result.ERROR, "图片保存异常,请稍后再试");
+		}
+		String a = "1006420771322462208";
+		long consumerId = Long.valueOf(a);
 		Agent agent = new Agent();
 		agent.setId(id);
 		Agent agg = agentMapper.selectOne(agent);
@@ -54,10 +71,10 @@ public class AgentService {
 
 
 	public Result SaveAgentLeyu(String loginName,String pwd){
-//		Consumer consumer= this.apiSessionUtil.getConsumer();
-//		long consumerId = consumer.getId();
-		String a = "1006420771322462208";
-		long consumerId = Long.valueOf(a);
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		long consumerId = consumer.getId();
+//		String a = "1006420771322462208";
+//		long consumerId = Long.valueOf(a);
 		Agent param = new Agent();
 		param.setLoginName(loginName);
 		param.setPwd(pwd);
@@ -79,8 +96,8 @@ public class AgentService {
 		Consumer consparam = new Consumer();
 		consparam.setId(consumerId);
 		consparam.setStatus(1);
-		Consumer  consumer = consumerMapper.selectOne(consparam);
-		if(consumer ==null ) return new Result(Result.ERROR, "当前客商已是代理商，无法绑定");
+		Consumer  consumer1 = consumerMapper.selectOne(consparam);
+		if(consumer1 ==null ) return new Result(Result.ERROR, "当前客商已是代理商，无法绑定");
 		//更新agent 状态2，客商id
 		agent.setStatus(2);
 		agentMapper.updateAgentStatusToLeyu(agent);
