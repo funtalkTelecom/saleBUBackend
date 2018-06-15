@@ -1,6 +1,15 @@
 package com.hrtx.global;
 
+import com.hrtx.dto.Result;
 import net.sf.json.JSONObject;
+import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -16,7 +25,35 @@ import java.util.*;
 
 public class HttpUtil {
 	private static Logger log = LoggerFactory.getLogger(HttpUtil.class);
+    public static Result doHttpPost(String url, String sendR, String type, String charset) throws Exception{
+        log.info("请求url："+url);
+        log.info("请求参数："+sendR);
+        log.info("请求contentType："+type);
+        log.info("请求字符编码："+charset);
+        HttpClient httpClient = new HttpClient();
+        HttpMethodBase getMethod = createMethod(url, sendR, type, charset);
+        int statusCode = httpClient.executeMethod(getMethod);
+        //只要在获取源码中，服务器返回的不是200代码，则统一认为抓取源码失败，返回失败。
+        if (statusCode != HttpStatus.SC_OK) {
+            log.error("Method failed: " + getMethod.getStatusLine() + "\tstatusCode: " + statusCode);
+            return new Result(500, "返回码异常["+statusCode+"]");
+        }else{
+            return new Result(200, getMethod.getResponseBodyAsString());
+        }
 
+    }
+
+    private static HttpMethodBase createMethod(String url, String param, String type, String  charset) throws UnsupportedEncodingException {
+        PostMethod method = null;
+        method = new PostMethod(url);
+        RequestEntity se = new StringRequestEntity(param, type, charset);
+        method.setRequestEntity(se);
+        //使用系统提供的默认的恢复策略
+        method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
+        //设置超时的时间
+        method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 30000);
+        return method;
+    }
 	/**
 	 *
 	 * HTTP协议POST请求方法
