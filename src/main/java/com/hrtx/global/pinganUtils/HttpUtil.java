@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -171,12 +172,13 @@ public class HttpUtil {
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
+			return URLDecoder.decode("\"errcode\": 99999, \"msg\": \"未知异常\", \"timestamp\": 1494483084, \"data\": \"\",\"sign\": \"\"");
 		} finally {
 			if (uc != null) {
 				uc.disconnect();
 			}
 		}
-		return sb.toString();
+		return URLDecoder.decode(sb.toString());
 	}
 
 	/**

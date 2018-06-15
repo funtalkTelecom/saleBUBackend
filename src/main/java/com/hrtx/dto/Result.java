@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 public class Result {
 	public static final int OK			= 200;//正常
 	public static final int TIME_OUT	= 300;//会话超时
-	public static final int WARN		= 400;//数据库等可预知的异常
-	public static final int ERROR		= 500;//未知异常
+	public static final int WARN		= 400;//未知异常
+	public static final int ERROR		= 500;//数据库等可预知的异常
 	public static final int NOPOWER		= 250;//权限不足
 	public static final int PARAM		= 999;//参数异常
 	public static final int OTHER		= 888;//其他（可返前台）
@@ -19,8 +19,7 @@ public class Result {
 	
 	public Result(int code, Object data) {
 		super();
-		String msg = ObjectUtils.toString(data);
-		log.info("-------------------(返回结果：code:"+code+",data:"+(msg.length()>500 ? msg.substring(0, 500) : msg)+")");
+		log.info("-------------------(返回结果："+ObjectUtils.toString(data)+")");
 		this.code = code;
 		this.data = data;
 	}

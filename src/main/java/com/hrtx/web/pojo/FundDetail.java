@@ -5,10 +5,15 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 @Table(name = "tb_fund_detail")
 public class FundDetail extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
+    public static String ORDER_ACT_TYPE_ADD = "ADD";
+    public static String ORDER_ACT_TYPE_CANCEL = "CANCEL";
+    public static String ORDER_ACT_TYPE_REFUND = "REFUND";
+
 	@Id
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
@@ -16,24 +21,22 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
     private String serial;
     private String req_ip;
     private Long req_user;
-    private String add_date;
-    private String busi;
-    private Long busi_num;
+    private Date add_date;
     private String act_type;
-    private Long status;
+    private Integer status;
+    private Integer resCode;
+    private String resDesc;
 
     public FundDetail() {
 	}
 
-    public FundDetail(Long id, Long fund_order_id, String serial, String req_ip, Long req_user, String add_date, String busi, Long busi_num, String act_type, Long status) {
+    public FundDetail(Long id, Long fund_order_id, String serial, String req_ip, Long req_user, Date add_date, String act_type, Integer status) {
         this.id = id;
         this.fund_order_id = fund_order_id;
         this.serial = serial;
         this.req_ip = req_ip;
         this.req_user = req_user;
         this.add_date = add_date;
-        this.busi = busi;
-        this.busi_num = busi_num;
         this.act_type = act_type;
         this.status = status;
     }
@@ -78,28 +81,12 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
         this.req_user = req_user;
     }
 
-    public String getAdd_date() {
+    public Date getAdd_date() {
         return add_date;
     }
 
-    public void setAdd_date(String add_date) {
+    public void setAdd_date(Date add_date) {
         this.add_date = add_date;
-    }
-
-    public String getBusi() {
-        return busi;
-    }
-
-    public void setBusi(String busi) {
-        this.busi = busi;
-    }
-
-    public Long getBusi_num() {
-        return busi_num;
-    }
-
-    public void setBusi_num(Long busi_num) {
-        this.busi_num = busi_num;
     }
 
     public String getAct_type() {
@@ -110,11 +97,27 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
         this.act_type = act_type;
     }
 
-    public Long getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Long status) {
+    public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getResCode() {
+        return resCode == null ? 0 : resCode;
+    }
+
+    public void setResCode(Integer resCode) {
+        this.resCode = resCode;
+    }
+
+    public String getResDesc() {
+        return resDesc;
+    }
+
+    public void setResDesc(String resDesc) {
+        this.resDesc = resDesc;
     }
 }

@@ -269,8 +269,7 @@ public class HttpsUtil {
 			uc.setDoOutput(true);
 			uc.setDoInput(true);
 			uc.setUseCaches(false);
-			uc.setRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded");
+			uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 			uc.connect();
 			DataOutputStream out = new DataOutputStream(uc.getOutputStream());
 			out.write(params.getBytes(gb));
@@ -290,6 +289,7 @@ public class HttpsUtil {
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
+			return URLDecoder.decode("\"errcode\": 99999, \"msg\": \"未知异常\", \"timestamp\": 1494483084, \"data\": \"\",\"sign\": \"\"");
 		} finally {
 			if (uc != null) {
 				uc.disconnect();

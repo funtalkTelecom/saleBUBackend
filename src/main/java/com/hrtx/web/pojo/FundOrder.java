@@ -2,35 +2,47 @@ package com.hrtx.web.pojo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Table(name = "tb_fund_order")
 public class FundOrder extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
+    public static String THIRD_PAY_PINGANAPP = "PINGANAPP";
+
+    public static String BUSI_TYPE_PAYORDER = "PAYORDER";
+    public static String BUSI_TYPE_PAYDEPOSIT = "PAYDEPOSIT";
 	@Id
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
+	@NotBlank(message = "业务类型不能为空")
     private String busi;
-    private Long busi_num;
+	@NotNull(message = "付款金额不能为空")
+	@Min(value = 1, message = "付款金额必须大于0")
     private Integer amt;
     private String payee;
+    @NotBlank(message = "付款方不能为空")
     private String payer;
     private Integer status;
+    @NotBlank(message = "付款描述不能为空")
     private String order_name;
     private String contractno;
     private String third;
     private Integer actual_amt;
     private String remark;
+    @NotBlank(message = "来源不能为空")
+    private String sourceId;
 
     public FundOrder() {
 	}
 
-    public FundOrder(Long id, String busi, Long busi_num, Integer amt, String payee, String payer, Integer status, String order_name, String contractno, String third, Integer actual_amt, String remark) {
+    public FundOrder(Long id, String busi, Integer amt, String payee, String payer, Integer status, String order_name, String contractno, String third, Integer actual_amt, String remark, String sourceId) {
         this.id = id;
         this.busi = busi;
-        this.busi_num = busi_num;
         this.amt = amt;
         this.payee = payee;
         this.payer = payer;
@@ -40,6 +52,7 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
         this.third = third;
         this.actual_amt = actual_amt;
         this.remark = remark;
+        this.sourceId = sourceId;
     }
 
     public Long getId() {
@@ -60,14 +73,6 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
 
     public void setBusi(String busi) {
         this.busi = busi;
-    }
-
-    public Long getBusi_num() {
-        return busi_num;
-    }
-
-    public void setBusi_num(Long busi_num) {
-        this.busi_num = busi_num;
     }
 
     public Integer getAmt() {
@@ -140,5 +145,13 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
     }
 }
