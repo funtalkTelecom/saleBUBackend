@@ -9,12 +9,61 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
 
 public class HttpUtil {
 	private static Logger log = LoggerFactory.getLogger(HttpUtil.class);
+
+	/**
+	 *
+	 * HTTP协议POST请求方法
+	 */
+	public static String sendPost(String url, String params, String charet) {
+		if (null == charet || "".equals(charet)) {
+			charet = "UTF-8";
+		}
+		StringBuffer sb = new StringBuffer();
+		URL urls;
+		HttpURLConnection uc = null;
+		BufferedReader in = null;
+		try {
+			urls = new URL(url);
+			uc = (HttpURLConnection) urls.openConnection();
+			uc.setRequestMethod("POST");
+			uc.setDoOutput(true);
+			uc.setDoInput(true);
+			uc.setUseCaches(false);
+			uc.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
+			uc.connect();
+			DataOutputStream out = new DataOutputStream(uc.getOutputStream());
+			out.write(params.getBytes(charet));
+			out.flush();
+			out.close();
+			in = new BufferedReader(new InputStreamReader(uc.getInputStream(),
+					charet));
+			String readLine = "";
+			while ((readLine = in.readLine()) != null) {
+				sb.append(readLine);
+			}
+			if (in != null) {
+				in.close();
+			}
+			if (uc != null) {
+				uc.disconnect();
+			}
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		} finally {
+			if (uc != null) {
+				uc.disconnect();
+			}
+		}
+		return sb.toString();
+	}
 
 	public static String sendPost(String url, Map<String, ?> paramMap) {
 		PrintWriter out = null;
