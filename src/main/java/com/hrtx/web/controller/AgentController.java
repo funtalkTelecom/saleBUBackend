@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class AgentController {
 	@Autowired
 	AgentService agentService;
 	@Autowired private ApiSessionUtil apiSessionUtil;
-    @PutMapping(value = "/api/save-or-update-agent")
+    @PostMapping(value = "/api/save-or-update-agent")
     @Powers({PowerConsts.NOLOGINPOWER})
 	public Result SaveOrUpdateAgent(@RequestParam(value="id",required=false) Long id,
 								   @RequestParam(value="commpayName",required=false) String commpayName,
@@ -36,8 +37,8 @@ public class AgentController {
 								   @RequestParam(value="city",required=false) Long city,
 								   @RequestParam(value="district",required=false) Long district,
 								   @RequestParam(value="address",required=false) String address,
-								   @RequestParam(value="tradingImg",required=false) String tradingImg) {
-		return agentService.SaveOrUpdateAgent(id,commpayName,person,phone,province,city,district,address,tradingImg);
+									@RequestParam(name = "file",required = false) MultipartFile file) {
+		return agentService.SaveOrUpdateAgent(id,commpayName,person,phone,province,city,district,address,file);
 	}
 
 	@PutMapping(value = "/api/save-agent-leyu")
