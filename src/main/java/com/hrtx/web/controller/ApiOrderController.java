@@ -6,9 +6,11 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
+import com.hrtx.dto.StorageInterfaceRequest;
 import com.hrtx.global.*;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
+import com.hrtx.web.pojo.Number;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
@@ -18,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.Number;
+import java.io.IOException;
 import java.lang.System;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,6 +62,7 @@ public class ApiOrderController extends BaseReturn{
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Result createOrder(HttpServletRequest request){
+	    log.info("进入创建订单");
 		//子项小计
 		double sub_total = 0;
 		//合计
@@ -86,8 +89,10 @@ public class ApiOrderController extends BaseReturn{
 		apiSessionUtil.saveOrUpdate(token,u);
 
 //		Consumer user = apiSessionUtil.getConsumer();
+        log.info("获取用户信息");
 		Consumer user = (Consumer) redisUtil.get("egt-kh:api:"+token);
 		try {
+		    log.info("获取订单类型");
 			type = request.getParameter("type");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -96,12 +101,14 @@ public class ApiOrderController extends BaseReturn{
 
 		try {
 		    if("1".equals(type)) {
+                log.info("进入订单类型1");
 //						出货	  出货
 //				type:1  白卡1或普号2		skuid,数量,地址
-                    String skuid = null, addrid;
-                    int numcount;
-                    Map number = null;
-                    try {
+                String skuid = null, addrid;
+                int numcount;Map number = null;
+                List<Number> nlist = null;
+                try {
+                        log.info("获取传入参数");
                         skuid = request.getParameter("skuid");
                         addrid = request.getParameter("addrid");//普通靓号可不填
                         numcount = request.getParameter("numcount")==null?-1:Integer.parseInt(request.getParameter("numcount"));
@@ -114,7 +121,9 @@ public class ApiOrderController extends BaseReturn{
                         if (!LockUtils.tryLock(skuid)) return new Result(Result.ERROR, "请稍后再试!");
                         try {
                             //获取sku列表
+                            log.info("获取sku信息");
                             List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
+                            if(skulist==null || skulist.size()<=0) return new Result(Result.ERROR, "未找到相关商品,请刷新后再试");
                             for (int i = 0; i < skulist.size(); i++) {
                                 OrderItem orderItem = new OrderItem();
                                 Map sku = (Map) skulist.get(i);
@@ -124,7 +133,17 @@ public class ApiOrderController extends BaseReturn{
                                 orderItem.setOrderId(order.getOrderId());
 
                                 //获取商品
+                                log.info("获取商品信息");
                                 goods = goodsMapper.findGoodsInfoBySkuid(skuid);
+                                log.info("验证一级代理商");
+                                if(user.getIsAgent() != 2){
+                                    return new Result(Result.ERROR, "您不是一级代理商,无法提交普通靓号订单");
+                                }
+                                //判断商品地市和代理商地市
+                                log.info("判断商品地市和代理商地市");
+                                if(user.getCity()==null || !goods.getgSaleCity().contains(user.getCity())) {
+                                    return new Result(Result.ERROR, "不属于您的地市,无法操作");
+                                }
                                 orderItem.setGoodsId(goods.getgId());
                                 orderItem.setSkuId(Long.parseLong(skuid));
                                 orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
@@ -144,11 +163,44 @@ public class ApiOrderController extends BaseReturn{
 
                                 orderItems.add(orderItem);
 
-                                //是普号,添加号码item
+                                log.info("冻结号码,添加号码item");
+                                //是普号,根据数量冻结号码,添加号码item
                                 if("2".equals(sku.get("skuGoodsType"))){
+                                    //获取可冻结的号码,判断库存是否充足
+                                    nlist = numberMapper.getListBySkuidAndStatus(skuid, "'2'", numcount);
+                                    if(nlist.size()!=numcount){//获取的数量和购买不等
+                                        return new Result(Result.ERROR, "库存不足,请重试");
+                                    }
+                                    //冻结号码,往orderItem写数据
+                                    freezeNumByIds(nlist, "3");
+                                    for (Number n : nlist) {
+                                        orderItem = new OrderItem();
 
+                                        orderItem.setItemId(orderItem.getGeneralId());
+                                        orderItem.setOrderId(order.getOrderId());
+
+                                        orderItem.setGoodsId(goods.getgId());
+                                        orderItem.setSkuId(Long.parseLong(skuid));
+                                        orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+                                        orderItem.setNumId(n.getId());
+                                        orderItem.setNum(n.getNumResource());
+                                        orderItem.setIsShipment(0);//号码item无需发货
+                                        orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
+                                        orderItem.setSellerName((String) sku.get("gSellerName"));
+                                        orderItem.setShipmentApi("egt");
+                                        orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                                        orderItem.setQuantity(1);
+                                        twobPrice = Double.parseDouble((String) sku.get("skuTobPrice"));
+                                        orderItem.setPrice(0);
+                                        orderItem.setTotal(0);
+//                                orderItem.setMealId(Long.parseLong(mealid));
+                                        sub_total += orderItem.getTotal();
+
+                                        orderItems.add(orderItem);
+                                    }
                                 }
                             }
+                            log.info("设置订单信息");
                             //设置订单
                             order.setConsumer(user.getId());
                             order.setConsumerName(user.getName());
@@ -158,6 +210,7 @@ public class ApiOrderController extends BaseReturn{
                             order.setAddDate(new Date());
                             order.setOrderType(1);
 
+                            log.info("设置收货信息");
                             //获取收货地址信息
                             DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
                             order.setAddressId(deliveryAddress.getId());
@@ -165,6 +218,7 @@ public class ApiOrderController extends BaseReturn{
                             order.setPersonTel(deliveryAddress.getPersonTel());
                             order.setAddress(deliveryAddress.getAddress());
 
+                            log.info("计算金额");
                             order.setCommission(commission);
                             order.setShippingTotal(shipping_total);
                             order.setSubTotal(sub_total);
@@ -173,6 +227,7 @@ public class ApiOrderController extends BaseReturn{
                             order.setTotal(total);
 
 
+                            log.info("调用仓储接口");
                             //调用仓储接口成功之后写入
                             order.setNoticeShipmentDate(new Date());
 
@@ -185,18 +240,21 @@ public class ApiOrderController extends BaseReturn{
                         e.printStackTrace();
                         //清除已生成的订单
                         deleteOrder(orderList);
+                        log.info("解冻号码");
                         //解冻号码,把冻结之前的状态还原
-                        freezeNumBySkuid(skuid, "2");
+                        freezeNumByIds(nlist, "2");
                         return new Result(Result.ERROR, "获取数据异常");
                     }
 
 
             }else if("2".equals(type)) {
+                    log.info("进入订单类型2");
 //						不出货		出货
 //				type:2  普通靓号3或超级靓号4    skuid, numid, addrid, payType, mealid
                     String skuid, numid = null, addrid, payType, mealid;
                     Map number = null;
                     try {
+                        log.info("获取传入参数");
                         skuid = request.getParameter("skuid");
                         numid = request.getParameter("numid");
                         addrid = request.getParameter("addrid");//普通靓号可不填
@@ -206,37 +264,47 @@ public class ApiOrderController extends BaseReturn{
                         if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
                         if (numid == null || "".equals(numid)) return new Result(Result.ERROR, "numid不能为空");
 
+                        log.info("获取号码信息");
                         //获取号码
                         number = numberMapper.getNumInfoById(numid);
                         //冻结号码
                         if (!LockUtils.tryLock(numid)) return new Result(Result.ERROR, "请稍后再试!");
                         try {
+                            log.info("验证号码是否可下单");
                             //验证号码是否可下单,2:销售中
                             if (number == null || !"2".equals(String.valueOf(number.get("status"))))
                                 return new Result(Result.ERROR, "号码已被购买!");
+                            log.info("冻结号码");
                             freezeNum(numid, "3");
+                            log.info("获取sku信息");
                             //获取sku列表
                             List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
+                            if(skulist==null || skulist.size()<=0) return new Result(Result.ERROR, "未找到相关商品,请刷新后再试");
                             for (int i = 0; i < skulist.size(); i++) {
                                 OrderItem orderItem = new OrderItem();
                                 Map sku = (Map) skulist.get(i);
+
+                                log.info("获取商品信息");
                                 //获取商品
                                 goods = goodsMapper.findGoodsInfoBySkuid(skuid);
                                 //普通靓号,需要一级代理商
-                                if("3".equals(sku.get("skuGoodsType")) && user.getIsAgent() != 2){
-                                    freezeNum(numid, String.valueOf(number.get("status")));
-                                    return new Result(Result.ERROR, "您不是一级代理商,无法提交普通靓号订单");
-                                }
-                                //判断商品地市和代理商地市
-                                else if(user.getCity()==null || !goods.getgSaleCity().contains(user.getCity())) {
-                                    freezeNum(numid, String.valueOf(number.get("status")));
-                                    return new Result(Result.ERROR, "不属于您的地市,无法操作");
+                                if("3".equals(sku.get("skuGoodsType"))){
+                                    log.info("普通靓号,验证一级代理商");
+                                    if(user.getIsAgent() != 2){
+                                        freezeNum(numid, String.valueOf(number.get("status")));
+                                        return new Result(Result.ERROR, "您不是一级代理商,无法提交普通靓号订单");
+                                    }
+                                    log.info("判断商品地市和代理商地市");
+                                    //判断商品地市和代理商地市
+                                    if(user.getCity()==null || !goods.getgSaleCity().contains(user.getCity())) {
+                                        freezeNum(numid, String.valueOf(number.get("status")));
+                                        return new Result(Result.ERROR, "不属于您的地市,无法操作");
+                                    }
                                 }
                                 List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 
                                 orderItem.setItemId(orderItem.getGeneralId());
                                 orderItem.setOrderId(order.getOrderId());
-
                                 orderItem.setGoodsId(goods.getgId());
                                 orderItem.setSkuId(Long.parseLong(skuid));
                                 orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
@@ -256,7 +324,36 @@ public class ApiOrderController extends BaseReturn{
                                 sub_total += orderItem.getTotal();
 
                                 orderItems.add(orderItem);
+
+
+                                //超级靓号添加卡的item
+                                if("4".equals(sku.get("skuGoodsType"))){
+                                    orderItem = new OrderItem();
+                                    orderItem.setItemId(orderItem.getGeneralId());
+                                    orderItem.setOrderId(order.getOrderId());
+
+                                    orderItem.setGoodsId(goods.getgId());
+                                    orderItem.setSkuId(Long.parseLong(skuid));
+                                    orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+                                    orderItem.setNumId(Long.parseLong(numid));
+                                    orderItem.setNum((String) number.get("numResource"));
+                                    orderItem.setIsShipment(1);//卡体发货
+                                    orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
+                                    orderItem.setSellerName((String) sku.get("gSellerName"));
+                                    orderItem.setShipmentApi("egt");
+                                    orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                                    num = 1;
+                                    orderItem.setQuantity(num);
+                                    twobPrice = 0;//Double.parseDouble((String) sku.get("skuTobPrice"));
+                                    orderItem.setPrice(twobPrice);
+                                    orderItem.setTotal(twobPrice * num);
+                                    orderItem.setMealId(Long.parseLong(mealid));
+                                    sub_total += orderItem.getTotal();
+
+                                    orderItems.add(orderItem);
+                                }
                             }
+
                             //设置订单
                             order.setConsumer(user.getId());
                             order.setConsumerName(user.getName());
@@ -299,8 +396,8 @@ public class ApiOrderController extends BaseReturn{
                     }
             }
             //判断商品是否在有效期内
-            if (!betweenCalendar(new Date(), goods.getgStartTime(), goods.getgEndTime()))
-                return new Result(Result.ERROR, "不在有效期内");
+            if (goods.getgStartTime()==null || goods.getgEndTime()==null || !betweenCalendar(new Date(), goods.getgStartTime(), goods.getgEndTime()))
+                return new Result(Result.ERROR, "商品不在有效期内");
             orderMapper.insertBatch(orderList);
             orderItemMapper.insertBatch(orderItems);
 		} catch (Exception e) {
@@ -313,6 +410,13 @@ public class ApiOrderController extends BaseReturn{
 		return new Result(Result.OK, order.getOrderId());
 	}
 
+    public static void main(String[] args) throws Exception {
+        Result res = HttpUtil.doHttpPost("http://192.168.7.1:21401/DS_Storage/dispatchRequests.htm",
+                JSONArray.fromObject(new StorageInterfaceRequest("1001", "HK0006", Utils.randomNoByDateTime(), "123456", new Object())).toString(),
+                "application/json",
+                "UTF-8");
+        System.out.println(res);
+    }
     /**
      * 字符串转换成日期
      * @param str
@@ -355,6 +459,7 @@ public class ApiOrderController extends BaseReturn{
     }
 
     private void deleteOrder(List<Order> orderList) {
+        log.info("删除订单");
 		for (Order o : orderList) {
 			orderMapper.deleteByOrderid(o.getOrderId());
 		}
@@ -369,7 +474,7 @@ public class ApiOrderController extends BaseReturn{
 		numberMapper.freezeNum(numid, status);
 	}
 
-    private void freezeNumBySkuid(String skuid, String status) {
-//        numberMapper.freezeNumBySkuid(skuid, status);
+    private void freezeNumByIds(List<Number> nlist , String status) throws  Exception{
+        numberMapper.freezeNumByIds(nlist, status);
     }
 }

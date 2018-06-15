@@ -42,6 +42,16 @@
         where a.sku_id = #{skuid}
     </select>
 
+    <select id="getListBySkuidAndStatus" resultType="Number">
+        select
+        <include refid="ex_col_list"/>
+        <include refid="col_list"/>
+        from tb_num a
+        where a.sku_id = #{skuid}
+        and a.status in (${status})
+        limit 0,#{numcount}
+    </select>
+
     <resultMap id="saleNumber" type="java.util.HashMap">
         <result column="id" property="id" javaType="java.lang.String"></result>
         <result column="city_id" property="cityId" javaType="java.lang.String"></result>
@@ -132,5 +142,13 @@
 
     <update id="freezeNum">
         update tb_num a set a.status = #{status} where a.id = #{id}
+    </update>
+
+    <update id="freezeNumByIds">
+        update tb_num a set a.status = #{status} where a.id in (
+        <foreach collection="numberList" item="n" separator=",">
+            #{n.id}
+        </foreach>
+        )
     </update>
 </mapper>
