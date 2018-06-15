@@ -3,11 +3,15 @@ package com.hrtx.web.controller;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
-import com.hrtx.web.pojo.DeliveryAddress;
+import com.hrtx.global.SystemParam;
+import com.hrtx.web.mapper.FileMapper;
+import com.hrtx.web.pojo.Auction;
+import com.hrtx.web.pojo.AuctionDeposit;
 import com.hrtx.web.pojo.EPSale;
-import com.hrtx.web.service.CityService;
-import com.hrtx.web.service.EPSaleService;
-import com.hrtx.web.service.FileService;
+import com.hrtx.web.pojo.File;
+import com.hrtx.web.pojo.Goods;
+import com.hrtx.web.service.*;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +36,12 @@ public class EPSaleController extends BaseReturn{
 	private EPSaleService epSaleService;
 	@Autowired
 	private FileService fileService;
+	@Autowired
+	private AuctionService auctionService;
+	@Autowired
+	private AuctionDepositService auctionDepositService;
+	@Autowired
+	private GoodsService goodsService;
 
 	@RequestMapping("/epSale/epSale-query")
 	@Powers({PowerConsts.EPSALEMOUDULE})
@@ -72,6 +83,110 @@ public class EPSaleController extends BaseReturn{
 		epSaleMap.get(0).put("goodsList",goodsList);
 		map.put("code", Result.OK);
 		map.put("data", epSaleMap);
+		return map;
+	}
+
+	@PostMapping("/api/epSaleGoodsAuciton")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public void goodsAuciton(Auction auction, HttpServletRequest request) {
+		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息
+		List<Map> auctionDepositConsumerList=auctionDepositService.findAuctionDepositListConsumerByNumId(auction.getNumId(),2);
+		if(auctionDepositConsumerList.size()>0)//前用户保证金已支付成功 状态：2成功
+		{
+			auction.setStatus(2);
+			auctionService.auctionEdit(auction);
+
+		}else //当前用户保证金未支付成功 status:2    出价记录 状态：1初始   保证金记录  状态：1 初始
+		{
+			auction.setStatus(1);
+			auctionService.auctionEdit(auction);
+			AuctionDeposit auctionDeposit=new AuctionDeposit();
+			auctionDeposit.setStatus(1);
+			auctionDeposit.setNum(auction.getNum());
+			auctionDeposit.setNumId(auction.getNumId());
+			auctionDeposit.setSkuId(auction.getSkuId());
+			auctionDeposit.setAmt(Double.valueOf(goods.getgDeposit()));//保证金
+			auctionDepositService.auctionDepositEdit(auctionDeposit);
+			returnResult(epSaleService.goodsAuciton(auction, request));
+		}
+
+	}
+
+	/**
+	 * 查询竟拍活动的商品信息
+	 * 详情
+	 * @param
+	 * @return
+	 */
+	@GetMapping("/api/epSaleGoods/{goodsId}")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public Map findEPSaleGoods(@PathVariable("goodsId") String goodsId){
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Map> goodsList=epSaleService.findEPSaleGoodsByGoodsId(Long.valueOf(goodsId));
+		if(goodsList.size()>0){
+			Map<String, Object> goodsMap= goodsList.get(0);
+			String gId=String.valueOf(goodsMap.get("gId"));
+			Long numId=NumberUtils.toLong(String.valueOf(goodsMap.get("numId")));
+			List<File> fileList = new ArrayList<File>();
+			List<Map> imgList= new ArrayList<Map>();
+			Map<String, Object> imgMap= new HashMap<String, Object>();
+			fileList = fileService.findFilesByRefid(gId);
+			//fileList = fileService.findFilesByRefid("1003545391213314048");
+			if (fileList != null && fileList.size() > 0) {
+				for (File file : fileList) {
+					String gImgUrl=SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +goodsId+"/"+ file.getFileName();
+					imgMap.put("seq",file.getSeq());
+					imgMap.put("gImg",gImgUrl);
+					imgList.add(imgMap);
+				}
+				goodsList.get(0).put("gImgList",imgList);
+			}else
+			{
+				goodsList.get(0).put("gImgList","");
+			}
+
+			List<Map> epSaleGoodsAuctionPriceInfo=auctionService.findAuctionSumEPSaleGoodsByNumId(Long.valueOf(numId));
+ 			if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0)
+			{
+				goodsList.get(0).put("priceCount",NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount"))));
+				goodsList.get(0).put("currentPrice",String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("currentPrice")));
+			}else
+			{
+				goodsList.get(0).put("priceCount",0);
+				goodsList.get(0).put("currentPrice","");
+			}
+			//最近10次出价记录
+			List<Map> goodsAuctionList=auctionService.findAuctionListByNumId(Long.valueOf(numId));
+			if(goodsAuctionList!=null&&goodsAuctionList.size()>0)
+			{
+				goodsList.get(0).put("goodsAuctionList",goodsAuctionList);
+			}else
+			{
+				goodsList.get(0).put("goodsAuctionList","");
+			}
+
+			List<Map> goodsAuctionDepositList=auctionDepositService.findAuctionDepositListByNumId(Long.valueOf(numId));
+			if(goodsAuctionDepositList!=null&&goodsAuctionDepositList.size()>0)
+			{
+				goodsList.get(0).put("idDeposit","1");
+			}else
+			{
+				goodsList.get(0).put("idDeposit","0");
+			}
+
+			//goodsList.get(0).remove("numId");
+		}else
+		{
+			goodsList.get(0).put("gImgList","");
+			goodsList.get(0).put("goodsAuctionList","");
+			goodsList.get(0).put("idDeposit","0");
+			goodsList.get(0).put("priceCount",0);
+			goodsList.get(0).put("currentPrice","");
+		}
+		map.put("code", Result.OK);
+		map.put("data", goodsList.get(0));
 		return map;
 	}
 

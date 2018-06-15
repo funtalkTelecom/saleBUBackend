@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.AuctionMapper">
+     <select id="findAuctionSumEPSaleGoodsByNumId" resultType="java.util.HashMap">
+      select count(tb_auction.id) as priceCount,
+	  max(tb_auction.price) as  currentPrice,
+	  tb_auction.num_id as numId
+	  from tb_auction
+	  where  tb_auction.status=2 and tb_auction.num_id = #{numId}
+	  group by tb_auction.num_id
+    </select>
+	<select id="findAuctionListByNumId" resultType="java.util.HashMap">
+	  select tb_auction.price,tb_auction.add_date as addDate,tb_consumer.name as consumerName
+	  from tb_auction
+	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
+	   where  tb_auction.num_id = #{numId}
+	  order by tb_auction.add_date desc limit 10
+    </select>
+
+	<insert id="insertBatch">
+		insert into tb_auction(
+		id,
+		sku_id,
+		num_id,
+		num,
+		g_id,
+		g_name,
+		price,
+		add_date,
+		status,
+		consumer_id,
+		add_ip,
+		order_id,
+		remark
+		) values
+		<foreach collection="auctionList" item="Auction" separator=",">
+			(
+			#{Auction.id},
+			#{Auction.skuId},
+			#{Auction.numId},
+			#{Auction.num},
+			#{Auction.gId},
+			#{Auction.gName},
+			#{Auction.price},
+			#{Auction.addDate},
+			#{Auction.status},
+			#{Auction.consumerId},
+			#{Auction.addIp},
+			#{Auction.orderId},
+			#{Auction.remark}
+			)
+		</foreach>
+	</insert>
+</mapper>

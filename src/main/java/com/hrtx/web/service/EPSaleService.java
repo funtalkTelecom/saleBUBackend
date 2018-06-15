@@ -12,6 +12,7 @@ import com.hrtx.web.mapper.FileMapper;
 import com.hrtx.web.pojo.EPSale;
 import com.hrtx.web.pojo.File;
 import com.hrtx.web.pojo.Poster;
+import com.hrtx.web.pojo.Auction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,11 +48,19 @@ public class EPSaleService {
 		return epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
 	}
 
+	public List<Map> findEPSaleGoodsByGoodsId(Long goodsId) {
+		return epSaleMapper.findEPSaleGoodsByGoodsId2(goodsId);
+	}
+
 	public EPSale finEPSaleById(Long id) {
 		EPSale epSale = epSaleMapper.findEPSaleById(id);
 		return epSale;
 	}
 
+	public Result goodsAuciton(Auction auciton, HttpServletRequest request) {
+
+		return new Result(Result.OK, "提交成功");
+	}
 	public Result epSaleEdit(EPSale epSale, HttpServletRequest request, MultipartFile[] files) {
 
 		epSale.setAddUserId(SessionUtil.getUserId());
