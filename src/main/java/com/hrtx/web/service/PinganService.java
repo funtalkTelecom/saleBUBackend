@@ -82,6 +82,8 @@ public class PinganService {
         	log.info("=====没有返回data数据=====");
 			return new Result("B0007","接口返回数据错误",null);
         }*/
+        if("99999".equals(respObject.getString("errcode"))) return new Result(Result.WARN,respObject.getString("msg"));
+        if(!"0".equals(respObject.getString("errcode"))) return new Result(Result.ERROR,respObject.getString("msg"));
 		Object dataStr= respObject.get("data");
 		if (!(!rspStr.isEmpty() || ( dataStr != null ))) {
 			log.info("=====没有返回data数据=====");
@@ -89,7 +91,7 @@ public class PinganService {
 //			return new Result("B0007","接口返回数据错误",null);
 		}
 //		if(!respObject.containsKey("data"))return new Result(Result.ERROR,respObject.getString("msg"));//return new Result("B0008",respObject.getString("msg"),null);
-//		if(!"0".equals(respObject.getString("errcode"))) return new Result(Result.ERROR,respObject.getString("msg"));//return new Result("B0008",respObject.getString("msg"),null);
+		//return new Result("B0008",respObject.getString("msg"),null);
 		if (!TLinx2Util.verifySign(respObject)) {
 			log.info("=====验签失败=====");
 			return new Result(Result.PARAM,"验签失败");
@@ -289,7 +291,7 @@ public class PinganService {
 	 * @param notifyUrl
 	 * @return
 	 */
-	public Result payOrderWXXCX(String outNo, String pmtTag,String ordName, Integer originalAmount,Integer tradeAmount,
+	public Result payOrder(String outNo, String pmtTag,String ordName, Integer originalAmount,Integer tradeAmount,
 								 String remark,String notifyUrl,String sub_appid, String sub_openid, String trade_type){
 		return this.payOrder(outNo, pmtTag,null, ordName, originalAmount,0, 0,
 				tradeAmount,null, null, null, remark, null, null, null,
@@ -358,8 +360,8 @@ public class PinganService {
 		try {
 			rspStr = TLinx2Util.handlePost(postmap, this.PAYORDER);
 		} catch (Exception e) {
-			log.error("请求接口失败",e);
-			return new Result(Result.ERROR,"请求失败");
+			log.error("请求接口未知异常",e);
+			return new Result(Result.WARN,"未知异常");
 		}
 		/**
 		 * 4 验签  有data节点时才验签

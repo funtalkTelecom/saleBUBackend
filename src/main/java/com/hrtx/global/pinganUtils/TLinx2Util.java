@@ -98,6 +98,28 @@ public class TLinx2Util {
     }
 
     /**
+     * 验签
+     * @param respObject
+     * @return
+     */
+    public static Boolean verifySign(Map respObject) {
+        String respSign = respObject.get("sign").toString();
+
+        respObject.remove("sign");    // 删除sign节点
+        respObject.put("open_key",PinganService.getOpenKey());
+
+        String veriSign = sign(respObject);    // 按A~z排序，串联成字符串，先进行sha1加密(小写)，再进行md5加密(小写)，得到签名
+
+        if (respSign.equals(veriSign)) {
+            System.out.println("=====验签成功=====");
+            return true;
+        } else {
+            System.out.println("=====验签失败=====");
+        }
+        return false;
+    }
+
+    /**
      * AES加密，再二进制转十六进制(bin2hex)
      * @param postmap 说明：
      * @throws Exception

@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.github.abel533.entity.Example;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.TokenGenerator;
@@ -15,6 +16,9 @@ import com.hrtx.web.pojo.ConsumerLog;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +32,10 @@ import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.UserMapper;
 import com.hrtx.web.pojo.User;
 
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 @Service
 public class UserService {
 	
@@ -36,22 +44,35 @@ public class UserService {
 	@Autowired private ConsumerLogMapper consumerLogMapper;
 	@Autowired private ConsumerMapper consumerMapper;
 	@Autowired private ApiSessionUtil apiSessionUtil;
+	@Autowired private UserService userService;
 
-	public void paytest1() {
+	public void test() {
 		User u = new User(10l);
 		userMapper.insert(u);
-		this.paytest();
-		if(1==1) throw new ServiceException("手动异常");
+//		userService.paytest("b","b");
+//		if(1==1) throw new ServiceException("手动异常");
 //		List<User> list=this.userMapper.select(null);
 //		for (User user : list) {
 //			System.out.println("----"+user.getName());
 //		}
 	}
 
-	public void paytest() {
-		User u = new User(11l);
-		userMapper.insert(u);
+	public void paytest(@Valid @NotNull String aa, @NotNull String bb, @Valid User u) {
+//		User u = new User(11l);
+//		userMapper.insert(u);
 //		if(1==1) throw new ServiceException("手动异常");
+        System.out.println("ddddd");
+        User user = new User();
+        user.setId(9l);
+        user = userMapper.selectOne(user);
+//        user.setCorpId(10l);
+//        userMapper.updateByPrimaryKey(user);
+//        user.setLoginName("eee");
+//        Example example = new Example(User.class);
+//        example.createCriteria().andEqualTo("corpId",10l);
+//        userMapper.updateByPrimaryKeySelective(user);
+//        userMapper.updateByExampleSelective(user, example);
+
 	}
 
 	public Result pageUser(User user) {

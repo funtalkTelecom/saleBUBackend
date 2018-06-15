@@ -4,6 +4,7 @@ import com.hrtx.web.service.SystemService;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,5 +87,9 @@ public final class SystemParam {
 	 */
 	public final static Iterator<String> getKeys(){
 		return params.keySet().iterator();
+	}
+
+	public static int getInt(String key) {
+		return NumberUtils.toInt(params.get(key), -99);
 	}
 }

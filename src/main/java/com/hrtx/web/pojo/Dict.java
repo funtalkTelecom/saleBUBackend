@@ -21,7 +21,12 @@ public class Dict extends BasePojo implements java.io.Serializable {
     private int seq;
 
     public Dict() {
-	}
+    }
+
+    public Dict(String keyId, String keyGroup) {
+        this.keyId = keyId;
+        this.keyGroup = keyGroup;
+    }
 
     public Dict(Long id, String keyId, String keyGroup, String keyValue, int isDel, String note, String pid, int seq) {
         this.id = id;
