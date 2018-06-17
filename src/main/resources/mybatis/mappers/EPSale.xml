@@ -92,14 +92,12 @@
         tb_num.id as numId,
         tb_goods.g_active as gEPSaleId,
         tb_goods.g_id as gId,
-        tb_goods.g_start_time,
-        tb_goods.g_end_time,
         case
-        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[<0]]> then 1
-        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[>=0]]> and
-        TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[<=0]]>
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
         then 2
-        when TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[>0]]>
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
         then 3
         else 0
         end as gSatus,
@@ -142,14 +140,12 @@
         tb_num.id as numId,
         tb_goods.g_active as gEPSaleId,
         tb_goods.g_id as gId,
-        tb_goods.g_start_time,
-        tb_goods.g_end_time,
         case
-        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[<0]]> then 1
-        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[>=0]]> and
-        TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[<=0]]>
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
         then 2
-        when TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[>0]]>
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
         then 3
         else 0
         end as gSatus,
@@ -177,11 +173,11 @@
         tb_num.id as numId,
         tb_goods.g_id as gId,
         case
-        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[<0]]> then 1
-        when TIMESTAMPDIFF(second,tb_goods.g_start_time, now())<![CDATA[>=0]]> and
-        TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[<=0]]>
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
         then 2
-        when TIMESTAMPDIFF(second,tb_goods.g_end_time, now())<![CDATA[>0]]>
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
         then 3
         else 0
         end as gSatus,

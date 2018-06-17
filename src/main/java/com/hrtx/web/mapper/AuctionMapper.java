@@ -15,4 +15,6 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
     List<Map> findAuctionListByNumId(@Param("numId") Long numId);
 
     void insertBatch(@Param("auctionList") List<Auction> list);
+
+    void auctionEditStatusById(@Param("status") int  status,@Param("id") Long id);
 }

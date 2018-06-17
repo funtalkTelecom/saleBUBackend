@@ -35,7 +35,7 @@ public class AuctionDepositService {
 		auctionDepositMapper.insertBatch(list);
 	}
 
-	public List<Map> findAuctionDepositListConsumerByNumId(Long numId,int status) {
-		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatus(numId,apiSessionUtil.getConsumer().getId(),status);
+	public List<Map> findAuctionDepositListConsumerByNumId(Long numId) {
+		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerId(numId,apiSessionUtil.getConsumer().getId());
 	}
 }

@@ -10,10 +10,10 @@
 	  group by tb_auction.num_id
     </select>
 	<select id="findAuctionListByNumId" resultType="java.util.HashMap">
-	  select tb_auction.price,tb_auction.add_date as addDate,tb_consumer.name as consumerName
+	  select tb_auction.id,tb_auction.price,tb_auction.add_date as addDate,tb_consumer.name as consumerName
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
-	   where  tb_auction.num_id = #{numId}
+	   where tb_auction.status=2 and  tb_auction.num_id = #{numId}
 	  order by tb_auction.add_date desc limit 10
     </select>
 
@@ -51,4 +51,11 @@
 			)
 		</foreach>
 	</insert>
+
+	<update id="auctionEditStatusById">
+        update tb_auction t set
+         t.status=#{status}
+        where
+            t.id = #{id}
+    </update>
 </mapper>

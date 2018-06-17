@@ -20,10 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 //@RequestMapping("/api")
@@ -91,26 +88,75 @@ public class EPSaleController extends BaseReturn{
 	@ResponseBody
 	public void goodsAuciton(Auction auction, HttpServletRequest request) {
 		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息
-		List<Map> auctionDepositConsumerList=auctionDepositService.findAuctionDepositListConsumerByNumId(auction.getNumId(),2);
-		if(auctionDepositConsumerList.size()>0)//前用户保证金已支付成功 状态：2成功
+		//最近10次数出价记录
+		List<Map> goodsAuctionList=auctionService.findAuctionListByNumId(Long.valueOf(auction.getNumId()));
+		double priceUp=Double.valueOf(goods.getgPriceUp());//每次加价
+		int loopTime=Integer.valueOf(goods.getgLoopTime());//轮咨时间分钟
+		double beforePrice=0.00;//前一次出价记录
+		double subPrice=0.00;//当前出价与前一次出价相差
+		Long  autionId=0L;//前一次出价记录Id
+		boolean isDeposit=false;//是否支付保证金
+		if(goodsAuctionList.size()>0)
 		{
-			auction.setStatus(2);
-			auctionService.auctionEdit(auction);
-
-		}else //当前用户保证金未支付成功 status:2    出价记录 状态：1初始   保证金记录  状态：1 初始
+			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
+			 autionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
+			 subPrice=auction.getPrice()-beforePrice;
+		}else
 		{
-			auction.setStatus(1);
-			auctionService.auctionEdit(auction);
-			AuctionDeposit auctionDeposit=new AuctionDeposit();
-			auctionDeposit.setStatus(1);
-			auctionDeposit.setNum(auction.getNum());
-			auctionDeposit.setNumId(auction.getNumId());
-			auctionDeposit.setSkuId(auction.getSkuId());
-			auctionDeposit.setAmt(Double.valueOf(goods.getgDeposit()));//保证金
-			auctionDepositService.auctionDepositEdit(auctionDeposit);
-			returnResult(epSaleService.goodsAuciton(auction, request));
+			 subPrice=auction.getPrice();
 		}
+		if(subPrice>0)
+		{
+			if(subPrice%priceUp>0) {
+				returnResult(new Result(602, "当前加价不符规则;加价应按" + priceUp + "的倍数进行加价"));
+			}else
+			{
 
+				List<Map> auctionDepositConsumerList=auctionDepositService.findAuctionDepositListConsumerByNumId(auction.getNumId());//当前用户保证金已支付成功 状态：2成功
+				if(auctionDepositConsumerList.size()>0)
+				{
+					if(auctionDepositConsumerList.get(0).get("status").toString().equals("2"))
+					{
+						isDeposit=true;
+					}else
+					{
+						isDeposit=false;
+					}
+
+				}else
+				{
+					isDeposit=false;
+				}
+				if(isDeposit)//当前用户保证金已支付成功 状态：2成功
+				{
+					auction.setStatus(2);
+					auction.setAddDate(new Date());
+					auctionService.auctionEdit(auction);//出价记录 状态：2成功
+					if(autionId>0)
+					{
+						Auction auctonBef=new Auction();
+						auctonBef.setId(autionId);
+						auctonBef.setStatus(4);//前一次出价记录   状态：4 落败
+						auctionService.auctionEditStatusById(auctonBef);//通知用户
+					}
+				}else //当前用户保证金未支付成功 status:2    出价记录 状态：1初始   保证金记录  状态：1 初始
+				{
+					auction.setStatus(1);
+					auctionService.auctionEdit(auction);//出价记录 状态：1初始
+					AuctionDeposit auctionDeposit=new AuctionDeposit();
+					auctionDeposit.setStatus(1);
+					auctionDeposit.setNum(auction.getNum());
+					auctionDeposit.setNumId(auction.getNumId());
+					auctionDeposit.setSkuId(auction.getSkuId());
+					auctionDeposit.setAmt(Double.valueOf(goods.getgDeposit()));//保证金记录  状态：1初始
+					auctionDepositService.auctionDepositEdit(auctionDeposit);
+					returnResult(new Result(600, "保证金未支付"));
+				}
+			}
+		}else
+		{
+			returnResult(new Result(601, "当前加价不符规则;加价应超过前一次出价"));
+		}
 	}
 
 	/**
@@ -132,6 +178,7 @@ public class EPSaleController extends BaseReturn{
 			List<File> fileList = new ArrayList<File>();
 			List<Map> imgList= new ArrayList<Map>();
 			Map<String, Object> imgMap= new HashMap<String, Object>();
+			//图片集
 			fileList = fileService.findFilesByRefid(gId);
 			//fileList = fileService.findFilesByRefid("1003545391213314048");
 			if (fileList != null && fileList.size() > 0) {
@@ -146,7 +193,7 @@ public class EPSaleController extends BaseReturn{
 			{
 				goodsList.get(0).put("gImgList","");
 			}
-
+            //当前价 出价次数
 			List<Map> epSaleGoodsAuctionPriceInfo=auctionService.findAuctionSumEPSaleGoodsByNumId(Long.valueOf(numId));
  			if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0)
 			{

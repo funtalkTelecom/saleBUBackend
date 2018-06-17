@@ -14,11 +14,10 @@
 	  where  tb_auction_deposit.num_id = #{numId}
     </select>
 
-	<select id="findAuctionDepositListByNumIdAndConsumerIdAndStatus" resultType="java.util.HashMap">
+	<select id="findAuctionDepositListByNumIdAndConsumerId" resultType="java.util.HashMap">
 	  select * from 	tb_auction_deposit
 	  where  tb_auction_deposit.num_id = #{numId}
 	       and tb_auction_deposit.consumer_id=#{consumerId}
-	       and tb_auction_deposit.status=#{status}
     </select>
 
 	<insert id="insertBatch">
