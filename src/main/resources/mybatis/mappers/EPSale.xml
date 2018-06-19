@@ -220,7 +220,10 @@
         tb_goods.g_ad as gAd,
         tb_sku.sku_tob_price as gStartPrice,
         concat(tb_sku.sku_id,'')as skuId,
-        tb_num.num_resource as num
+        tb_num.num_resource as num,
+        tb_goods.g_price_up as gPriceUp,
+        tb_goods.g_deposit as gDeposit,
+        tb_goods.g_loop_time as gLoopTime
         from
         tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
         inner join  tb_goods on tb_goods.g_id=tb_sku.g_id

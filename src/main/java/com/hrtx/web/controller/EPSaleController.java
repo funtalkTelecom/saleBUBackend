@@ -62,7 +62,7 @@ public class EPSaleController extends BaseReturn{
 	 * @return
 	 */
 	@GetMapping("/api/epSales")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result findEPSaleList(EPSale epSale){
 		return epSaleService.findEPSaleList();
@@ -201,7 +201,7 @@ public class EPSaleController extends BaseReturn{
 			//fileList = fileService.findFilesByRefid("1003545391213314048");
 			if (fileList != null && fileList.size() > 0) {
 				for (File file : fileList) {
-					String gImgUrl=SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +goodsId+"/"+ file.getFileName();
+					String gImgUrl=SystemParam.get("domain-full") + "/get-img/goodsPics/" +goodsId+"/"+ file.getFileName();
 					imgMap.put("seq",file.getSeq());
 					imgMap.put("gImg",gImgUrl);
 					imgList.add(imgMap);
