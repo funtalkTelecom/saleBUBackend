@@ -78,6 +78,16 @@ public class TestDemo {
         System.out.println("deliveryAddress/5000删除*****返回值字符串  =================    "+resultStr2);
 
 
+        RequestBuilder  request_epSaleGoodsAuciton=post("/api/epSaleGoodsAuciton?__sessid="+token).
+        param("skuId", "收货地此测此...").param("personName", "收货人林林");
+
+        ResultActions resultActions_epSaleGoodsAuciton=mvc.perform(request_epSaleGoodsAuciton);
+        MvcResult result_epSaleGoodsAuciton= resultActions_epSaleGoodsAuciton.andReturn();
+        String resultStr_epSaleGoodsAuciton= result_epSaleGoodsAuciton.getResponse().getContentAsString();
+        System.out.println("epSaleGoodsAuciton***返回值字符串  =================    "+resultStr_epSaleGoodsAuciton);
+
+
+
         RequestBuilder  request_epSaleGoodss=get("/api/epSaleGoodss/1004991115960516609?__sessid="+token);
         ResultActions resultActions_epSaleGoodss=mvc.perform(request_epSaleGoodss);
         MvcResult result_epSaleGoodss= resultActions_epSaleGoodss.andReturn();

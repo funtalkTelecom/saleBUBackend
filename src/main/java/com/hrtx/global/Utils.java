@@ -209,6 +209,23 @@ public class Utils {
 		return new SimpleDateFormat(aFormat).format(date);
 	}
 
+	/*
+	  double转int
+	 */
+	public static int doubleToInt(double data) {
+		String dataStr=String.valueOf(data);
+		String strInt= dataStr.substring(0, dataStr.indexOf("."));
+		String strPoint= dataStr.substring(dataStr.indexOf(".") + 1);
+		int pointLen=strPoint.length();
+		String str ="";
+		str =strInt +strPoint;
+		if(pointLen==1)
+		{
+			str +="0";
+		}
+		return  Integer.parseInt(str);
+	}
+
 	/**
 	 * 将value值另起一行追加到fileSavePath 后面
 	 *
@@ -264,8 +281,16 @@ public class Utils {
 	}
 
 	public static void main(String args[]) {
-		int i= compareDate("1995-11-12 15:21", "1999-12-11 09:59");
-		System.out.println("i=="+i);
+		//int i= compareDate("1995-11-12 15:21", "1999-12-11 09:59");
+		//System.out.println("i=="+i);
+
+		//
+
+		System.out.println("i=="+doubleToInt(12));
+		System.out.println("i=="+doubleToInt(12.00));
+		System.out.println("i=="+doubleToInt(0.01));
+		System.out.println("i=="+doubleToInt(12.1));
+		System.out.println("i=="+doubleToInt(12.01));
 	}
    /*
        "1995-11-12 15:21", "1999-12-11 09:59"  DATE1<DATE2 =1

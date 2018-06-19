@@ -2,6 +2,7 @@ package com.hrtx.web.controller;
 
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
+import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.mapper.FileMapper;
@@ -38,6 +39,10 @@ public class EPSaleController extends BaseReturn{
 	private GoodsService goodsService;
 	@Autowired
 	private ConsumerService consumerService;
+	@Autowired
+	private FundOrderService fundOrderService;
+	@Autowired
+	private ApiSessionUtil apiSessionUtil;
 
 	@RequestMapping("/epSale/epSale-query")
 	@Powers({PowerConsts.EPSALEMOUDULE})
@@ -52,7 +57,7 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/**
-	 * 查询未过期的竟拍活动
+	 * 查询竟拍活动
 	 * @param epSale
 	 * @return
 	 */
@@ -161,6 +166,8 @@ public class EPSaleController extends BaseReturn{
 					auctionDeposit.setSkuId(auction.getSkuId());
 					auctionDeposit.setAmt(Double.valueOf(goods.getgDeposit()));//保证金记录  状态：1初始
 					auctionDepositService.auctionDepositEdit(auctionDeposit);
+					String orderNameStr="商品"+auction.getgName()+"保证金支付,额度:"+auctionDeposit.getAmt();
+					fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(auctionDeposit.getAmt()),"",orderNameStr,auctionDeposit.getId().toString());
 					returnResult(new Result(600, "保证金未支付"));
 				}
 			}

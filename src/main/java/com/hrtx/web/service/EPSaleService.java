@@ -33,6 +33,8 @@ public class EPSaleService {
 	@Autowired private AuctionMapper auctionMapper;
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
 	@Autowired private FileMapper fileMapper;
+	@Autowired
+	private FundOrderService fundOrderService;
 	public Result pageEPSale(EPSale epSale) {
 		PageHelper.startPage(epSale.getPageNum(),epSale.getLimit());
 		Page<Object> ob=this.epSaleMapper.queryPageList(epSale);
@@ -41,15 +43,33 @@ public class EPSaleService {
 	}
 
 	public Result findEPSaleList() {
-		return new Result(Result.OK,  epSaleMapper.findEPSaleList());
+		List<Map> list=epSaleMapper.findEPSaleList();
+		for(Map map:list)
+		{
+			String urlImg=SystemParam.get("domain-full")+"/"+map.get("epImg").toString();
+			map.put("epImg",urlImg);
+		}
+		return new Result(Result.OK, list);
 	}
 
 	public List<Map> findEPSaleByEPSaleId(Long ePSaleId) {
-		return epSaleMapper.findEPSaleByEPSaleId(ePSaleId);
+		List<Map> list=epSaleMapper.findEPSaleByEPSaleId(ePSaleId);
+		for(Map map:list)
+		{
+			String urlImg=SystemParam.get("domain-full")+"/"+map.get("epImg").toString();
+			map.put("epImg",urlImg);
+		}
+		return list;
 	}
 
 	public List<Map> findEPSaleGoodsListByEPSaleId(Long ePSaleId) {
-		return epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
+		List<Map> list=epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
+		for(Map map:list)
+		{
+			String urlImg=SystemParam.get("domain-full")+"/"+map.get("gImg").toString();
+			map.put("gImg",urlImg);
+		}
+		return list;
 	}
 
 	public List<Map> findEPSaleGoodsByGoodsId(Long goodsId) {
@@ -118,6 +138,7 @@ public class EPSaleService {
 					auctionDeposit.setConsumerId(consumerId);
 					auctionDeposit.setNumId(consumerId);
 					auctionDepositMapper.auctionDepositEdit(auctionDeposit);
+					fundOrderService.payDepositRefund(auctionDeposit.getId().toString(),"保证金");
 					Messager.send(consumerPhone,"竟拍结束;你的出价落败,保证金已退回,金额："+depositPrice);
 				}
 			}
@@ -173,11 +194,10 @@ public class EPSaleService {
 		return false;
 	}
 	public Result goodsAuciton(Auction auciton, HttpServletRequest request) {
-
 		return new Result(Result.OK, "提交成功");
 	}
-	public Result epSaleEdit(EPSale epSale, HttpServletRequest request, MultipartFile[] files) {
 
+	public Result epSaleEdit(EPSale epSale, HttpServletRequest request, MultipartFile[] files) {
 		epSale.setAddUserId(SessionUtil.getUserId());
 		if (epSale.getId() != null && epSale.getId() > 0) {
 			epSale.setUpdateDate(new Date());
