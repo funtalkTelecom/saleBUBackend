@@ -4,29 +4,25 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 @Table(name = "tb_corporation")
-public class Corporation extends BasePojo{
+public class Corporation extends BasePojo implements java.io.Serializable{
+    private static final long serialVersionUID = 1L;
     @Id
     private Long id;
-
     private String name;
-
     private String principal;
-
     private String phone;
-
     private Long district;
-
     private String address;
-
     private String remark;
-
     private Byte status;
-
     private Date addDate;
-
     private String addUser;
+    private boolean isDel;
+    private Long storageId;
+    private Long companyId;
 
-    private Boolean isDel;
+    public Corporation() {
+    }
 
     public Corporation(Long id, String name, String principal, String phone, Long district, String address, String remark, Byte status, Date addDate, String addUser, Boolean isDel) {
         this.id = id;
@@ -42,10 +38,6 @@ public class Corporation extends BasePojo{
         this.isDel = isDel;
     }
 
-    public Corporation() {
-        super();
-    }
-
     public Long getId() {
         return id;
     }
@@ -59,7 +51,7 @@ public class Corporation extends BasePojo{
     }
 
     public void setName(String name) {
-        this.name = name == null ? null : name.trim();
+        this.name = name;
     }
 
     public String getPrincipal() {
@@ -67,7 +59,7 @@ public class Corporation extends BasePojo{
     }
 
     public void setPrincipal(String principal) {
-        this.principal = principal == null ? null : principal.trim();
+        this.principal = principal;
     }
 
     public String getPhone() {
@@ -75,7 +67,7 @@ public class Corporation extends BasePojo{
     }
 
     public void setPhone(String phone) {
-        this.phone = phone == null ? null : phone.trim();
+        this.phone = phone;
     }
 
     public Long getDistrict() {
@@ -91,7 +83,7 @@ public class Corporation extends BasePojo{
     }
 
     public void setAddress(String address) {
-        this.address = address == null ? null : address.trim();
+        this.address = address;
     }
 
     public String getRemark() {
@@ -99,7 +91,7 @@ public class Corporation extends BasePojo{
     }
 
     public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
+        this.remark = remark;
     }
 
     public Byte getStatus() {
@@ -123,14 +115,30 @@ public class Corporation extends BasePojo{
     }
 
     public void setAddUser(String addUser) {
-        this.addUser = addUser == null ? null : addUser.trim();
+        this.addUser = addUser;
     }
 
-    public Boolean getIsDel() {
+    public boolean isDel() {
         return isDel;
     }
 
-    public void setIsDel(Boolean isDel) {
-        this.isDel = isDel;
+    public void setDel(boolean del) {
+        isDel = del;
+    }
+
+    public Long getStorageId() {
+        return storageId;
+    }
+
+    public void setStorageId(Long storageId) {
+        this.storageId = storageId;
+    }
+
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 }

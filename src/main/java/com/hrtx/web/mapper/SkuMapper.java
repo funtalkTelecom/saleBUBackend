@@ -15,4 +15,12 @@ public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
     List<Sku> findSkuInfo(@Param("gId") Long gId);
 
     List getSkuListBySkuids(@Param("skuids") String skuids);
+
+    Sku getSkuBySkuid(@Param("skuid") Long skuId);
+
+    void updateSkuNum(Sku nowSku);
+
+    void updateSku(Sku sku);
+
+    void deleteSkuBySkuids(@Param("delSkus") String delSkus);
 }

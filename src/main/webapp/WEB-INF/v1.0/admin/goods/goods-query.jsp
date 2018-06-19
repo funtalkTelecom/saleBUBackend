@@ -222,6 +222,7 @@
 
 							<%--sku列表--%>
 							<input type="hidden" name="skuJson" id="skuJson">
+							<input type="hidden" name="delSkus" id="delSkus">
 							<h3 class="header smaller lighter blue">SKU</h3>
 							<div id="skuResult" style="overflow: auto;">
 							</div>

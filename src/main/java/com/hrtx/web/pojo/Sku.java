@@ -14,18 +14,19 @@ public class Sku extends BasePojo implements java.io.Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long skuId;
     private Long gId;
-    private String skuTobPrice;
-    private String skuTocPrice;
+    private Double skuTobPrice;
+    private Double skuTocPrice;
     private String skuIsNum;
     private String skuSaleNum;
     private int skuNum;
     private String skuGoodsType;
     private String skuRepoGoods;
+    private String skuRepoGoodsName;
 
     public Sku() {
     }
 
-    public Sku(Long skuId, Long gId, String skuTobPrice, String skuTocPrice, String skuIsNum, String skuSaleNum, int skuNum, String skuGoodsType, String skuRepoGoods) {
+    public Sku(Long skuId, Long gId, Double skuTobPrice, Double skuTocPrice, String skuIsNum, String skuSaleNum, int skuNum, String skuGoodsType, String skuRepoGoods, String skuRepoGoodsName) {
         this.skuId = skuId;
         this.gId = gId;
         this.skuTobPrice = skuTobPrice;
@@ -35,6 +36,7 @@ public class Sku extends BasePojo implements java.io.Serializable {
         this.skuNum = skuNum;
         this.skuGoodsType = skuGoodsType;
         this.skuRepoGoods = skuRepoGoods;
+        this.skuRepoGoodsName = skuRepoGoodsName;
     }
 
     public Long getSkuId() {
@@ -53,19 +55,19 @@ public class Sku extends BasePojo implements java.io.Serializable {
         this.gId = gId;
     }
 
-    public String getSkuTobPrice() {
+    public Double getSkuTobPrice() {
         return skuTobPrice;
     }
 
-    public void setSkuTobPrice(String skuTobPrice) {
+    public void setSkuTobPrice(Double skuTobPrice) {
         this.skuTobPrice = skuTobPrice;
     }
 
-    public String getSkuTocPrice() {
+    public Double getSkuTocPrice() {
         return skuTocPrice;
     }
 
-    public void setSkuTocPrice(String skuTocPrice) {
+    public void setSkuTocPrice(Double skuTocPrice) {
         this.skuTocPrice = skuTocPrice;
     }
 
@@ -107,5 +109,13 @@ public class Sku extends BasePojo implements java.io.Serializable {
 
     public void setSkuRepoGoods(String skuRepoGoods) {
         this.skuRepoGoods = skuRepoGoods;
+    }
+
+    public String getSkuRepoGoodsName() {
+        return skuRepoGoodsName;
+    }
+
+    public void setSkuRepoGoodsName(String skuRepoGoodsName) {
+        this.skuRepoGoodsName = skuRepoGoodsName;
     }
 }

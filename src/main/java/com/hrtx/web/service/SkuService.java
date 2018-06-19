@@ -9,6 +9,7 @@ import com.hrtx.web.pojo.SkuProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,20 +30,21 @@ public class SkuService {
 
 		List<Sku> skuList = skuMapper.findSkuInfo(gId);
 		List<SkuProperty> skuPropertyList = skuPropertyMapper.findSkuPropertyByGid(gId);
-
+		DecimalFormat df = new DecimalFormat("######0.00");
 		//从tb_sku中读取固有的几个字段
 		if (skuList != null && skuList.size() > 0) {
 			for (Sku sku : skuList) {
 				LinkedHashMap<String, String> skuMap = new LinkedHashMap<String, String>();
 				skuMap.put("skuId", String.valueOf(sku.getSkuId()));
-				skuMap.put("skuTobPrice", sku.getSkuTobPrice());
-				skuMap.put("skuTocPrice", sku.getSkuTocPrice());
+				skuMap.put("skuTobPrice", df.format(sku.getSkuTobPrice()));
+				skuMap.put("skuTocPrice", df.format(sku.getSkuTocPrice()));
 //				skuMap.put("skuIsNum", sku.getSkuIsNum());
 				skuMap.put("skuSaleNum", concatSaleNumBySkuid(String.valueOf(sku.getSkuId())));
 //				skuMap.put("skuSaleNum", sku.getSkuSaleNum().replaceAll(",", "\n"));
 				skuMap.put("skuNum", String.valueOf(sku.getSkuNum()));
 				skuMap.put("skuGoodsType", sku.getSkuGoodsType());
 				skuMap.put("skuRepoGoods", sku.getSkuRepoGoods());
+				skuMap.put("skuRepoGoodsName", sku.getSkuRepoGoodsName());
 
 				skuidMap.put(sku.getSkuId().toString(), skuMap);
 			}

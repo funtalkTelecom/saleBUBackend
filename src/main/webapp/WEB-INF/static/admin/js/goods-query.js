@@ -32,63 +32,86 @@ $(function() {
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
                         $operate.find(".update").click(function () {
-                            $.post("goods/goods-info", {gId: v}, function (data) {
-                                var _data = data.data;
-                                initGoodsPics(data.goodsPics);
-                                editor.html(data.kindeditor);
-                                $.fn.zTree.init($("#cityTree"), setting, zNodes);
-                                formInit($("#goodsInfo form"), _data);
-                                //给cityTree赋值
-                                var zTree = $.fn.zTree.getZTreeObj("cityTree");
-                                var gSaleCitys = record.gSaleCity.split(",");
-                                var node=null;
-                                for(var i=1; i<gSaleCitys.length-1; i++){
-                                    node = zTree.getNodeByParam("id",gSaleCitys[i], null);//根据节点数据的属性(id)获取条件完全匹配的节点数据 JSON 对象集合
-                                    if(node) zTree.checkNode(node,true,true,false);//根据节点数据选中指定节点,false表示单独选中，之前选中的节点会被取消选中状态，为true 表示追加选中
-                                }
-                                onCheck(null, "cityTree");
-
-                                gIsAucOnClick();
-
-                                //获取sku列表
-                                $.post("sku/sku-list-gid", {gId: v}, function (data) {
-                                    if (data.code == "200"){
-                                        var _data = data.data;
-                                        $("#gProperty").hide();
-                                        $("#gProperty").prev().hide();
-                                        //选中属性的checkbox
-                                        for(var key in _data){
-                                            var d = _data[key];
-                                            for(var k in d){
-                                                if(!titleStrObj.hasOwnProperty(k)){
-                                                    $("input[name="+k+"][value="+d[k]+"][type=checkbox]").prop("checked", "checked");
-                                                }
-                                            }
+                            //获取仓库商品类型下拉框
+                            $.ajax({
+                                type: "POST",
+                                async: true,
+                                url: "goods/goods-repoGoods",
+                                success: function(data){
+                                    if(data.code=="200"){
+                                        repoGoods = data.data.platresponse;
+                                        var repoGoodsSelect = '<select onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
+                                        for(var i=0; i<repoGoods.length; i++){
+                                            repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'</option>';
                                         }
-                                        //调用生成列表
-                                        createSkuTable(_data);
+                                        repoGoodsSelect += '</select>';
+                                        titleStrObj.skuRepoGoods.type=repoGoodsSelect;
+                                        // active_quantity可用库存
+                                        // companystock_id
+                                        // commodity_name
+                                        $.post("goods/goods-info", {gId: v}, function (data) {
+                                            var _data = data.data;
+                                            initGoodsPics(data.goodsPics);
+                                            editor.html(data.kindeditor);
+                                            $.fn.zTree.init($("#cityTree"), setting, zNodes);
+                                            formInit($("#goodsInfo form"), _data);
+                                            //给cityTree赋值
+                                            var zTree = $.fn.zTree.getZTreeObj("cityTree");
+                                            var gSaleCitys = record.gSaleCity.split(",");
+                                            var node=null;
+                                            for(var i=1; i<gSaleCitys.length-1; i++){
+                                                node = zTree.getNodeByParam("id",gSaleCitys[i], null);//根据节点数据的属性(id)获取条件完全匹配的节点数据 JSON 对象集合
+                                                if(node) zTree.checkNode(node,true,true,false);//根据节点数据选中指定节点,false表示单独选中，之前选中的节点会被取消选中状态，为true 表示追加选中
+                                            }
+                                            onCheck(null, "cityTree");
 
-                                        var html = tablePre+titlePre+titleContent+gtitleContent+titleSuf+tbodyPre+rowContent+tbodySuf+tableSuf;
-                                        // console.log(html);
-                                        $("#skuResult").html(html);
-                                        //再给固定的几个select赋值
-                                        $("#skuResult select").each(function (i, e) {
-                                            $(this).val($(this).attr("selectValue"));
-                                            $(this).change();
-                                        });
-                                        //给文本域赋值
-                                        $("#skuResult textarea").each(function (i, e) {
-                                            $(this).val($(this).attr("textareaValue"));
-                                        });
+                                            gIsAucOnClick();
+
+                                            //获取sku列表
+                                            $.post("sku/sku-list-gid", {gId: v}, function (data) {
+                                                if (data.code == "200"){
+                                                    var _data = data.data;
+                                                    $("#gProperty").hide();
+                                                    $("#gProperty").prev().hide();
+                                                    //选中属性的checkbox
+                                                    for(var key in _data){
+                                                        var d = _data[key];
+                                                        for(var k in d){
+                                                            if(!titleStrObj.hasOwnProperty(k)){
+                                                                $("input[name="+k+"][value="+d[k]+"][type=checkbox]").prop("checked", "checked");
+                                                            }
+                                                        }
+                                                    }
+                                                    //调用生成列表
+                                                    createSkuTable(_data);
+
+                                                    var html = tablePre+titlePre+titleContent+gtitleContent+titleSuf+tbodyPre+rowContent+tbodySuf+tableSuf;
+                                                    // console.log(html);
+                                                    $("#skuResult").html(html);
+                                                    //再给固定的几个select赋值
+                                                    $("#skuResult select").each(function (i, e) {
+                                                        $(this).val($(this).attr("selectValue"));
+                                                        $(this).change();
+                                                    });
+                                                    //给文本域赋值
+                                                    $("#skuResult textarea").each(function (i, e) {
+                                                        $(this).val($(this).attr("textareaValue"));
+                                                    });
+                                                }else{
+                                                    $("button.btn-success").attr("disabled", "disabled");
+                                                    alert("sku加载异常,请重新打开!");
+                                                }
+                                            }, "json");
+                                            //获取sku列表end
+
+                                            $('#goodsInfo').modal('show');
+                                        }, "json");
                                     }else{
-                                        $("button.btn-success").attr("disabled", "disabled");
-                                        alert("sku加载异常,请重新打开!");
+                                        repoGoods = "";
                                     }
-                                }, "json");
-                                //获取sku列表end
+                                }
+                            });
 
-                                $('#goodsInfo').modal('show');
-                            }, "json");
                         });
                         $operate.find(".delete").click(function () {
                             if (confirm("确认删除？")) {
@@ -141,6 +164,25 @@ $(function() {
 	}
 
     $(document).on("click","#goodsInfo .modal-footer .btn-success",function() {
+        //验证填写数量和库存数量
+        var isError = false;
+        var msg = "";
+        $("select[name=skuRepoGoods]").each(function(i, e){
+            if($(this).find("option:selected").attr("acqu")==undefined){
+                msg = "请选择关联仓库商品";
+                isError = true;
+                return;
+            }
+            if(parseInt($(this).find("option:selected").attr("acqu"))+parseInt($("select[name=skuRepoGoods]").parent().parent().find("input[name=skuNum]").val())<parseInt($("select[name=skuRepoGoods]").parent().parent().find("input[name=skuNum]").val())){
+                msg = "第" + (i + 1) + "行数量大于库存" + $(this).find("option:selected").attr("acqu") + ",请重新填写";
+                isError = true;
+                return;
+            }
+        });
+        if(isError){
+            alert(msg);
+            return false;
+        }
         var skuJson = getSkuJson();
         $("#skuJson").val(skuJson);
         editor.sync();
@@ -325,62 +367,6 @@ $(function() {
             colIndex++;
         }
     }
-    var titleStrObj = {
-        "skuId":{
-            "isShow":false,
-            "title":"skuId",
-            "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
-            "titleClass":"col-xs-1"
-        },
-        "skuTobPrice":{
-            "isShow":true,
-            "title":"2B价格",
-            "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
-            "titleClass":"col-xs-1"
-        },
-        "skuTocPrice":{
-            "isShow":true,
-            "title":"2C价格",
-            "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
-            "titleClass":"col-xs-1"
-        },
-        // "skuIsNum":{
-        //     "isShow":true,
-        //     "title":"是否号码",
-        //     "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">是</option><option value="2">否</option></select>',
-        //     "titleClass":""
-        // },
-        "skuSaleNum":{
-            "isShow":true,
-            "title":"所售号码",
-            "type":'<textarea tag="sku_skuindex" class="col-xs-12" style="height:34px;resize: none;width:150px" type="text" onclick="selectSaleNum(this)" name="skukey" textareaValue="skuvalue" class="col-xs-12" readonly></textarea>',
-            "titleClass":"col-xs-1"
-        },
-        "skuNum":{
-            "isShow":true,
-            "title":"数量",
-            "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
-            "titleClass":"col-xs-1"
-        },
-        "skuGoodsType":{
-            "isShow":true,
-            "title":"商品类型",
-            "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">普号</option><option value="3">普靓</option><option value="4">超靓</option></select>',
-            "titleClass":""
-        },
-        "skuRepoGoods":{
-            "isShow":true,
-            "title":"关联仓库商品",
-            "type":'<select tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
-            "titleClass":""
-        },
-        "operation":{
-            "isShow":true,
-            "title":"操作",
-            "type":'<a class="btn btn-danger btn-xs delete" href="javascript:void(0);" onclick="deleteSkuRow(this)">删除</a>',
-            "titleClass":""
-        }
-    };
     function createSkuTable(data){
         var index = 0;
         var colIndex = 0;
@@ -588,7 +574,101 @@ $(function() {
         }
         $("#picUpload").html(html);
     }
+    getRepoGodds();
 });
+
+var titleStrObj = {
+    "skuId":{
+        "isShow":false,
+        "title":"skuId",
+        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
+        "titleClass":"col-xs-1"
+    },
+    "skuTobPrice":{
+        "isShow":true,
+        "title":"2B价格",
+        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
+        "titleClass":"col-xs-1"
+    },
+    "skuTocPrice":{
+        "isShow":true,
+        "title":"2C价格",
+        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
+        "titleClass":"col-xs-1"
+    },
+    // "skuIsNum":{
+    //     "isShow":true,
+    //     "title":"是否号码",
+    //     "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">是</option><option value="2">否</option></select>',
+    //     "titleClass":""
+    // },
+    "skuSaleNum":{
+        "isShow":true,
+        "title":"所售号码",
+        "type":'<textarea tag="sku_skuindex" class="col-xs-12" style="height:34px;resize: none;width:150px" type="text" onclick="selectSaleNum(this)" name="skukey" textareaValue="skuvalue" class="col-xs-12" readonly></textarea>',
+        "titleClass":"col-xs-1"
+    },
+    "skuNum":{
+        "isShow":true,
+        "title":"数量",
+        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
+        "titleClass":"col-xs-1"
+    },
+    "skuGoodsType":{
+        "isShow":true,
+        "title":"商品类型",
+        "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">普号</option><option value="3">普靓</option><option value="4">超靓</option></select>',
+        "titleClass":""
+    },
+    "skuRepoGoodsName":{
+        "isShow":false,
+        "title":"关联仓库商品",
+        "type":'<input tag="sku_skuindex" type="hidden" name="skukey" value="skuvalue" class="col-xs-12">',
+        "titleClass":""
+    },
+    "skuRepoGoods":{
+        "isShow":true,
+        "title":"关联仓库商品",
+        "type":'<select tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
+        "titleClass":""
+    },
+    "operation":{
+        "isShow":true,
+        "title":"操作",
+        "type":'<a class="btn btn-danger btn-xs delete" href="javascript:void(0);" onclick="deleteSkuRow(this)">删除</a>',
+        "titleClass":""
+    }
+};
+var repoGoods;
+function getRepoGodds(){
+    //获取仓库商品类型下拉框
+    $.ajax({
+        type: "POST",
+        async: true,
+        url: "goods/goods-repoGoods",
+        success: function(data){
+            if(data.code=="200"){
+                repoGoods = data.data.platresponse;
+                var repoGoodsSelect = '<select onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
+                for(var i=0; i<repoGoods.length; i++){
+                    repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'</option>';
+                }
+                repoGoodsSelect += '</select>';
+                titleStrObj.skuRepoGoods.type=repoGoodsSelect;
+                // active_quantity可用库存
+                // companystock_id
+                // commodity_name
+                return true;
+            }else{
+                repoGoods = "";
+                return false;
+            }
+        }
+    });
+}
+function skuRepoGoodsChange(obj){
+    $(obj).parent().parent().find("input[name=skuRepoGoodsName]").eq(0).val($(obj).find("option:selected").text());
+}
 function deletePic(obj){
     if($("#delPicSeqs").val().indexOf($(obj).prev().attr("seq"))==-1) $("#delPicSeqs").val($("#delPicSeqs").val()+'"'+$(obj).prev().attr("seq")+'",');
     $(obj).parent().find("img").eq(0).css("visibility","hidden");
@@ -633,5 +713,6 @@ function deleteSkuRow(obj){
         alert("至少保留一条记录");
         return false;
     }
+    $("#delSkus").val($("#delSkus").val()+$(obj).parent().parent().find("input[tag^=sku_][name=skuId]").eq(0).val()+",");
     $(obj).parent().parent().remove();
 }
