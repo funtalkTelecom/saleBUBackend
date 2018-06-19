@@ -56,34 +56,13 @@ public class AgentController {
 	@Powers({PowerConsts.NOLOGINPOWER})
 	@ResponseBody
 	public Result listAgent(){
-//		Consumer consumer= this.apiSessionUtil.getConsumer();
-//		long consumerId =consumer.getId();
-		String  a = "1007534495353536512";
-		long consumerId =Long.valueOf(a);
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		long consumerId =consumer.getId();
+//		String  a = "1007534495353536512";
+//		long consumerId =Long.valueOf(a);
 		List list = agentService.findAgentListByaddConsumerId(consumerId);
 		Map map = (Map) list.get(0);
 		map.put("tradingImgUrl", SystemParam.get("domain-full") + "get-img/trading_url/1000/" +map.get("trading_img").toString());
-//		Agent agent = new Agent();
-//		agent.setId( Long.valueOf(map.get("id").toString()));
-//		agent.setPhone(map.get("phone").toString());
-//		agent.setPerson(map.get("person").toString());
-//		agent.setProvinceName(map.get("provinceName").toString());
-//		agent.setCityName(map.get("cityName").toString());
-//		agent.setDistrictName(map.get("districtName").toString());
-//		agent.setAddress(map.get("address").toString());
-//		agent.setStatus(Integer.parseInt(map.get("status").toString()));
-//		agent.setStatustext(map.get("statustext").toString());
-//		if(map.get("loginName")!=null) {
-//			agent.setLoginName(map.get("loginName").toString());
-//		}
-//		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//		Date d = new Date();
-//		String time =map.get("adddate").toString();
-//		try {
-//			agent.setAddDate(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(time));
-//		} catch (ParseException e) {
-//			e.printStackTrace();
-//		}
 		return new Result(Result.OK, map);
 	}
 
