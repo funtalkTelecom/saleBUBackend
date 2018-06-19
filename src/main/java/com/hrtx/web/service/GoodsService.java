@@ -10,6 +10,7 @@ import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
 import com.hrtx.web.controller.BaseReturn;
+import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
@@ -126,6 +127,11 @@ public class GoodsService {
                             "UTF-8");
                     if(200!=(res.getCode())){
                         return new Result(Result.ERROR, "库存验证失败");
+                    }else{
+                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                        if(!"00000".equals(sir.getCode())){
+                            return new Result(Result.ERROR, "库存验证失败");
+                        }
                     }
                     //再冻结新库存
                     param.put("type", "1");//处理类型1上架；2下架
@@ -142,6 +148,11 @@ public class GoodsService {
                             "UTF-8");
                     if(200!=(res.getCode())){
                         return new Result(Result.ERROR, "库存验证失败");
+                    }else{
+                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                        if(!"00000".equals(sir.getCode())){
+                            return new Result(Result.ERROR, "库存验证失败");
+                        }
                     }
                 }
             }
@@ -312,6 +323,11 @@ public class GoodsService {
                         "UTF-8");
                 if(200!=(res.getCode())){
                     return new Result(Result.ERROR, "库存验证失败");
+                }else{
+                    StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                    if(!"00000".equals(sir.getCode())){
+                        return new Result(Result.ERROR, "库存验证失败");
+                    }
                 }
             }
         } catch (Exception e) {
@@ -354,6 +370,11 @@ public class GoodsService {
                         "UTF-8");
                 if(200!=(res.getCode())){
                     return new Result(Result.ERROR, "库存验证失败");
+                }else{
+                    StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                    if(!"00000".equals(sir.getCode())){
+                        return new Result(Result.ERROR, "库存验证失败");
+                    }
                 }
             }
 

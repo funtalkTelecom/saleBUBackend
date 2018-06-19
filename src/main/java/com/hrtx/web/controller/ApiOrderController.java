@@ -8,6 +8,7 @@ import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
 import com.hrtx.global.*;
+import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
@@ -100,6 +101,7 @@ public class ApiOrderController extends BaseReturn{
 		}
 
 		try {
+		    int storagen = 0;
 		    if("1".equals(type)) {
                 log.info("进入订单类型1");
 //						出货	  出货
@@ -112,6 +114,7 @@ public class ApiOrderController extends BaseReturn{
                         skuid = request.getParameter("skuid");
                         addrid = request.getParameter("addrid");//普通靓号可不填
                         numcount = request.getParameter("numcount")==null?-1:Integer.parseInt(request.getParameter("numcount"));
+                        storagen=numcount;
 
                         if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
                         if (addrid == null || "".equals(addrid)) return new Result(Result.ERROR, "收货地址不能为空");
@@ -162,6 +165,10 @@ public class ApiOrderController extends BaseReturn{
                                 sub_total += orderItem.getTotal();
 
                                 orderItems.add(orderItem);
+                                //修改sku数量
+                                Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong((String) sku.get("skuId")));
+                                nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-numcount);
+                                skuMapper.updateSkuNum(nowSku);
 
                                 log.info("冻结号码,添加号码item");
                                 //是普号,根据数量冻结号码,添加号码item
@@ -226,11 +233,6 @@ public class ApiOrderController extends BaseReturn{
                             total = sub_total * commission - shipping_total;
                             order.setTotal(total);
 
-
-                            log.info("调用仓储接口");
-                            //调用仓储接口成功之后写入
-                            order.setNoticeShipmentDate(new Date());
-
                             orderList.add(order);
                         } finally {
                             LockUtils.unLock(skuid);
@@ -249,6 +251,7 @@ public class ApiOrderController extends BaseReturn{
 
             }else if("2".equals(type)) {
                     log.info("进入订单类型2");
+                    storagen = 1;
 //						不出货		出货
 //				type:2  普通靓号3或超级靓号4    skuid, numid, addrid, payType, mealid
                     String skuid, numid = null, addrid, payType, mealid;
@@ -378,10 +381,6 @@ public class ApiOrderController extends BaseReturn{
                             total = sub_total * commission - shipping_total;
                             order.setTotal(total);
 
-
-                            //调用仓储接口成功之后写入
-                            order.setNoticeShipmentDate(new Date());
-
                             orderList.add(order);
                         } finally {
                             LockUtils.unLock(numid);
@@ -395,11 +394,179 @@ public class ApiOrderController extends BaseReturn{
                         return new Result(Result.ERROR, "获取数据异常");
                     }
             }
+            else if("3".equals(type)) {//竞拍订单
+		        log.info("进入竞拍订单");
+                storagen = 1;
+                String skuid, numid = null, addrid, price;
+
+                Map number = null;
+                try {
+                    log.info("获取传入参数");
+                    skuid = request.getParameter("skuid");
+                    numid = request.getParameter("numid");
+                    addrid = request.getParameter("addrid");
+                    price = request.getParameter("price");
+
+                    if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
+                    if (numid == null || "".equals(numid)) return new Result(Result.ERROR, "numid不能为空");
+                    if (addrid == null || "".equals(addrid)) return new Result(Result.ERROR, "addrid不能为空");
+                    if (price == null || "".equals(price)) return new Result(Result.ERROR, "price不能为空");
+
+                    log.info("获取号码信息");
+                    //获取号码
+                    number = numberMapper.getNumInfoById(numid);
+                    //冻结号码
+                    if (!LockUtils.tryLock(numid)) return new Result(Result.ERROR, "请稍后再试!");
+                    try {
+                        log.info("验证号码是否可下单");
+                        //验证号码是否可下单,2:销售中
+                        if (number == null || !"2".equals(String.valueOf(number.get("status"))))
+                            return new Result(Result.ERROR, "号码已被购买!");
+                        log.info("冻结号码");
+                        freezeNum(numid, "3");
+                        log.info("获取sku信息");
+                        //获取sku列表
+                        List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
+                        if(skulist==null || skulist.size()<=0) return new Result(Result.ERROR, "未找到相关商品,请刷新后再试");
+                        for (int i = 0; i < skulist.size(); i++) {
+                            OrderItem orderItem = new OrderItem();
+                            Map sku = (Map) skulist.get(i);
+
+                            log.info("获取商品信息");
+                            //获取商品
+                            goods = goodsMapper.findGoodsInfoBySkuid(skuid);
+                            List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
+
+                            orderItem.setItemId(orderItem.getGeneralId());
+                            orderItem.setOrderId(order.getOrderId());
+                            orderItem.setGoodsId(goods.getgId());
+                            orderItem.setSkuId(Long.parseLong(skuid));
+                            orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+                            orderItem.setNumId(Long.parseLong(numid));
+                            orderItem.setNum((String) number.get("numResource"));
+                            orderItem.setIsShipment(0);
+                            orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
+                            orderItem.setSellerName((String) sku.get("gSellerName"));
+                            orderItem.setShipmentApi("egt");
+                            orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                            int num = 1;
+                            orderItem.setQuantity(num);
+                            double twobPrice = Double.parseDouble(price);
+                            orderItem.setPrice(twobPrice);
+                            orderItem.setTotal(twobPrice * num);
+                            sub_total += orderItem.getTotal();
+
+                            orderItems.add(orderItem);
+
+
+                            //添加卡的item
+                            orderItem = new OrderItem();
+                            orderItem.setItemId(orderItem.getGeneralId());
+                            orderItem.setOrderId(order.getOrderId());
+
+                            orderItem.setGoodsId(goods.getgId());
+                            orderItem.setSkuId(Long.parseLong(skuid));
+                            orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+                            orderItem.setNumId(Long.parseLong(numid));
+                            orderItem.setNum((String) number.get("numResource"));
+                            orderItem.setIsShipment(1);//卡体发货
+                            orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
+                            orderItem.setSellerName((String) sku.get("gSellerName"));
+                            orderItem.setShipmentApi("egt");
+                            orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                            num = 1;
+                            orderItem.setQuantity(num);
+                            twobPrice = 0;//Double.parseDouble((String) sku.get("skuTobPrice"));
+                            orderItem.setPrice(twobPrice);
+                            orderItem.setTotal(twobPrice * num);
+                            sub_total += orderItem.getTotal();
+
+                            orderItems.add(orderItem);
+                        }
+
+                        //设置订单
+                        order.setConsumer(user.getId());
+                        order.setConsumerName(user.getName());
+                        order.setStatus(1);//设置成待付款
+                        order.setReqUserAgent(request.getHeader("user-agent"));
+                        order.setReqIp(SessionUtil.getUserIp());
+                        order.setAddDate(new Date());
+                        order.setOrderType(3);
+                        if (addrid == null) order.setAddressId(null);
+                        else {
+                            //获取收货地址信息
+                            DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
+                            order.setAddressId(deliveryAddress.getId());
+                            order.setPersonName(deliveryAddress.getPersonName());
+                            order.setPersonTel(deliveryAddress.getPersonTel());
+                            order.setAddress(deliveryAddress.getAddress());
+                        }
+                        order.setCommission(commission);
+                        order.setShippingTotal(shipping_total);
+                        order.setSubTotal(sub_total);
+                        //子项小计打折之后减去运费
+                        total = sub_total * commission - shipping_total;
+                        order.setTotal(total);
+
+                        orderList.add(order);
+                    } finally {
+                        LockUtils.unLock(numid);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //清除已生成的订单
+                    deleteOrder(orderList);
+                    //解冻号码,把冻结之前的状态还原
+                    freezeNum(numid, String.valueOf(number.get("status")));
+                    return new Result(Result.ERROR, "获取数据异常");
+                }
+            }
             //判断商品是否在有效期内
             if (goods.getgStartTime()==null || goods.getgEndTime()==null || !betweenCalendar(new Date(), goods.getgStartTime(), goods.getgEndTime()))
                 return new Result(Result.ERROR, "商品不在有效期内");
-            orderMapper.insertBatch(orderList);
-            orderItemMapper.insertBatch(orderItems);
+
+            log.info("调用仓储接口");
+            //调用仓储接口
+            //callback SystemParam.get("Storage_domain")+"/deliver-order-callback"
+            Map param = new HashMap();
+            Long preOrderId = 0L;
+            for (OrderItem i : orderItems) {
+                if(preOrderId!=i.getOrderId()) {
+                    preOrderId = i.getOrderId();
+                    param = new HashMap();
+                    param.put("order_id", i.getOrderId());
+                }
+
+                Map item = new HashMap();
+                item.put("item_id", i.getItemId());
+                item.put("companystock_id", i.getCompanystockId());
+                item.put("quantity", i.getQuantity());
+
+                param.put("commodities", item);
+            }
+            Result res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
+                    JSONObject.fromObject(new StorageInterfaceRequest(
+                            SystemParam.get("merid"),
+                            "HK0003",
+                            Utils.randomNoByDateTime(),
+                            SystemParam.get("key"),
+                            param
+                    )).toString(),
+                    "application/json",
+                    "UTF-8");
+            if(200!=(res.getCode())){
+                return new Result(Result.ERROR, "库存验证失败");
+            }else{
+                StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                if("00000".equals(sir.getCode())){
+                    //调用仓储接口成功之后写入
+                    for (Order o : orderList) {
+                        o.setNoticeShipmentDate(new Date());
+                    }
+                    orderMapper.insertBatch(orderList);
+                    orderItemMapper.insertBatch(orderItems);
+                }
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 			//清除已生成的订单
@@ -410,23 +577,6 @@ public class ApiOrderController extends BaseReturn{
 		return new Result(Result.OK, order.getOrderId());
 	}
 
-    public static void main(String[] args) throws Exception {
-        Map param = new HashMap();
-//        仓库：10656635
-//        卖家：10007016
-        param.put("storage_id", "10656635");
-        param.put("company_id", "10007016");
-        Result res = HttpUtil.doHttpPost("http://192.168.7.1:21401/DS_Storage/dispatchRequests.htm",
-                JSONObject.fromObject(new StorageInterfaceRequest(
-                        "1001",
-                        "HK0001",
-                        Utils.randomNoByDateTime(),
-                        "123456",
-                        param
-                )).toString(),
-                "application/json",
-                "UTF-8");
-    }
     /**
      * 字符串转换成日期
      * @param str
