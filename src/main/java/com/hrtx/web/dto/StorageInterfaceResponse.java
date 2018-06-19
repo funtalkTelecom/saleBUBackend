@@ -35,7 +35,7 @@ public class StorageInterfaceResponse {
         }
     }
 
-    public StorageInterfaceResponse(String jsonStr) {
+    public StorageInterfaceResponse(String jsonStr, String key) {
         JSONObject jsonObject = JSONObject.fromObject(jsonStr);
         this.merid = jsonObject.getString("merid");
         this.act_type = jsonObject.getString("act_type");
@@ -45,10 +45,15 @@ public class StorageInterfaceResponse {
         this.timestamp = jsonObject.getString("timestamp");
         this.sign = jsonObject.getString("sign");
         this.platresponse = jsonObject.get("platresponse");
+        String localSign = StorageInterfaceUtils.getSign(this, key);
+        if(!localSign.equals(this.sign)) {
+            this.code = "C0005";
+            this.desc = "签名出错";
+        }
     }
 
-    public static StorageInterfaceResponse create(String jsonStr) {
-        return new StorageInterfaceResponse(jsonStr);
+    public static StorageInterfaceResponse create(String jsonStr, String key) {
+        return new StorageInterfaceResponse(jsonStr, key);
     }
 
     public String getMerid() {
