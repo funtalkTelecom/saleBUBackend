@@ -35,7 +35,7 @@ $(function() {
             "header" : "营业执照",
             "dataIndex" : "tradingImg",
             "renderer" : function (v, record) {
-                return"<a href='get-img/reg/1000/"+record.tradingImg+"' data-lightbox='tradingImg'><img src='get-img/reg/300/"+record.tradingImg+"' style='max-width: 40px;max-height: 40px;'> </a>";
+                return"<a href='get-img/trading_url/1000/"+record.tradingImg+"' data-lightbox='tradingImg'><img src='get-img/trading_url/300/"+record.tradingImg+"' style='max-width: 40px;max-height: 40px;'> </a>";
             }
         },{
             "header" : "操作",
@@ -60,8 +60,8 @@ $(function() {
                         $(".phone").html(_data.phone);
                         var addresss = _data.provinceName+_data.cityName+_data.districtName+_data.address;
                         $(".address").html(addresss);
-                        $("#tradingImg").attr("src","get-img/reg/300/"+_data.tradingImg);
-                        $("#adtradingImg").attr("href","get-img/reg/1000/"+_data.tradingImg);
+                        $("#tradingImg").attr("src","get-img/trading_url/300/"+_data.tradingImg);
+                        $("#adtradingImg").attr("href","get-img/trading_url/1000/"+_data.tradingImg);
                         $("#id").val(_data.id);
                         $("#addConsumerId").val(_data.addConsumerId);
                         $('#checkModal').modal('show');

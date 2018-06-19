@@ -30,7 +30,13 @@
         y.name as provinceName ,c.name as cityName,d.name as districtName,
         t.address,u.nick_name as userName,
         t.status as status,
-        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,
+        case
+				when t.status =1 then '待审核'
+				when t.status =2 then '审核通过'
+                when t.status =3 then '审核未通过'
+				else '未知'
+				end as statustext,
+        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,t.login_name as loginName,
         t.trading_img from tb_agent t left join tb_city y on t.province = y.id
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
