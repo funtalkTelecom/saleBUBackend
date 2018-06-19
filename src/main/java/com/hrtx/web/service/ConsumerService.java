@@ -102,4 +102,10 @@ public class ConsumerService {
 		}
 		return new Result(Result.OK, "注册成功");
 	}
+
+	public  Consumer  getConsumerById(Consumer consumer)
+	{
+		consumer = consumerMapper.selectOne(consumer);
+		return  consumer;
+	}
 }

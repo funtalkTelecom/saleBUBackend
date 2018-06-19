@@ -57,4 +57,11 @@
 		</foreach>
 	</insert>
 
+	<update id="auctionDepositEdit">
+        update tb_auction_deposit t set
+         t.status=#{status}
+        where
+         t.num_id= #{numId}
+         and t.consumer_id= #{consumerId}
+    </update>
 </mapper>
