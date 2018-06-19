@@ -30,7 +30,8 @@
         ep.ep_rule as erRule,
         ep.start_time as startTime,
         ep.end_time as endTime,
-        concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) as epImg,
+        case when epImg.file_name is null then ''
+		else concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) end as epImg,
         case
         when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[<0]]> then 1
         when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[>=0]]> and
@@ -54,13 +55,13 @@
     ep.ep_rule as erRule,
     ep.start_time as startTime,
     ep.end_time as endTime,
-    concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) as epImg
+    case when epImg.file_name is null then ''
+		  else concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) end as epImg
     from tb_ep_sale ep
     inner join
     tb_file_info epImg
     on epImg.ref_id=ep.id
     where ep.is_del=0
-    and TIMESTAMPDIFF(second, now(),ep.end_time)>0
     and ep.id = #{epSaleId};
     </select>
 
@@ -125,13 +126,14 @@
         tb_goods.g_name as gName,
         tb_goods.g_ad as gAd,
         tb_sku.sku_tob_price as gStartPrice,
-        concat("get-img","/",tb_file_info.file_group,"/",tb_file_info.ref_id,"/",tb_file_info.file_name) as gImg,
+         case when tb_file_info.file_name is null then ''
+        else  concat("get-img","/",tb_file_info.file_group,"/",tb_file_info.ref_id,"/",tb_file_info.file_name) end as gImg,
         tb_sku.sku_id as  skuId,
         tb_num.num_resource as num
         from
         tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
         inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
-        inner join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
+        left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
         and tb_file_info.file_group='goodsPic'
         and tb_file_info.seq=1  and  tb_num.status=2
