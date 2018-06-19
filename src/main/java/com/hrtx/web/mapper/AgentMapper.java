@@ -11,7 +11,7 @@ import java.util.Map;
 public interface AgentMapper extends Mapper<Agent>,BaseMapper<Agent>{
     void updateAgent(Agent agent);
 
-    List<Map> findAgentListByConsumerId(@Param("ConsumerId") Long ConsumerId);
+     List<Map> findAgentListByConsumerId(@Param("ConsumerId") Long ConsumerId);
 
 //    List<Map> findAgentById(@Param("id") Long id);
 

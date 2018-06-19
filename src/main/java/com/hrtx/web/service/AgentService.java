@@ -113,8 +113,8 @@ public class AgentService {
 
 		return new Result(Result.OK, "绑定成功");
 	}
-	public Result findAgentListByaddConsumerId(Long ConsumerId) {
-		return new Result(Result.OK,  agentMapper.findAgentListByConsumerId( ConsumerId));
+	public List<Map> findAgentListByaddConsumerId(Long ConsumerId) {
+		return this.agentMapper.findAgentListByConsumerId( ConsumerId);
 	}
 
     public Result pageAgent(Agent agent) {
@@ -149,7 +149,7 @@ public class AgentService {
 			consparam.setId(aa.getAddConsumerId());
 			consparam.setStatus(1);
 			Consumer  consumer = consumerMapper.selectOne(consparam);
-			if(consumer ==null ) return new Result(Result.ERROR, "审核失败，当前客商不能升级为代理商");
+			if(consumer ==null ) return new Result(Result.ERROR, "审核失败，当前客商已是代理商");
 			consumer.setIsAgent(2);
 			consumer.setCommpayName(aa.getCommpayName());
 			consumer.setName(aa.getPerson());
