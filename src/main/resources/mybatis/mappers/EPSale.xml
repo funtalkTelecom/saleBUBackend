@@ -223,7 +223,9 @@
         tb_num.num_resource as num,
         tb_goods.g_price_up as gPriceUp,
         tb_goods.g_deposit as gDeposit,
-        tb_goods.g_loop_time as gLoopTime
+        tb_goods.g_loop_time as gLoopTime,
+        tb_num.start_time as gStartTime,
+        tb_num.end_time as gEndTime
         from
         tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
         inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
