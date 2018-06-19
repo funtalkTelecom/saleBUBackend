@@ -25,15 +25,27 @@ public class FundOrderService extends BaseService {
 	@Autowired private ApiSessionUtil apiSessionUtil;
 
     /**
-     * 平安微信小程序支付订单下单
+     * 平台订单支付（平安微信小程序支付方式）
      * @param amt 支付金额
      * @param payer 付款方
      * @param order_name 订单描述
-     * @param sourceId  业务来源编码
+     * @param sourceId  订单号
      * @return
      */
     public Result payPinganWxxOrder(int amt, String payer, String order_name, String sourceId) {
         return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, "", payer, order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
+    }
+
+    /**
+     * 保证金支付（平安微信小程序支付方式）
+     * @param amt 支付金额
+     * @param payer 付款方
+     * @param order_name 订单描述
+     * @param sourceId  保证金订单号
+     * @return
+     */
+    public Result payPinganWxxDeposit(int amt, String payer, String order_name, String sourceId) {
+        return payAddOrder(FundOrder.BUSI_TYPE_PAYDEPOSIT, amt, "", payer, order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
     }
 
     /**
@@ -44,7 +56,7 @@ public class FundOrderService extends BaseService {
      * @param payer 付款方
      * @param order_name 支付订单描述
      * @param third 支付方式
-     * @param sourceId 支付订单来源
+     * @param sourceId 业务来源编码
      * @param remark 备注
      * @return
      */
@@ -53,7 +65,7 @@ public class FundOrderService extends BaseService {
         if(!LockUtils.tryLock(orderMark)) return new Result(Result.ERROR, "正在支付，请勿重复请求");
         try {
             Example example = new Example(FundOrder.class);
-            example.createCriteria().andEqualTo("busi", busi_type).andEqualTo("sourceId", sourceId).andIn("status",Arrays.asList(new int[]{}));
+            example.createCriteria().andEqualTo("busi", busi_type).andEqualTo("sourceId", sourceId).andIn("status",Arrays.asList(new int[]{3,5,7}));
             List fundOrders = fundOrderMapper.selectByExample(example);
             if(fundOrders.size()>0) return new Result(Result.ERROR, "订单已支付");
             String contractno = "PAY"+Utils.randomNoByDateTime();
@@ -133,6 +145,7 @@ public class FundOrderService extends BaseService {
         String out_no = params.get("out_no");
         FundDetail fundDetail = new FundDetail();
         fundDetail.setSerial(out_no);
+        fundDetail.setAct_type(FundDetail.ORDER_ACT_TYPE_ADD);
         fundDetail = fundDetailMapper.selectOne(fundDetail);
         if(fundDetail == null) return new Result(Result.ERROR, "未找到订单");
         fundDetail.setStatus(5);//回掉完成
@@ -158,14 +171,42 @@ public class FundOrderService extends BaseService {
         return new Result(Result.OK, "success");
     }
 
-    public Result payRefund(String outNo, String remark){
+    /**
+     * 平台订单退款
+     * @param sourceId 订单号
+     * @param remark 退款备注
+     * @return
+     */
+    public Result payOrderRefund(String sourceId, String remark){
+        return payRefund(FundOrder.BUSI_TYPE_PAYORDER, sourceId, remark);
+    }
+
+    /**
+     * 平台保证金退款
+     * @param sourceId 保证金订单号
+     * @param remark 退款备注
+     * @return
+     */
+    public Result payDepositRefund(String sourceId, String remark){
+        return payRefund(FundOrder.BUSI_TYPE_PAYDEPOSIT, sourceId, remark);
+    }
+
+    /**
+     * 退款
+     * @param busi_type 业务类型
+     * @param sourceId 业务编码
+     * @param remark 退款备注
+     * @return
+     */
+    public Result payRefund(String busi_type, String sourceId, String remark){
+        Example example = new Example(FundOrder.class);
+        example.createCriteria().andEqualTo("busi", busi_type).andEqualTo("sourceId", sourceId).andEqualTo("status", 3);
+        List fundOrders = fundOrderMapper.selectByExample(example);
+        if(fundOrders.size() != 1) return new Result(Result.ERROR, "退款订单不存在");
+        FundOrder fundOrder = (FundOrder) fundOrders.get(0);
+        String outNo = fundOrder.getContractno();
         if(!LockUtils.tryLock(outNo)) return new Result(Result.ERROR, "退款中，请稍后再试");
         try {
-            FundOrder fundOrder = new FundOrder();
-            fundOrder.setContractno(outNo);
-            fundOrder = fundOrderMapper.selectOne(fundOrder);
-            if(fundOrder == null) return new Result(Result.ERROR, "退款订单不存在");
-            if(fundOrder.getStatus() != 3) return new Result(Result.ERROR, "订单此状态不可退款");
             Long req_user = apiSessionUtil.getUser() == null ? 0l:apiSessionUtil.getUser().getId();
             String contractno = "REFUND"+Utils.randomNoByDateTime();
             FundDetail fundDetail = new FundDetail(0l, fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_REFUND, 1);
