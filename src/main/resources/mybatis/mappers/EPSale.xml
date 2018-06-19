@@ -32,11 +32,11 @@
         ep.end_time as endTime,
         concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) as epImg,
         case
-        when TIMESTAMPDIFF(second,tb_ep_sale.start_time, now())<![CDATA[<0]]> then 1
-        when TIMESTAMPDIFF(second,tb_ep_sale.start_time, now())<![CDATA[>=0]]> and
-        TIMESTAMPDIFF(second,tb_ep_sale.end_time, now())<![CDATA[<=0]]>
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,ep.end_time, now())<![CDATA[<=0]]>
         then 2
-        when TIMESTAMPDIFF(second,tb_ep_sale.end_time, now())<![CDATA[>0]]>
+        when TIMESTAMPDIFF(second,ep.end_time, now())<![CDATA[>0]]>
         then 3
         else 0
         end as erSatus
