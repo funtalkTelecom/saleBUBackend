@@ -46,7 +46,7 @@ public class EPSaleService {
 		List<Map> list=epSaleMapper.findEPSaleList();
 		for(Map map:list)
 		{
-			String urlImg=SystemParam.get("domain-full")+"/"+map.get("epImg").toString();
+			String urlImg=SystemParam.get("domain-full")+"/"+map.get("epImg")==null?"":map.get("epImg").toString();
 			map.put("epImg",urlImg);
 		}
 		return new Result(Result.OK, list);
@@ -56,7 +56,7 @@ public class EPSaleService {
 		List<Map> list=epSaleMapper.findEPSaleByEPSaleId(ePSaleId);
 		for(Map map:list)
 		{
-			String urlImg=SystemParam.get("domain-full")+"/"+map.get("epImg").toString();
+			String urlImg=SystemParam.get("domain-full")+"/"+map.get("epImg")==null?"":map.get("epImg").toString();
 			map.put("epImg",urlImg);
 		}
 		return list;
@@ -66,7 +66,7 @@ public class EPSaleService {
 		List<Map> list=epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
 		for(Map map:list)
 		{
-			String urlImg=SystemParam.get("domain-full")+"/"+map.get("gImg").toString();
+			String urlImg=SystemParam.get("domain-full")+"/"+map.get("gImg")==null?"":map.get("gImg").toString();
 			map.put("gImg",urlImg);
 		}
 		return list;
@@ -193,6 +193,7 @@ public class EPSaleService {
 		}
 		return false;
 	}
+
 	public Result goodsAuciton(Auction auciton, HttpServletRequest request) {
 		return new Result(Result.OK, "提交成功");
 	}
