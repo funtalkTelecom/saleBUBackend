@@ -73,6 +73,19 @@
        where t.is_del = 0 and t.id = #{id};
     </select>
 
+    <select id="findNumById" resultType="java.util.HashMap">
+      select t.id,
+       t.*,
+       from  tb_num
+        where tb_num.status=2  and t.id = #{id};
+    </select>
+
+    <update id="numLoopEdit">
+        update tb_num t set
+         t.end_time=#{endTime}
+      where tb_num.status=2  and t.id = #{id};
+    </update>
+
     <select id="findEPSaleGoodsListByEPSaleId" resultType="java.util.HashMap">
         select
         goodsInfo.gId,
@@ -167,6 +180,18 @@
         on     numSaleInfo.numId=goodsInfo.numId
         where  goodsInfo.gId = #{goodsId}
     </select>
+
+    <select id="findEPSaleGoods" resultType="java.util.HashMap">
+    select
+    tb_num.id as numId,
+    tb_num.end_time as endTime,
+    tb_goods.g_start_num as startNum,
+    tb_goods.g_deposit as depositPrice
+    from
+    tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+    inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+    where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1  and  tb_num.status=2
+   </select>
 
     <select id="findEPSaleGoodsByGoodsId2" resultType="java.util.HashMap">
         select

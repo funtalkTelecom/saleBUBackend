@@ -123,6 +123,19 @@ public class Utils {
 		return new SimpleDateFormat(format, Locale.ENGLISH).format(c.getTime());
 	}
 
+	/**
+	 * @param offset 距离date时间的 分偏移量
+	 * @param format 返回字符串格式
+	 * @return
+	 */
+	public static String getDate2(int offset, Date date, String format) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		//c.set(Calendar.DATE, c.get(Calendar.MINUTE) + offset);
+		c.add(Calendar.MINUTE,offset);
+		return new SimpleDateFormat(format, Locale.ENGLISH).format(c.getTime());
+	}
+
 	public static int offsetDay(String date, String format) throws ParseException {
 		Calendar c1 = Calendar.getInstance();//当前
 		c1.set(Calendar.MINUTE, 0);
@@ -150,10 +163,31 @@ public class Utils {
 	 * @throws ParseException
 	 */
 	public final static Date stringToDate(String dateStr, String format) throws ParseException {
+		Date d = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		try {
+			d = sdf.parse(dateStr);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		return sdf.parse(dateStr);
 	}
 
+	/**
+	 * 将日期类型的参数转换为字符串类型，格式是：yyyyMMdd 20100115
+	 *
+	 * @param sdate
+	 * @return
+	 */
+	public static String dateToString(Date date, String format) {
+		String sdate = "";
+		if (date == null) {
+			return "";
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		sdate = sdf.format(date);
+		return sdate;
+	}
 	/**
 	 * yyyyMMddHHmmss 把当前时间格式化为指定的格式
 	 *
@@ -227,6 +261,33 @@ public class Utils {
 		int beg_mount = ((c1.get(Calendar.YEAR) - c0.get(Calendar.YEAR)) * 12) + c1.get(Calendar.MONTH) - c0.get(Calendar.MONTH);
 		//System.out.println(beg_mount);
 		return beg_mount;
+	}
+
+	public static void main(String args[]) {
+		int i= compareDate("1995-11-12 15:21", "1999-12-11 09:59");
+		System.out.println("i=="+i);
+	}
+   /*
+       "1995-11-12 15:21", "1999-12-11 09:59"  DATE1<DATE2 =1
+    */
+	public static int compareDate(String DATE1, String DATE2) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+		try {
+			Date dt1 = df.parse(DATE1);
+			Date dt2 = df.parse(DATE2);
+			if (dt1.getTime() > dt2.getTime()) {
+				//System.out.println("dt1 在dt2前");
+				return 1;
+			} else if (dt1.getTime() < dt2.getTime()) {
+				//System.out.println("dt1在dt2后");
+				return -1;
+			} else {
+				return 0;
+			}
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+		return 0;
 	}
 
 	/**

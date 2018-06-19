@@ -5,11 +5,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.mapper.FileMapper;
-import com.hrtx.web.pojo.Auction;
-import com.hrtx.web.pojo.AuctionDeposit;
-import com.hrtx.web.pojo.EPSale;
-import com.hrtx.web.pojo.File;
-import com.hrtx.web.pojo.Goods;
+import com.hrtx.web.pojo.*;
 import com.hrtx.web.service.*;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -21,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import com.hrtx.global.Messager;
 
 @RestController
 //@RequestMapping("/api")
@@ -39,6 +36,8 @@ public class EPSaleController extends BaseReturn{
 	private AuctionDepositService auctionDepositService;
 	@Autowired
 	private GoodsService goodsService;
+	@Autowired
+	private ConsumerService consumerService;
 
 	@RequestMapping("/epSale/epSale-query")
 	@Powers({PowerConsts.EPSALEMOUDULE})
@@ -95,11 +94,13 @@ public class EPSaleController extends BaseReturn{
 		double beforePrice=0.00;//前一次出价记录
 		double subPrice=0.00;//当前出价与前一次出价相差
 		Long  autionId=0L;//前一次出价记录Id
+		Long consumerId=0L;//前一次出价记录用户Id
 		boolean isDeposit=false;//是否支付保证金
 		if(goodsAuctionList.size()>0)
 		{
 			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
 			 autionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
+			 consumerId=Long.valueOf(goodsAuctionList.get(0).get("consumerId").toString());//前一次出价记录用户Id
 			 subPrice=auction.getPrice()-beforePrice;
 		}else
 		{
@@ -111,7 +112,6 @@ public class EPSaleController extends BaseReturn{
 				returnResult(new Result(602, "当前加价不符规则;加价应按" + priceUp + "的倍数进行加价"));
 			}else
 			{
-
 				List<Map> auctionDepositConsumerList=auctionDepositService.findAuctionDepositListConsumerByNumId(auction.getNumId());//当前用户保证金已支付成功 状态：2成功
 				if(auctionDepositConsumerList.size()>0)
 				{
@@ -122,22 +122,33 @@ public class EPSaleController extends BaseReturn{
 					{
 						isDeposit=false;
 					}
-
 				}else
 				{
 					isDeposit=false;
 				}
 				if(isDeposit)//当前用户保证金已支付成功 状态：2成功
 				{
+					Date addDate=new Date();
 					auction.setStatus(2);
-					auction.setAddDate(new Date());
+					auction.setAddDate(addDate);
 					auctionService.auctionEdit(auction);//出价记录 状态：2成功
+					//**************当前出价记录是处于（结束时间-轮询时间）与结束时间 之间************************************************
+					if(epSaleService.isLoopTime(addDate,loopTime,auction.getNumId())) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
+					{
+						//***************************则延长结束时间= 结束时间+loopTime*********************
+						epSaleService.numLoopEdit(auction.getNumId(),loopTime);
+					}
+					//***************************前一次出价记录******状态4 落败******并通知*****************
 					if(autionId>0)
 					{
 						Auction auctonBef=new Auction();
 						auctonBef.setId(autionId);
 						auctonBef.setStatus(4);//前一次出价记录   状态：4 落败
 						auctionService.auctionEditStatusById(auctonBef);//通知用户
+						Consumer consumer=new Consumer();
+						consumer.setId(consumerId);
+						consumer=consumerService.getConsumerById(consumer);
+						Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
 					}
 				}else //当前用户保证金未支付成功 status:2    出价记录 状态：1初始   保证金记录  状态：1 初始
 				{

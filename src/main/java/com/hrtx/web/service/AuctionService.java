@@ -34,6 +34,10 @@ public class AuctionService {
 		return auctionMapper.findAuctionListByNumId(numId);
 	}
 
+	public List<Map> findAuctionGoodsByNumId(Long numId) {
+		return auctionMapper.findAuctionGoodsByNumId(numId);
+	}
+
 	public void auctionEdit(Auction auction) {
 			List<Auction> list = new ArrayList<Auction>();
 			auction.setConsumerId(apiSessionUtil.getConsumer().getId());
