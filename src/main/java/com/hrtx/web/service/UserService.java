@@ -11,8 +11,10 @@ import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.TokenGenerator;
 import com.hrtx.web.mapper.ConsumerLogMapper;
 import com.hrtx.web.mapper.ConsumerMapper;
+import com.hrtx.web.mapper.CorporationMapper;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.ConsumerLog;
+import com.hrtx.web.pojo.Corporation;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +47,7 @@ public class UserService {
 	@Autowired private ConsumerMapper consumerMapper;
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private UserService userService;
+	@Autowired private CorporationService corporationService;
 
 	public void test() {
 		User u = new User(10l);
@@ -106,6 +109,10 @@ public class UserService {
 			info.put("user", null);
 			return info;
 		}
+		//获取storage_id和company_id
+		Corporation corporation = corporationService.findCorporationById(u.getCorpId());
+//		u.setStorageId();
+//		u.setCompanyId();
 		
 		//加载权限和菜单
 		Map<Long, Object> permissionMap = new HashMap<Long, Object>();
@@ -134,6 +141,7 @@ public class UserService {
 		sessionUtil.getSession().setAttribute("powers", permissionMap);
 		sessionUtil.getSession().setAttribute("mainMenus", mainMenus);
 		sessionUtil.getSession().setAttribute("childMends", childMends);
+		sessionUtil.getSession().setAttribute("corporation", corporation);
 		u.setRoles(StringUtils.join(userMapper.findRoles(u.getId()),","));
 		info.put("user", u);
 		return info;

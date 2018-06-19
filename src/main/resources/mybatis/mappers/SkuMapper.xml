@@ -10,13 +10,20 @@
         a.sku_sale_num as skuSaleNum,
         a.sku_num as skuNum,
         a.sku_goods_type as skuGoodsType,
-        a.sku_repo_goods as skuRepoGoods
+        a.sku_repo_goods as skuRepoGoods,
+        a.sku_repo_goods_name as skuRepoGoodsName
     </sql>
     <select id="findSkuInfo" resultType="Sku">
         select
         <include refid="col_list"/>
         from tb_sku a where a.g_id = #{gId}
         order by a.sku_id asc
+    </select>
+
+    <select id="getSkuBySkuid" resultType="Sku">
+        select
+        <include refid="col_list"/>
+        from tb_sku a where a.sku_id = #{skuid}
     </select>
 
     <select id="queryPageList" resultType="Sku">
@@ -38,6 +45,7 @@
         <result property="skuSaleNum" column="sku_sale_num"></result>
         <result property="skuGoodsType" column="sku_goods_type"></result>
         <result property="skuRepoGoods" column="sku_repo_goods"></result>
+        <result property="skuRepoGoodsName" column="sku_repo_goodsName"></result>
         <result property="skuNum" column="sku_num"></result>
         <result property="gStartTime" column="g_start_time"></result>
         <result property="gEndTime" column="g_end_time"></result>
@@ -65,7 +73,8 @@
             sku_sale_num,
             sku_num,
             sku_goods_type,
-            sku_repo_goods
+            sku_repo_goods,
+            sku_repo_goods_name
         ) values
         <foreach collection="skuList" item="sku" separator=",">
             (
@@ -77,7 +86,8 @@
             #{sku.skuSaleNum},
             #{sku.skuNum},
             #{sku.skuGoodsType},
-            #{sku.skuRepoGoods}
+            #{sku.skuRepoGoods},
+            #{sku.skuRepoGoodsName}
             )
         </foreach>
     </insert>
@@ -88,6 +98,28 @@
 
     <update id="deleteSkuByGid">
         delete from tb_sku where g_id = #{gId}
+    </update>
+
+    <update id="deleteSkuBySkuids">
+        delete from tb_sku where sku_id in (${delSkus})
+    </update>
+
+    <update id="updateSkuNum">
+        update tb_sku set sku_num = #{skuNum} where sku_id = #{skuId}
+    </update>
+
+    <update id="updateSku">
+        update tb_sku a set
+            a.g_id = #{gId},
+            a.sku_tob_price = #{skuTobPrice},
+            a.sku_toc_price = #{skuTocPrice},
+            a.sku_is_num = #{skuIsNum},
+            a.sku_sale_num = #{skuSaleNum},
+            a.sku_num = #{skuNum},
+            a.sku_goods_type = #{skuGoodsType},
+            a.sku_repo_goods = #{skuRepoGoods},
+            a.sku_repo_goods_name = #{skuRepoGoodsName}
+        where a.sku_id = #{skuId}
     </update>
 
 </mapper>

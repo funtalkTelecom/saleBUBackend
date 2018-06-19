@@ -22,10 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service
@@ -56,7 +53,7 @@ public class GoodsService {
 
 	public Result goodsEdit(Goods goods, HttpServletRequest request, MultipartFile[] files) {
         try {
-            String ignoreKey = "skuId,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuNum,skuGoodsType,skuRepoGoods,";
+            String ignoreKey = "skuId,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuNum,skuGoodsType,skuRepoGoods,skuRepoGoodsName";
             //商品主表操作
             if (goods.getgId() != null && goods.getgId() > 0) {
                 goodsMapper.goodsEdit(goods);
@@ -69,6 +66,7 @@ public class GoodsService {
                 list.add(goods);
                 goodsMapper.insertBatch(list);
             }
+            goods = goodsMapper.findGoodsInfo(goods.getgId());
             //商品子表操作
             Sku sku = new Sku();
             Sku dsku = new Sku();
@@ -98,15 +96,57 @@ public class GoodsService {
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
                     String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));
                     sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?"9999": tskuId));
-                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false);
+                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, Long.parseLong(tskuId));
+                    sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
+                    sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
+                    sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
+
                     //有错误号码
                     if(skuSaleNum.split("★").length>1){
                         return new Result(Result.ERROR, "第"+(i+1)+"行,以下号码不符合,请重新确认\n"+skuSaleNum.split("★")[1]);
                     }
+                    //调用仓储接口
+                    Map param = new HashMap();
+                    param.put("supply_id", sku.getSkuId());//供货单编码(sku_id)
+                    param.put("companystock_id", sku.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                    //获取目前sku信息
+                    Sku nowSku = skuMapper.getSkuBySkuid(sku.getSkuId());
+                    //先解冻现有库存
+                    param.put("type", "2");//处理类型1上架；2下架
+                    param.put("quantity", nowSku==null?0:nowSku.getSkuNum());//数量
+                    Result res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
+                            JSONObject.fromObject(new StorageInterfaceRequest(
+                                    "1001",
+                                    "HK0002",
+                                    Utils.randomNoByDateTime(),
+                                    "123456",
+                                    param
+                            )).toString(),
+                            "application/json",
+                            "UTF-8");
+                    if(200!=(res.getCode())){
+                        return new Result(Result.ERROR, "库存验证失败");
+                    }
+                    //再冻结新库存
+                    param.put("type", "1");//处理类型1上架；2下架
+                    param.put("quantity", sku.getSkuNum());//数量
+                    res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
+                            JSONObject.fromObject(new StorageInterfaceRequest(
+                                    "1001",
+                                    "HK0002",
+                                    Utils.randomNoByDateTime(),
+                                    "123456",
+                                    param
+                            )).toString(),
+                            "application/json",
+                            "UTF-8");
+                    if(200!=(res.getCode())){
+                        return new Result(Result.ERROR, "库存验证失败");
+                    }
                 }
             }
             //验证通过之后删除数据,重新写入
-            skuMapper.deleteSkuByGid(dsku);
+//            skuMapper.deleteSkuByGid(dsku);
             skuPropertyMapper.deleteSkuPropertyByGid(dskuProperty);
             if(!skuPropertyJsonArr.isEmpty()){
                 List<SkuProperty> skuPropertyList = new ArrayList<SkuProperty>();
@@ -122,8 +162,8 @@ public class GoodsService {
                     Iterator it = obj.keySet().iterator();
 
                     //,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuGoodsType,skuRepoGoods,
-                    sku.setSkuTobPrice(((JSONObject) obj.get("skuTobPrice")).get("value")==null||((JSONObject) obj.get("skuTobPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value"));
-                    sku.setSkuTocPrice(((JSONObject) obj.get("skuTocPrice")).get("value")==null||((JSONObject) obj.get("skuTocPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTocPrice")).get("value"));
+                    sku.setSkuTobPrice(Double.parseDouble(((JSONObject) obj.get("skuTobPrice")).get("value")==null||((JSONObject) obj.get("skuTobPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value")));
+                    sku.setSkuTocPrice(Double.parseDouble(((JSONObject) obj.get("skuTocPrice")).get("value")==null||((JSONObject) obj.get("skuTocPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTocPrice")).get("value")));
 //                    sku.setSkuIsNum(((JSONObject) obj.get("skuIsNum")).get("value")==null||((JSONObject) obj.get("skuIsNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuIsNum")).get("value"));
                     sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
@@ -131,12 +171,21 @@ public class GoodsService {
                     String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));
                     sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?"9999": tskuId));
 
-                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, true);
+                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, true, Long.parseLong(tskuId));
 
                     sku.setSkuId(sku.getGeneralId());
                     sku.setSkuSaleNum(skuSaleNum.split("★")[0].split("\n")[0]);
                     sku.setSkuGoodsType(((JSONObject) obj.get("skuGoodsType")).get("value")==null||((JSONObject) obj.get("skuGoodsType")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuGoodsType")).get("value"));
                     sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
+                    sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
+
+                    //sku属性表操作end
+                    //判断是否存在,存在就update,否则加到list中insert
+                    if(skuMapper.getSkuBySkuid(Long.parseLong(tskuId))!=null) {
+                        sku.setSkuId(Long.parseLong(tskuId));
+                        skuMapper.updateSku(sku);
+                    }
+                    else skuList.add(sku);
 
                     skuPropertyList.clear();
                     while (it.hasNext()){
@@ -155,11 +204,13 @@ public class GoodsService {
 
                         skuPropertyList.add(skuProperty);
                     }
-                    skuPropertyMapper.insertBatch(skuPropertyList);
-                    //sku属性表操作end
-                    skuList.add(sku);
+                    if(skuPropertyList!=null && skuPropertyList.size()>0) skuPropertyMapper.insertBatch(skuPropertyList);
                 }
-                skuMapper.insertBatch(skuList);
+                if(skuList!=null && skuList.size()>0) skuMapper.insertBatch(skuList);
+                //删除前台传过来的sku
+                String delSkus = request.getParameter("delSkus");
+                delSkus = "".equalsIgnoreCase(delSkus) ? "" : "'"+delSkus.substring(0, delSkus.length() - 1).replaceAll(",", "','")+"'";
+                if(!"".equals(delSkus)) skuMapper.deleteSkuBySkuids(delSkus);
 
                 //富文本信息获取
                 String kindeditorContent = request.getParameter("kindeditorContent");
@@ -207,11 +258,11 @@ public class GoodsService {
         return new Result(Result.OK, "提交成功");
 	}
 
-    private String checkSkuSaleNum(String skuSaleNum, Sku sku, boolean isUpdate) {
+    private String checkSkuSaleNum(String skuSaleNum, Sku sku, boolean isUpdate, Long skuid) {
 	    //把tb_num里面skuid下的所有状态改成1
         String errorNum = "";
         Number number = new Number();
-        number.setSkuId(sku.getSkuId());
+        number.setSkuId(skuid);
         number.setStatus(1);
         numberMapper.updateStatus(number);
 
@@ -222,11 +273,11 @@ public class GoodsService {
                 //验证号码可用性
                 number = new Number();
                 number.setNumResource(skuSaleNumbs[i]);
-                number.setSkuId(sku.getSkuId());
+                number.setSkuId(skuid);
                 if(numberMapper.checkNumberIsOk(number) > 0) {
                     skuSaleNum += skuSaleNumbs[i]+"\n";
                     //更新状态
-                    number.setSkuId(sku.getGeneralId());
+                    number.setSkuId(skuid);
                     number.setStatus(2);
                     if(isUpdate) numberMapper.updateStatus(number);
                 }else{
@@ -240,6 +291,33 @@ public class GoodsService {
     }
 
     public Result goodsDelete(Goods goods) {
+        Result res = new Result(Result.ERROR, "请求异常");
+        List<Sku> skuList = skuMapper.findSkuInfo(goods.getgId());
+        try {
+            for(Sku s : skuList){
+                Map param = new HashMap();
+                param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
+                param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                param.put("type", "2");//处理类型1上架；2下架
+                param.put("quantity", s.getSkuNum());//数量
+                res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
+                        JSONObject.fromObject(new StorageInterfaceRequest(
+                                "1001",
+                                "HK0002",
+                                Utils.randomNoByDateTime(),
+                                "123456",
+                                param
+                        )).toString(),
+                        "application/json",
+                        "UTF-8");
+                if(200!=(res.getCode())){
+                    return new Result(Result.ERROR, "库存验证失败");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(Result.ERROR, "请求异常");
+        }
 		goodsMapper.goodsDelete(goods);
         //商品子表操作
         Sku sku = new Sku();
@@ -254,19 +332,60 @@ public class GoodsService {
 	}
 
     public Result goodsUnsale(Goods goods, HttpServletRequest request) {
+
+        Result res = new Result(Result.ERROR, "请求异常");
+        try {
+            List<Sku> skuList = skuMapper.findSkuInfo(goods.getgId());
+            for(Sku s : skuList){
+                Map param = new HashMap();
+                param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
+                param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                param.put("type", "2");//处理类型1上架；2下架
+                param.put("quantity", s.getSkuNum());//数量
+                res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
+                        JSONObject.fromObject(new StorageInterfaceRequest(
+                                "1001",
+                                "HK0002",
+                                Utils.randomNoByDateTime(),
+                                "123456",
+                                param
+                        )).toString(),
+                        "application/json",
+                        "UTF-8");
+                if(200!=(res.getCode())){
+                    return new Result(Result.ERROR, "库存验证失败");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         goodsMapper.goodsUnsale(goods);
-        return new Result(Result.OK, "下架成功");
+        res = new Result(Result.OK, "下架成功");
+        return res;
     }
 
     public Result repoGoods(HttpServletRequest request) {
+        Result res = new Result(Result.ERROR, "请求异常");
         try {
-            Result res = HttpUtil.doHttpPost("http://192.168.7.1:21401/DS_Storage/dispatchRequests.htm",
-                    JSONArray.fromObject(new StorageInterfaceRequest("1001", "HK0006", Utils.randomNoByDateTime(), "123456", new Object())).toString(),
+
+            Map param = new HashMap();
+            Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");
+            param.put("storage_id", corporation.getStorageId());
+            param.put("company_id", corporation.getCompanyId());
+            res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
+                    JSONObject.fromObject(new StorageInterfaceRequest(
+                            "1001",
+                            "HK0001",
+                            Utils.randomNoByDateTime(),
+                            "123456",
+                            param
+                    )).toString(),
                     "application/json",
                     "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new Result(Result.OK, "");
+        return res;
     }
 }
