@@ -4,6 +4,7 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.HttpUtil;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.global.SystemParam;
 import com.hrtx.web.service.ConsumerService;
 import com.hrtx.web.service.UserService;
 import net.sf.json.JSONObject;
@@ -27,8 +28,8 @@ public class WxinController {
     @Powers({PowerConsts.NOLOGINPOWER})
 	public Result getOpenid(@RequestParam(value="getcode",required=false)String getcode) {
 		String code=getcode;
-		String appid="wxb6164ee4e09e26e1";
-		String appsecret="69e84ba556b7c4cad2926537650c7415";
+		String appid=SystemParam.get("AppID");
+		String appsecret=SystemParam.get("AppSecret");
 		//授权（必填）
 		String grant_type = "authorization_code";
 		//URL
