@@ -28,29 +28,26 @@ import java.util.*;
 public class StorageApiCallUtil {
 	private static Logger log = LoggerFactory.getLogger(StorageApiCallUtil.class);
 
-	public static StorageInterfaceResponse storageApiCall(Map param, String key){
-		StorageInterfaceResponse sir = null;
+	public static Result storageApiCall(Map param, String act_type){
+		Result res = new Result(Result.ERROR, "调用接口异常");
+		String merid = SystemParam.get("merid");
+		String key = SystemParam.get("key");
+		String serial = Utils.randomNoByDateTime();
 		try {
-			Result res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
+			res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
 					JSONObject.fromObject(new StorageInterfaceRequest(
-							SystemParam.get("merid"),
-							"HK0003",
-							Utils.randomNoByDateTime(),
-							SystemParam.get("key"),
+							merid,
+							act_type,
+							serial,
+							key,
 							param
 					)).toString(),
 					"application/json",
 					"UTF-8");
-			if(200!=(res.getCode())){
-				return new StorageInterfaceResponse(res.getData().toString(), key);
-			}else{
-				sir = StorageInterfaceResponse.create(res.getData().toString(), key);
-			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new StorageInterfaceResponse("{\"code\":\"F0001\",\"desc\":\"失败\"}", key);
+			return new Result(Result.ERROR, "调用接口异常");
 		}
 
-		return sir;
+		return res;
 	}
 }

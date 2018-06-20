@@ -5,10 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
-import com.hrtx.global.HttpUtil;
-import com.hrtx.global.SessionUtil;
-import com.hrtx.global.SystemParam;
-import com.hrtx.global.Utils;
+import com.hrtx.global.*;
 import com.hrtx.web.controller.BaseReturn;
 import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.*;
@@ -116,16 +113,7 @@ public class GoodsService {
                     //先解冻现有库存
                     param.put("type", "2");//处理类型1上架；2下架
                     param.put("quantity", nowSku==null?0:nowSku.getSkuNum());//数量
-                    Result res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
-                            JSONObject.fromObject(new StorageInterfaceRequest(
-                                    SystemParam.get("merid"),
-                                    "HK0002",
-                                    Utils.randomNoByDateTime(),
-                                    SystemParam.get("key"),
-                                    param
-                            )).toString(),
-                            "application/json",
-                            "UTF-8");
+                    Result res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                     if(200!=(res.getCode())){
                         return new Result(Result.ERROR, "库存验证失败");
                     }else{
@@ -137,16 +125,7 @@ public class GoodsService {
                     //再冻结新库存
                     param.put("type", "1");//处理类型1上架；2下架
                     param.put("quantity", sku.getSkuNum());//数量
-                    res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
-                            JSONObject.fromObject(new StorageInterfaceRequest(
-                                    SystemParam.get("merid"),
-                                    "HK0002",
-                                    Utils.randomNoByDateTime(),
-                                    SystemParam.get("key"),
-                                    param
-                            )).toString(),
-                            "application/json",
-                            "UTF-8");
+                    res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                     if(200!=(res.getCode())){
                         return new Result(Result.ERROR, "库存验证失败");
                     }else{
@@ -312,16 +291,7 @@ public class GoodsService {
                 param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
                 param.put("type", "2");//处理类型1上架；2下架
                 param.put("quantity", s.getSkuNum());//数量
-                res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
-                        JSONObject.fromObject(new StorageInterfaceRequest(
-                                SystemParam.get("merid"),
-                                "HK0002",
-                                Utils.randomNoByDateTime(),
-                                SystemParam.get("key"),
-                                param
-                        )).toString(),
-                        "application/json",
-                        "UTF-8");
+                res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                 if(200!=(res.getCode())){
                     return new Result(Result.ERROR, "库存验证失败");
                 }else{
@@ -359,16 +329,7 @@ public class GoodsService {
                 param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
                 param.put("type", "2");//处理类型1上架；2下架
                 param.put("quantity", s.getSkuNum());//数量
-                res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
-                        JSONObject.fromObject(new StorageInterfaceRequest(
-                                SystemParam.get("merid"),
-                                "HK0002",
-                                Utils.randomNoByDateTime(),
-                                SystemParam.get("key"),
-                                param
-                        )).toString(),
-                        "application/json",
-                        "UTF-8");
+                res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                 if(200!=(res.getCode())){
                     return new Result(Result.ERROR, "库存验证失败");
                 }else{
@@ -395,16 +356,7 @@ public class GoodsService {
             Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");
             param.put("storage_id", corporation.getStorageId());
             param.put("company_id", corporation.getCompanyId());
-            res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
-                    JSONObject.fromObject(new StorageInterfaceRequest(
-                            SystemParam.get("merid"),
-                            "HK0001",
-                            Utils.randomNoByDateTime(),
-                            SystemParam.get("key"),
-                            param
-                    )).toString(),
-                    "application/json",
-                    "UTF-8");
+            res = StorageApiCallUtil.storageApiCall(param, "HK0001");
         } catch (Exception e) {
             e.printStackTrace();
         }

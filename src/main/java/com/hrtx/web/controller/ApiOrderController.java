@@ -549,16 +549,7 @@ public class ApiOrderController extends BaseReturn{
 
             }
             param.put("commodities", items);
-            Result res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
-                    JSONObject.fromObject(new StorageInterfaceRequest(
-                            SystemParam.get("merid"),
-                            "HK0003",
-                            Utils.randomNoByDateTime(),
-                            SystemParam.get("key"),
-                            param
-                    )).toString(),
-                    "application/json",
-                    "UTF-8");
+            Result res = StorageApiCallUtil.storageApiCall(param, "HK0003");
             if(200!=(res.getCode())){
                 return new Result(Result.ERROR, "库存验证失败");
             }else{

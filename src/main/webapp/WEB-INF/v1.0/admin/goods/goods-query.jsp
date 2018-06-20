@@ -140,7 +140,7 @@
 							</div>
 							<div class="form-group">
 								<label class="col-xs-2 control-label">是否竞拍</label>
-								<div class="col-xs-10">
+								<div class="col-xs-2">
 									<div class="control-group">
 										<div class="radio col-xs-2" style="width: auto;">
 											<label>
@@ -155,6 +155,12 @@
 												<span class="lbl">否</span>
 											</label>
 										</div>
+									</div>
+								</div>
+								<div class="col-xs-4">
+									<div class="control-group">
+										<select class="form-control" id="gActive" name="gActive">
+										</select>
 									</div>
 								</div>
 							</div>

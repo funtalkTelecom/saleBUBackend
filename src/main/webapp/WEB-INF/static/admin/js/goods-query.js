@@ -532,10 +532,13 @@ $(function() {
     $("input[name=gIsAuc]").off("click").on("click", gIsAucOnClick);
     function gIsAucOnClick(){
         var isAucContent = $("#isAucContent");
+        var gActive = $("#gActive");
         if($("input[name=gIsAuc]:checked").val()=="1"){
             isAucContent.show();
+            gActive.show();
         }else{
             isAucContent.hide();
+            gActive.hide();
         }
     }
     function initGoodsPics(picList){
@@ -575,8 +578,29 @@ $(function() {
         $("#picUpload").html(html);
     }
     getRepoGodds();
+    getActive();
 });
-
+var activeSelectOptions;
+function getActive(){
+    $.ajax({
+        type: "GET",
+        async: true,
+        url: "api/epSales",
+        success: function(data){
+            if(data.code=="200"){
+                activeSelectOptions = data.data;
+                var option = '';
+                for(var i=0; i<activeSelectOptions.length; i++){
+                    option += '<option value="'+activeSelectOptions[i]["id"]+'">'+activeSelectOptions[i]["title"]+'</option>';
+                }
+                activeSelectOptions=option;
+                $("#gActive").html(activeSelectOptions);
+            }else{
+                activeSelectOptions = "";
+            }
+        }
+    });
+}
 var titleStrObj = {
     "skuId":{
         "isShow":false,
