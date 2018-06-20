@@ -1,11 +1,13 @@
 package com.hrtx.web.service;
 
 import com.hrtx.global.ApiSessionUtil;
+import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.AuctionDepositMapper;
 import com.hrtx.web.pojo.AuctionDeposit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,21 +45,30 @@ public class AuctionDepositService {
 	  保证金支付
 	  status true 成功 false失败
 	 */
-	public void auctionDepositPay(Long Id,boolean status) {
+	public void auctionDepositPay(Long Id,boolean status,String paySnn,String payDate) {
 		AuctionDeposit AuctionDeposit=new AuctionDeposit();
 		AuctionDeposit.setId(Id);
 		if(status)
 		{
+            Date payDate1=new Date();
+            try {
+             payDate1=Utils.stringToDate(payDate,"yyyy-MM-dd HH:mm:ss");
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 			AuctionDeposit.setStatus(2);
+            AuctionDeposit.setPayDate(payDate1);
+            AuctionDeposit.setPaySnn(paySnn);
 		}else
 		{
 			AuctionDeposit.setStatus(1);
 		}
 		auctionDepositMapper.auctionDepositSatusEdit(AuctionDeposit);
+
 	}
 
 	/*
-	  保证金支付
+	  保证金退款
 	  status true 成功 false失败
 	 */
 	public void auctionDepositRefund(Long Id,boolean status) {
