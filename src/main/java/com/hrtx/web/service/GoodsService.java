@@ -10,6 +10,7 @@ import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
 import com.hrtx.web.controller.BaseReturn;
+import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.System;
 import java.util.*;
 
 
@@ -116,32 +118,42 @@ public class GoodsService {
                     param.put("quantity", nowSku==null?0:nowSku.getSkuNum());//数量
                     Result res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                             JSONObject.fromObject(new StorageInterfaceRequest(
-                                    "1001",
+                                    SystemParam.get("merid"),
                                     "HK0002",
                                     Utils.randomNoByDateTime(),
-                                    "123456",
+                                    SystemParam.get("key"),
                                     param
                             )).toString(),
                             "application/json",
                             "UTF-8");
                     if(200!=(res.getCode())){
                         return new Result(Result.ERROR, "库存验证失败");
+                    }else{
+                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                        if(!"00000".equals(sir.getCode())){
+                            return new Result(Result.ERROR, "库存验证失败");
+                        }
                     }
                     //再冻结新库存
                     param.put("type", "1");//处理类型1上架；2下架
                     param.put("quantity", sku.getSkuNum());//数量
                     res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                             JSONObject.fromObject(new StorageInterfaceRequest(
-                                    "1001",
+                                    SystemParam.get("merid"),
                                     "HK0002",
                                     Utils.randomNoByDateTime(),
-                                    "123456",
+                                    SystemParam.get("key"),
                                     param
                             )).toString(),
                             "application/json",
                             "UTF-8");
                     if(200!=(res.getCode())){
                         return new Result(Result.ERROR, "库存验证失败");
+                    }else{
+                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                        if(!"00000".equals(sir.getCode())){
+                            return new Result(Result.ERROR, "库存验证失败");
+                        }
                     }
                 }
             }
@@ -302,16 +314,21 @@ public class GoodsService {
                 param.put("quantity", s.getSkuNum());//数量
                 res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                         JSONObject.fromObject(new StorageInterfaceRequest(
-                                "1001",
+                                SystemParam.get("merid"),
                                 "HK0002",
                                 Utils.randomNoByDateTime(),
-                                "123456",
+                                SystemParam.get("key"),
                                 param
                         )).toString(),
                         "application/json",
                         "UTF-8");
                 if(200!=(res.getCode())){
                     return new Result(Result.ERROR, "库存验证失败");
+                }else{
+                    StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                    if(!"00000".equals(sir.getCode())){
+                        return new Result(Result.ERROR, "库存验证失败");
+                    }
                 }
             }
         } catch (Exception e) {
@@ -344,16 +361,21 @@ public class GoodsService {
                 param.put("quantity", s.getSkuNum());//数量
                 res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                         JSONObject.fromObject(new StorageInterfaceRequest(
-                                "1001",
+                                SystemParam.get("merid"),
                                 "HK0002",
                                 Utils.randomNoByDateTime(),
-                                "123456",
+                                SystemParam.get("key"),
                                 param
                         )).toString(),
                         "application/json",
                         "UTF-8");
                 if(200!=(res.getCode())){
                     return new Result(Result.ERROR, "库存验证失败");
+                }else{
+                    StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                    if(!"00000".equals(sir.getCode())){
+                        return new Result(Result.ERROR, "库存验证失败");
+                    }
                 }
             }
 
@@ -375,10 +397,10 @@ public class GoodsService {
             param.put("company_id", corporation.getCompanyId());
             res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                     JSONObject.fromObject(new StorageInterfaceRequest(
-                            "1001",
+                            SystemParam.get("merid"),
                             "HK0001",
                             Utils.randomNoByDateTime(),
-                            "123456",
+                            SystemParam.get("key"),
                             param
                     )).toString(),
                     "application/json",
