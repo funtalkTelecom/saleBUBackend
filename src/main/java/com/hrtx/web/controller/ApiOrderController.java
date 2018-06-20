@@ -95,7 +95,7 @@ public class ApiOrderController extends BaseReturn{
 		if(user==null) return new Result(Result.ERROR, "未获取到用户,请重试");
 		try {
 		    log.info("获取订单类型");
-			type = request.getParameter("sessid");
+			type = request.getParameter("type");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new Result(Result.ERROR, "未获取到参数");
