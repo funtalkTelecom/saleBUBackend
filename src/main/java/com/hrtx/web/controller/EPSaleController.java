@@ -80,8 +80,17 @@ public class EPSaleController extends BaseReturn{
 	public Map findEPSaleGoodss(@PathVariable("ePSaleId") String ePSaleId){
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Map> epSaleMap=epSaleService.findEPSaleByEPSaleId(Long.valueOf(ePSaleId));
-		List<Map> goodsList=epSaleService.findEPSaleGoodsListByEPSaleId(Long.valueOf(ePSaleId));
-		epSaleMap.get(0).put("goodsList",goodsList);
+		if(epSaleMap.size()>0)
+        {
+            List<Map> goodsList=epSaleService.findEPSaleGoodsListByEPSaleId(Long.valueOf(ePSaleId));
+            if(goodsList.size()>0)
+            {
+                epSaleMap.get(0).put("goodsList",goodsList);
+            }else
+            {
+                epSaleMap.get(0).put("goodsList","");
+            }
+        }
 		map.put("code", Result.OK);
 		map.put("data", epSaleMap);
 		return map;
@@ -144,9 +153,8 @@ public class EPSaleController extends BaseReturn{
 				}
 				if(isDeposit)//当前用户保证金已支付成功 状态：2成功
 				{
-					//yyyymmddhhiiss
-					auctionDepositService.auctionDepositPay(auctionDepositId,true,"20180620112023");
-
+					//yyyymmddhhiiss 可以用来测试auctionDepositPay接口
+					//auctionDepositService.auctionDepositPay(auctionDepositId,true,"20180620112023");
 					Date addDate=new Date();
 					auction.setStatus(2);
 					auction.setAddDate(addDate);

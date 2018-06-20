@@ -17,7 +17,7 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     List<Map> findNumById(@Param("id") Long id);
 
-    void numLoopEdit(@Param("endTime")String endTime, @Param("id") Long numId);
+    void numLoopEdit(@Param("endTime")String endTime, @Param("id") Long id);
 
     List<Map> findEPSaleListByUserId(@Param("addUserId") Long addUserId);
 

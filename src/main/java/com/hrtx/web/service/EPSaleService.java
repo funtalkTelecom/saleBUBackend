@@ -144,15 +144,24 @@ public class EPSaleService {
 				String consumerPhone="";
 				AuctionDeposit auctionDeposit=new AuctionDeposit();
 				List<Map> auctionList=auctionMapper.findAuctionListDepositByNumId(numId);
-				for(Map map2:auctionList)
+				if(auctionList.size()>0)
 				{
-					consumerId=Long.valueOf(map2.get("consumerId").toString());
-					consumerPhone=map2.get("consumerPhone").toString();
-					auctionDeposit.setConsumerId(consumerId);
-					auctionDeposit.setNumId(consumerId);
-					auctionDepositMapper.auctionDepositEdit(auctionDeposit);
-					fundOrderService.payDepositRefund(auctionDeposit.getId().toString(),"保证金");
-					Messager.send(consumerPhone,"竟拍结束;你的出价落败,保证金已退回,金额："+depositPrice);
+					for(Map map2:auctionList)
+					{
+						consumerId=Long.valueOf(map2.get("consumerId").toString());
+						consumerPhone=map2.get("consumerPhone").toString();
+						auctionDeposit.setConsumerId(consumerId);
+						auctionDeposit.setNumId(consumerId);
+						if(fundOrderService.payDepositRefund(auctionDeposit.getId().toString(),"保证金").getCode()!=200)
+						{
+
+						}else
+						{
+							auctionDeposit.setStatus(3);//status 3 已退款
+							auctionDepositMapper.auctionDepositEdit(auctionDeposit);
+						}
+						Messager.send(consumerPhone,"竟拍结束;你的出价落败,保证金已退回,金额："+depositPrice);
+					}
 				}
 			}
 		}
@@ -186,12 +195,13 @@ public class EPSaleService {
 			String endTimeStr="";
 			Date strtTime=new Date();//开始时间
 			Date currentTime=new Date();//当前时间
-			endTimeStr=numList.get(0).get("start_time").toString();
+			endTimeStr=numList.get(0).get("end_time").toString();
 			try {
 				endTime=Utils.stringToDate(endTimeStr,"yyyy-MM-dd HH:mm:ss");
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
+			endTimeStr=Utils.dateToString(endTime,"yyyy-MM-dd HH:mm:ss");
 			String startTimeStr=Utils.getDate2(-loopTime,endTime,"yyyy-MM-dd HH:mm:ss");
 			String currentTimeStr=Utils.dateToString(addTime,"yyyy-MM-dd HH:mm:ss");
 			/*try {
