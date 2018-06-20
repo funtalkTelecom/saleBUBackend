@@ -65,6 +65,16 @@
     and ep.id = #{epSaleId};
     </select>
 
+    <select id="findEPSalePriceCountByEPSaleId" resultType="java.util.HashMap">
+    select tb_goods.g_active as epSaleId,
+    count(tb_auction.id) as priceCount
+    from tb_auction
+    inner join tb_goods on tb_auction.g_id=tb_goods.g_id
+    where tb_auction.status in(2,4)
+    and tb_goods.g_active= #{epSaleId}
+    group by tb_goods.g_active
+  </select>
+
     <select id="findEPSaleById" resultType="EPSale">
       select t.id,
        t.title,
@@ -143,6 +153,7 @@
         max(tb_auction.price) as  currentPrice,
         tb_auction.num_id as numId
         from tb_auction
+        where tb_auction.status in(2,4)
         group by tb_auction.num_id) numSaleInfo
         on     numSaleInfo.numId=goodsInfo.numId
         where  goodsInfo.gEPSaleId = #{ePSaleId}
@@ -186,6 +197,7 @@
         max(tb_auction.price) as  currentPrice,
         tb_auction.num_id as numId
         from tb_auction
+        where tb_auction.status in(2,4)
         group by tb_auction.num_id) numSaleInfo
         on     numSaleInfo.numId=goodsInfo.numId
         where  goodsInfo.gId = #{goodsId}
