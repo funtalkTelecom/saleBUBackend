@@ -59,8 +59,8 @@ public class ApiOrderController extends BaseReturn{
 	 * @return
 	 */
 	@PostMapping("/order")
-//    @Powers(PowerConsts.NOPOWER)
-    @Powers(PowerConsts.NOLOGINPOWER)
+    @Powers(PowerConsts.NOPOWER)
+//    @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Result createOrder(HttpServletRequest request){
 	    log.info("进入创建订单");
@@ -91,11 +91,11 @@ public class ApiOrderController extends BaseReturn{
 
 //		Consumer user = apiSessionUtil.getConsumer();
         log.info("获取用户信息");
-		Consumer user = (Consumer) redisUtil.get("egt-kh:api:"+request.getParameter(ApiSessionUtil.JESSION_ID_NAME));
+		Consumer user = apiSessionUtil.getConsumer();
 		if(user==null) return new Result(Result.ERROR, "未获取到用户,请重试");
 		try {
 		    log.info("获取订单类型");
-			type = request.getParameter("type");
+			type = request.getParameter("sessid");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new Result(Result.ERROR, "未获取到参数");
