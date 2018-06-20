@@ -81,6 +81,42 @@
         <result property="seq" column="seq"></result>
     </resultMap>
 
+    <resultMap id="ApiGoodsSkuList" type="java.util.HashMap">
+        <result property="gId" column="g_id" javaType="java.lang.String"></result>
+        <result property="gType1" column="g_type1"></result>
+        <result property="gType2" column="g_type2"></result>
+        <result property="gName" column="g_name"></result>
+        <result property="gAd" column="g_ad"></result>
+        <result property="gStartTime" column="g_start_time"></result>
+        <result property="gEndTime" column="g_end_time"></result>
+        <result property="gSaleCity" column="g_sale_city"></result>
+        <result property="gIsAuc" column="g_is_auc"></result>
+        <result property="gActive" column="g_active"></result>
+        <result property="gIsPack" column="g_is_pack"></result>
+        <result property="gLoopTime" column="g_loop_time"></result>
+        <result property="gDeposit" column="g_deposit"></result>
+        <result property="gStartNum" column="g_start_num"></result>
+        <result property="gPriceUp" column="g_price_up"></result>
+        <result property="gSellerId" column="g_seller_id" javaType="java.lang.String"></result>
+        <result property="gSellerName" column="g_seller_name"></result>
+        <result property="gIsSale" column="g_is_sale"></result>
+        <result property="fileId" column="file_id" javaType="java.lang.String"></result>
+        <result property="refId" column="ref_id" javaType="java.lang.String"></result>
+        <result property="fileName" column="file_name"></result>
+        <result property="fileGroup" column="file_group"></result>
+        <result property="seq" column="seq"></result>
+
+        <result property="skuId" column="sku_id" javaType="java.lang.String"></result>
+        <result property="skuTobPrice" column="sku_tob_price"></result>
+        <result property="skuTocPrice" column="sku_toc_price"></result>
+        <result property="skuIsNum" column="sku_is_num"></result>
+        <result property="skuSaleNum" column="sku_sale_num"></result>
+        <result property="skuGoodsType" column="sku_goods_type"></result>
+        <result property="skuRepoGoods" column="sku_repo_goods"></result>
+        <result property="skuRepoGoodsName" column="sku_repo_goodsName"></result>
+        <result property="skuNum" column="sku_num"></result>
+    </resultMap>
+
     <select id="queryPageListApi" resultMap="ApiGoodsList">
         select distinct * from (
         <if test="gSaleCityArr!=null and gSaleCityArr.length>0">
@@ -115,6 +151,51 @@
         where SYSDATE() between t.gStartTime and t.gEndTime and t.gIsSale='1'
         and t.gIsAuc = '0'
         order by t.gStartTime
+    </select>
+
+    <sql id="sku_col_list">
+        b.sku_id,
+        b.sku_tob_price,
+        b.sku_toc_price,
+        b.sku_is_num,
+        b.sku_goods_type,
+        b.sku_repo_goods,
+        b.sku_repo_goods_name,
+        b.sku_num,
+    </sql>
+    <select id="queryPageSkuListApi" resultMap="ApiGoodsSkuList">
+        select
+        c.file_id,
+        c.ref_id,
+        c.file_name,
+        c.file_group,
+        c.seq,
+        <include refid="sku_col_list"/>
+        a.g_id,
+        a.g_type1,
+        a.g_type2,
+        a.g_name,
+        a.g_ad,
+        a.g_start_time,
+        a.g_end_time,
+        a.g_sale_city,
+        a.g_is_auc,
+        a.g_active,
+        a.g_is_pack,
+        a.g_loop_time,
+        a.g_deposit,
+        a.g_start_num,
+        a.g_price_up,
+        a.g_seller_id,
+        a.g_seller_name,
+        a.g_is_sale
+        from tb_sku b left join tb_goods a on b.g_id=a.g_id left join tb_file_info c on c.ref_id = b.g_id
+        where b.sku_goods_type in ('1', '2') and SYSDATE() BETWEEN a.g_start_time and a.g_end_time and c.seq = 1
+        and a.g_is_auc = '0'
+        <if test="gSaleCity!=null and gSaleCity!=''">
+            and a.g_sale_city like "%,"#{gSaleCity}",%"
+        </if>
+        order by a.g_start_time
     </select>
 
     <insert id="insertBatch">

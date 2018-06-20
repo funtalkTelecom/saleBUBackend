@@ -60,6 +60,9 @@ public enum PowerConsts {
 	AGENTMOUDULE_COMMON_QUEYR(70501,"查询",70500,1,"",3,1),//管代理商理查询
 	AGENTMOUDULE_COMMON_CHECK(70502,"审核",70500,1,"",3,2),//管代理商理审核
 
+	ORDERMOUDULE(70600,"订单管理",70000,0,"order/order-query",2,1),
+	ORDERMOUDULE_COMMON_QUEYR(70601,"查询",70600,1,"",3,1),//订单查询
+
 	SYSMOUDULE(90300,"配置管理",90000,0,"system/system-query",2,1),//配置管理
 	SYSMOUDULE_COMMON_QUEYR(90301,"查询",90300,1,"",3,1),//配置查询
 	SYSMOUDULE_COMMON_EDIT(90302,"修改",90300,1,"",3,2),//配置修改

@@ -5,11 +5,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
+import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
+import com.hrtx.global.TokenGenerator;
 import com.hrtx.web.mapper.FileMapper;
 import com.hrtx.web.mapper.GoodsMapper;
 import com.hrtx.web.mapper.SkuMapper;
+import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.File;
 import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.pojo.Sku;
@@ -36,6 +39,8 @@ public class ApiGoodsController extends BaseReturn{
 	private SkuMapper skuMapper;
 	@Autowired
 	private FileMapper fileMapper;
+	@Autowired
+	private ApiSessionUtil apiSessionUtil;
 
 	/**
 	 * 在售商品列表
@@ -54,8 +59,18 @@ public class ApiGoodsController extends BaseReturn{
 			goods.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
 			goods.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
 
+			//模拟登陆
+//			Consumer u = new Consumer();
+//			u.setId(1L);
+//			u.setName("周元强");
+//			u.setCity("396");
+//			u.setIsAgent(2);//设置为一级代理商
+//			u.setAgentCity(396L);
+			//apiSessionUtil.getConsumer()==null?u.getAgentCity():
+
+			goods.setgSaleCity(String.valueOf(apiSessionUtil.getConsumer().getAgentCity()));
 			PageHelper.startPage(goods.getPageNum(),goods.getLimit());
-			Page<Object> ob=this.goodsMapper.queryPageListApi(goods, goods.getgSaleCity().split(","));
+			Page<Object> ob=this.goodsMapper.queryPageSkuListApi(goods, goods.getgSaleCity());
 			if(ob!=null && ob.size()>0){
 				for(int i=0; i<ob.size(); i++){
 					Map g = (Map) ob.get(i);
