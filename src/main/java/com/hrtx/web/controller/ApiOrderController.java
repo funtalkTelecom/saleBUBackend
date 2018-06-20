@@ -81,17 +81,18 @@ public class ApiOrderController extends BaseReturn{
 		String type = null;
 
 		//模拟登陆
-		Consumer u = new Consumer();
-		u.setId(1L);
-		u.setName("周元强");
-		u.setCity("396");
-		u.setIsAgent(2);//设置为一级代理商
-		String token=TokenGenerator.generateValue();
-		apiSessionUtil.saveOrUpdate(token,u);
+//		Consumer u = new Consumer();
+//		u.setId(1L);
+//		u.setName("周元强");
+//		u.setCity("396");
+//		u.setIsAgent(2);//设置为一级代理商
+//		String token=TokenGenerator.generateValue();
+//		apiSessionUtil.saveOrUpdate(token,u);
 
 //		Consumer user = apiSessionUtil.getConsumer();
         log.info("获取用户信息");
-		Consumer user = (Consumer) redisUtil.get("egt-kh:api:"+token);
+		Consumer user = (Consumer) redisUtil.get("egt-kh:api:"+request.getParameter(ApiSessionUtil.JESSION_ID_NAME));
+		if(user==null) return new Result(Result.ERROR, "未获取到用户,请重试");
 		try {
 		    log.info("获取订单类型");
 			type = request.getParameter("type");
