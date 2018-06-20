@@ -19,4 +19,6 @@ public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<
     void insertBatch(@Param("auctionDepositList") List<AuctionDeposit> list);
 
     void auctionDepositEdit(AuctionDeposit auctionDeposit);
+
+    void auctionDepositSatusEdit(AuctionDeposit auctionDeposit);
 }

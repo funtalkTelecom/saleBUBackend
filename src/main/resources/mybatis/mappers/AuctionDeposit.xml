@@ -64,4 +64,11 @@
          t.num_id= #{numId}
          and t.consumer_id= #{consumerId}
     </update>
+
+	<update id="auctionDepositSatusEdit">
+        update tb_auction_deposit t set
+         t.status=#{status}
+        where
+         t.id= #{id}
+    </update>
 </mapper>

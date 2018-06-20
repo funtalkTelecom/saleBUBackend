@@ -38,4 +38,38 @@ public class AuctionDepositService {
 	public List<Map> findAuctionDepositListConsumerByNumId(Long numId) {
 		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerId(numId,apiSessionUtil.getConsumer().getId());
 	}
+
+	/*
+	  保证金支付
+	  status true 成功 false失败
+	 */
+	public void auctionDepositPay(Long Id,boolean status) {
+		AuctionDeposit AuctionDeposit=new AuctionDeposit();
+		AuctionDeposit.setId(Id);
+		if(status)
+		{
+			AuctionDeposit.setStatus(2);
+		}else
+		{
+			AuctionDeposit.setStatus(1);
+		}
+		auctionDepositMapper.auctionDepositSatusEdit(AuctionDeposit);
+	}
+
+	/*
+	  保证金支付
+	  status true 成功 false失败
+	 */
+	public void auctionDepositRefund(Long Id,boolean status) {
+		AuctionDeposit AuctionDeposit=new AuctionDeposit();
+		AuctionDeposit.setId(Id);
+		if(status)
+		{
+			AuctionDeposit.setStatus(3);
+		}else
+		{
+			AuctionDeposit.setStatus(1);
+		}
+		auctionDepositMapper.auctionDepositSatusEdit(AuctionDeposit);
+	}
 }
