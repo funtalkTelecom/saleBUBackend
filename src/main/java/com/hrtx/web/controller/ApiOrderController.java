@@ -261,7 +261,7 @@ public class ApiOrderController extends BaseReturn{
                         skuid = request.getParameter("skuid");
                         numid = request.getParameter("numid");
                         addrid = request.getParameter("addrid");//普通靓号可不填
-                        payType = request.getParameter("pauMethod");
+                        payType = request.getParameter("payMethod");
                         mealid = request.getParameter("mealid") == null ? "" : request.getParameter("mealid");
 
                         if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
@@ -529,21 +529,25 @@ public class ApiOrderController extends BaseReturn{
             //调用仓储接口
             //callback SystemParam.get("Storage_domain")+"/deliver-order-callback"
             Map param = new HashMap();
+            List items = new ArrayList();
             Long preOrderId = 0L;
             for (OrderItem i : orderItems) {
                 if(preOrderId!=i.getOrderId()) {
                     preOrderId = i.getOrderId();
                     param = new HashMap();
+                    items = new ArrayList();
                     param.put("order_id", i.getOrderId());
                 }
 
                 Map item = new HashMap();
+                if(i.getIsShipment()==0) continue;
                 item.put("item_id", i.getItemId());
                 item.put("companystock_id", i.getCompanystockId());
                 item.put("quantity", i.getQuantity());
+                items.add(item);
 
-                param.put("commodities", item);
             }
+            param.put("commodities", items);
             Result res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                     JSONObject.fromObject(new StorageInterfaceRequest(
                             SystemParam.get("merid"),
@@ -565,6 +569,8 @@ public class ApiOrderController extends BaseReturn{
                     }
                     orderMapper.insertBatch(orderList);
                     orderItemMapper.insertBatch(orderItems);
+                }else{
+                    return new Result(Result.ERROR, "创建订单异常");
                 }
             }
 		} catch (Exception e) {

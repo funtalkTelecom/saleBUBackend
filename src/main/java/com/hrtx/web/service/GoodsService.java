@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.System;
 import java.util.*;
 
 
@@ -117,10 +118,10 @@ public class GoodsService {
                     param.put("quantity", nowSku==null?0:nowSku.getSkuNum());//数量
                     Result res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                             JSONObject.fromObject(new StorageInterfaceRequest(
-                                    "1001",
+                                    SystemParam.get("merid"),
                                     "HK0002",
                                     Utils.randomNoByDateTime(),
-                                    "123456",
+                                    SystemParam.get("key"),
                                     param
                             )).toString(),
                             "application/json",
@@ -138,10 +139,10 @@ public class GoodsService {
                     param.put("quantity", sku.getSkuNum());//数量
                     res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                             JSONObject.fromObject(new StorageInterfaceRequest(
-                                    "1001",
+                                    SystemParam.get("merid"),
                                     "HK0002",
                                     Utils.randomNoByDateTime(),
-                                    "123456",
+                                    SystemParam.get("key"),
                                     param
                             )).toString(),
                             "application/json",
@@ -313,10 +314,10 @@ public class GoodsService {
                 param.put("quantity", s.getSkuNum());//数量
                 res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                         JSONObject.fromObject(new StorageInterfaceRequest(
-                                "1001",
+                                SystemParam.get("merid"),
                                 "HK0002",
                                 Utils.randomNoByDateTime(),
-                                "123456",
+                                SystemParam.get("key"),
                                 param
                         )).toString(),
                         "application/json",
@@ -360,10 +361,10 @@ public class GoodsService {
                 param.put("quantity", s.getSkuNum());//数量
                 res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                         JSONObject.fromObject(new StorageInterfaceRequest(
-                                "1001",
+                                SystemParam.get("merid"),
                                 "HK0002",
                                 Utils.randomNoByDateTime(),
-                                "123456",
+                                SystemParam.get("key"),
                                 param
                         )).toString(),
                         "application/json",
@@ -396,10 +397,10 @@ public class GoodsService {
             param.put("company_id", corporation.getCompanyId());
             res = HttpUtil.doHttpPost(SystemParam.get("Storage_domain")+"/dispatchRequests.htm",
                     JSONObject.fromObject(new StorageInterfaceRequest(
-                            "1001",
+                            SystemParam.get("merid"),
                             "HK0001",
                             Utils.randomNoByDateTime(),
-                            "123456",
+                            SystemParam.get("key"),
                             param
                     )).toString(),
                     "application/json",
