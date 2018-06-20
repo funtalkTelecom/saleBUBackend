@@ -152,14 +152,14 @@ public class ApiOrderController extends BaseReturn{
                                 orderItem.setSkuId(Long.parseLong(skuid));
                                 orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
 //                                orderItem.setNumId(Long.parseLong(numid));
-//                                orderItem.setNum((String) number.get("numResource"));
+//                                orderItem.setNum(String.valueOf( number.get("numResource"));
                                 orderItem.setIsShipment(1);//都需要发货
-                                orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
-                                orderItem.setSellerName((String) sku.get("gSellerName"));
+                                orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+                                orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
                                 orderItem.setShipmentApi("egt");
-                                orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                                orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
                                 orderItem.setQuantity(numcount);
-                                double twobPrice = Double.parseDouble((String) sku.get("skuTobPrice"));
+                                double twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
                                 orderItem.setPrice(twobPrice);
                                 orderItem.setTotal(twobPrice * numcount);
 //                                orderItem.setMealId(Long.parseLong(mealid));
@@ -167,7 +167,7 @@ public class ApiOrderController extends BaseReturn{
 
                                 orderItems.add(orderItem);
                                 //修改sku数量
-                                Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong((String) sku.get("skuId")));
+                                Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
                                 nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-numcount);
                                 skuMapper.updateSkuNum(nowSku);
 
@@ -193,12 +193,12 @@ public class ApiOrderController extends BaseReturn{
                                         orderItem.setNumId(n.getId());
                                         orderItem.setNum(n.getNumResource());
                                         orderItem.setIsShipment(0);//号码item无需发货
-                                        orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
-                                        orderItem.setSellerName((String) sku.get("gSellerName"));
+                                        orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+                                        orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
                                         orderItem.setShipmentApi("egt");
-                                        orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                                        orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
                                         orderItem.setQuantity(1);
-                                        twobPrice = Double.parseDouble((String) sku.get("skuTobPrice"));
+                                        twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
                                         orderItem.setPrice(0);
                                         orderItem.setTotal(0);
 //                                orderItem.setMealId(Long.parseLong(mealid));
@@ -313,15 +313,15 @@ public class ApiOrderController extends BaseReturn{
                                 orderItem.setSkuId(Long.parseLong(skuid));
                                 orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
                                 orderItem.setNumId(Long.parseLong(numid));
-                                orderItem.setNum((String) number.get("numResource"));
+                                orderItem.setNum(String.valueOf( number.get("numResource")));
                                 orderItem.setIsShipment("3".equals(sku.get("skuGoodsType")) ? 0 : 1);//普通靓号不发货
-                                orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
-                                orderItem.setSellerName((String) sku.get("gSellerName"));
+                                orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+                                orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
                                 orderItem.setShipmentApi("egt");
-                                orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                                orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
                                 int num = 1;
                                 orderItem.setQuantity(num);
-                                double twobPrice = Double.parseDouble((String) sku.get("skuTobPrice"));
+                                double twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
                                 orderItem.setPrice(twobPrice);
                                 orderItem.setTotal(twobPrice * num);
                                 orderItem.setMealId(Long.parseLong(mealid));
@@ -340,15 +340,15 @@ public class ApiOrderController extends BaseReturn{
                                     orderItem.setSkuId(Long.parseLong(skuid));
                                     orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
                                     orderItem.setNumId(Long.parseLong(numid));
-                                    orderItem.setNum((String) number.get("numResource"));
+                                    orderItem.setNum(String.valueOf( number.get("numResource")));
                                     orderItem.setIsShipment(1);//卡体发货
-                                    orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
-                                    orderItem.setSellerName((String) sku.get("gSellerName"));
+                                    orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+                                    orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
                                     orderItem.setShipmentApi("egt");
-                                    orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                                    orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
                                     num = 1;
                                     orderItem.setQuantity(num);
-                                    twobPrice = 0;//Double.parseDouble((String) sku.get("skuTobPrice"));
+                                    twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
                                     orderItem.setPrice(twobPrice);
                                     orderItem.setTotal(twobPrice * num);
                                     orderItem.setMealId(Long.parseLong(mealid));
@@ -444,12 +444,12 @@ public class ApiOrderController extends BaseReturn{
                             orderItem.setSkuId(Long.parseLong(skuid));
                             orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
                             orderItem.setNumId(Long.parseLong(numid));
-                            orderItem.setNum((String) number.get("numResource"));
+                            orderItem.setNum(String.valueOf( number.get("numResource")));
                             orderItem.setIsShipment(0);
-                            orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
-                            orderItem.setSellerName((String) sku.get("gSellerName"));
+                            orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+                            orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
                             orderItem.setShipmentApi("egt");
-                            orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                            orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
                             int num = 1;
                             orderItem.setQuantity(num);
                             double twobPrice = Double.parseDouble(price);
@@ -469,15 +469,15 @@ public class ApiOrderController extends BaseReturn{
                             orderItem.setSkuId(Long.parseLong(skuid));
                             orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
                             orderItem.setNumId(Long.parseLong(numid));
-                            orderItem.setNum((String) number.get("numResource"));
+                            orderItem.setNum(String.valueOf( number.get("numResource")));
                             orderItem.setIsShipment(1);//卡体发货
-                            orderItem.setSellerId(Long.parseLong((String) sku.get("gSellerId")));
-                            orderItem.setSellerName((String) sku.get("gSellerName"));
+                            orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+                            orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
                             orderItem.setShipmentApi("egt");
-                            orderItem.setCompanystockId(Long.parseLong((String) sku.get("skuRepoGoods")));
+                            orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
                             num = 1;
                             orderItem.setQuantity(num);
-                            twobPrice = 0;//Double.parseDouble((String) sku.get("skuTobPrice"));
+                            twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
                             orderItem.setPrice(twobPrice);
                             orderItem.setTotal(twobPrice * num);
                             sub_total += orderItem.getTotal();
