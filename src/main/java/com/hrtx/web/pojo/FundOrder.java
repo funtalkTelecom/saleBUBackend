@@ -20,19 +20,19 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
     private String busi;
-	@NotNull(message = "付款金额不能为空")
-	@Min(value = 1, message = "付款金额必须大于0")
+	@NotNull(message = "付款金额不能为空", groups = {Groups.FundOrderPayOrder.class})
+	@Min(value = 1, message = "付款金额必须大于0", groups = {Groups.FundOrderPayOrder.class})
     private Integer amt;
     private String payee;
     private String payer;
     private Integer status;
-    @NotBlank(message = "付款描述不能为空")
+    @NotBlank(message = "付款描述不能为空", groups = {Groups.FundOrderPayOrder.class})
     private String order_name;
     private String contractno;
     private String third;
     private Integer actual_amt;
     private String remark;
-    @NotBlank(message = "来源不能为空")
+    @NotBlank(message = "来源不能为空", groups = {Groups.FundOrderPayOrder.class})
     private String sourceId;
 
     public FundOrder() {

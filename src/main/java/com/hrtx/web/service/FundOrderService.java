@@ -6,11 +6,13 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.global.pinganUtils.TLinx2Util;
 import com.hrtx.web.mapper.*;
+import com.hrtx.web.pojo.ConsumerLog;
 import com.hrtx.web.pojo.Dict;
 import com.hrtx.web.pojo.FundDetail;
 import com.hrtx.web.pojo.FundOrder;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,31 +23,34 @@ import java.util.*;
 public class FundOrderService extends BaseService {
 	@Autowired private FundOrderMapper fundOrderMapper;
 	@Autowired private FundDetailMapper fundDetailMapper;
+	@Autowired private ConsumerLogMapper consumerLogMapper;
 	@Autowired private PinganService pinganService;
 	@Autowired private ApiSessionUtil apiSessionUtil;
 
     /**
      * 平台订单支付（平安微信小程序支付方式）
      * @param amt 支付金额
-     * @param payer 付款方
      * @param order_name 订单描述
      * @param sourceId  订单号
      * @return
      */
-    public Result payPinganWxxOrder(int amt, String payer, String order_name, String sourceId) {
-        return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, "", payer, order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
+    public Result payPinganWxxOrder(int amt, String order_name, String sourceId) {
+        Result result = this.getPayer(2);
+        if(result.getCode() == Result.ERROR) return result;
+        return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, "", String.valueOf(result.getData()), order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
     }
 
     /**
      * 保证金支付（平安微信小程序支付方式）
      * @param amt 支付金额
-     * @param payer 付款方
      * @param order_name 订单描述
      * @param sourceId  保证金订单号
      * @return
      */
-    public Result payPinganWxxDeposit(int amt, String payer, String order_name, String sourceId) {
-        return payAddOrder(FundOrder.BUSI_TYPE_PAYDEPOSIT, amt, "", payer, order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
+    public Result payPinganWxxDeposit(int amt, String order_name, String sourceId) {
+        Result result = this.getPayer(2);
+        if(result.getCode() == Result.ERROR) return result;
+        return payAddOrder(FundOrder.BUSI_TYPE_PAYDEPOSIT, amt, "", String.valueOf(result.getData()), order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
     }
 
     /**
@@ -60,7 +65,7 @@ public class FundOrderService extends BaseService {
      * @param remark 备注
      * @return
      */
-	public Result payAddOrder(String busi_type, int amt, String payee, String payer, String order_name, String third, String sourceId, String remark){
+	private Result payAddOrder(String busi_type, int amt, String payee, String payer, String order_name, String third, String sourceId, String remark){
 	    String orderMark = busi_type+"-"+sourceId;
         if(!LockUtils.tryLock(orderMark)) return new Result(Result.ERROR, "正在支付，请勿重复请求");
         try {
@@ -198,7 +203,7 @@ public class FundOrderService extends BaseService {
      * @param remark 退款备注
      * @return
      */
-    public Result payRefund(String busi_type, String sourceId, String remark){
+    private Result payRefund(String busi_type, String sourceId, String remark){
         Example example = new Example(FundOrder.class);
         example.createCriteria().andEqualTo("busi", busi_type).andEqualTo("sourceId", sourceId).andEqualTo("status", 3);
         List fundOrders = fundOrderMapper.selectByExample(example);
@@ -251,5 +256,20 @@ public class FundOrderService extends BaseService {
         }finally {
             LockUtils.unLock(outNo);
         }
+    }
+
+    /**
+     * 获取付款方
+     * @param loginType 登录方式
+     * @return
+     */
+    private Result getPayer(int loginType){
+        ConsumerLog consumerLog = new ConsumerLog();
+        consumerLog.setUserId(apiSessionUtil.getConsumer().getId());
+        consumerLog.setStatus(1);
+        consumerLog.setLoginType(loginType);
+        consumerLog = consumerLogMapper.selectOne(consumerLog);
+        if(consumerLog == null || StringUtils.isBlank(consumerLog.getOpenid())) return new Result(Result.ERROR, "未找到付款账户");
+        return new Result(Result.OK, consumerLog.getOpenid());
     }
 }
