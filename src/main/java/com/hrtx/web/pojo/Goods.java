@@ -27,12 +27,14 @@ public class Goods extends BasePojo implements java.io.Serializable {
     private Date gEndTime;
     private String gSaleCity;
     private String gIsAuc;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long gActive;
     private String gIsPack;
     private String gLoopTime;
     private String gDeposit;
     private String gStartNum;
     private String gPriceUp;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long gSellerId;
     private String gSellerName;
     private String gIsSale;
