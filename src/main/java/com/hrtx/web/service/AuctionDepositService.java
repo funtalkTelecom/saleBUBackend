@@ -45,20 +45,20 @@ public class AuctionDepositService {
 	  保证金支付
 	  status true 成功 false失败
 	 */
-	public void auctionDepositPay(Long Id,boolean status,String paySnn,String payDate) {
+	public void auctionDepositPay(Long Id,boolean status,String payDate) {
 		AuctionDeposit AuctionDeposit=new AuctionDeposit();
 		AuctionDeposit.setId(Id);
 		if(status)
 		{
             Date payDate1=new Date();
             try {
-             payDate1=Utils.stringToDate(payDate,"yyyy-MM-dd HH:mm:ss");
+             payDate1=Utils.stringToDate(payDate,"yyyymmddhhiiss");
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 			AuctionDeposit.setStatus(2);
             AuctionDeposit.setPayDate(payDate1);
-            AuctionDeposit.setPaySnn(paySnn);
+            //AuctionDeposit.setPaySnn(paySnn);
 		}else
 		{
 			AuctionDeposit.setStatus(1);
