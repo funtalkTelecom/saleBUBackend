@@ -581,7 +581,7 @@ public class ApiOrderController extends BaseReturn{
 			return new Result(Result.ERROR, "创建订单异常");
 		}
 
-		return new Result(Result.OK, order.getOrderId());
+		return new Result(Result.OK, order.getOrderId().toString());
 	}
 
     /**
