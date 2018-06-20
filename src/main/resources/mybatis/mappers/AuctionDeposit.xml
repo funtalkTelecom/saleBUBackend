@@ -9,6 +9,13 @@
 	  where  tb_auction.status=2 and tb_auction.num_id = #{numId}
 	  group by tb_auction.num_id
     </select>
+
+
+	<select id="findAuctionDepositById" resultType="java.util.HashMap">
+	  select * from 	tb_auction_deposit
+	  where  tb_auction_deposit.id = #{Id}
+    </select>
+
 	<select id="findAuctionDepositListByNumId" resultType="java.util.HashMap">
 	  select * from 	tb_auction_deposit
 	  where  tb_auction_deposit.num_id = #{numId}

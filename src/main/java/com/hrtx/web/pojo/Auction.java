@@ -25,6 +25,9 @@ public class Auction extends BasePojo implements java.io.Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date addDate;//	创建时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date confirmDate;//确认时间  status:2
     private Long  consumerId;//	用户id  来自tb_consumer.id
     private String addIp;//	用户ip
     private Long orderId;//订单id
@@ -35,7 +38,7 @@ public class Auction extends BasePojo implements java.io.Serializable {
     public Auction() {
     }
 
-    public Auction(Long id, Long skuId, Long numId, String num, String gName,Long gId, double price, int status, Date addDate, Long consumerId,
+    public Auction(Long id, Long skuId, Long numId, String num, String gName,Long gId, double price, int status, Date addDate,Date confirmDate, Long consumerId,
                    String addIp, Long orderId,String remark) {
         this.id = id;
         this.skuId = skuId;
@@ -44,6 +47,7 @@ public class Auction extends BasePojo implements java.io.Serializable {
         this.price = price;
         this.status = status;
         this.addDate = addDate;
+        this.confirmDate=confirmDate;
         this.consumerId = consumerId;
         this.addIp = addIp;
         this.consumerId = consumerId;
@@ -135,6 +139,10 @@ public class Auction extends BasePojo implements java.io.Serializable {
     public void setAddDate(Date addDate) {
         this.addDate = addDate;
     }
+
+    public Date getConfirmDate() { return confirmDate; }
+
+    public void setConfirmDate(Date confirmDate) { this.confirmDate = confirmDate; }
 
     public Long getConsumerId() {
         return consumerId;
