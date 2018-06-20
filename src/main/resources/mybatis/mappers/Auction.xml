@@ -24,13 +24,54 @@
 	  select
 	  concat(tb_auction.id,'')as id,
 	  tb_auction.price,
-	  tb_auction.add_date as addDate,
+	  tb_auction.confirm_date as addDate,
 	  tb_consumer.name as consumerName,
 	   concat(tb_auction.consumer_id,'')as consumerId
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	   where tb_auction.status in(2,4) and  tb_auction.num_id = #{numId}
-	  order by tb_auction.add_date desc limit 10
+	  order by tb_auction.confirm_date desc limit 10
+    </select>
+
+	<select id="findAuctionListByNumIdAndConsumerId" resultType="java.util.HashMap">
+	  select
+	  concat(tb_auction.id,'')as id,
+	  tb_auction.price,
+	  tb_auction.confirm_date as addDate,
+	  concat(tb_auction.consumer_id,'')as consumerId
+	  from tb_auction
+	  where tb_auction.status in(1) and  tb_auction.num_id = #{numId}
+      and  tb_auction.consumer_id = #{consumerId}
+    </select>
+
+	<select id="findAuctionListByNumIdAndPrice" resultType="java.util.HashMap">
+	  select
+	  concat(tb_auction.id,'')as id,
+	  tb_auction.price,
+	  tb_auction.confirm_date as addDate,
+	  tb_consumer.name as consumerName,
+	   concat(tb_auction.consumer_id,'')as consumerId
+	  from tb_auction
+	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
+	  where tb_auction.status in(2,4)
+	  and  tb_auction.num_id = #{numId}
+	  and tb_auction.price = #{price}
+	  order by tb_auction.confirm_date
+    </select>
+
+	<select id="findAuctionListByNumIdAndPrice2" resultType="java.util.HashMap">
+	  select
+	  concat(tb_auction.id,'')as id,
+	  tb_auction.price,
+	  tb_auction.confirm_date as addDate,
+	  tb_consumer.name as consumerName,
+	   concat(tb_auction.consumer_id,'')as consumerId
+	  from tb_auction
+	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
+	  where tb_auction.status in(2,4)
+	  and  tb_auction.num_id = #{numId}
+	  and tb_auction.price > #{price}
+	  order by tb_auction.confirm_date
     </select>
 
 	<select id="findAuctionListDepositByNumId" resultType="java.util.HashMap">
@@ -63,6 +104,7 @@
 		g_name,
 		price,
 		add_date,
+		confirm_date,
 		status,
 		consumer_id,
 		add_ip,
@@ -79,6 +121,7 @@
 			#{Auction.gName},
 			#{Auction.price},
 			#{Auction.addDate},
+			#{Auction.confirmDate},
 			#{Auction.status},
 			#{Auction.consumerId},
 			#{Auction.addIp},
@@ -89,9 +132,9 @@
 	</insert>
 
 	<update id="auctionEditStatusById">
-        update tb_auction t set
-         t.status=#{status}
-        where
-            t.id = #{id}
+          update tb_auction t
+          set t.status=#{status},
+         t.confirm_date=#{confirmDate}
+         where t.id =#{id}
     </update>
 </mapper>

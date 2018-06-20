@@ -144,9 +144,13 @@ public class EPSaleController extends BaseReturn{
 				}
 				if(isDeposit)//当前用户保证金已支付成功 状态：2成功
 				{
+					//yyyymmddhhiiss
+					auctionDepositService.auctionDepositPay(auctionDepositId,true,"20180620112023");
+
 					Date addDate=new Date();
 					auction.setStatus(2);
 					auction.setAddDate(addDate);
+					auction.setConfirmDate(addDate);//status 2 确认时间
 					auctionService.auctionEdit(auction);//出价记录 状态：2成功
 					//**************当前出价记录是处于（结束时间-轮询时间）与结束时间 之间************************************************
 					if(epSaleService.isLoopTime(addDate,loopTime,auction.getNumId())) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;

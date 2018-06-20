@@ -48,6 +48,6 @@ public class AuctionService {
 	}
 
 	public void auctionEditStatusById(Auction auction) {
-		auctionMapper.auctionEditStatusById(auction.getStatus(),auction.getId());
+		auctionMapper.auctionEditStatusById(auction);
 	}
 }

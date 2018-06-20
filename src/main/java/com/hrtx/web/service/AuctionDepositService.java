@@ -3,7 +3,9 @@ package com.hrtx.web.service;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.AuctionDepositMapper;
+import com.hrtx.web.mapper.AuctionMapper;
 import com.hrtx.web.pojo.AuctionDeposit;
+import com.hrtx.web.pojo.Auction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.Map;
 public class AuctionDepositService {
 
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
+	@Autowired private AuctionMapper auctionMapper;
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 	public List<Map> findAuctionDepositSumEPSaleGoodsByNumId(Long numId) {
@@ -44,27 +47,78 @@ public class AuctionDepositService {
 	/*
 	  保证金支付
 	  status true 成功 false失败
+	  若true成功，对应出价记录status:1 状态调整
 	 */
 	public void auctionDepositPay(Long Id,boolean status,String payDate) {
-		AuctionDeposit AuctionDeposit=new AuctionDeposit();
-		AuctionDeposit.setId(Id);
+		AuctionDeposit auctionDeposit=new AuctionDeposit();
+		List<Map> auctionDepositList=auctionDepositMapper.findAuctionDepositById(Id);
+				//auctionDepositMapper.findAuctionDepositListById(Id);
+		Long consumerId=0L;
+		Long numId=0L;
+		if(auctionDepositList.size()>0)
+		{
+			consumerId=Long.valueOf(auctionDepositList.get(0).get("consumer_id").toString());
+			numId=Long.valueOf(auctionDepositList.get(0).get("num_id").toString());
+		}
+		auctionDeposit.setConsumerId(consumerId);
+		auctionDeposit.setNumId(numId);
+		auctionDeposit.setId(Id);
 		if(status)
 		{
             Date payDate1=new Date();
             try {
-             payDate1=Utils.stringToDate(payDate,"yyyymmddhhiiss");
+             payDate1=Utils.stringToDate(payDate,"yyyyMMddHHmmss");
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-			AuctionDeposit.setStatus(2);
-            AuctionDeposit.setPayDate(payDate1);
+			auctionDeposit.setStatus(2);
+			auctionDeposit.setPayDate(payDate1);
+            //**********************************同步
             //AuctionDeposit.setPaySnn(paySnn);
 		}else
 		{
-			AuctionDeposit.setStatus(1);
+			auctionDeposit.setStatus(1);
 		}
-		auctionDepositMapper.auctionDepositSatusEdit(AuctionDeposit);
-
+		auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
+		if(status)
+		{
+			//****************保证金支付成功************************
+			Boolean isUpdateStatus=false;
+			Long autionId=0L;
+			double price=0.00;//出价价格
+			//auction.status=1记录状态调整
+			List<Map> auctionList =auctionMapper.findAuctionListByNumIdAndConsumerId(auctionDeposit.getNumId(),auctionDeposit.getConsumerId());
+			if(auctionList.size()>0)
+			{
+				Auction auction=new Auction();
+				autionId=Long.valueOf(auctionList.get(0).get("id").toString());
+				price=Double.valueOf(auctionList.get(0).get("price").toString());
+				auction.setConfirmDate(auctionDeposit.getPayDate());
+				auction.setId(autionId);
+				//1、若有新的相同的出价记录 status=2,4，该出价记录autionId状态为status3失败
+				List<Map> auctionListPrice=auctionMapper.findAuctionListByNumIdAndPrice(auctionDeposit.getNumId(),price);
+                if(auctionListPrice.size()>0)
+				{
+					auction.setStatus(3);
+					auctionMapper.auctionEditStatusById(auction);
+					isUpdateStatus=true;
+				}
+				//2、若有新的更高的出价记录 status=2,4，该出价记录autionId状态为status 4 落败
+				List<Map> auctionListPrice2=auctionMapper.findAuctionListByNumIdAndPrice2(auctionDeposit.getNumId(),price);
+                if(auctionListPrice2.size()>0)
+				{
+					auction.setStatus(4);
+					auctionMapper.auctionEditStatusById(auction);
+					isUpdateStatus=true;
+				}
+				//该出价记录autionId状态为status 2 成功
+				if(!isUpdateStatus)
+				{
+					auction.setStatus(2);
+					auctionMapper.auctionEditStatusById(auction);
+				}
+			}
+		}
 	}
 
 	/*
