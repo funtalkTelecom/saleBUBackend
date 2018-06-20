@@ -96,11 +96,13 @@ public class EPSaleController extends BaseReturn{
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumId(Long.valueOf(auction.getNumId()));
 		double priceUp=Double.valueOf(goods.getgPriceUp());//每次加价
 		int loopTime=Integer.valueOf(goods.getgLoopTime());//轮咨时间分钟
+		double deposit=Double.valueOf(goods.getgDeposit());//保证金
 		double beforePrice=0.00;//前一次出价记录
 		double subPrice=0.00;//当前出价与前一次出价相差
 		Long  autionId=0L;//前一次出价记录Id
 		Long consumerId=0L;//前一次出价记录用户Id
 		boolean isDeposit=false;//是否支付保证金
+		Long auctionDepositId=0L;//保证金Id
 		if(goodsAuctionList.size()>0)
 		{
 			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
@@ -120,6 +122,7 @@ public class EPSaleController extends BaseReturn{
 				List<Map> auctionDepositConsumerList=auctionDepositService.findAuctionDepositListConsumerByNumId(auction.getNumId());//当前用户保证金已支付成功 状态：2成功
 				if(auctionDepositConsumerList.size()>0)
 				{
+					auctionDepositId=Long.valueOf(auctionDepositConsumerList.get(0).get("id").toString());
 					if(auctionDepositConsumerList.get(0).get("status").toString().equals("2"))
 					{
 						isDeposit=true;
@@ -129,6 +132,14 @@ public class EPSaleController extends BaseReturn{
 					}
 				}else
 				{
+					AuctionDeposit auctionDeposit=new AuctionDeposit();
+					auctionDeposit.setStatus(1);
+					auctionDeposit.setNum(auction.getNum());
+					auctionDeposit.setNumId(auction.getNumId());
+					auctionDeposit.setSkuId(auction.getSkuId());
+					auctionDeposit.setAmt(Double.valueOf(goods.getgDeposit()));//保证金记录  状态：1初始
+					auctionDepositService.auctionDepositEdit(auctionDeposit);
+					auctionDepositId=auctionDeposit.getId();
 					isDeposit=false;
 				}
 				if(isDeposit)//当前用户保证金已支付成功 状态：2成功
@@ -159,16 +170,10 @@ public class EPSaleController extends BaseReturn{
 				{
 					auction.setStatus(1);
 					auctionService.auctionEdit(auction);//出价记录 状态：1初始
-					AuctionDeposit auctionDeposit=new AuctionDeposit();
-					auctionDeposit.setStatus(1);
-					auctionDeposit.setNum(auction.getNum());
-					auctionDeposit.setNumId(auction.getNumId());
-					auctionDeposit.setSkuId(auction.getSkuId());
-					auctionDeposit.setAmt(Double.valueOf(goods.getgDeposit()));//保证金记录  状态：1初始
-					auctionDepositService.auctionDepositEdit(auctionDeposit);
-					String orderNameStr="商品"+auction.getgName()+"保证金支付,额度:"+auctionDeposit.getAmt();
-					fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(auctionDeposit.getAmt()),"",orderNameStr,auctionDeposit.getId().toString());
-					returnResult(new Result(600, "保证金未支付"));
+					String orderNameStr="商品"+auction.getgName()+",保证金支付,额度:"+deposit;
+					Result res=fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(deposit),"",orderNameStr,auctionDepositId.toString());
+					returnResult(new Result(600, "保证金未支付"+res.getData().toString()));
+					//returnResult(res);
 				}
 			}
 		}else

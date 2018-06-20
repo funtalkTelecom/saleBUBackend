@@ -93,10 +93,10 @@
     </select>
 
     <select id="findNumById" resultType="java.util.HashMap">
-      select t.id,
-       t.*,
-       from  tb_num
-        where tb_num.status=2  and t.id = #{id};
+      select *
+      from tb_num
+      where status=2
+             and id = #{id};
     </select>
 
     <update id="numLoopEdit">
