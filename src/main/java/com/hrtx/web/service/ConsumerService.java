@@ -1,28 +1,18 @@
 package com.hrtx.web.service;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.hrtx.dto.Menu;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.global.TokenGenerator;
-import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.ConsumerLogMapper;
 import com.hrtx.web.mapper.ConsumerMapper;
 import com.hrtx.web.mapper.UserMapper;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.ConsumerLog;
 import com.hrtx.web.pojo.User;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -45,6 +35,7 @@ public class ConsumerService {
 	public Result isOpenid(String openid) {
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		if(openid==null) return new Result(Result.ERROR, "获取openid 失败");
 		String token=TokenGenerator.generateValue();
 		ConsumerLog consumerLog =null;
 		ConsumerLog param = new ConsumerLog();
