@@ -33,6 +33,8 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     List<Map>  findEPSaleByEPSaleId(Long epSaleId);
 
+    List<Map>  findEPSalePriceCountByEPSaleId(Long epSaleId);
+
     int checkEPSaleKeyIdIsExist(EPSale epSale);
 
     void epSaleEdit(EPSale epSale);
