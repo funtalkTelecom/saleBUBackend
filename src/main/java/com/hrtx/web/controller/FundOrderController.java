@@ -2,9 +2,11 @@ package com.hrtx.web.controller;
 
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
+import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.Dict;
 import com.hrtx.web.pojo.FundOrder;
+import com.hrtx.web.pojo.Groups;
 import com.hrtx.web.service.DictService;
 import com.hrtx.web.service.FundOrderService;
 import org.hibernate.validator.constraints.NotBlank;
@@ -31,14 +33,15 @@ public class FundOrderController extends BaseReturn{
 
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired private FundOrderService fundOrderService;
+	@Autowired ApiSessionUtil apiSessionUtil;
 
 	@PostMapping("/pay-order")
 	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result payOrder(@Validated FundOrder fundOrder, BindingResult result){
+	public Result payOrder(@Validated({Groups.FundOrderPayOrder.class}) FundOrder fundOrder, BindingResult result){
+//        result.rejectValue("amt","", "参数错误");
         if(result.hasErrors()) return new Result(Result.ERROR, this.getErrors(result.getFieldErrors()));
-//		Result result = fundOrderService.payAddOrder(busi_type, amt, payer, order_name, sourceId);
         fundOrder.setPayer("oKvRM5YKZpcp1nIFcyBgApnC-bLk");
-		return fundOrderService.payPinganWxxOrder(fundOrder.getAmt(), fundOrder.getPayer(), fundOrder.getOrder_name(), fundOrder.getSourceId());
+		return fundOrderService.payPinganWxxOrder(fundOrder.getAmt(), fundOrder.getOrder_name(), fundOrder.getSourceId());
 	}
 
 	@RequestMapping("/pingan-pay-result")

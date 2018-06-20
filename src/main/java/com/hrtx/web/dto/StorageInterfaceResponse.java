@@ -1,7 +1,7 @@
 package com.hrtx.web.dto;
+
 import com.hrtx.global.StorageInterfaceUtils;
 import com.hrtx.global.Utils;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
@@ -45,10 +45,12 @@ public class StorageInterfaceResponse {
         this.timestamp = jsonObject.getString("timestamp");
         this.sign = jsonObject.getString("sign");
         this.platresponse = jsonObject.get("platresponse");
-        String localSign = StorageInterfaceUtils.getSign(this, key);
-        if(!localSign.equals(this.sign)) {
-            this.code = "C0005";
-            this.desc = "签名出错";
+        if("00000".equals(this.code) || "10000".equals(this.code)) {
+            String localSign = StorageInterfaceUtils.getSign(this, key);
+            if(!localSign.equals(this.sign)) {
+                this.code = "C0005";
+                this.desc = "签名出错";
+            }
         }
     }
 
