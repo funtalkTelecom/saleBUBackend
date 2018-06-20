@@ -103,7 +103,7 @@ public class EPSaleController extends BaseReturn{
 		Long consumerId=0L;//前一次出价记录用户Id
 		boolean isDeposit=false;//是否支付保证金
 		Long auctionDepositId=0L;//保证金Id
-		if(goodsAuctionList.size()>0)
+		if(goodsAuctionList.size()>0)//最近10次数出价记录
 		{
 			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
 			 autionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
@@ -171,9 +171,9 @@ public class EPSaleController extends BaseReturn{
 					auction.setStatus(1);
 					auctionService.auctionEdit(auction);//出价记录 状态：1初始
 					String orderNameStr="商品"+auction.getgName()+",保证金支付,额度:"+deposit;
-					Result res=fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(deposit),"",orderNameStr,auctionDepositId.toString());
-					returnResult(new Result(600, "保证金未支付"+res.getData().toString()));
-					//returnResult(res);
+					Result res=fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(deposit),orderNameStr,auctionDepositId.toString());
+					//returnResult(new Result(600, "保证金未支付"+res.getData().toString()));
+					 returnResult(res);
 				}
 			}
 		}else
