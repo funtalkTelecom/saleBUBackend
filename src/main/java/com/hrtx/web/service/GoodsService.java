@@ -54,18 +54,18 @@ public class GoodsService {
         try {
             String ignoreKey = "skuId,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuNum,skuGoodsType,skuRepoGoods,skuRepoGoodsName";
             //商品主表操作
+            List<Goods> list = new ArrayList<Goods>();
             if (goods.getgId() != null && goods.getgId() > 0) {
                 goodsMapper.goodsEdit(goods);
+                goods = goodsMapper.findGoodsInfo(goods.getgId());
             } else {
-                List<Goods> list = new ArrayList<Goods>();
-                User user = SessionUtil.getUser();
+//                User user = SessionUtil.getUser();
+                Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");
                 goods.setgId(goods.getGeneralId());
-                goods.setgSellerId(user.getId());
-                goods.setgSellerName(user.getName());
+                goods.setgSellerId(corporation.getId());
+                goods.setgSellerName(corporation.getName());
                 list.add(goods);
-                goodsMapper.insertBatch(list);
             }
-            goods = goodsMapper.findGoodsInfo(goods.getgId());
             //商品子表操作
             Sku sku = new Sku();
             Sku dsku = new Sku();
@@ -94,8 +94,8 @@ public class GoodsService {
 
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
                     String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));
-                    sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?"9999": tskuId));
-                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, Long.parseLong(tskuId));
+                    sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?String.valueOf(sku.getGeneralId()): tskuId));
+                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
                     sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
                     sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
                     sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
@@ -110,16 +110,19 @@ public class GoodsService {
                     param.put("companystock_id", sku.getSkuRepoGoods());//库存编码(skuRepoGoods)
                     //获取目前sku信息
                     Sku nowSku = skuMapper.getSkuBySkuid(sku.getSkuId());
-                    //先解冻现有库存
-                    param.put("type", "2");//处理类型1上架；2下架
-                    param.put("quantity", nowSku==null?0:nowSku.getSkuNum());//数量
-                    Result res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                    if(200!=(res.getCode())){
-                        return new Result(Result.ERROR, "库存验证失败");
-                    }else{
-                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                        if(!"00000".equals(sir.getCode())){
+                    Result res;
+                    if(goods.getGeneralId()!=goods.getgId()) {
+                        //先解冻现有库存
+                        param.put("type", "2");//处理类型1上架；2下架
+                        param.put("quantity", nowSku == null ? 0 : nowSku.getSkuNum());//数量
+                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                        if (200 != (res.getCode())) {
                             return new Result(Result.ERROR, "库存验证失败");
+                        } else {
+                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                            if (!"00000".equals(sir.getCode())) {
+                                return new Result(Result.ERROR, sir.getDesc());
+                            }
                         }
                     }
                     //再冻结新库存
@@ -131,11 +134,12 @@ public class GoodsService {
                     }else{
                         StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                         if(!"00000".equals(sir.getCode())){
-                            return new Result(Result.ERROR, "库存验证失败");
+                            return new Result(Result.ERROR, sir.getDesc());
                         }
                     }
                 }
             }
+            if(list!=null && list.size()>0) goodsMapper.insertBatch(list);
             //验证通过之后删除数据,重新写入
 //            skuMapper.deleteSkuByGid(dsku);
             skuPropertyMapper.deleteSkuPropertyByGid(dskuProperty);
@@ -160,9 +164,10 @@ public class GoodsService {
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
 //                    验证号码可用性之前赋值旧的skuId,便于tb_num表复原状态
                     String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));
-                    sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?"9999": tskuId));
+                    sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?String.valueOf(sku.getGeneralId()): tskuId));
 
-                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, true, Long.parseLong(tskuId));
+//                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, true, Long.parseLong(tskuId));
+                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, true, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
 
                     sku.setSkuId(sku.getGeneralId());
                     sku.setSkuSaleNum(skuSaleNum.split("★")[0].split("\n")[0]);
@@ -172,7 +177,7 @@ public class GoodsService {
 
                     //sku属性表操作end
                     //判断是否存在,存在就update,否则加到list中insert
-                    if(skuMapper.getSkuBySkuid(Long.parseLong(tskuId))!=null) {
+                    if(!"".equals(tskuId)&&skuMapper.getSkuBySkuid(Long.parseLong(tskuId))!=null) {
                         sku.setSkuId(Long.parseLong(tskuId));
                         skuMapper.updateSku(sku);
                     }

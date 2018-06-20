@@ -10,4 +10,6 @@ public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
     void insertBatch(@Param("orderList") List<Order> orderList);
 
     void deleteByOrderid(@Param("orderid") Long orderId);
+
+    Order findOrderInfo(@Param("orderid") Long id);
 }

@@ -37,7 +37,7 @@
     <select id="findOrderInfo" resultType="Order">
         select
         <include refid="col_list"/>
-        from tb_order a where a.id = #{id};
+        from tb_order a where a.order_id = #{orderid};
     </select>
 
     <select id="queryPageList" resultType="Order">

@@ -1,7 +1,9 @@
 package com.hrtx.web.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -18,6 +20,8 @@ public class Order extends BasePojo implements java.io.Serializable {
     private int status;//状态 1待付款；2已付款待推送（已付款尚未推送到仓储期）；3待配货(仓储系统已收到)；4待签收(仓储物流已取件)；5完成
     private String reqUserAgent;//请求的user_agent
     private String reqIp;//请求的ip
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date addDate;//添加时间
     private int orderType;//1商品；2号码；3竞拍
     private String shippingMenthodId;//运输方式编码 字典表
@@ -26,16 +30,26 @@ public class Order extends BasePojo implements java.io.Serializable {
     private String personName;//收货人
     private String personTel;//收货电话
     private String address;//收货地址 地区+街道
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date noticeShipmentDate;//通知出货时间 即调用发货成功时间
     private String payMenthodId;//支付方式编码 字典表
     private String payMenthod;//支付方式
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date payDate;//付款日期
     private String expressId;//快递公司 发货后  字典表
     private String expressName;//快递名称
     private String expressNumber;//快递单号
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date deliverDate;//发货时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date pickupDate;//仓库调用时间
     private int signType;//签收方式1用户自动签收2系统
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date signDate;//签收时间
     private double commission;//优惠券 折扣
     private double shippingTotal;//运输费用
