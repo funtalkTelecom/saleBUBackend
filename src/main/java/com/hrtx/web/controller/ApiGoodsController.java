@@ -12,6 +12,7 @@ import com.hrtx.global.TokenGenerator;
 import com.hrtx.web.mapper.FileMapper;
 import com.hrtx.web.mapper.GoodsMapper;
 import com.hrtx.web.mapper.SkuMapper;
+import com.hrtx.web.mapper.SkuPropertyMapper;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.File;
 import com.hrtx.web.pojo.Goods;
@@ -38,6 +39,8 @@ public class ApiGoodsController extends BaseReturn{
 	@Autowired
 	private SkuMapper skuMapper;
 	@Autowired
+	private SkuPropertyMapper skuPropertyMapper;
+	@Autowired
 	private FileMapper fileMapper;
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
@@ -60,21 +63,31 @@ public class ApiGoodsController extends BaseReturn{
 			goods.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
 
 			//模拟登陆
-//			Consumer u = new Consumer();
-//			u.setId(1L);
-//			u.setName("周元强");
-//			u.setCity("396");
-//			u.setIsAgent(2);//设置为一级代理商
-//			u.setAgentCity(396L);
+			Consumer u = new Consumer();
+			u.setId(1L);
+			u.setName("周元强");
+			u.setCity("396");
+			u.setIsAgent(2);//设置为一级代理商
+			u.setAgentCity(396L);
 			//apiSessionUtil.getConsumer()==null?u.getAgentCity():
 
-			goods.setgSaleCity(String.valueOf(apiSessionUtil.getConsumer().getAgentCity()));
+			goods.setgSaleCity(String.valueOf(apiSessionUtil.getConsumer()==null?u.getAgentCity():apiSessionUtil.getConsumer().getAgentCity()));
 			PageHelper.startPage(goods.getPageNum(),goods.getLimit());
 			Page<Object> ob=this.goodsMapper.queryPageSkuListApi(goods, goods.getgSaleCity());
 			if(ob!=null && ob.size()>0){
 				for(int i=0; i<ob.size(); i++){
 					Map g = (Map) ob.get(i);
 					g.put("fileName", SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +g.get("gId")+"/"+ g.get("fileName"));
+					//获取sku的属性,追加到名称中
+					List prolist = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(String.valueOf(g.get("skuId"))));
+					if(prolist!=null && prolist.size()>0){
+						StringBuffer pro = new StringBuffer();
+						for(int j=0; j<prolist.size(); j++){
+							Map p = (Map) prolist.get(j);
+							pro.append(p.get("keyValue")+" ");
+						}
+						g.put("gName", g.get("gName") + " (" + pro.substring(0, pro.length()-1) + ")");
+					}
 				}
 			}
 			pm = new PageInfo<Object>(ob);
