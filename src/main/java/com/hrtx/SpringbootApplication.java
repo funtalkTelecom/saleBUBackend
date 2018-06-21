@@ -3,13 +3,11 @@ package com.hrtx;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.*;
 
 @SpringBootApplication
 @ImportResource(value = {"classpath:applicationContext.xml"})
+@PropertySource(value = {"classpath:regexp.properties"})
 @Configuration
 @ComponentScan(basePackages = "com.hrtx")
 @ServletComponentScan

@@ -17,12 +17,12 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
 	@Id
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
-    private Long fund_order_id;
+    private Long fundOrderId;
     private String serial;
-    private String req_ip;
-    private Long req_user;
-    private Date add_date;
-    private String act_type;
+    private String reqIp;
+    private Long reqUser;
+    private Date addDate;
+    private String actType;
     private Integer status;
     private Integer resCode;
     private String resDesc;
@@ -30,14 +30,14 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
     public FundDetail() {
 	}
 
-    public FundDetail(Long id, Long fund_order_id, String serial, String req_ip, Long req_user, Date add_date, String act_type, Integer status) {
+    public FundDetail(Long id, Long fundOrderId, String serial, String reqIp, Long reqUser, Date addDate, String actType, Integer status) {
         this.id = id;
-        this.fund_order_id = fund_order_id;
+        this.fundOrderId = fundOrderId;
         this.serial = serial;
-        this.req_ip = req_ip;
-        this.req_user = req_user;
-        this.add_date = add_date;
-        this.act_type = act_type;
+        this.reqIp = reqIp;
+        this.reqUser = reqUser;
+        this.addDate = addDate;
+        this.actType = actType;
         this.status = status;
     }
 
@@ -49,12 +49,12 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
 		this.id = id;
 	}
 
-    public Long getFund_order_id() {
-        return fund_order_id;
+    public Long getFundOrderId() {
+        return fundOrderId;
     }
 
-    public void setFund_order_id(Long fund_order_id) {
-        this.fund_order_id = fund_order_id;
+    public void setFundOrderId(Long fundOrderId) {
+        this.fundOrderId = fundOrderId;
     }
 
     public String getSerial() {
@@ -65,36 +65,36 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
         this.serial = serial;
     }
 
-    public String getReq_ip() {
-        return req_ip;
+    public String getReqIp() {
+        return reqIp;
     }
 
-    public void setReq_ip(String req_ip) {
-        this.req_ip = req_ip;
+    public void setReqIp(String reqIp) {
+        this.reqIp = reqIp;
     }
 
-    public Long getReq_user() {
-        return req_user;
+    public Long getReqUser() {
+        return reqUser;
     }
 
-    public void setReq_user(Long req_user) {
-        this.req_user = req_user;
+    public void setReqUser(Long reqUser) {
+        this.reqUser = reqUser;
     }
 
-    public Date getAdd_date() {
-        return add_date;
+    public Date getAddDate() {
+        return addDate;
     }
 
-    public void setAdd_date(Date add_date) {
-        this.add_date = add_date;
+    public void setAddDate(Date addDate) {
+        this.addDate = addDate;
     }
 
-    public String getAct_type() {
-        return act_type;
+    public String getActType() {
+        return actType;
     }
 
-    public void setAct_type(String act_type) {
-        this.act_type = act_type;
+    public void setActType(String actType) {
+        this.actType = actType;
     }
 
     public Integer getStatus() {
@@ -106,7 +106,7 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
     }
 
     public Integer getResCode() {
-        return resCode == null ? 0 : resCode;
+        return resCode;
     }
 
     public void setResCode(Integer resCode) {

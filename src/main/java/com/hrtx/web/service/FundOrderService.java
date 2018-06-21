@@ -2,17 +2,17 @@ package com.hrtx.web.service;
 
 import com.github.abel533.entity.Example;
 import com.hrtx.config.advice.ServiceException;
+import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.global.pinganUtils.TLinx2Util;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.ConsumerLog;
-import com.hrtx.web.pojo.Dict;
 import com.hrtx.web.pojo.FundDetail;
 import com.hrtx.web.pojo.FundOrder;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,56 +25,61 @@ public class FundOrderService extends BaseService {
 	@Autowired private FundDetailMapper fundDetailMapper;
 	@Autowired private ConsumerLogMapper consumerLogMapper;
 	@Autowired private PinganService pinganService;
+	@Autowired private OrderService orderService;
+	@Autowired private AuctionDepositService auctionDepositService;
 	@Autowired private ApiSessionUtil apiSessionUtil;
 
     /**
      * 平台订单支付（平安微信小程序支付方式）
-     * @param amt 支付金额
-     * @param order_name 订单描述
+     * @param amt 支付金额(分)
+     * @param orderName 订单描述
      * @param sourceId  订单号
      * @return
      */
-    public Result payPinganWxxOrder(int amt, String order_name, String sourceId) {
-        Result result = this.getPayer(2);
-        if(result.getCode() == Result.ERROR) return result;
-        return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, "", String.valueOf(result.getData()), order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
+    @NoRepeat
+    public Result payPinganWxxOrder(int amt, String orderName, String sourceId) {
+//        Result result = this.getPayer(2);
+        Result result = new Result(Result.OK, "o1F3M4sVzb7FUkxpgzGBinJWpnQA");
+        if(result.getCode() != Result.OK) return result;
+        return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, "", String.valueOf(result.getData()), orderName, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
     }
 
     /**
      * 保证金支付（平安微信小程序支付方式）
-     * @param amt 支付金额
-     * @param order_name 订单描述
+     * @param amt 支付金额(分)
+     * @param orderName 订单描述
      * @param sourceId  保证金订单号
      * @return
      */
-    public Result payPinganWxxDeposit(int amt, String order_name, String sourceId) {
+    public Result payPinganWxxDeposit(int amt, String orderName, String sourceId) {
         Result result = this.getPayer(2);
         if(result.getCode() == Result.ERROR) return result;
-        return payAddOrder(FundOrder.BUSI_TYPE_PAYDEPOSIT, amt, "", String.valueOf(result.getData()), order_name, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
+        return payAddOrder(FundOrder.BUSI_TYPE_PAYDEPOSIT, amt, "", String.valueOf(result.getData()), orderName, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
     }
 
     /**
      *
-     * @param busi_type 业务类型
-     * @param amt  付款金额
+     * @param busiType 业务类型
+     * @param amt  付款金额(分)
      * @param payee 收款方
      * @param payer 付款方
-     * @param order_name 支付订单描述
+     * @param orderName 支付订单描述
      * @param third 支付方式
      * @param sourceId 业务来源编码
      * @param remark 备注
      * @return
      */
-	private Result payAddOrder(String busi_type, int amt, String payee, String payer, String order_name, String third, String sourceId, String remark){
-	    String orderMark = busi_type+"-"+sourceId;
+	private Result payAddOrder(String busiType, int amt, String payee, String payer, String orderName, String third, String sourceId, String remark){
+	    String orderMark = busiType+"-"+sourceId;
         if(!LockUtils.tryLock(orderMark)) return new Result(Result.ERROR, "正在支付，请勿重复请求");
         try {
             Example example = new Example(FundOrder.class);
-            example.createCriteria().andEqualTo("busi", busi_type).andEqualTo("sourceId", sourceId).andIn("status",Arrays.asList(new int[]{3,5,7}));
+            example.createCriteria().andEqualTo("busi", busiType).andEqualTo("sourceId", sourceId).andIn("status",Arrays.asList(new Integer[]{3,5,7}));
             List fundOrders = fundOrderMapper.selectByExample(example);
+//            if(true) return new Result(Result.ERROR, "订单已支付");
             if(fundOrders.size()>0) return new Result(Result.ERROR, "订单已支付");
             String contractno = "PAY"+Utils.randomNoByDateTime();
-            FundOrder fundOrder = new FundOrder(0l, busi_type, amt, payee, payer, 1, order_name, contractno, third, amt, remark, sourceId);
+            FundOrder fundOrder = new FundOrder(0l, busiType, amt, payee, payer, 1, orderName, contractno, third, amt, remark, sourceId);
             fundOrder.setId(fundOrder.getGeneralId());
             fundOrderMapper.insert(fundOrder);
             Long req_user = apiSessionUtil.getUser() == null ? 0l:apiSessionUtil.getUser().getId();
@@ -87,20 +92,20 @@ public class FundOrderService extends BaseService {
             Result result = null;
             try {
                 if(FundOrder.THIRD_PAY_PINGANAPP.equals(third)) {
-                    result=pinganService.payOrder(contractno,"WeixinOL",order_name,amt,amt,remark,notify_url,sub_appid,payer,"JSAPI");
+                    result=pinganService.payOrder(contractno,"WeixinOL",orderName,amt,amt,remark,notify_url,sub_appid,payer,"JSAPI");
                     if(result.getCode() == Result.OK) {
                         JSONObject json1=(JSONObject) result.getData();
-                        String[] keys={"appid","noncestr","timestamp","signType","package","paysign"};
+                        String[] keys={"appId","nonceStr","timeStamp","signType","package","paySign"};
                         for (String key:keys) {
                             if(!json1.containsKey(key))return  result = new Result(Result.ERROR,"接口返回参数错误");
                         }
                         Map _map = new HashMap();
-                        _map.put("appId",json1.getString("appid"));
-                        _map.put("nonceStr",json1.getString("noncestr"));
-                        _map.put("timeStamp",json1.getString("timestamp"));
+                        _map.put("appId",json1.getString("appId"));
+                        _map.put("nonceStr",json1.getString("nonceStr"));
+                        _map.put("timeStamp",json1.getString("timeStamp"));
                         _map.put("signType",json1.getString("signType"));
                         _map.put("package",json1.getString("package"));
-                        _map.put("paySign",json1.getString("paysign"));
+                        _map.put("paySign",json1.getString("paySign"));
                         return result = new Result(Result.OK, _map);
                     }
                 }
@@ -147,32 +152,55 @@ public class FundOrderService extends BaseService {
         if(!TLinx2Util.verifySign(params)) {
             return new Result(Result.ERROR, "验签失败");
         }
+        int status = NumberUtils.toInt(params.get("status"));
+        if(!ArrayUtils.contains(new int[]{1,4}, status)) return  new Result(Result.ERROR, "参数异常");
         String out_no = params.get("out_no");
         FundDetail fundDetail = new FundDetail();
         fundDetail.setSerial(out_no);
-        fundDetail.setAct_type(FundDetail.ORDER_ACT_TYPE_ADD);
+        fundDetail.setActType(FundDetail.ORDER_ACT_TYPE_ADD);
         fundDetail = fundDetailMapper.selectOne(fundDetail);
         if(fundDetail == null) return new Result(Result.ERROR, "未找到订单");
         fundDetail.setStatus(5);//回掉完成
         Example example = new Example(FundDetail.class);
-        example.createCriteria().andEqualTo("id",fundDetail.getId()).andIn("status", Arrays.<Object>asList(new int[]{2,3}));
+        example.createCriteria().andEqualTo("id",fundDetail.getId()).andIn("status", Arrays.asList(new Integer[]{2,3}));
         int count = fundDetailMapper.updateByExample(fundDetail, example);
         if(count != 1) throw new ServiceException("该状态订单不接受回调");
 
         FundOrder fundOrder = new FundOrder();
-        fundOrder.setId(fundDetail.getFund_order_id());
+        fundOrder.setId(fundDetail.getFundOrderId());
         fundOrder = fundOrderMapper.selectByPrimaryKey(fundOrder);
         if(fundOrder == null) throw new ServiceException("未找到订单");
-        String status = params.get("status");
-        if("1".equals(status)) {
-            fundOrder.setStatus(3);//已支付
-        }else if("4".equals(status)) {
-            fundOrder.setStatus(4);//已取消
-        }
+
+        if(status == 1)  fundOrder.setStatus(3);//已支付
+        if(status == 4) fundOrder.setStatus(4);//已取消
+
         example = new Example(FundOrder.class);
-        example.createCriteria().andEqualTo("id",fundOrder.getId()).andIn("status", Arrays.<Object>asList(new int[]{1,2}));
+        example.createCriteria().andEqualTo("id",fundOrder.getId()).andIn("status", Arrays.<Object>asList(new Integer[]{1,2}));
         count = fundOrderMapper.updateByExample(fundOrder, example);
         if(count != 1) throw new ServiceException("该状态订单不接受回调");
+
+        String busiType = fundOrder.getBusi();
+        Long orderId = NumberUtils.toLong(fundOrder.getSourceId());
+        String payTime = params.get("pay_time");
+        if(FundOrder.BUSI_TYPE_PAYORDER.equals(busiType)) {// 订单支付完成回调
+            if(status == 1) {//支付成功
+                try {
+                    Result result = orderService.payOrderSuccess(orderId);
+                    if(result.getCode() == Result.OK) {
+                        result = orderService.payDeliverOrder(orderId);
+                    }
+                }catch (Exception e) {
+                    log.error("支付完成，发货失败", e);
+                }
+            }
+        }
+        if(FundOrder.BUSI_TYPE_PAYDEPOSIT.equals(busiType)) {//保证金支付完成 回调
+            try{
+                auctionDepositService.auctionDepositPay(orderId, status == 1 ? true : false, payTime);
+            }catch (Exception e) {
+                log.error("支付完成更新保证金回调信息异常", e);
+            }
+        }
         return new Result(Result.OK, "success");
     }
 
@@ -198,14 +226,14 @@ public class FundOrderService extends BaseService {
 
     /**
      * 退款
-     * @param busi_type 业务类型
+     * @param busiType 业务类型
      * @param sourceId 业务编码
      * @param remark 退款备注
      * @return
      */
-    private Result payRefund(String busi_type, String sourceId, String remark){
+    private Result payRefund(String busiType, String sourceId, String remark){
         Example example = new Example(FundOrder.class);
-        example.createCriteria().andEqualTo("busi", busi_type).andEqualTo("sourceId", sourceId).andEqualTo("status", 3);
+        example.createCriteria().andEqualTo("busi", busiType).andEqualTo("sourceId", sourceId).andEqualTo("status", 3);
         List fundOrders = fundOrderMapper.selectByExample(example);
         if(fundOrders.size() != 1) return new Result(Result.ERROR, "退款订单不存在");
         FundOrder fundOrder = (FundOrder) fundOrders.get(0);
@@ -220,7 +248,7 @@ public class FundOrderService extends BaseService {
             Result result = null;
             try {
                 if(FundOrder.THIRD_PAY_PINGANAPP.equals(fundOrder.getThird())) {
-                    result = pinganService.payRefund(outNo, contractno, fundOrder.getOrder_name()+"退款", fundOrder.getAmt(), remark);
+                    result = pinganService.payRefund(outNo, contractno, fundOrder.getOrderName()+"退款", fundOrder.getAmt(), remark);
                 }
                 if(result == null) result = new Result(Result.ERROR,"第三方支付接口不存在");
                 return result;
@@ -265,7 +293,7 @@ public class FundOrderService extends BaseService {
      */
     private Result getPayer(int loginType){
         ConsumerLog consumerLog = new ConsumerLog();
-        consumerLog.setUserId(apiSessionUtil.getConsumer().getId());
+        consumerLog.setUserId(apiSessionUtil.getConsumer() == null ? 0 : apiSessionUtil.getConsumer().getId());
         consumerLog.setStatus(1);
         consumerLog.setLoginType(loginType);
         consumerLog = consumerLogMapper.selectOne(consumerLog);
