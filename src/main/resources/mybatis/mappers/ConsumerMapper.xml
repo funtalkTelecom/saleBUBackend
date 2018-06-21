@@ -25,4 +25,10 @@
             c.trading_img=#{tradingImg}
             where c.id=#{id}
     </update>
+
+    <select id="findConsumerById" resultType="Consumer">
+	  select * from 	tb_consumer c
+	  where  c.id = #{id}
+    </select>
+
 </mapper>

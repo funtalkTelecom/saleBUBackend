@@ -3,9 +3,9 @@ package com.hrtx.web.controller;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
+import com.hrtx.global.Messager;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
-import com.hrtx.web.mapper.FileMapper;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.service.*;
 import org.apache.commons.lang.math.NumberUtils;
@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import com.hrtx.global.Messager;
 
 @RestController
 //@RequestMapping("/api")
@@ -183,6 +183,22 @@ public class EPSaleController extends BaseReturn{
 						Consumer consumer=new Consumer();
 						consumer.setId(consumerId);
 						consumer=consumerService.getConsumerById(consumer);
+						//最近10次出价记录
+						List<Map> goodsAuctionList2=auctionService.findAuctionListByNumId(Long.valueOf(auction.getNumId()));
+						String goodsAuctionListStr="";
+						Map goodsAuctionMap=new HashMap();
+						if(goodsAuctionList!=null&&goodsAuctionList.size()>0)
+						{
+							goodsAuctionMap.put("goodsAuctionList",goodsAuctionList);
+							goodsAuctionListStr="goodsAuctionList:"+goodsAuctionList;
+						}else
+						{
+							goodsAuctionMap.put("goodsAuctionList","");
+							goodsAuctionListStr="goodsAuctionList:"+"";
+						}
+
+						returnResult(new Result(200, "本次出价成功！,"+goodsAuctionListStr));
+
 						Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
 					}
 				}else //当前用户保证金未支付成功 status:2    出价记录 状态：1初始   保证金记录  状态：1 初始

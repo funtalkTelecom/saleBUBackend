@@ -2,27 +2,24 @@ package com.hrtx.web.controller;
 
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
+import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.Account;
 import com.hrtx.web.pojo.DeliveryAddress;
-import com.hrtx.web.pojo.Poster;
-import com.hrtx.web.pojo.System;
 import com.hrtx.web.service.AccountService;
 import com.hrtx.web.service.CityService;
 import com.hrtx.web.service.DeliveryAddressService;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 
 @RestController
 //@RequestMapping("/api")
@@ -35,6 +32,8 @@ public class DeliveryAddressController extends BaseReturn{
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private DeliveryAddressService deliveryAddressService;
+	@Autowired
+	private ApiSessionUtil apiSessionUtil;
 
 	@RequestMapping("/deliveryAddress/deliveryAddress-query")
 	@Powers({PowerConsts.DELIVERYADDRESSMOUDULE})
@@ -59,7 +58,9 @@ public class DeliveryAddressController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result DeliveryAddressDefault(){
-		return deliveryAddressService.findDeliveryAddressDefault();
+		Long cunsumerId=0L;
+		cunsumerId=this.apiSessionUtil.getConsumer().getId();
+		return deliveryAddressService.findDeliveryAddressDefault(cunsumerId);
 	}
 
 	@GetMapping("/api/deliveryAddress/{id}")

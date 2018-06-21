@@ -46,7 +46,10 @@ public class ApiOrderService {
 	@Autowired
 	private DeliveryAddressMapper deliveryAddressMapper;
 	@Autowired
+	private AuctionMapper auctionMapper;
+	@Autowired
 	private RedisUtil redisUtil;
+
 
 	/**
 	 * 根据商品id创建订单
@@ -84,14 +87,18 @@ public class ApiOrderService {
 
 //		Consumer user = apiSessionUtil.getConsumer();
 		log.info("获取用户信息");
-		Consumer user = apiSessionUtil.getConsumer();
+		Consumer user =null;
+		Auction action=null;//type:3 出价记录
 		try {
 			log.info("获取订单类型");
 			if(oparam!=null) {
 				type = String.valueOf(oparam.get("type"));
 				user = (Consumer) oparam.get("user");
 			}
-			else type = request.getParameter("type");
+			else {
+				type = request.getParameter("type");
+				user = apiSessionUtil.getConsumer();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new Result(Result.ERROR, "未获取到参数");
@@ -411,12 +418,12 @@ public class ApiOrderService {
 						addrid = request.getParameter("addrid");
 						price = request.getParameter("price");
 					}
-
+					action=new Auction();
+					action.setNumId(Long.valueOf(numid));
 					if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
 					if (numid == null || "".equals(numid)) return new Result(Result.ERROR, "numid不能为空");
-					if (addrid == null || "".equals(addrid)) return new Result(Result.ERROR, "addrid不能为空");
+					//if (addrid == null || "".equals(addrid)) return new Result(Result.ERROR, "addrid不能为空");
 					if (price == null || "".equals(price)) return new Result(Result.ERROR, "price不能为空");
-
 					log.info("获取号码信息");
 					//获取号码
 					number = numberMapper.getNumInfoById(numid);
@@ -493,7 +500,7 @@ public class ApiOrderService {
 						order.setConsumer(user.getId());
 						order.setConsumerName(user.getName());
 						order.setStatus(1);//设置成待付款
-						order.setReqUserAgent(request.getHeader("user-agent"));
+						//order.setReqUserAgent(request.getHeader("user-agent"));
 						order.setReqIp(SessionUtil.getUserIp());
 						order.setAddDate(new Date());
 						order.setOrderType(3);
@@ -501,10 +508,13 @@ public class ApiOrderService {
 						else {
 							//获取收货地址信息
 							DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
-							order.setAddressId(deliveryAddress.getId());
-							order.setPersonName(deliveryAddress.getPersonName());
-							order.setPersonTel(deliveryAddress.getPersonTel());
-							order.setAddress(deliveryAddress.getAddress());
+							if(deliveryAddress!=null)
+							{
+								order.setAddressId(deliveryAddress.getId());
+								order.setPersonName(deliveryAddress.getPersonName());
+								order.setPersonTel(deliveryAddress.getPersonTel());
+								order.setAddress(deliveryAddress.getAddress());
+							}
 						}
 						order.setCommission(commission);
 						order.setShippingTotal(shipping_total);
@@ -512,8 +522,8 @@ public class ApiOrderService {
 						//子项小计打折之后减去运费
 						total = sub_total * commission - shipping_total;
 						order.setTotal(total);
-
 						orderList.add(order);
+
 					} finally {
 						LockUtils.unLock(numid);
 					}
@@ -552,6 +562,12 @@ public class ApiOrderService {
 				items.add(item);
 
 			}
+			if(type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+			{
+				action.setOrderId(preOrderId);
+				auctionMapper.auctionEditOrderIDByNumId(action);
+			}
+
 			param.put("commodities", items);
 			Result res = StorageApiCallUtil.storageApiCall(param, "HK0003");
 			if(200!=(res.getCode())){
@@ -573,6 +589,11 @@ public class ApiOrderService {
 			e.printStackTrace();
 			//清除已生成的订单
 			deleteOrder(orderList);
+			if(type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+			{
+				action.setOrderId(0L);
+				auctionMapper.auctionEditOrderIDByNumId(action);
+			}
 			return new Result(Result.ERROR, "创建订单异常");
 		}
 

@@ -21,6 +21,34 @@
 	group by tb_auction.consumer_id
    </select>
 
+	<select id="findCustomersByNumId" resultType="java.util.HashMap">
+	select
+	count(tb_auction.id) as consumerCount
+	from tb_auction
+	where tb_auction.status in(2,4)
+	and tb_auction.num_id = #{numId}
+	group by tb_auction.consumer_id
+   </select>
+
+	<select id="findAuctionByNumIdAndStatus" resultType="java.util.HashMap">
+	select
+    id as id,
+	sku_id as skuId,
+	num_id as numId,
+	num,
+	g_id as gId,
+	g_name as gName,
+	price,
+	add_date as addDate,
+	confirm_date as  confirmDate,
+	status,
+	consumer_id as consumerId
+	from tb_auction
+	where tb_auction.status=#{status}
+	and tb_auction.num_id = #{numId}
+	group by tb_auction.consumer_id
+   </select>
+
 	<select id="findAuctionListByNumId" resultType="java.util.HashMap">
 	  select
 	  concat(tb_auction.id,'')as id,
@@ -138,4 +166,14 @@
          t.confirm_date=#{confirmDate}
          where t.id =#{id}
     </update>
+
+	<update id="auctionEditOrderIDByNumId">
+	update
+	tb_auction
+	set
+	order_id=#{orderId}
+	where status=2
+	and num_id=#{numId}
+	</update>
+
 </mapper>
