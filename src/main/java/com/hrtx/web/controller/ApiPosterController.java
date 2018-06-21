@@ -44,7 +44,7 @@ public class ApiPosterController extends BaseReturn{
 		try {
 			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
 			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-			poster.setStart(limit*(pageNum-1)+1);
+			poster.setStart(limit*(pageNum-1));
 			poster.setLimit(limit);
 
 			PageHelper.startPage(poster.getPageNum(),poster.getLimit());

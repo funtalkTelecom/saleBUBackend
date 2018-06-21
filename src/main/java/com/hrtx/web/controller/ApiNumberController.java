@@ -42,7 +42,7 @@ public class ApiNumberController extends BaseReturn{
 		try {
 			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
 			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-			number.setStart(limit*(pageNum-1)+1);
+			number.setStart(limit*(pageNum-1));
 			number.setLimit(limit);
 			String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
 			tags = "'"+ tags.replaceAll(",", "','") +"'";
