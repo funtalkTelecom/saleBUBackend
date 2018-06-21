@@ -105,7 +105,7 @@ public class ApiGoodsController extends BaseReturn{
 	 * 商品详情
 	 * sku列表
 	 * file列表
-	 * @param id
+	 * @param id(skuid)
 	 * @param request
 	 * @return
 	 */
@@ -115,17 +115,25 @@ public class ApiGoodsController extends BaseReturn{
 	public Result goodsDetail(@PathVariable("id") String id, HttpServletRequest request){
 		Map returnMap = new HashMap();
 		Goods goods = new Goods();
-		List skuList = new ArrayList<>();
+		Sku sku = new Sku();
 		List<File> fileList = new ArrayList<File>();
 
 		try {
-			goods = goodsMapper.findGoodsInfo(Long.parseLong(id));
+			goods = goodsMapper.findGoodsInfoBySkuid(id);
 
-			Sku sku = new Sku();
-			sku.setgId(Long.parseLong(id));
-			skuList = skuMapper.queryList(sku);
+			sku = skuMapper.getSkuBySkuid(Long.parseLong(id));
+			//获取sku的属性,追加到名称中
+			List prolist = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(id));
+			if(prolist!=null && prolist.size()>0){
+				StringBuffer pro = new StringBuffer();
+				for(int j=0; j<prolist.size(); j++){
+					Map p = (Map) prolist.get(j);
+					pro.append(p.get("keyValue")+" ");
+				}
+				goods.setgName(goods.getgName() + " (" + pro.substring(0, pro.length()-1) + ")");
+			}
 
-			fileList = fileMapper.findFilesByRefid(id);
+			fileList = fileMapper.findFilesByRefid(String.valueOf(goods.getgId()));
 			if (fileList != null && fileList.size() > 0) {
 				for (File file : fileList) {
 					file.setFileName(SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +goods.getgId()+"/"+ file.getFileName());
@@ -135,7 +143,7 @@ public class ApiGoodsController extends BaseReturn{
 		} catch (Exception e) {
 			e.printStackTrace();
 			goods = new Goods();
-			skuList = new ArrayList<>();
+			sku = new Sku();
 			fileList = new ArrayList<>();
 			returnMap.put("code", Result.ERROR);
 			return new Result(Result.ERROR, "异常");
@@ -143,7 +151,7 @@ public class ApiGoodsController extends BaseReturn{
 
 
 		returnMap.put("goods", goods);
-		returnMap.put("skuList", skuList);
+		returnMap.put("sku", sku);
 		returnMap.put("fileList", fileList);
 		return new Result(Result.OK, returnMap);
 	}
