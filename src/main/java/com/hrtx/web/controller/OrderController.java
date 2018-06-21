@@ -40,6 +40,12 @@ public class OrderController extends BaseReturn{
 		return orderService.pageOrder(order);
 	}
 
+	@RequestMapping("/order-receipt")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
+	public Result receipt(Order order){
+		return orderService.pageOrder(order);
+	}
+
 	@RequestMapping("/item-list")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
 	public Result listItem(OrderItem orderItem){

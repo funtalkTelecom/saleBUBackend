@@ -214,7 +214,7 @@
 		</div>
 
 		<!-- 模态框（Modal） -->
-		<div class="modal fade" id="saleNumInfo" tabindex="-1" style="overflow: auto" >
+		<div class="modal fade" id="receiptInfo" tabindex="-1" style="overflow: auto" >
 			<div class="modal-dialog" style="width:300px;">
 				<div class="modal-content" style="width: 300px; max-height:700px; overflow: auto">
 					<div class="modal-header">
@@ -222,7 +222,7 @@
 							&times;
 						</button>
 						<h4 class="modal-title">
-							所售号码列表
+							收款信息
 						</h4>
 					</div>
 					<form role="form" class="form-horizontal">
@@ -244,6 +244,7 @@
 		<script type="text/javascript">
             var basePath = "<%=basePath %>";
             var p_query = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_QUEYR)%>;
+            var p_receipt = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_RECEIPT)%>;
 		</script>
 	</body>
 </html>
