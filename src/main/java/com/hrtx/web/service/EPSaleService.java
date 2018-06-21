@@ -3,36 +3,56 @@ package com.hrtx.web.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hrtx.config.annotation.Powers;
+import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
-import com.hrtx.global.Messager;
-import com.hrtx.global.SessionUtil;
-import com.hrtx.global.SystemParam;
+import com.hrtx.global.*;
 import com.hrtx.web.controller.BaseReturn;
-import com.hrtx.web.mapper.EPSaleMapper;
-import com.hrtx.web.mapper.FileMapper;
-import com.hrtx.web.mapper.AuctionMapper;
-import com.hrtx.web.mapper.AuctionDepositMapper;
+import com.hrtx.web.dto.StorageInterfaceResponse;
+import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
+import com.hrtx.web.pojo.Number;
+import net.sf.json.JSONArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import com.hrtx.global.Utils;
+
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class EPSaleService {
 
+	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired SessionUtil sessionUtil;
 	@Autowired private EPSaleMapper epSaleMapper;
 	@Autowired private AuctionMapper auctionMapper;
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
 	@Autowired private FileMapper fileMapper;
+	@Autowired
+	private ApiSessionUtil apiSessionUtil;
+	@Autowired
+	private GoodsMapper goodsMapper;
+	@Autowired
+	private SkuMapper skuMapper;
+	@Autowired
+	private SkuPropertyMapper skuPropertyMapper;
+	@Autowired
+	private OrderMapper orderMapper;
+	@Autowired
+	private NumberMapper numberMapper;
+	@Autowired
+	private OrderItemMapper orderItemMapper;
+	@Autowired
+	private DeliveryAddressMapper deliveryAddressMapper;
+	@Autowired
+	private RedisUtil redisUtil;
 	@Autowired
 	private FundOrderService fundOrderService;
 	public Result pageEPSale(EPSale epSale) {
@@ -97,9 +117,9 @@ public class EPSaleService {
    /*
    *
    * 竟拍的号码是否结束
-   *
-    */
-   @Scheduled(cron = "0 0 6 * * ?")
+   * "0 0/5 14,18 * * ?" 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发
+	*/
+   @Scheduled(cron = "0 42 10 * * ?")
 	public void checkEPsaleNum() {
 		List<Map> list=epSaleMapper.findEPSaleGoods();
 		String endTimeStr="";//结束时间
@@ -109,6 +129,7 @@ public class EPSaleService {
 		boolean isEPSaleValid=false;//是否竟拍成功
 		int succesPriceCount=0;// 出价成功次数 状态2
 		int priceCount=0;//出价记录  状态2，4
+	    long successConsumerId=0L;//出价成功用户ID
 		double depositPrice=0.00;
 		if(list.size()>0)
 		{
@@ -119,19 +140,21 @@ public class EPSaleService {
 				startNum=Integer.valueOf(map.get("startNum").toString());
 				depositPrice=Double.valueOf(map.get("depositPrice").toString());
 				currentTimeStr=Utils.dateToString(new Date(),"yyyy-MM-dd HH:mm:ss");
-				if(Utils.compareDate(currentTimeStr,endTimeStr)==0)//当前时间==结束时间
+				if(Utils.compareDate(currentTimeStr,endTimeStr)>0)//当前时间==结束时间
 				{
 					List<Map> auctionList=auctionMapper.findAuctionGoodsByNumId(numId);
 					if(auctionList.size()>0)
 					{
-						succesPriceCount=Integer.valueOf(map.get("succesPriceCount").toString());
-						priceCount=Integer.valueOf(map.get("priceCount").toString());
+						succesPriceCount=Integer.valueOf(auctionList.get(0).get("succesPriceCount").toString());
+						successConsumerId=Long.valueOf(auctionList.get(0).get("successConsumerId").toString());
+						priceCount=Integer.valueOf(auctionList.get(0).get("priceCount").toString());
 						if(priceCount>=startNum&&succesPriceCount>0)
 						{
 							isEPSaleValid=true;
 						}
 					}
 				}
+
 				if(isEPSaleValid)//有效竟拍，最新一条出价转订单，其他用户退回保证金
 				{
                       //*****************转订单
@@ -139,20 +162,39 @@ public class EPSaleService {
 
 
 				}
+
+
 				//****************状态4 落败者 保证金退回并通知
 				Long consumerId=0L;
+				Long depositId=0L;
 				String consumerPhone="";
 				AuctionDeposit auctionDeposit=new AuctionDeposit();
 				List<Map> auctionList=auctionMapper.findAuctionListDepositByNumId(numId);
-				for(Map map2:auctionList)
+				if(auctionList.size()>0)
 				{
-					consumerId=Long.valueOf(map2.get("consumerId").toString());
-					consumerPhone=map2.get("consumerPhone").toString();
-					auctionDeposit.setConsumerId(consumerId);
-					auctionDeposit.setNumId(consumerId);
-					auctionDepositMapper.auctionDepositEdit(auctionDeposit);
-					fundOrderService.payDepositRefund(auctionDeposit.getId().toString(),"保证金");
-					Messager.send(consumerPhone,"竟拍结束;你的出价落败,保证金已退回,金额："+depositPrice);
+					for(Map map2:auctionList)
+					{
+						consumerId=Long.valueOf(map2.get("consumerId").toString());
+						consumerPhone=map2.get("consumerPhone").toString();
+						auctionDeposit.setConsumerId(consumerId);
+						auctionDeposit.setNumId(consumerId);
+						List<Map> depositList =auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerId(numId,consumerId);
+						if(depositList.size()>0)
+						{
+							depositId=Long.valueOf(depositList.get(0).get("id").toString());
+							if(depositId>0)
+							{
+								auctionDeposit.setId(depositId);
+								if(fundOrderService.payDepositRefund(auctionDeposit.getId().toString(),"保证金").getCode()==200)
+								{
+									auctionDeposit.setStatus(3);//status 3 已退款
+									auctionDepositMapper.auctionDepositEdit(auctionDeposit);
+								}
+								Messager.send(consumerPhone,"竟拍结束;你的出价落败,保证金已退回,金额："+depositPrice);
+							}
+						}
+
+					}
 				}
 			}
 		}
@@ -186,12 +228,13 @@ public class EPSaleService {
 			String endTimeStr="";
 			Date strtTime=new Date();//开始时间
 			Date currentTime=new Date();//当前时间
-			endTimeStr=numList.get(0).get("start_time").toString();
+			endTimeStr=numList.get(0).get("end_time").toString();
 			try {
 				endTime=Utils.stringToDate(endTimeStr,"yyyy-MM-dd HH:mm:ss");
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
+			endTimeStr=Utils.dateToString(endTime,"yyyy-MM-dd HH:mm:ss");
 			String startTimeStr=Utils.getDate2(-loopTime,endTime,"yyyy-MM-dd HH:mm:ss");
 			String currentTimeStr=Utils.dateToString(addTime,"yyyy-MM-dd HH:mm:ss");
 			/*try {

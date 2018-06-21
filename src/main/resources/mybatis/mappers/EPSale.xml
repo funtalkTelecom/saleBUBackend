@@ -100,9 +100,9 @@
     </select>
 
     <update id="numLoopEdit">
-        update tb_num t set
-         t.end_time=#{endTime}
-      where tb_num.status=2  and t.id = #{id};
+      update tb_num t set
+      t.end_time=#{endTime}
+      where t.status=2  and t.id = #{id};
     </update>
 
     <select id="findEPSaleGoodsListByEPSaleId" resultType="java.util.HashMap">
