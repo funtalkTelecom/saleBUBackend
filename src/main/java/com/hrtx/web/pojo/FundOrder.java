@@ -26,11 +26,12 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
     private String payee;
     private String payer;
     private Integer status;
+
     @NotBlank(message = "付款描述不能为空", groups = {Groups.FundOrderPayOrder.class})
-    private String order_name;
+    private String orderName;
     private String contractno;
     private String third;
-    private Integer actual_amt;
+    private Integer actualAmt;
     private String remark;
     @NotBlank(message = "来源不能为空", groups = {Groups.FundOrderPayOrder.class})
     private String sourceId;
@@ -38,17 +39,17 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
     public FundOrder() {
 	}
 
-    public FundOrder(Long id, String busi, Integer amt, String payee, String payer, Integer status, String order_name, String contractno, String third, Integer actual_amt, String remark, String sourceId) {
+    public FundOrder(Long id, String busi, Integer amt, String payee, String payer, Integer status, String orderName, String contractno, String third, Integer actual_amt, String remark, String sourceId) {
         this.id = id;
         this.busi = busi;
         this.amt = amt;
         this.payee = payee;
         this.payer = payer;
         this.status = status;
-        this.order_name = order_name;
+        this.orderName = orderName;
         this.contractno = contractno;
         this.third = third;
-        this.actual_amt = actual_amt;
+        this.actualAmt = actual_amt;
         this.remark = remark;
         this.sourceId = sourceId;
     }
@@ -105,12 +106,12 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
         this.status = status;
     }
 
-    public String getOrder_name() {
-        return order_name;
+    public String getOrderName() {
+        return orderName;
     }
 
-    public void setOrder_name(String order_name) {
-        this.order_name = order_name;
+    public void setOrderName(String orderName) {
+        this.orderName = orderName;
     }
 
     public String getContractno() {
@@ -129,12 +130,12 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
         this.third = third;
     }
 
-    public Integer getActual_amt() {
-        return actual_amt;
+    public Integer getActualAmt() {
+        return actualAmt;
     }
 
-    public void setActual_amt(Integer actual_amt) {
-        this.actual_amt = actual_amt;
+    public void setActualAmt(Integer actualAmt) {
+        this.actualAmt = actualAmt;
     }
 
     public String getRemark() {
