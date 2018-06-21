@@ -13,6 +13,7 @@
 	<select id="findAuctionGoodsByNumId" resultType="java.util.HashMap">
 	select
 	sum(case when tb_auction.status=2 then 1 else 0  end ) as succesPriceCount,
+	case when tb_auction.status=2 then consumer_id else 0  end as successConsumerId,
 	count(tb_auction.id) as priceCount
 	from tb_auction
 	where tb_auction.status in(2,4)
