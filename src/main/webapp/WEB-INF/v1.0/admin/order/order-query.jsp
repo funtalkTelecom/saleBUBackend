@@ -48,7 +48,7 @@
 									<form class="form-inline pd5" role="form">
 										<div class="form-group">
 											<label class="control-label">订单编号</label>
-											<input type="text" class="form-control" style="width:130px;" name="orderId">
+											<input type="text" class="form-control" style="width:170px;" name="orderId">
 										</div>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
