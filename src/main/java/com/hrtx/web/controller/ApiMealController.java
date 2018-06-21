@@ -41,7 +41,7 @@ public class ApiMealController extends BaseReturn{
 		try {
 			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
 			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-			meal.setStart(limit*(pageNum-1)+1);
+			meal.setStart(limit*(pageNum-1));
 			meal.setLimit(limit);
 			meal.setCreateBy(Long.parseLong(supplier));
 
