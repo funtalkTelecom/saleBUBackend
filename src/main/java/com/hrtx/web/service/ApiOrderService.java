@@ -88,7 +88,10 @@ public class ApiOrderService {
 		if(user==null) return new Result(Result.ERROR, "未获取到用户,请重试");
 		try {
 			log.info("获取订单类型");
-			if(oparam!=null) type = String.valueOf(oparam.get("type"));
+			if(oparam!=null) {
+				type = String.valueOf(oparam.get("type"));
+				user = (Consumer) oparam.get("user");
+			}
 			else type = request.getParameter("type");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -635,5 +638,12 @@ public class ApiOrderService {
 
 	private void freezeNumByIds(List<com.hrtx.web.pojo.Number> nlist , String status) throws  Exception{
 		numberMapper.freezeNumByIds(nlist, status);
+	}
+
+	public Result getOrderByConsumer(HttpServletRequest request) {
+		Consumer consumer = apiSessionUtil.getConsumer();
+		if(consumer==null) return new Result(Result.ERROR, "未获取到用户");
+
+		return new Result(Result.OK, "");
 	}
 }
