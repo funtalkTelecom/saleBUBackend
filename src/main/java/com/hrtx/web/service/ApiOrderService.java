@@ -642,8 +642,26 @@ public class ApiOrderService {
 
 	public Result getOrderByConsumer(HttpServletRequest request) {
 		Consumer consumer = apiSessionUtil.getConsumer();
+		//模拟登陆
+		consumer = new Consumer();
+		consumer.setId(1009364253750067200L);
 		if(consumer==null) return new Result(Result.ERROR, "未获取到用户");
+		PageInfo<Object> pm = null;
+		Order order = new Order();
+		try{
+			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+			order.setStart(limit*(pageNum-1)+1);
+			order.setLimit(limit);
+			order.setConsumer(consumer.getId());
 
-		return new Result(Result.OK, "");
+			PageHelper.startPage(order.getPageNum(),order.getLimit());
+			Page<Object> ob=orderMapper.getOrderByConsumer(order);
+			pm = new PageInfo<Object>(ob);
+		}catch(Exception e){
+			return new Result(Result.ERROR, "获取列表异常");
+		}
+
+		return new Result(Result.OK, pm);
 	}
 }

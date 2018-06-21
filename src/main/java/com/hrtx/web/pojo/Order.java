@@ -15,6 +15,7 @@ public class Order extends BasePojo implements java.io.Serializable {
 	@Id
 	@JsonSerialize(using = ToStringSerializer.class)
     private Long orderId;//编号
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long consumer;//用户编码
     private String consumerName;//用户名称
     private int status;//状态 1待付款；2已付款待推送（已付款尚未推送到仓储期）；3待配货(仓储系统已收到)；4待签收(仓储物流已取件)；5完成
@@ -26,6 +27,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     private int orderType;//1商品；2号码；3竞拍
     private String shippingMenthodId;//运输方式编码 字典表
     private String shippingMenthod;//运输方式
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long addressId;//收货地址编码
     private String personName;//收货人
     private String personTel;//收货电话

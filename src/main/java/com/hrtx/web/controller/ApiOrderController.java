@@ -47,8 +47,8 @@ public class ApiOrderController extends BaseReturn{
     }
 
     @GetMapping("/order")
-    @Powers(PowerConsts.NOPOWER)
-//    @Powers(PowerConsts.NOLOGINPOWER)
+//    @Powers(PowerConsts.NOPOWER)
+    @Powers(PowerConsts.NOLOGINPOWER)
     @ResponseBody
     public Result getOrderByConsumer(HttpServletRequest request){
         return apiOrderService.getOrderByConsumer(request);
