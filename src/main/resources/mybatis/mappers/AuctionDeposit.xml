@@ -18,7 +18,8 @@
 
 	<select id="findAuctionDepositListByNumId" resultType="java.util.HashMap">
 	  select * from 	tb_auction_deposit
-	  where  tb_auction_deposit.num_id = #{numId}
+	  where status=2 and
+	  tb_auction_deposit.num_id = #{numId}
     </select>
 
 	<select id="findAuctionDepositListByNumIdAndConsumerId" resultType="java.util.HashMap">
