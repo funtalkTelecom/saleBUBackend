@@ -103,6 +103,9 @@ $(function() {
 						if(p_query) {
 							node.push('<a class="btn btn-success btn-xs detail" href="javascript:void(0);">详情</a>');
                         }
+						if(p_receipt) {
+							node.push('<a class="btn btn-success btn-xs receipt" href="javascript:void(0);">收款</a>');
+                        }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
                         $operate.find(".detail").click(function () {
@@ -113,6 +116,9 @@ $(function() {
                                 itemList.load();
                                 $('#orderInfo').modal('show');
                             }, "json");
+                        });
+                        $operate.find(".receipt").click(function () {
+                            $('#receiptInfo').modal('show');
                         });
 						return $operate;
 					}
@@ -181,4 +187,11 @@ $(function() {
 		dataList.reload();
 	}
 
+    $(document).on("click","#receiptInfo .modal-footer .btn-success",function() {
+        $.post("order/order-receipt",$("#receiptInfo form").serialize(),function(data){
+            dataList.reload();
+            $('#receiptInfo').modal('hide');
+            alert(data.data);
+        },"json");
+    });
 });

@@ -46,10 +46,10 @@
     </select>
 
     <select id="queryPageList" resultType="Order">
-        select
+        select distinct
         <include refid="col_list"/>
         from tb_order a
-        where 1=1 and a.is_del=0
+        where 1=1 and a.is_del=0 and a.order_id in (select order_id from tb_order_item where seller_id = #{sellerId})
         <if test="param.orderId!=null and param.orderId!=''">
             and a.order_id = #{param.orderId}
         </if>
