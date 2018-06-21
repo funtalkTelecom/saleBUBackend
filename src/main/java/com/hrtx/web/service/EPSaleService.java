@@ -35,26 +35,11 @@ public class EPSaleService {
 	@Autowired private AuctionMapper auctionMapper;
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
 	@Autowired private FileMapper fileMapper;
-	@Autowired
-	private ApiSessionUtil apiSessionUtil;
-	@Autowired
-	private GoodsMapper goodsMapper;
-	@Autowired
-	private SkuMapper skuMapper;
-	@Autowired
-	private SkuPropertyMapper skuPropertyMapper;
-	@Autowired
-	private OrderMapper orderMapper;
-	@Autowired
-	private NumberMapper numberMapper;
-	@Autowired
-	private OrderItemMapper orderItemMapper;
-	@Autowired
-	private DeliveryAddressMapper deliveryAddressMapper;
-	@Autowired
-	private RedisUtil redisUtil;
-	@Autowired
-	private FundOrderService fundOrderService;
+    @Autowired private ConsumerMapper consumerMapper;
+	@Autowired private DeliveryAddressMapper deliveryAddressMapper;
+	@Autowired private ApiSessionUtil apiSessionUtil;
+	@Autowired private FundOrderService fundOrderService;
+	@Autowired private ApiOrderService apiOrderService;
 	public Result pageEPSale(EPSale epSale) {
 		PageHelper.startPage(epSale.getPageNum(),epSale.getLimit());
 		Page<Object> ob=this.epSaleMapper.queryPageList(epSale);
@@ -119,18 +104,21 @@ public class EPSaleService {
    * 竟拍的号码是否结束
    * "0 0/5 14,18 * * ?" 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发
 	*/
-   @Scheduled(cron = "0 42 10 * * ?")
+   @Scheduled(cron = "0 49 19 * * ?")
 	public void checkEPsaleNum() {
 		List<Map> list=epSaleMapper.findEPSaleGoods();
 		String endTimeStr="";//结束时间
 		String currentTimeStr="";//当前时间
 		Long numId=0L;//条码ID
+	    Long skuId=0L;//skuId
+	    Long addrid=0L;//最后成功出价成功=》默认地此
+        double successAutionPrice=0.00;//最后成功出价记录价格
 		int startNum=0;//竟拍人数
 		boolean isEPSaleValid=false;//是否竟拍成功
-		int succesPriceCount=0;// 出价成功次数 状态2
-		int priceCount=0;//出价记录  状态2，4
-	    long successConsumerId=0L;//出价成功用户ID
-		double depositPrice=0.00;
+	    int priceCumsumerCount=0;//出价人数
+	    long successConsumerId=0L;//最后成功出价记录 用户ID
+		double depositPrice=0.00;//保证金
+
 		if(list.size()>0)
 		{
 			for (Map map:list)
@@ -140,27 +128,48 @@ public class EPSaleService {
 				startNum=Integer.valueOf(map.get("startNum").toString());
 				depositPrice=Double.valueOf(map.get("depositPrice").toString());
 				currentTimeStr=Utils.dateToString(new Date(),"yyyy-MM-dd HH:mm:ss");
-				if(Utils.compareDate(currentTimeStr,endTimeStr)>0)//当前时间==结束时间
+				if(Utils.compareDate(currentTimeStr,endTimeStr)==0)//当前时间==结束时间
 				{
-					List<Map> auctionList=auctionMapper.findAuctionGoodsByNumId(numId);
-					if(auctionList.size()>0)
+					List<Map> auctionCustomers=auctionMapper.findCustomersByNumId(numId);//竟拍人数
+					if(auctionCustomers.size()>0)
 					{
-						succesPriceCount=Integer.valueOf(auctionList.get(0).get("succesPriceCount").toString());
-						successConsumerId=Long.valueOf(auctionList.get(0).get("successConsumerId").toString());
-						priceCount=Integer.valueOf(auctionList.get(0).get("priceCount").toString());
-						if(priceCount>=startNum&&succesPriceCount>0)
+						priceCumsumerCount=auctionCustomers.size();//竟拍人数
+						if(priceCumsumerCount>=startNum)//竟拍人数>=竟拍人数  符合规则
 						{
-							isEPSaleValid=true;
+							Auction auction =new Auction();
+							auction.setNumId(numId);
+							auction.setStatus(2);
+							List<Map> successAution=auctionMapper.findAuctionByNumIdAndStatus(auction);//最后成功出价记录 status:2
+							if(successAution.size()>0)
+							{
+								successConsumerId=Long.valueOf(successAution.get(0).get("consumerId").toString());//最后成功出价记录 用户ID
+								numId=Long.valueOf(successAution.get(0).get("numId").toString());//条码ID
+								skuId=Long.valueOf(successAution.get(0).get("skuId").toString());//skuId
+								successAutionPrice=Double.valueOf(successAution.get(0).get("price").toString());//最后成功出价记录价格
+								isEPSaleValid=true;
+							}
 						}
 					}
 				}
-
+				isEPSaleValid=true;
 				if(isEPSaleValid)//有效竟拍，最新一条出价转订单，其他用户退回保证金
 				{
                       //*****************转订单
 
-
-
+                    Consumer user=this.consumerMapper.findConsumerById(successConsumerId);
+					List<Map> deliveryAddressDefault=deliveryAddressMapper.findDeliveryAddressDefaultByUserId(successConsumerId);
+					/*if(deliveryAddressDefault.size()>0)
+					{
+						addrid=Long.valueOf(deliveryAddressDefault.get(0).get("id").toString());
+					}*/
+                    Map mapOrder=new HashMap();
+                    mapOrder.put("type","3");//竟拍订单
+					mapOrder.put("user",user);//竟拍成功用户
+					mapOrder.put("skuid",skuId);//竟拍成功skuId
+					mapOrder.put("numid",numId);//竟拍成功numId
+					mapOrder.put("addrid",addrid);//竟拍成功addrid
+					mapOrder.put("price",successAutionPrice);//竟拍成功price
+					apiOrderService.createOrder(null,mapOrder);
 				}
 
 

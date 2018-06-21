@@ -47,8 +47,8 @@ public class DeliveryAddressService {
 		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressListByUserId(this.apiSessionUtil.getConsumer().getId()));
 	}
 
-	public Result findDeliveryAddressDefault() {
-		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressDefaultByUserId(this.apiSessionUtil.getConsumer().getId()));
+	public Result findDeliveryAddressDefault(Long cunsumerId) {
+		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressDefaultByUserId(cunsumerId));
 	}
 
 	public  List<Map> findDeliveryAddressById(Long id) {
