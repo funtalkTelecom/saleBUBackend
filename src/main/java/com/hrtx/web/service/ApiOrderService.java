@@ -85,7 +85,6 @@ public class ApiOrderService {
 //		Consumer user = apiSessionUtil.getConsumer();
 		log.info("获取用户信息");
 		Consumer user = apiSessionUtil.getConsumer();
-		if(user==null) return new Result(Result.ERROR, "未获取到用户,请重试");
 		try {
 			log.info("获取订单类型");
 			if(oparam!=null) {
@@ -98,6 +97,7 @@ public class ApiOrderService {
 			return new Result(Result.ERROR, "未获取到参数");
 		}
 
+		if(user==null) return new Result(Result.ERROR, "未获取到用户,请重试");
 		try {
 			int storagen = 0;
 			if("1".equals(type)) {
