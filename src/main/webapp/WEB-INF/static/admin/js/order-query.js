@@ -1,4 +1,5 @@
 var dataList = null;
+var itemList = null;
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
@@ -105,11 +106,11 @@ $(function() {
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
                         $operate.find(".detail").click(function () {
-                            //获取仓库商品类型下拉框
                             $.post("order/order-info", {orderId: v}, function (data) {
                                 var _data = data.data;
                                 formInit($("#orderInfo form"), _data);
 
+                                itemList.load();
                                 $('#orderInfo').modal('show');
                             }, "json");
                         });
@@ -129,6 +130,47 @@ $(function() {
 			return obj;
 		}
 	});
+    itemList = new $.DSTable({
+        "url" : '/order/item-list',
+        "ct" : "#itemResult",
+        "cm" : [{
+            "header" : "商品属性",
+            "dataIndex" : "skuProperty",
+            "renderer":function(v,record){
+                var pro = "";
+                v = eval(v);
+                for(p in v){
+                    for(key in v[p]){
+                        if(key=="keyValue"){
+                            pro += v[p][key] + " ";
+                        }
+                    }
+                }
+                pro = pro.substring(0, pro.length-1);
+                var skuGoodsType = record.skuGoodsType;
+                if(skuGoodsType=="1") skuGoodsType="白卡";
+                else if(skuGoodsType=="2") skuGoodsType="普号";
+                else if(skuGoodsType=="3") skuGoodsType="普靓";
+                else if(skuGoodsType=="4") skuGoodsType="超靓";
+                return skuGoodsType+" ("+pro+")";
+            }
+        },{
+            "header" : "手机号码",
+            "dataIndex" : "num"
+        },{
+            "header" : "采购数量",
+            "dataIndex" : "quantity"
+        },{
+            "header" : "单价",
+            "dataIndex" : "price"
+        },{
+            "header" : "总价",
+            "dataIndex" : "total"
+        }],
+        "getParam" : function(){
+            return {"orderId" : $("#orderId").val()};
+        }
+    });
 	dataList.load();
 
 	$("#query").click(function() {
@@ -140,65 +182,3 @@ $(function() {
 	}
 
 });
-var titleStrObj = {
-    "skuId":{
-        "isShow":false,
-        "title":"skuId",
-        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
-        "titleClass":"col-xs-1"
-    },
-    "skuTobPrice":{
-        "isShow":true,
-        "title":"2B价格",
-        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
-        "titleClass":"col-xs-1"
-    },
-    "skuTocPrice":{
-        "isShow":true,
-        "title":"2C价格",
-        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
-        "titleClass":"col-xs-1"
-    },
-    // "skuIsNum":{
-    //     "isShow":true,
-    //     "title":"是否号码",
-    //     "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">是</option><option value="2">否</option></select>',
-    //     "titleClass":""
-    // },
-    "skuSaleNum":{
-        "isShow":true,
-        "title":"所售号码",
-        "type":'<textarea tag="sku_skuindex" class="col-xs-12" style="height:34px;resize: none;width:150px" type="text" onclick="selectSaleNum(this)" name="skukey" textareaValue="skuvalue" class="col-xs-12" readonly></textarea>',
-        "titleClass":"col-xs-1"
-    },
-    "skuNum":{
-        "isShow":true,
-        "title":"数量",
-        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
-        "titleClass":"col-xs-1"
-    },
-    "skuOrderType":{
-        "isShow":true,
-        "title":"商品类型",
-        "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">普号</option><option value="3">普靓</option><option value="4">超靓</option></select>',
-        "titleClass":""
-    },
-    "skuRepoOrderName":{
-        "isShow":false,
-        "title":"关联仓库商品",
-        "type":'<input tag="sku_skuindex" type="hidden" name="skukey" value="skuvalue" class="col-xs-12">',
-        "titleClass":""
-    },
-    "skuRepoOrder":{
-        "isShow":true,
-        "title":"关联仓库商品",
-        "type":'<select tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
-        "titleClass":""
-    },
-    "operation":{
-        "isShow":true,
-        "title":"操作",
-        "type":'<a class="btn btn-danger btn-xs delete" href="javascript:void(0);" onclick="deleteSkuRow(this)">删除</a>',
-        "titleClass":""
-    }
-};

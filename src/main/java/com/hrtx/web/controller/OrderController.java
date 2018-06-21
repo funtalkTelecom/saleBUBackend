@@ -4,6 +4,8 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.Order;
+import com.hrtx.web.pojo.OrderItem;
+import com.hrtx.web.service.OrderItemService;
 import com.hrtx.web.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,8 @@ public class OrderController extends BaseReturn{
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private OrderService orderService;
+	@Autowired
+	private OrderItemService orderItemService;
 
 	@RequestMapping("/order-query")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
@@ -34,6 +38,14 @@ public class OrderController extends BaseReturn{
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
 	public Result listOrder(Order order){
 		return orderService.pageOrder(order);
+	}
+
+	@RequestMapping("/item-list")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
+	public Result listItem(OrderItem orderItem){
+		orderItem.setPageNum(1);
+		orderItem.setLimit(999999);
+		return orderItemService.pageOrderItem(orderItem);
 	}
 
 	@RequestMapping("/order-info")

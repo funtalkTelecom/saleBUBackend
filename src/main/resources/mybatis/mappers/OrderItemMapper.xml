@@ -31,6 +31,40 @@
         <include refid="col_list"/>
         from tb_order_item a
         where 1=1
+        <if test="param.orderId!=null and param.orderId != ''">
+            and a.order_id = #{param.orderId}
+        </if>
+    </select>
+
+    <resultMap id="OrderItemDetail" type="java.util.HashMap">
+        <result property="itemId" column="itemId" javaType="java.lang.String"></result>
+        <result property="orderId" column="orderId" javaType="java.lang.String"></result>
+        <result property="goodsId" column="goodsId" javaType="java.lang.String"></result>
+        <result property="skuId" column="skuId" javaType="java.lang.String"></result>
+        <result property="skuProperty" column="skuProperty"></result>
+        <result property="numId" column="numId" javaType="java.lang.String"></result>
+        <result property="num" column="num"></result>
+        <result property="isShipment" column="isShipment"></result>
+        <result property="sellerId" column="sellerId" javaType="java.lang.String"></result>
+        <result property="sellerName" column="sellerName"></result>
+        <result property="shipmentApi" column="shipmentApi"></result>
+        <result property="companystockId" column="companystockId" javaType="java.lang.String"></result>
+        <result property="quantity" column="quantity"></result>
+        <result property="price" column="price"></result>
+        <result property="total" column="total"></result>
+        <result property="mealId" column="mealId" javaType="java.lang.String"></result>
+        <result property="iccid" column="iccid" javaType="java.lang.String"></result>
+        <result property="skuGoodsType" column="skuGoodsType"></result>
+    </resultMap>
+    <select id="queryPageListDetail" resultMap="OrderItemDetail">
+        select
+        b.sku_goods_type as skuGoodsType,
+        <include refid="col_list"/>
+        from tb_order_item a left join tb_sku b on b.sku_id = a.sku_id
+        where 1=1
+        <if test="orderId!=null and orderId != ''">
+            and a.order_id = #{orderId}
+        </if>
     </select>
 
     <insert id="insertBatch">
