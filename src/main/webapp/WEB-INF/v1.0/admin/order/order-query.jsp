@@ -100,7 +100,7 @@
 								</div>
 								<label class="col-xs-2 control-label">用户名称</label>
 								<div class="col-xs-3">
-									<input type="text" class="form-control" name="orderType">
+									<input type="text" class="form-control" name="consumerName">
 								</div>
 							</div>
 							<div class="form-group">

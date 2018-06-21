@@ -15,4 +15,6 @@ public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
     Order findOrderInfo(@Param("orderid") Long id);
 
     Page<Object> getOrderByConsumer(Order order);
+
+    Page<Object> queryPageList(@Param("param") Order order, @Param("sellerId") Long sellerId);
 }
