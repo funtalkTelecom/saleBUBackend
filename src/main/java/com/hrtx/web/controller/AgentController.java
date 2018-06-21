@@ -58,12 +58,17 @@ public class AgentController {
 	public Result listAgent(){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		long consumerId =consumer.getId();
-//		String  a = "1007534495353536512";
+//		String  a = "1006420771322462209";
 //		long consumerId =Long.valueOf(a);
+		Map map = new HashMap();
 		List list = agentService.findAgentListByaddConsumerId(consumerId);
-		if(list.size()==0) return  new Result(Result.OK,list);
-		Map map = (Map) list.get(0);
-		map.put("tradingImgUrl", SystemParam.get("domain-full") + "get-img/trading_url/1000/" +map.get("trading_img").toString());
+		if(list.size()==0){
+			map.put("isAgent","false");
+		}else {
+			map = (Map) list.get(0);
+			map.put("isAgent","true");
+			map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +map.get("trading_img").toString());
+		}
 		return new Result(Result.OK, map);
 	}
 
