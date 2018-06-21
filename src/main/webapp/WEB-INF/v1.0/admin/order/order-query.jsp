@@ -92,130 +92,113 @@
 						</h4>
 					</div>
 					<form role="form" class="form-horizontal" enctype="multipart/form-data">
-						<input name="gId" id="gId" type="hidden">
 						<div class="modal-body">
 							<div class="form-group">
-								<label class="col-xs-2 control-label">大类</label>
+								<label class="col-xs-2 control-label">订单编号</label>
 								<div class="col-xs-3">
-									<select class="form-control" name="gType1" id="gType1">
-										<option value="-1">请选择...</option>
-									</select>
+									<input type="text" class="form-control" name="orderId" id="orderId">
 								</div>
-								<label class="col-xs-2 control-label" style="display: none">小类</label>
+								<label class="col-xs-2 control-label">用户名称</label>
 								<div class="col-xs-3">
-									<select class="form-control" style="display: none" name="gType2" id="gType2">
-										<option value="-1">请选择...</option>
-									</select>
+									<input type="text" class="form-control" name="orderType">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-xs-2 control-label">订单名称</label>
+								<label class="col-xs-2 control-label">状态</label>
 								<div class="col-xs-3">
-									<input type="text" class="form-control" name="gName">
+									<input type="text" class="form-control" name="status">
 								</div>
-								<label class="col-xs-2 control-label">宣传语</label>
+								<label class="col-xs-2 control-label">添加时间</label>
 								<div class="col-xs-3">
-									<input type="text" class="form-control" name="gAd">
-								</div>
-							</div>
-
-							<div class="form-group">
-								<label class="col-xs-2 control-label">销售地市</label>
-								<div class="col-xs-4">
-									<input type="text" class="form-control" name="gSaleCityStr" id="gSaleCityStr" readonly>
-									<input type="hidden" class="form-control" name="gSaleCity" id="gSaleCity">
-									<div id="gSaleCityContent" style="z-index: 999999;">
-										<div id="menuContent" class="menuContent" style="display:none; position: absolute;z-index: 999999;">
-											<ul id="cityTree" strObj="gSaleCityStr" valObj="gSaleCity" class="ztree" style="height:auto;max-height:500px;margin-top:0; width:180px; height: auto;overflow:auto;"></ul>
-										</div>
-									</div>
+									<input type="text" class="form-control" name="addDate">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-xs-2 control-label">是否竞拍</label>
-								<div class="col-xs-2">
-									<div class="control-group">
-										<div class="radio col-xs-2" style="width: auto;">
-											<label>
-												<input name="gIsAuc" type="radio" class="ace" value="1">
-												<span class="lbl">是</span>
-											</label>
-										</div>
-
-										<div class="radio col-xs-2" style="width: auto;">
-											<label>
-												<input name="gIsAuc" type="radio" class="ace" value="0" checked>
-												<span class="lbl">否</span>
-											</label>
-										</div>
-									</div>
+								<label class="col-xs-2 control-label">收货人</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="personName">
 								</div>
-								<div class="col-xs-4">
-									<div class="control-group">
-										<select class="form-control" id="gActive" name="gActive">
-										</select>
-									</div>
-								</div>
-							</div>
-							<div class="form-group" style="display: none" id="isAucContent">
-								<div class="control-group">
-									<label class="col-xs-2 control-label">轮询时间(分钟)</label>
-									<div class="col-xs-1" style="width:100px">
-										<select class="form-control" name="gLoopTime" id="gLoopTime">
-											<option value="-1">请选择...</option>
-										</select>
-									</div>
-									<label class="col-xs-1 control-label" style="width:100px">起拍人数</label>
-									<div class="col-xs-1" style="width:100px">
-										<input type="text" class="form-control" name="gStartNum">
-									</div>
-									<label class="col-xs-1 control-label" style="width:100px">保证金</label>
-									<div class="col-xs-1" style="width:100px">
-										<input type="text" class="form-control" name="gDeposit">
-									</div>
-									<label class="col-xs-1 control-label" style="width:100px">每次加价</label>
-									<div class="col-xs-1" style="width:100px">
-										<input type="text" class="form-control" name="gPriceUp">
-									</div>
+								<label class="col-xs-2 control-label">收货电话</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="personTel">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-xs-2 control-label">是否打包</label>
-								<div class="col-xs-4">
-									<div class="control-group">
-										<div class="radio col-xs-2" style="width: auto;">
-											<label>
-												<input name="gIsPack" type="radio" class="ace" value="1">
-												<span class="lbl">是</span>
-											</label>
-										</div>
-
-										<div class="radio col-xs-2" style="width: auto;">
-											<label>
-												<input name="gIsPack" type="radio" class="ace" value="0" checked>
-												<span class="lbl">否</span>
-											</label>
-										</div>
-									</div>
+								<label class="col-xs-2 control-label">收货地址</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="address">
+								</div>
+								<label class="col-xs-2 control-label">运输方式</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="shippingMenthod">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-xs-2 control-label">有效期</label>
-								<div class="col-xs-8">
-									<div class="control-group">
-										<div class="col-xs-3">
-											<input type="text" class="form-control" name="gStartTime" id="gStartTime" readonly>
-										</div>
-										<div class="col-xs-3" style="width: 10px; padding: 0px; height: 34px; line-height: 34px;">
-											-
-										</div>
-										<div class="col-xs-3">
-											<input type="text" class="form-control" name="gEndTime" id="gEndTime" readonly>
-										</div>
-									</div>
+								<label class="col-xs-2 control-label">快递公司</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="expressName">
+								</div>
+								<label class="col-xs-2 control-label">快递单号</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="expressNumber">
 								</div>
 							</div>
-
+							<div class="form-group">
+								<label class="col-xs-2 control-label">发货时间</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="deliverDate">
+								</div>
+								<label class="col-xs-2 control-label">通知出货时间</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="noticeShipmentDate">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-xs-2 control-label">支付方式</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="payMenthod">
+								</div>
+								<label class="col-xs-2 control-label">付款日期</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="payDate">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-xs-2 control-label">签收方式</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="signType">
+								</div>
+								<label class="col-xs-2 control-label">签收时间</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="signDate">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-xs-2 control-label">优惠券</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="commission">
+								</div>
+								<label class="col-xs-2 control-label">运输费用</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="shippingTotal">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-xs-2 control-label">子项小计</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="subTotal">
+								</div>
+								<label class="col-xs-2 control-label">合计</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="total">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-xs-2 control-label">摘要</label>
+								<div class="col-xs-10">
+									<textarea type="text" style="width: 468px" class="form-control input-xxlarge" name="conment" ></textarea>
+								</div>
+							</div>
 							<%--item列表--%>
 							<h3 class="header smaller lighter blue">列表</h3>
 							<div id="itemResult" style="overflow: auto;">

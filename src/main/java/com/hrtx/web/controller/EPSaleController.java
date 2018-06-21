@@ -68,6 +68,13 @@ public class EPSaleController extends BaseReturn{
 		return epSaleService.findEPSaleList();
 	}
 
+	@GetMapping("/epSales")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public Result findEpSaleList(EPSale epSale){
+		return epSaleService.findEPSaleList();
+	}
+
 	/**
 	 * 查询竟拍活动的商品列表
 	 * 未过期

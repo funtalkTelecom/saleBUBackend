@@ -585,7 +585,7 @@ function getActive(){
     $.ajax({
         type: "GET",
         async: true,
-        url: "api/epSales",
+        url: "epSales",
         success: function(data){
             if(data.code=="200"){
                 activeSelectOptions = data.data;
