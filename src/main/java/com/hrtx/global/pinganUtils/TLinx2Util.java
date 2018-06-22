@@ -56,7 +56,7 @@ public class TLinx2Util {
         return sign;
     }
     
-    public static String signRSA(Map<String, String> postMap) {
+    public static String signRSA(Map<String, String> postMap, String privateKey) {
         String sortStr = null;
         String sign    = null;
 
@@ -66,7 +66,7 @@ public class TLinx2Util {
              * 1 A~z排序(加上open_key)
              */
             sortStr = TLinxUtil.sort(postMap);
-            sign = TLinxRSACoder.sign(sortStr.getBytes("utf-8"),PinganService.getPrivateKey());
+            sign = TLinxRSACoder.sign(sortStr.getBytes("utf-8"), privateKey);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,14 +152,14 @@ public class TLinx2Util {
      * 签名
      * @param postmap
      */
-    public static void handleSignRSA(TreeMap<String, String> postmap) {
+    public static void handleSignRSA(TreeMap<String, String> postmap, String privateKey) {
         Map<String, String> veriDataMap = new HashMap<String, String>();
 
         veriDataMap.putAll(postmap);
         veriDataMap.put("open_key",PinganService.getOpenKey());
 
         // 签名
-        String sign = signRSA(veriDataMap);
+        String sign = signRSA(veriDataMap, privateKey);
 
         postmap.put("sign", sign);
     }

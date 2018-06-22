@@ -9,6 +9,8 @@ import com.hrtx.web.pojo.*;
 import net.sf.json.JSONObject;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +29,13 @@ public class PinganService {
 	public static String PAYCANCEL = "paycancel";
 	public static String PAYREFUND = "payrefund";
 
-	public static String getPrivateKey(){
-		return SystemParam.get("pingan_private_key");
+	@Value("${pingan.private.key}")
+	public String privateKey;
+
+	public String getPrivateKey(){
+		return this.privateKey;
 	}
+
 	public static String getOpenId(){
 		return SystemParam.get("pingan_open_id");
 	}
@@ -138,7 +144,7 @@ public class PinganService {
 		/**
 		 * 2 请求参数签名 按A~z排序，串联成字符串，先进行RSA签名
 		 */
-		TLinx2Util.handleSignRSA(postmap);
+		TLinx2Util.handleSignRSA(postmap, this.getPrivateKey());
 
 		/**
 		 * 3 请求、响应
@@ -195,7 +201,7 @@ public class PinganService {
 		/**
 		 * 2 请求参数签名 按A~z排序，串联成字符串，进行RSA签名
 		 */
-		TLinx2Util.handleSignRSA(postmap);
+		TLinx2Util.handleSignRSA(postmap, this.getPrivateKey());
 
 		/**
 		 * 3 请求、响应

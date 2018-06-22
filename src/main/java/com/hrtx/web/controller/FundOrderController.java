@@ -28,9 +28,8 @@ public class FundOrderController extends BaseReturn{
 	@PostMapping("/pay-order")
 	@Powers({PowerConsts.NOLOGINPOWER})
 	public Result payOrder(@Validated(value = {Groups.FundOrderPayOrder.class}) FundOrder fundOrder, BindingResult result){
-        if(result.hasErrors()) return new Result(Result.ERROR, this.getErrors(result.getFieldErrors()));
-//		Result result = fundOrderService.payAddOrder(busi_type, amt, payer, order_name, sourceId);
-//        fundOrder.setPayer("oKvRM5YKZpcp1nIFcyBgApnC-bLk");
+//	public Result payOrder(String orderId){
+//        if(result.hasErrors()) return new Result(Result.ERROR, this.getErrors(result.getFieldErrors()));
 		return fundOrderService.payPinganWxxOrder(fundOrder.getAmt(), fundOrder.getOrderName(), fundOrder.getSourceId());
 	}
 
