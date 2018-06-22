@@ -137,7 +137,7 @@ public class EPSaleController extends BaseReturn{
 			 subPrice=auction.getPrice();
 			 if(startPrice>subPrice)
 			 {
-				 returnResult(new Result(602, "当前加价不符规则;加价不能低于起拍价"+startPrice));
+				 returnResult(new Result(603, "当前加价不符规则;加价不能低于起拍价"+startPrice));
 			 }
 		}
 		if(subPrice>0)

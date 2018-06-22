@@ -1,36 +1,24 @@
 package com.hrtx.web.test;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hrtx.dto.Result;
-import com.hrtx.global.SystemParam;
-import com.hrtx.web.pojo.City;
 import net.sf.json.JSONObject;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Date;
-
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -79,7 +67,13 @@ public class TestDemo {
 
 
         RequestBuilder  request_epSaleGoodsAuciton=post("/api/epSaleGoodsAuciton?__sessid="+token).
-        param("skuId", "收货地此测此...").param("personName", "收货人林林");
+                param("skuId", "1008886610579685376")
+                .param("numId", "989625959558676480")
+                .param("num", "17086379765")
+                .param("gId", "1006737565283254272")
+                .param("gName", "1")
+                .param("price", "2630");
+
 
         ResultActions resultActions_epSaleGoodsAuciton=mvc.perform(request_epSaleGoodsAuciton);
         MvcResult result_epSaleGoodsAuciton= resultActions_epSaleGoodsAuciton.andReturn();
@@ -88,6 +82,34 @@ public class TestDemo {
 
 
 
+
+        RequestBuilder  request_epSaleAuctions=get("/api/epSaleAuctions/989625959558676480?__sessid="+token);
+
+
+        ResultActions resultActions_epSaleAuctions=mvc.perform(request_epSaleAuctions);
+        MvcResult result_epSaleAuctions= resultActions_epSaleAuctions.andReturn();
+        String resultStr_epSaleAucitons= result_epSaleAuctions.getResponse().getContentAsString();
+        System.out.println("epSaleAuctions***返回值字符串  =================    "+resultStr_epSaleAucitons);
+
+
+
+
+
+
+
+
+
+
+
+
+        RequestBuilder request7= get("/api/epSales?__sessid="+token);
+        // .param("addUserId", "1");
+        ResultActions resultActions7=mvc.perform(request7);
+        resultActions7.andDo(MockMvcResultHandlers.print()).andExpect(status().isOk());
+        MvcResult result7= resultActions7.andReturn();
+        String resultStr7= result7.getResponse().getContentAsString();
+        System.out.println("epSales列表***返回值字符串  =================    "+resultStr7);
+
         RequestBuilder  request_epSaleGoodss=get("/api/epSaleGoodss/1004991115960516609?__sessid="+token);
         ResultActions resultActions_epSaleGoodss=mvc.perform(request_epSaleGoodss);
         MvcResult result_epSaleGoodss= resultActions_epSaleGoodss.andReturn();
@@ -95,12 +117,38 @@ public class TestDemo {
         System.out.println("epSaleGoodss***返回值字符串  =================    "+resultStr_epSaleGoodss);
 
 
-       // SystemParam.load();
-        RequestBuilder  request_epSaleGoods=get("/api/epSaleGoods/1006737565283254272?__sessid="+token);
-        ResultActions resultActions_epSaleGoods=mvc.perform(request_epSaleGoods);
-        MvcResult result_epSaleGoods= resultActions_epSaleGoods.andReturn();
-        String resultStr_epSaleGoods= result_epSaleGoods.getResponse().getContentAsString();
-        System.out.println("resultStr_epSaleGoods***返回值字符串  =================    "+resultStr_epSaleGoods);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*    RequestBuilder  request_epSaleGoodss=get("/api/epSaleGoodss/1004991115960516609?__sessid="+token);
+        ResultActions resultActions_epSaleGoodss=mvc.perform(request_epSaleGoodss);
+        MvcResult result_epSaleGoodss= resultActions_epSaleGoodss.andReturn();
+        String resultStr_epSaleGoodss= result_epSaleGoodss.getResponse().getContentAsString();
+        System.out.println("epSaleGoodss***返回值字符串  =================    "+resultStr_epSaleGoodss);
+*/
+
+
 
 
 
@@ -124,15 +172,6 @@ public class TestDemo {
         System.out.println("deliveryAddress列表***返回值字符串  =================    "+resultStr99);
 
 
-//列表epSales s
-        //RequestBuilder request = get("/hello-world-users");
-        RequestBuilder request7= get("/api/epSales");
-        // .param("addUserId", "1");
-        ResultActions resultActions7=mvc.perform(request7);
-        resultActions7.andDo(MockMvcResultHandlers.print()).andExpect(status().isOk());
-        MvcResult result7= resultActions7.andReturn();
-        String resultStr7= result7.getResponse().getContentAsString();
-        System.out.println("epSales列表***返回值字符串  =================    "+resultStr7);
 
         request =get("/api/hello-world-user?__sessid="+token);
         resultActions=mvc.perform(request);
