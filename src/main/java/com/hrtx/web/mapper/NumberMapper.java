@@ -24,4 +24,6 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
     void freezeNumByIds(@Param("numberList") List<Number> nlist, @Param("status") String status);
 
     List<Number> getListBySkuidAndStatus(@Param("skuid") String skuid, @Param("status") String status, @Param("numcount") int numcount);
+
+    Page<Object> queryPageListApiForNumber3(@Param("skuGoodsType") String skuGoodsType,@Param("agentCity") Long agentCity);
 }
