@@ -219,10 +219,10 @@ public class EPSaleController extends BaseReturn{
 					Result res=fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(deposit),orderNameStr,auctionDepositId.toString());
 					if(res.getCode()==200)
 					{
-						res.setCode(604);//"保证金支付"
+						res.setCode(604);//"保证金支付中"
 					}else
 					{
-						res.setCode(605);//"保证金支付异常"
+						res.setCode(605);//"保证金支付中异常"
 					}
 					//returnResult(new Result(600, "保证金未支付"+res.getData().toString()));
 					 returnResult(res);
