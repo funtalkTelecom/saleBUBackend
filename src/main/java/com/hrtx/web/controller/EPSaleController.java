@@ -114,7 +114,6 @@ public class EPSaleController extends BaseReturn{
 		{
 			startPrice=Double.valueOf(numMap.get("skuTobPrice").toString());
 		}
-		startPrice=1000.00;
 		//最近10次数出价记录
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumId(Long.valueOf(auction.getNumId()));
 		double priceUp=Double.valueOf(goods.getgPriceUp());//每次加价
