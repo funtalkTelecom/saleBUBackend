@@ -217,6 +217,13 @@ public class EPSaleController extends BaseReturn{
 					auctionService.auctionEdit(auction);//出价记录 状态：1初始
 					String orderNameStr="商品"+auction.getgName()+",保证金支付,额度:"+deposit;
 					Result res=fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(deposit),orderNameStr,auctionDepositId.toString());
+					if(res.getCode()==200)
+					{
+						res.setCode(604);//"保证金支付"
+					}else
+					{
+						res.setCode(605);//"保证金支付异常"
+					}
 					//returnResult(new Result(600, "保证金未支付"+res.getData().toString()));
 					 returnResult(res);
 				}
