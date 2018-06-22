@@ -38,8 +38,8 @@ public class FundOrderService extends BaseService {
      */
     @NoRepeat
     public Result payPinganWxxOrder(int amt, String orderName, String sourceId) {
-//        Result result = this.getPayer(2);
-        Result result = new Result(Result.OK, "o1F3M4sVzb7FUkxpgzGBinJWpnQA");
+        Result result = this.getPayer(2);
+//        Result result = new Result(Result.OK, "o1F3M4sVzb7FUkxpgzGBinJWpnQA");
         if(result.getCode() != Result.OK) return result;
         return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, "", String.valueOf(result.getData()), orderName, FundOrder.THIRD_PAY_PINGANAPP, sourceId, "");
     }
@@ -196,7 +196,7 @@ public class FundOrderService extends BaseService {
         }
         if(FundOrder.BUSI_TYPE_PAYDEPOSIT.equals(busiType)) {//保证金支付完成 回调
             try{
-                auctionDepositService.auctionDepositPay(orderId, status == 1 ? true : false, payTime);
+                auctionDepositService.newAuctionDepositPay(orderId, status == 1 ? true : false, payTime);
             }catch (Exception e) {
                 log.error("支付完成更新保证金回调信息异常", e);
             }
@@ -258,7 +258,7 @@ public class FundOrderService extends BaseService {
             } finally {
                 fundDetail.setResCode(result.getCode());
                 String desc = String.valueOf(result.getData());
-                desc = desc.length() > 200 ? desc.substring(0, 199) : desc;
+                desc = desc.length() > 1000 ? desc.substring(0, 999) : desc;
                 fundDetail.setResDesc(desc);
                 if(result.getCode() == Result.WARN) {//请求未知
                     fundDetail.setStatus(2);//请求中

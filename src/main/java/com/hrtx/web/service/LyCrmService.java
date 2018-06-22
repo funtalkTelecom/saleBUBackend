@@ -8,6 +8,7 @@ import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.NumBaseMapper;
 import com.hrtx.web.mapper.NumMapper;
 import com.hrtx.web.mapper.SequenceMapper;
+import com.hrtx.web.pojo.Num;
 import com.hrtx.web.pojo.NumBase;
 import com.hrtx.web.pojo.Sequence;
 import com.hrtx.webservice.crmsps.CrmSpsServiceLocator;
