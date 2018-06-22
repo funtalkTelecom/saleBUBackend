@@ -74,8 +74,6 @@ public class ApiNumberController extends BaseReturn{
 		PageInfo<Object> pm = null;
 		try {
 			Consumer consumer = apiSessionUtil.getConsumer();
-			consumer = new Consumer();
-			consumer.setAgentCity(47L);
 			if(consumer==null) return new Result(Result.ERROR, "未获取到用户");
 
 			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
