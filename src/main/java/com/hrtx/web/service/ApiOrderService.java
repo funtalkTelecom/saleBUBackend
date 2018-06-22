@@ -149,7 +149,7 @@ public class ApiOrderService {
 							}
 							//判断商品地市和代理商地市
 							log.info("判断商品地市和代理商地市");
-							if(user.getAgentDistrict()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentDistrict()))) {
+							if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
 								return new Result(Result.ERROR, "不属于您的地市,无法操作");
 							}
 							orderItem.setGoodsId(goods.getgId());
@@ -304,7 +304,7 @@ public class ApiOrderService {
 								}
 								log.info("判断商品地市和代理商地市");
 								//判断商品地市和代理商地市
-								if(user.getAgentDistrict()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentDistrict()))) {
+								if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
 									freezeNum(numid, String.valueOf(number.get("status")));
 									return new Result(Result.ERROR, "不属于您的地市,无法操作");
 								}
@@ -684,5 +684,21 @@ public class ApiOrderService {
 		}
 
 		return new Result(Result.OK, pm);
+	}
+
+	public Result getOrderAndItemsByOrderId(HttpServletRequest request, String id) {
+		Map o = new HashMap();
+		try{
+			Order order = orderMapper.findOrderInfo(Long.parseLong(id));
+			OrderItem orderItem = new OrderItem();
+			orderItem.setOrderId(Long.parseLong(id));
+			List list = orderItemMapper.queryPageListDetailForConsumer(orderItem);
+			o.put("order", order);
+			o.put("orderItem", list);
+		}catch(Exception e){
+			return new Result(Result.ERROR, "获取异常");
+		}
+
+		return new Result(Result.OK, o);
 	}
 }

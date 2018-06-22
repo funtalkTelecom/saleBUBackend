@@ -128,6 +128,33 @@
         </if>
     </select>
 
+    <resultMap id="queryPageListApiForNumber3" type="java.util.HashMap">
+        <result property="id" column="id" javaType="java.lang.String"></result>
+        <result property="name" column="name"></result>
+        <result property="phone" column="phone"></result>
+        <result property="numResource" column="num_resource"></result>
+        <result property="lowConsume" column="low_consume"></result>
+        <result property="skuTocPrice" column="sku_toc_price"></result>
+        <result property="skuTobPrice" column="sku_tob_price"></result>
+    </resultMap>
+    <select id="queryPageListApiForNumber3" resultMap="queryPageListApiForNumber3">
+        select
+            c.name,
+            c.phone,
+            a.id,
+            a.num_resource,
+            a.low_consume,
+            b.sku_toc_price,
+            b.sku_tob_price
+
+        from tb_num a left join tb_sku b on b.sku_id = a.sku_id
+        left join
+          (select max(name) as name, max(phone) as phone, agent_city from tb_consumer GROUP BY agent_city) c
+        on c.agent_city = a.city_id
+        where b.sku_goods_type in (${skuGoodsType})
+        and c.agent_city = #{agentCity}
+    </select>
+
     <update id="updateStatus">
         update tb_num a set
         <if test="status==1">
