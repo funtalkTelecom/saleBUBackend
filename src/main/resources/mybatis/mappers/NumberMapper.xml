@@ -130,6 +130,7 @@
 
     <resultMap id="queryPageListApiForNumber3" type="java.util.HashMap">
         <result property="id" column="id" javaType="java.lang.String"></result>
+        <result property="skuId" column="sku_id" javaType="java.lang.String"></result>
         <result property="name" column="name"></result>
         <result property="phone" column="phone"></result>
         <result property="numResource" column="num_resource"></result>
@@ -145,7 +146,8 @@
             a.num_resource,
             a.low_consume,
             b.sku_toc_price,
-            b.sku_tob_price
+            b.sku_tob_price,
+            b.sku_id
 
         from tb_num a left join tb_sku b on b.sku_id = a.sku_id
         left join
