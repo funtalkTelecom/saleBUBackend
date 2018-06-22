@@ -86,7 +86,7 @@ public class ApiNumberController extends BaseReturn{
 			else skuGoodsType = "'" + skuGoodsType.replaceAll(",", "','") + "'";
 
 			PageHelper.startPage(number.getPageNum(),number.getLimit());
-			Page<Object> ob=this.numberMapper.queryPageListApiForNumber3(skuGoodsType, consumer.getAgentCity());
+			Page<Object> ob=this.numberMapper.queryPageListApiForNumber3(skuGoodsType, consumer.getAgentCity(),consumer.getIsAgent());
 			if(ob!=null && ob.size()>0){
 				//处理号码,生成号码块字段(numBlock)
 				for (int i = 0; i < ob.size(); i++) {

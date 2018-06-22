@@ -11,6 +11,7 @@ import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
 import net.sf.json.JSONArray;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -309,10 +310,15 @@ public class ApiOrderService {
 								}
 								log.info("判断商品地市和代理商地市");
 								//判断商品地市和代理商地市
-								if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
+
+									if(!StringUtils.equals(number.get("city_id")+"",user.getAgentCity()+"")) {
+										freezeNum(numid, String.valueOf(number.get("status")));
+										return new Result(Result.ERROR, "不属于您的地市,无法操作");
+								}
+								/*if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
 									freezeNum(numid, String.valueOf(number.get("status")));
 									return new Result(Result.ERROR, "不属于您的地市,无法操作");
-								}
+								}*/
 							}
 							List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 

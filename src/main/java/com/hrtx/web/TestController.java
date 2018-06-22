@@ -13,6 +13,7 @@ import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.TokenGenerator;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.User;
+import com.hrtx.web.service.ConsumerService;
 import net.sf.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ public class TestController {
     @Autowired private UserService userService;
     @Autowired private EventService eventService;
     @Autowired private ApiSessionUtil apiSessionUtil;
+    @Autowired private ConsumerService consumerService;
 
     @RequestMapping("/")
     @Powers({PowerConsts.NOLOGINPOWER})
@@ -193,8 +195,8 @@ public class TestController {
         Consumer user= this.apiSessionUtil.getConsumer();
         System.out.println("获取用户  "+user);
         user=new Consumer();
-        user.setId(1234567890l);
-        user.setName("zjc");
+        user.setId(1009758228466106368l);
+        user=consumerService.getConsumerById(user);
         String token=TokenGenerator.generateValue();
         this.apiSessionUtil.saveOrUpdate(token,user);
         System.out.println("method{login}  "+user.getName());

@@ -155,7 +155,10 @@
           (select max(name) as name, max(phone) as phone, agent_city from tb_consumer GROUP BY agent_city) c
         on c.agent_city = a.city_id
         where b.sku_goods_type in (${skuGoodsType})
-        and c.agent_city = #{agentCity}
+        <if test="isAgent==2">
+            and a.city_id = #{agentCity}
+        </if>
+
         and a.status = 2
     </select>
 
