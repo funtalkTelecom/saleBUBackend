@@ -98,6 +98,9 @@ public class ApiNumberController extends BaseReturn{
 						obj.put("lowConsume", "");
 						obj.put("skuTocPrice", "");
 						obj.put("skuTobPrice", "");
+						obj.put("isAgent", "0");
+					}else{
+						obj.put("isAgent", "1");
 					}
 				}
 			}
