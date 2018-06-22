@@ -238,4 +238,35 @@ public class BaseReturn {
 		}
 		return errors;
     }
+
+	protected String getParamBody(HttpServletRequest request) {
+		InputStream is = null;
+		BufferedReader reader = null;
+		try {
+			is = request.getInputStream();
+			reader = new BufferedReader(new InputStreamReader(is,"UTF-8"));
+			StringBuffer buffer = new StringBuffer();
+			String line=null;
+			while((line = reader.readLine())!=null){
+				buffer.append(line);
+			}
+			return buffer.toString();
+		} catch (Exception e) {
+			log.error("解析参数流异常",e);
+			return "解析参数流异常";
+		}finally{
+			try {
+				if(is != null) {
+					is.close();
+					is = null;
+				}
+				if(reader != null){
+					reader.close();
+					reader = null;
+				}
+			} catch (IOException e) {
+				log.error("",e);
+			}
+		}
+	}
 }

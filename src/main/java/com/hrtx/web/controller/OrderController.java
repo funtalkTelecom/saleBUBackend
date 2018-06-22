@@ -1,12 +1,16 @@
 package com.hrtx.web.controller;
 
+import com.hrtx.config.advice.ServiceException;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
+import com.hrtx.dto.StorageInterfaceRequest;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.global.SystemParam;
 import com.hrtx.web.pojo.Order;
 import com.hrtx.web.pojo.OrderItem;
 import com.hrtx.web.service.OrderItemService;
 import com.hrtx.web.service.OrderService;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,5 +66,23 @@ public class OrderController extends BaseReturn{
 		map.put("code", Result.OK);
 		map.put("data", orderService.findOrderById(order.getOrderId()));
 		return map;
+	}
+
+	@RequestMapping("/deliver-order-callback")
+	@Powers({PowerConsts.NOLOGINPOWER})
+	public void deliverOrderCallback(HttpServletRequest request){
+		try{
+			String param = this.getParamBody(request);
+			log.info("接收到发货回调参数["+param+"]");
+			StorageInterfaceRequest storageInterfaceRequest = StorageInterfaceRequest.create(param, SystemParam.get("key"));
+//			Result result = orderService.
+		}catch (ServiceException e) {
+			log.error(e.getMessage(), e);
+			renderHtml(e.getMessage());
+		}catch (Exception e) {
+			long err_no=System.currentTimeMillis();
+			log.error("系统未知异常"+err_no, e);
+			renderHtml("系统未知异常"+err_no);
+		}
 	}
 }

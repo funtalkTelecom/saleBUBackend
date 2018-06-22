@@ -7,7 +7,6 @@ import org.springframework.context.annotation.*;
 
 @SpringBootApplication
 @ImportResource(value = {"classpath:applicationContext.xml"})
-@PropertySource(value = {"classpath:regexp.properties"})
 @Configuration
 @ComponentScan(basePackages = "com.hrtx")
 @ServletComponentScan

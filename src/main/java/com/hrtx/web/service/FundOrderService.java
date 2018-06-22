@@ -300,4 +300,15 @@ public class FundOrderService extends BaseService {
         if(consumerLog == null || StringUtils.isBlank(consumerLog.getOpenid())) return new Result(Result.ERROR, "未找到付款账户");
         return new Result(Result.OK, consumerLog.getOpenid());
     }
+
+    @NoRepeat
+    public Result test(String a, String b) {
+        try {
+            Thread.sleep(1000*5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        log.info(a+"----------"+b);
+        return new Result(Result.OK, "success");
+    }
 }
