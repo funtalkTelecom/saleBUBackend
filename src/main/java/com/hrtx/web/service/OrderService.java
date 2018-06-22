@@ -1,25 +1,34 @@
 package com.hrtx.web.service;
 
+
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.CommonMap;
 import com.hrtx.global.SessionUtil;
+import com.hrtx.global.StorageApiCallUtil;
+import com.hrtx.global.SystemParam;
+import com.hrtx.web.mapper.OrderItemMapper;
 import com.hrtx.web.mapper.OrderMapper;
 import com.hrtx.web.pojo.Order;
+import com.hrtx.web.pojo.OrderItem;
 import com.hrtx.web.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.github.abel533.entity.Example;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
+import java.util.Map;
 
 @Service
 public class OrderService {
 
 	@Autowired
 	private OrderMapper orderMapper;
+    @Autowired private OrderItemMapper orderItemMapper;
 
 	public Result pageOrder(Order order) {
 		User user = SessionUtil.getUser();
@@ -34,26 +43,7 @@ public class OrderService {
 		Order order = orderMapper.findOrderInfo(id);
 		return order;
 	}
-}
-import com.github.abel533.entity.Example;
-import com.hrtx.dto.Result;
-import com.hrtx.global.CommonMap;
-import com.hrtx.global.StorageApiCallUtil;
-import com.hrtx.global.SystemParam;
-import com.hrtx.web.mapper.OrderItemMapper;
-import com.hrtx.web.mapper.OrderMapper;
-import com.hrtx.web.pojo.Order;
-import com.hrtx.web.pojo.OrderItem;
-import com.hrtx.web.pojo.System;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.util.*;
-
-@Component
-public class OrderService extends BaseService {
-    @Autowired private OrderMapper orderMapper;
-    @Autowired private OrderItemMapper orderItemMapper;
 
     /**
      * 发货
