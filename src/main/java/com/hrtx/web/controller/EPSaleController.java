@@ -193,18 +193,18 @@ public class EPSaleController extends BaseReturn{
 						Consumer consumer=new Consumer();
 						consumer.setId(consumerId);
 						consumer=consumerService.getConsumerById(consumer);
-						//最近10次出价记录
-						List<Map> goodsAuctionList2=auctionService.findAuctionListByNumId(Long.valueOf(auction.getNumId()));
-						String goodsAuctionListStr="";
+						//出价后的最近10次出价记录
+						List<Map> goodsAuctionListAfter=auctionService.findAuctionListByNumId(Long.valueOf(auction.getNumId()));
+						//String goodsAuctionListStr="";
 						Map goodsAuctionMap=new HashMap();
-						if(goodsAuctionList!=null&&goodsAuctionList.size()>0)
+						if(goodsAuctionListAfter!=null&&goodsAuctionListAfter.size()>0)
 						{
-							goodsAuctionMap.put("goodsAuctionList",goodsAuctionList);
-							goodsAuctionListStr="goodsAuctionList:"+goodsAuctionList;
+							goodsAuctionMap.put("goodsAuctionList",goodsAuctionListAfter);
+							//goodsAuctionListStr="goodsAuctionList:"+goodsAuctionListAfter;
 						}else
 						{
 							goodsAuctionMap.put("goodsAuctionList","");
-							goodsAuctionListStr="goodsAuctionList:"+"";
+							//goodsAuctionListStr="goodsAuctionList:"+"";
 						}
 
 						returnResult(new Result(200, goodsAuctionMap));
