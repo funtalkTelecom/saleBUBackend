@@ -155,6 +155,7 @@
         on c.agent_city = a.city_id
         where b.sku_goods_type in (${skuGoodsType})
         and c.agent_city = #{agentCity}
+        and a.status = 2
     </select>
 
     <update id="updateStatus">
