@@ -37,6 +37,7 @@ public class EPSaleService {
 	@Autowired private FileMapper fileMapper;
     @Autowired private ConsumerMapper consumerMapper;
 	@Autowired private DeliveryAddressMapper deliveryAddressMapper;
+	@Autowired private NumberMapper numberMapper;
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private FundOrderService fundOrderService;
 	@Autowired private ApiOrderService apiOrderService;
@@ -92,6 +93,10 @@ public class EPSaleService {
 
 	public List<Map> findEPSaleGoodsByGoodsId(Long goodsId) {
 		return epSaleMapper.findEPSaleGoodsByGoodsId2(goodsId);
+	}
+
+	public Map findEPSaleNumInfoByNumId(Long numId) {
+		return  numberMapper.getNumInfoById(numId.toString());
 	}
 
 	public EPSale finEPSaleById(Long id) {
