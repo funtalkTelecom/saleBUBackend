@@ -218,6 +218,31 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/**
+	 * 查询竟拍活动的商品的最近10条出价记录
+	 * 最近出价记录10条
+	 * 详情
+	 * @param
+	 * @return
+	 */
+	@GetMapping("/api/epSaleAuctions/{numId}")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public Map findAuctions(@PathVariable("numId") String numId){
+		Map<String, Object> map = new HashMap<String, Object>();
+		//最近10次出价记录
+		List<Map> goodsAuctionList=auctionService.findAuctionListByNumId(Long.valueOf(numId));
+		if(goodsAuctionList!=null&&goodsAuctionList.size()>0)
+		{
+			map.put("goodsAuctionList",goodsAuctionList);
+		}else
+		{
+			map.put("goodsAuctionList","");
+		}
+		map.put("code", Result.OK);
+		map.put("data",map);
+		return map;
+	}
+	/**
 	 * 查询竟拍活动的商品信息
 	 * 详情
 	 * @param
