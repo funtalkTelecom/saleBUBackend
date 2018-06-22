@@ -55,10 +55,18 @@ public class AuctionDepositService {
 
 	/*
 	  保证金支付
-	  status true 成功 false失败
-	  若true成功，对应出价记录status:1 状态调整
+	  可供支付接口调用操作
+	  ****status true 成功 false失败
+	  若true成功
+	   1、保证金支付成功状态status:1 调整为status:2
+	   2、若有对应出价记录（status:1 状态）
+	     1）、有大于本次出价的价格的新记录，则本次出价记录  status:1 调整status:4 落败
+	          注：新记录 status in(2,4)
+	     2）、有与本次出价的价格相同的新记录，则本次出价记录  status:1 调整status:3 落败
+	          注：新记录 status in(2,4)
+	     3）、本次出价出价状态status:1 调整status:2 成功
 	 */
-	public void auctionDepositPay(Long Id,boolean status,String payDate) {
+	public void newAuctionDepositPay(Long Id,boolean status,String payDate) {
 		AuctionDeposit auctionDeposit=new AuctionDeposit();
 		List<Map> auctionDepositList=auctionDepositMapper.findAuctionDepositById(Id);
 				//auctionDepositMapper.findAuctionDepositListById(Id);
