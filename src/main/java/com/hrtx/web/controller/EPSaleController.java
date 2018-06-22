@@ -103,7 +103,7 @@ public class EPSaleController extends BaseReturn{
 		return map;
 	}
 
-	@PostMapping("/api/epSaleGoodsAuciton1")
+	@PostMapping("/api/epSaleGoodsAuciton")
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public void goodsAuciton(Auction auction, HttpServletRequest request) {
