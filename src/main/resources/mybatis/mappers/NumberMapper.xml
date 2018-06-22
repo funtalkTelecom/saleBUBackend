@@ -91,7 +91,8 @@
             select d.num_id from tb_num_rule d where d.`value` in (${tags}) and d.rule_type = 'tag'
         )
         </if>
-        and a.status in ('1', '2')
+        and a.status in ('2')
+        and b.sku_goods_type = '4'
         and c.g_is_sale = '1'
     </select>
 
