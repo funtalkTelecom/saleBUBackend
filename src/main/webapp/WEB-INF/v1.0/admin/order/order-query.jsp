@@ -215,8 +215,8 @@
 
 		<!-- 模态框（Modal） -->
 		<div class="modal fade" id="receiptInfo" tabindex="-1" style="overflow: auto" >
-			<div class="modal-dialog" style="width:300px;">
-				<div class="modal-content" style="width: 300px; max-height:700px; overflow: auto">
+			<div class="modal-dialog" style="width:700px;">
+				<div class="modal-content" style="width: 700px; max-height:300px; overflow: auto">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 							&times;
@@ -228,8 +228,24 @@
 					<form role="form" class="form-horizontal">
 						<div class="modal-body">
 							<div class="form-group">
-								<div class="col-xs-12">
-									<textarea id="saleNum" class="form-control" style="height:500px;resize: none;"></textarea>
+								<label class="col-xs-2 control-label">收款人</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="">
+								</div>
+								<label class="col-xs-2 control-label">收款账号</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-xs-2 control-label">应收</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="">
+								</div>
+								<label class="col-xs-2 control-label">实收</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="">
 								</div>
 							</div>
 						</div>

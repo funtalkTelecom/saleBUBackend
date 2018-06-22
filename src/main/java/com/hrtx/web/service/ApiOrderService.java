@@ -562,11 +562,6 @@ public class ApiOrderService {
 				items.add(item);
 
 			}
-			if(type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
-			{
-				action.setOrderId(preOrderId);
-				auctionMapper.auctionEditOrderIDByNumId(action);
-			}
 
 			param.put("commodities", items);
 			Result res = StorageApiCallUtil.storageApiCall(param, "HK0003");
@@ -581,6 +576,11 @@ public class ApiOrderService {
 					}
 					orderMapper.insertBatch(orderList);
 					orderItemMapper.insertBatch(orderItems);
+					if(type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+					{
+						action.setOrderId(preOrderId);
+						auctionMapper.auctionEditOrderIDByNumId(action);
+					}
 				}else{
 					return new Result(Result.ERROR, "创建订单异常");
 				}

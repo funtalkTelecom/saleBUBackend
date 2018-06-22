@@ -103,7 +103,7 @@ $(function() {
 						if(p_query) {
 							node.push('<a class="btn btn-success btn-xs detail" href="javascript:void(0);">详情</a>');
                         }
-						if(p_receipt) {
+						if(p_receipt && record.status=="1") {
 							node.push('<a class="btn btn-success btn-xs receipt" href="javascript:void(0);">收款</a>');
                         }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
