@@ -1,11 +1,14 @@
 package com.hrtx.web.dto;
 
+import com.hrtx.global.MapJsonUtils;
 import com.hrtx.global.StorageInterfaceUtils;
 import com.hrtx.global.Utils;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class StorageInterfaceResponse {
     private String merid;
@@ -36,15 +39,15 @@ public class StorageInterfaceResponse {
     }
 
     public StorageInterfaceResponse(String jsonStr, String key) {
-        JSONObject jsonObject = JSONObject.fromObject(jsonStr);
-        this.merid = jsonObject.getString("merid");
-        this.act_type = jsonObject.getString("act_type");
-        this.serial = jsonObject.getString("serial");
-        this.code = jsonObject.getString("code");
-        this.desc = jsonObject.getString("desc");
-        this.timestamp = jsonObject.getString("timestamp");
-        this.sign = jsonObject.getString("sign");
-        this.platresponse = jsonObject.get("platresponse");
+        Map jsonObject = MapJsonUtils.parseJSON2Map(jsonStr);
+        this.merid = ObjectUtils.toString(jsonObject.get("merid"));
+        this.act_type = ObjectUtils.toString(jsonObject.get("act_type"));
+        this.serial = ObjectUtils.toString(jsonObject.get("serial"));
+        this.timestamp = ObjectUtils.toString(jsonObject.get("timestamp"));
+        this.sign = ObjectUtils.toString(jsonObject.get("sign"));
+        this.code = ObjectUtils.toString(jsonObject.get("code"));
+        this.desc = ObjectUtils.toString(jsonObject.get("desc"));
+        this.platresponse = JSONObject.fromObject(jsonStr).get("platresponse");
         if("00000".equals(this.code) || "10000".equals(this.code)) {
             String localSign = StorageInterfaceUtils.getSign(this, key);
             if(!localSign.equals(this.sign)) {
@@ -52,6 +55,7 @@ public class StorageInterfaceResponse {
                 this.desc = "签名出错";
             }
         }
+        this.platresponse = jsonObject.get("platresponse");
     }
 
     public static StorageInterfaceResponse create(String jsonStr, String key) {

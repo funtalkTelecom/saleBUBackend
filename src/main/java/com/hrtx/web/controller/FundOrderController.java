@@ -1,5 +1,6 @@
 package com.hrtx.web.controller;
 
+import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
@@ -43,6 +44,10 @@ public class FundOrderController extends BaseReturn{
         }
 	}
 
-
-
+    @RequestMapping("/test-no-repate")
+    @Powers({PowerConsts.NOLOGINPOWER})
+//    @NoRepeat
+    public void testNoRepate(String a, String b){
+        returnResult(fundOrderService.test(a, b));
+    }
 }
