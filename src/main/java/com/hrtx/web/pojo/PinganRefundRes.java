@@ -14,7 +14,6 @@ public class PinganRefundRes extends BasePojo implements java.io.Serializable {
 	private Long id;
     private String errcode;
     private String msg ;
-    private String data;
     private String ord_no;
     private String ord_shop_id;
     private String ord_mct_id;
@@ -32,11 +31,10 @@ public class PinganRefundRes extends BasePojo implements java.io.Serializable {
     public PinganRefundRes() {
 	}
 
-    public PinganRefundRes(Long id, String errcode, String msg, String data, String ord_no, String ord_shop_id, String ord_mct_id, String trade_amount, String trade_no, String trade_result, String original_ord_no, String status, String ord_currency, String currency_sign, String out_no, String trade_time) {
+    public PinganRefundRes(Long id, String errcode, String msg, String ord_no, String ord_shop_id, String ord_mct_id, String trade_amount, String trade_no, String trade_result, String original_ord_no, String status, String ord_currency, String currency_sign, String out_no, String trade_time) {
         this.id = id;
         this.errcode = errcode;
         this.msg = msg;
-        this.data = data;
         this.ord_no = ord_no;
         this.ord_shop_id = ord_shop_id;
         this.ord_mct_id = ord_mct_id;
@@ -73,14 +71,6 @@ public class PinganRefundRes extends BasePojo implements java.io.Serializable {
 
     public void setMsg(String msg) {
         this.msg = msg;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
     }
 
     public String getOrd_no() {

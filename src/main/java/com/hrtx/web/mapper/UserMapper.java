@@ -7,7 +7,9 @@ import com.github.abel533.mapper.Mapper;
 import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.User;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
 
+@Component
 public interface UserMapper extends Mapper<User>,BaseMapper<User>{
 
 	public User findUserInfo();

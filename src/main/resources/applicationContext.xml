@@ -22,6 +22,8 @@
             <tx:method name="get*" read-only="true" propagation="REQUIRED"/>
             <tx:method name="find*" read-only="true"  propagation="REQUIRED"/>
             <tx:method name="query*" read-only="true"  propagation="REQUIRED"/>
+            <!-- 对以new开头的方法，起新事物，当前事物挂起，  (在service A调用sevice B时， catch B抛异常时，不影响A 情况下使用)-->
+            <tx:method name="new*"  propagation="REQUIRES_NEW"/>
             <!-- 对以pay开头的方法，已非事务方式运行-->
             <tx:method name="pay*"  propagation="NOT_SUPPORTED"/>
             <!-- 其他的则使用开启事务的机制 -->

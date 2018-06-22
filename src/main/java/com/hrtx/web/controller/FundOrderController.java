@@ -44,6 +44,12 @@ public class FundOrderController extends BaseReturn{
         }
 	}
 
+    @PostMapping("/refund-order")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public Result refundOrder(FundOrder fundOrder){
+        return fundOrderService.payOrderRefund(fundOrder.getSourceId(), fundOrder.getRemark());
+    }
+
     @RequestMapping("/test-no-repate")
     @Powers({PowerConsts.NOLOGINPOWER})
 //    @NoRepeat
