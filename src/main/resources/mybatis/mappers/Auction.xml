@@ -167,6 +167,12 @@
          where t.id =#{id}
     </update>
 
+	<update id="auctionEditStatusById2">
+          update tb_auction t
+          set t.status=#{status}
+         where t.id =#{id}
+    </update>
+
 	<update id="auctionEditOrderIDByNumId">
 	update
 	tb_auction

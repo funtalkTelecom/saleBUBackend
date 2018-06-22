@@ -108,6 +108,13 @@ public class EPSaleController extends BaseReturn{
 	@ResponseBody
 	public void goodsAuciton(Auction auction, HttpServletRequest request) {
 		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息
+		double startPrice=0L;
+		Map numMap=epSaleService.findEPSaleNumInfoByNumId(auction.getNumId());
+		if(numMap!=null&&numMap.size()>0)
+		{
+			startPrice=Double.valueOf(numMap.get("skuTobPrice").toString());
+		}
+		startPrice=1000.00;
 		//最近10次数出价记录
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumId(Long.valueOf(auction.getNumId()));
 		double priceUp=Double.valueOf(goods.getgPriceUp());//每次加价
@@ -128,6 +135,10 @@ public class EPSaleController extends BaseReturn{
 		}else
 		{
 			 subPrice=auction.getPrice();
+			 if(startPrice>subPrice)
+			 {
+				 returnResult(new Result(602, "当前加价不符规则;加价不能低于起拍价"+startPrice));
+			 }
 		}
 		if(subPrice>0)
 		{
@@ -179,7 +190,7 @@ public class EPSaleController extends BaseReturn{
 						Auction auctonBef=new Auction();
 						auctonBef.setId(autionId);
 						auctonBef.setStatus(4);//前一次出价记录   状态：4 落败
-						auctionService.auctionEditStatusById(auctonBef);//通知用户
+						auctionService.auctionEditStatusById2(auctonBef);//通知用户
 						Consumer consumer=new Consumer();
 						consumer.setId(consumerId);
 						consumer=consumerService.getConsumerById(consumer);

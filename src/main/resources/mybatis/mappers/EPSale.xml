@@ -245,7 +245,7 @@
         and  tb_num.status=2
         and  tb_goods.g_id = #{goodsId}
     </select>
-
+    
     <insert id="insertBatch">
         insert into tb_ep_sale(
         id,
