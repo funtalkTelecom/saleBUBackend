@@ -229,17 +229,18 @@ public class EPSaleController extends BaseReturn{
 	@ResponseBody
 	public Map findAuctions(@PathVariable("numId") String numId){
 		Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> mapData= new HashMap<String, Object>();
 		//最近10次出价记录
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumId(Long.valueOf(numId));
 		if(goodsAuctionList!=null&&goodsAuctionList.size()>0)
 		{
-			map.put("goodsAuctionList",goodsAuctionList);
+            mapData.put("goodsAuctionList",goodsAuctionList);
 		}else
 		{
-			map.put("goodsAuctionList","");
+            mapData.put("goodsAuctionList","");
 		}
 		map.put("code", Result.OK);
-		map.put("data",map);
+		map.put("data",mapData);
 		return map;
 	}
 	/**
