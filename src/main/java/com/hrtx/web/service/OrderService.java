@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.dto.Result;
 import com.hrtx.global.CommonMap;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.global.StorageApiCallUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.dto.StorageInterfaceResponse;
@@ -14,6 +15,7 @@ import com.hrtx.web.mapper.OrderItemMapper;
 import com.hrtx.web.mapper.OrderMapper;
 import com.hrtx.web.pojo.Order;
 import com.hrtx.web.pojo.OrderItem;
+import com.hrtx.web.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,9 +29,12 @@ public class OrderService extends BaseService {
     @Autowired private OrderMapper orderMapper;
     @Autowired private OrderItemMapper orderItemMapper;
 
+
     public Result pageOrder(Order order) {
+        User user = SessionUtil.getUser();
+        if(user==null) return new Result(Result.ERROR, "未获取到用户");
         PageHelper.startPage(order.getPageNum(),order.getLimit());
-        Page<Object> ob=this.orderMapper.queryPageList(order);
+        Page<Object> ob=this.orderMapper.queryPageList(order, user.getId());
         PageInfo<Object> pm = new PageInfo<Object>(ob);
         return new Result(Result.OK, pm);
     }
