@@ -271,7 +271,9 @@ public class EPSaleController extends BaseReturn{
 			{
 				goodsList.get(0).put("goodsAuctionList","");
 			}
-			List<Map> goodsAuctionDepositList=auctionDepositService.findAuctionDepositListByNumId(Long.valueOf(numId));
+			AuctionDeposit auctionDeposit=new AuctionDeposit();
+			auctionDeposit.setNumId(numId);
+			List<Map> goodsAuctionDepositList=auctionDepositService.findAuctionDepositListByNumId(auctionDeposit);
 			if(goodsAuctionDepositList!=null&&goodsAuctionDepositList.size()>0)
 			{
 				goodsList.get(0).put("idDeposit","1");
