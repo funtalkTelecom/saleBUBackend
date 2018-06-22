@@ -30,6 +30,15 @@ public class AuctionDepositService {
 		return auctionDepositMapper.findAuctionDepositListByNumId(numId);
 	}
 
+	/*
+	  获取当前用户已支付保证金记录
+	 */
+    public List<Map> findAuctionDepositListByNumId(AuctionDeposit auctionDeposit){
+        auctionDeposit.setStatus(2);
+        auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
+        return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatus(auctionDeposit);
+    }
+
 	public void auctionDepositEdit(AuctionDeposit auctionDeposit) {
 		List<AuctionDeposit> list = new ArrayList<AuctionDeposit>();
 		auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
