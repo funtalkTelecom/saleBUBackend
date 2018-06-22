@@ -12,4 +12,6 @@ public interface OrderItemMapper extends Mapper<OrderItem>,BaseMapper<OrderItem>
     void insertBatch(@Param("orderItemList") List<OrderItem> orderItems);
 
     Page<Object> queryPageListDetail(OrderItem orderItem);
+
+    List queryPageListDetailForConsumer(OrderItem orderItem);
 }
