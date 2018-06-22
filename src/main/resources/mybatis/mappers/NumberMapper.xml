@@ -117,7 +117,7 @@
         left join tb_goods c on c.g_id = b.g_id
         where 1=1
             and a.id = #{id}
-        and a.status in ('1', '2')
+        and a.status in ('2')
         and c.g_is_sale = '1'
     </select>
 
