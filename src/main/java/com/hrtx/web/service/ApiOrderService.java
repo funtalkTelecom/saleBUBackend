@@ -149,7 +149,7 @@ public class ApiOrderService {
 							}
 							//判断商品地市和代理商地市
 							log.info("判断商品地市和代理商地市");
-							if(user.getCity()==null || !goods.getgSaleCity().contains(user.getCity())) {
+							if(user.getAgentDistrict()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentDistrict()))) {
 								return new Result(Result.ERROR, "不属于您的地市,无法操作");
 							}
 							orderItem.setGoodsId(goods.getgId());
@@ -304,7 +304,7 @@ public class ApiOrderService {
 								}
 								log.info("判断商品地市和代理商地市");
 								//判断商品地市和代理商地市
-								if(user.getCity()==null || !goods.getgSaleCity().contains(user.getCity())) {
+								if(user.getAgentDistrict()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentDistrict()))) {
 									freezeNum(numid, String.valueOf(number.get("status")));
 									return new Result(Result.ERROR, "不属于您的地市,无法操作");
 								}
