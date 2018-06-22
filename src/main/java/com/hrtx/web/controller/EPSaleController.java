@@ -197,7 +197,7 @@ public class EPSaleController extends BaseReturn{
 							goodsAuctionListStr="goodsAuctionList:"+"";
 						}
 
-						returnResult(new Result(200, "本次出价成功！,"+goodsAuctionListStr));
+						returnResult(new Result(200, goodsAuctionMap));
 
 						Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
 					}
