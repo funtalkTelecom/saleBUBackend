@@ -70,19 +70,21 @@ public class OrderController extends BaseReturn{
 
 	@RequestMapping("/deliver-order-callback")
 	@Powers({PowerConsts.NOLOGINPOWER})
-	public void deliverOrderCallback(HttpServletRequest request){
+	public String deliverOrderCallback(HttpServletRequest request){
 		try{
 			String param = this.getParamBody(request);
 			log.info("接收到发货回调参数["+param+"]");
 			StorageInterfaceRequest storageInterfaceRequest = StorageInterfaceRequest.create(param, SystemParam.get("key"));
-//			Result result = orderService.
+			Result result = orderService.updateDeliverCallbackInfo(storageInterfaceRequest);
+			if(result.getCode() == 200) return renderHtml("success");
+			return renderHtml(String.valueOf(result.getData()));
 		}catch (ServiceException e) {
 			log.error(e.getMessage(), e);
-			renderHtml(e.getMessage());
+			return renderHtml(e.getMessage());
 		}catch (Exception e) {
 			long err_no=System.currentTimeMillis();
 			log.error("系统未知异常"+err_no, e);
-			renderHtml("系统未知异常"+err_no);
+			return renderHtml("系统未知异常"+err_no);
 		}
 	}
 }

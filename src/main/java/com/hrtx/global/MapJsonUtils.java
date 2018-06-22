@@ -34,7 +34,7 @@ public class MapJsonUtils {
 	 * @return
 	 */
     public static Map<String, Object> parseJSON2Map(String jsonStr){
-    	Map<String, Object> map = new HashMap<String, Object>();
+    	TreeMap<String, Object> map = new TreeMap<String, Object>();
     	//最外层解析
     	JSONObject json = JSONObject.fromObject(jsonStr);
     	for(Object k : json.keySet()){

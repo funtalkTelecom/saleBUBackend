@@ -50,8 +50,23 @@ public class UserService {
 	@Autowired private CorporationService corporationService;
 
 	public void test() {
-		User u = new User(10l);
-		userMapper.insert(u);
+        User u = new User(10l);
+        userMapper.insert(u);
+	    try{
+	        userService.paytest();
+        }catch (Exception e) {
+	        e.printStackTrace();
+        }
+//		User u = new User(10l);
+//		userMapper.insert(u);
+//		Example example = new Example(User.class);
+//		List list = new ArrayList();
+//		for (int i = 0; i<2000; i++) {
+//			list.add("周元强");
+//		}
+//		example.createCriteria().andIn("name", list);
+//		List<User> users = userMapper.selectByExample(example);
+//        System.out.println(users.size()+"----------------------------");
 //		userService.paytest("b","b");
 //		if(1==1) throw new ServiceException("手动异常");
 //		List<User> list=this.userMapper.select(null);
@@ -60,14 +75,21 @@ public class UserService {
 //		}
 	}
 
-	public void paytest(@Valid @NotNull String aa, @NotNull String bb, @Valid User u) {
+    public void newtest() {
+        for (int i = 0; i<3; i++) {
+            User u = new User(((Integer)(i+3)).longValue());
+		    userMapper.insert(u);
+		    if(i == 2) throw  new ServiceException("test");
+		}
+    }
+
+    public void paytest() {
 //		User u = new User(11l);
 //		userMapper.insert(u);
 //		if(1==1) throw new ServiceException("手动异常");
-        System.out.println("ddddd");
-        User user = new User();
-        user.setId(9l);
-        user = userMapper.selectOne(user);
+        User u = new User(9l);
+        userMapper.insert(u);
+        if(true) throw  new ServiceException("test");
 //        user.setCorpId(10l);
 //        userMapper.updateByPrimaryKey(user);
 //        user.setLoginName("eee");
