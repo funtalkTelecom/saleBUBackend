@@ -80,6 +80,7 @@
     <insert id="insertBatch">
         insert into tb_order_item(
         item_id,
+        p_item_id,
         order_id,
         goods_id,
         sku_id,
@@ -100,6 +101,7 @@
         <foreach collection="orderItemList" item="orderItem" separator=",">
             (
             #{orderItem.itemId},
+            #{orderItem.pItemId},
             #{orderItem.orderId},
             #{orderItem.goodsId},
             #{orderItem.skuId},

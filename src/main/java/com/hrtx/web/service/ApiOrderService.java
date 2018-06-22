@@ -70,11 +70,13 @@ public class ApiOrderService {
 		double shipping_total = 0;
 
 		Order order = new Order();
+		OrderItem pOrderItem = new OrderItem();
 		Goods goods = new Goods();
 		order.setOrderId(order.getGeneralId());
 		List<OrderItem> orderItems = new ArrayList<OrderItem>();
 		List<Order> orderList = new ArrayList<Order>();
 		String type = null;
+
 
 		//模拟登陆
 //		Consumer u = new Consumer();
@@ -152,6 +154,7 @@ public class ApiOrderService {
 							if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
 								return new Result(Result.ERROR, "不属于您的地市,无法操作");
 							}
+							//卡体item
 							orderItem.setGoodsId(goods.getgId());
 							orderItem.setSkuId(Long.parseLong(skuid));
 							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
@@ -169,6 +172,7 @@ public class ApiOrderService {
 //                                orderItem.setMealId(Long.parseLong(mealid));
 							sub_total += orderItem.getTotal();
 
+							pOrderItem = orderItem;
 							orderItems.add(orderItem);
 							//修改sku数量
 							Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
@@ -187,6 +191,7 @@ public class ApiOrderService {
 								freezeNumByIds(nlist, "3");
 								for (com.hrtx.web.pojo.Number n : nlist) {
 									orderItem = new OrderItem();
+									orderItem.setpItemId(pOrderItem.getItemId());
 
 									orderItem.setItemId(orderItem.getGeneralId());
 									orderItem.setOrderId(order.getOrderId());
@@ -311,29 +316,9 @@ public class ApiOrderService {
 							}
 							List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 
-							orderItem.setItemId(orderItem.getGeneralId());
-							orderItem.setOrderId(order.getOrderId());
-							orderItem.setGoodsId(goods.getgId());
-							orderItem.setSkuId(Long.parseLong(skuid));
-							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
-							orderItem.setNumId(Long.parseLong(numid));
-							orderItem.setNum(String.valueOf( number.get("numResource")));
-							orderItem.setIsShipment("3".equals(sku.get("skuGoodsType")) ? 0 : 1);//普通靓号不发货
-							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
-							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
-							orderItem.setShipmentApi("egt");
-							orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+
 							int num = 1;
-							orderItem.setQuantity(num);
-							double twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
-							orderItem.setPrice(twobPrice);
-							orderItem.setTotal(twobPrice * num);
-							orderItem.setMealId(Long.parseLong(mealid));
-							sub_total += orderItem.getTotal();
-
-							orderItems.add(orderItem);
-
-
+							double twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
 							//超级靓号添加卡的item
 							if("4".equals(sku.get("skuGoodsType"))){
 								orderItem = new OrderItem();
@@ -350,16 +335,39 @@ public class ApiOrderService {
 								orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
 								orderItem.setShipmentApi("egt");
 								orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
-								num = 1;
 								orderItem.setQuantity(num);
-								twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
 								orderItem.setPrice(twobPrice);
 								orderItem.setTotal(twobPrice * num);
 								orderItem.setMealId(Long.parseLong(mealid));
 								sub_total += orderItem.getTotal();
 
+								pOrderItem = orderItem;
 								orderItems.add(orderItem);
 							}
+
+							//号码item
+							orderItem.setpItemId(pOrderItem.getItemId());
+							orderItem.setItemId(orderItem.getGeneralId());
+							orderItem.setOrderId(order.getOrderId());
+							orderItem.setGoodsId(goods.getgId());
+							orderItem.setSkuId(Long.parseLong(skuid));
+							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+							orderItem.setNumId(Long.parseLong(numid));
+							orderItem.setNum(String.valueOf( number.get("numResource")));
+							orderItem.setIsShipment("3".equals(sku.get("skuGoodsType")) ? 0 : 1);//普通靓号不发货
+							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
+							orderItem.setShipmentApi("egt");
+							orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+							num = 1;
+							orderItem.setQuantity(num);
+							twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
+							orderItem.setPrice(twobPrice);
+							orderItem.setTotal(twobPrice * num);
+							orderItem.setMealId(Long.parseLong(mealid));
+							sub_total += orderItem.getTotal();
+
+							orderItems.add(orderItem);
 						}
 
 						//设置订单
@@ -449,28 +457,9 @@ public class ApiOrderService {
 							goods = goodsMapper.findGoodsInfoBySkuid(skuid);
 							List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 
-							orderItem.setItemId(orderItem.getGeneralId());
-							orderItem.setOrderId(order.getOrderId());
-							orderItem.setGoodsId(goods.getgId());
-							orderItem.setSkuId(Long.parseLong(skuid));
-							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
-							orderItem.setNumId(Long.parseLong(numid));
-							orderItem.setNum(String.valueOf( number.get("numResource")));
-							orderItem.setIsShipment(0);
-							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
-							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
-							orderItem.setShipmentApi("egt");
-							orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+
 							int num = 1;
-							orderItem.setQuantity(num);
 							double twobPrice = Double.parseDouble(price);
-							orderItem.setPrice(twobPrice);
-							orderItem.setTotal(twobPrice * num);
-							sub_total += orderItem.getTotal();
-
-							orderItems.add(orderItem);
-
-
 							//添加卡的item
 							orderItem = new OrderItem();
 							orderItem.setItemId(orderItem.getGeneralId());
@@ -489,6 +478,29 @@ public class ApiOrderService {
 							num = 1;
 							orderItem.setQuantity(num);
 							twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
+							orderItem.setPrice(twobPrice);
+							orderItem.setTotal(twobPrice * num);
+							sub_total += orderItem.getTotal();
+
+							pOrderItem=orderItem;
+							orderItems.add(orderItem);
+
+							//号码item
+							orderItem.setItemId(orderItem.getGeneralId());
+							orderItem.setOrderId(order.getOrderId());
+							orderItem.setGoodsId(goods.getgId());
+							orderItem.setSkuId(Long.parseLong(skuid));
+							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+							orderItem.setNumId(Long.parseLong(numid));
+							orderItem.setNum(String.valueOf( number.get("numResource")));
+							orderItem.setIsShipment(0);
+							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
+							orderItem.setShipmentApi("egt");
+							orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+							num = 1;
+							orderItem.setQuantity(num);
+							twobPrice = Double.parseDouble(price);
 							orderItem.setPrice(twobPrice);
 							orderItem.setTotal(twobPrice * num);
 							sub_total += orderItem.getTotal();
