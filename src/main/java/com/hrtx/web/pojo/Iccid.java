@@ -1,8 +1,12 @@
 package com.hrtx.web.pojo;
 
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 
+@Table(name = "tb_iccid")
 public class Iccid {
+    @Id
     private Long id;
 
     private String cityCode;

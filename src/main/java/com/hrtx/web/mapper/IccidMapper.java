@@ -14,4 +14,5 @@ public interface IccidMapper extends Mapper<Iccid>,BaseMapper<Iccid>{
      * @param allImeis
      */
     int batchInsertTemp(@Param("list")List allImeis);
+    void iccidEditStatus(Iccid iccid);
 }
