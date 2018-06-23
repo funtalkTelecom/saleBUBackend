@@ -13,6 +13,6 @@ public interface IccidMapper extends Mapper<Iccid>,BaseMapper<Iccid>{
      * 插入临时表
      * @param allImeis
      */
-    int batchInsertTemp(@Param("list")List allImeis);
+    void batchInsertTemp(@Param("list")List allImeis);
     void iccidEditStatus(Iccid iccid);
 }
