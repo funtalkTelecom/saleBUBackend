@@ -7,9 +7,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.global.pinganUtils.TLinx2Util;
 import com.hrtx.web.mapper.*;
-import com.hrtx.web.pojo.ConsumerLog;
-import com.hrtx.web.pojo.FundDetail;
-import com.hrtx.web.pojo.FundOrder;
+import com.hrtx.web.pojo.*;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -82,7 +80,7 @@ public class FundOrderService extends BaseService {
             FundOrder fundOrder = new FundOrder(0l, busiType, amt, payee, payer, 1, orderName, contractno, third, amt, remark, sourceId);
             fundOrder.setId(fundOrder.getGeneralId());
             fundOrderMapper.insert(fundOrder);
-            Long req_user = apiSessionUtil.getUser() == null ? 0l:apiSessionUtil.getUser().getId();
+            Long req_user = apiSessionUtil.getConsumer() == null ? 0l:apiSessionUtil.getConsumer().getId();
             FundDetail fundDetail = new FundDetail(0l, fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_ADD, 1);
             fundDetail.setId(fundDetail.getGeneralId());
             fundDetailMapper.insert(fundDetail);
@@ -240,7 +238,7 @@ public class FundOrderService extends BaseService {
         String outNo = fundOrder.getContractno();
         if(!LockUtils.tryLock(outNo)) return new Result(Result.ERROR, "退款中，请稍后再试");
         try {
-            Long req_user = apiSessionUtil.getUser() == null ? 0l:apiSessionUtil.getUser().getId();
+            Long req_user = apiSessionUtil.getConsumer() == null ? 0l:apiSessionUtil.getConsumer().getId();
             String contractno = "REFUND"+Utils.randomNoByDateTime();
             FundDetail fundDetail = new FundDetail(0l, fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_REFUND, 1);
             fundDetail.setId(fundDetail.getGeneralId());
@@ -302,13 +300,13 @@ public class FundOrderService extends BaseService {
     }
 
     @NoRepeat
-    public Result test(String a, String b) {
+    public Result test(String a, Integer b, User u) {
         try {
             Thread.sleep(1000*5);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        log.info(a+"----------"+b);
+        log.info(a+"----------"+u);
         return new Result(Result.OK, "success");
     }
 }

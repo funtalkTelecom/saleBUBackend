@@ -7,11 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
-import com.hrtx.global.CommonMap;
-import com.hrtx.global.SessionUtil;
-import com.hrtx.global.StorageApiCallUtil;
-import com.hrtx.global.SystemParam;
-import com.hrtx.global.Utils;
+import com.hrtx.global.*;
 import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.OrderItemMapper;
 import com.hrtx.web.mapper.OrderMapper;
@@ -32,6 +28,7 @@ import java.util.Map;
 public class OrderService extends BaseService {
     @Autowired private OrderMapper orderMapper;
     @Autowired private OrderItemMapper orderItemMapper;
+    @Autowired private FundOrderService fundOrderService;
 
 
     public Result pageOrder(Order order) {
@@ -137,6 +134,19 @@ public class OrderService extends BaseService {
             log.error("绑卡异常", e);
         }
         return new Result(Result.OK, "success");
+    }
+
+    /**
+     * 订单付款操作
+     * @param orderId
+     * @return
+     */
+    @NoRepeat
+    public Result payOrder(String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order == null) return new Result(Result.ERROR, "订单不存在");
+        if(order.getStatus() !=1 || order.getIsDel() != 0) return new Result(Result.ERROR, "订单状态异常");
+        return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", orderId);
     }
 }
 
