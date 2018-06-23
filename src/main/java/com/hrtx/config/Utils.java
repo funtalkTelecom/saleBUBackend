@@ -62,7 +62,9 @@ public class Utils {
 	 */
 	public final static boolean isAjax(HttpServletRequest request){
 		String requestType =request.getHeader("X-Requested-With");
-		if (requestType != null && requestType.equals("XMLHttpRequest")) {
+		String app = request.getParameter("__app");
+		if ((requestType != null && requestType.equals("XMLHttpRequest")) ||(app != null && "xcx".equals(app))) {
+
 			return true;
 		} else {
 			return false;

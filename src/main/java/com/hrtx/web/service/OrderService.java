@@ -9,11 +9,11 @@ import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
 import com.hrtx.global.*;
 import com.hrtx.web.dto.StorageInterfaceResponse;
+import com.hrtx.web.mapper.IccidMapper;
+import com.hrtx.web.mapper.NumMapper;
 import com.hrtx.web.mapper.OrderItemMapper;
 import com.hrtx.web.mapper.OrderMapper;
-import com.hrtx.web.pojo.Order;
-import com.hrtx.web.pojo.OrderItem;
-import com.hrtx.web.pojo.User;
+import com.hrtx.web.pojo.*;
 import org.apache.commons.lang.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,6 +28,8 @@ import java.util.Map;
 public class OrderService extends BaseService {
     @Autowired private OrderMapper orderMapper;
     @Autowired private OrderItemMapper orderItemMapper;
+    @Autowired private NumMapper numMapper;
+    @Autowired private IccidMapper iccidMapper;
     @Autowired private FundOrderService fundOrderService;
 
 
@@ -126,9 +128,27 @@ public class OrderService extends BaseService {
         orderMapper.updateByPrimaryKey(order);
         try{
             List<Map> commodities = (List) platrequest.get("commodities");
+            List allImeis = new ArrayList();
             for (Map commodity:commodities) {
                 List imeis = (List) commodity.get("imeis");
+                String item_id = ObjectUtils.toString(commodity.get("item_id"));
+                allImeis.add(CommonMap.create("iccids",imeis).put("itemId", item_id));
+            }
 
+            iccidMapper.batchInsertTemp(allImeis);
+
+            Example example = new Example(Iccid.class);
+            example.createCriteria().andIn("iccid", allImeis).andEqualTo("stockStatus", 1).andEqualTo("dealStatus", 1);
+            List<Iccid> iccids = iccidMapper.selectByExample(example);
+            if(allImeis.size() > iccids.size()) {//卡库中有未找到的回调卡
+                allImeis.removeAll(iccids);
+                //添加未找到的
+//                iccidMapper.batchInsert(allImeis);
+                //更新已找到的
+//                iccidMapper.batchUpdate(iccids);
+            }else {
+                //更新已找到的
+//                iccidMapper.batchUpdate(iccids);
             }
         }catch (Exception e){
             log.error("绑卡异常", e);
@@ -142,11 +162,11 @@ public class OrderService extends BaseService {
      * @return
      */
     @NoRepeat
-    public Result payOrder(String orderId) {
+    public Result payOrder(Long orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getStatus() !=1 || order.getIsDel() != 0) return new Result(Result.ERROR, "订单状态异常");
-        return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", orderId);
+        return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
     }
 }
 

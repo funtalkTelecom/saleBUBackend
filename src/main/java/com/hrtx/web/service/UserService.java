@@ -1,20 +1,16 @@
 package com.hrtx.web.service;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.System;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.github.abel533.entity.Example;
 import com.hrtx.config.advice.ServiceException;
-import com.hrtx.global.ApiSessionUtil;
-import com.hrtx.global.TokenGenerator;
-import com.hrtx.web.mapper.ConsumerLogMapper;
-import com.hrtx.web.mapper.ConsumerMapper;
-import com.hrtx.web.mapper.CorporationMapper;
-import com.hrtx.web.pojo.Consumer;
-import com.hrtx.web.pojo.ConsumerLog;
-import com.hrtx.web.pojo.Corporation;
+import com.hrtx.global.*;
+import com.hrtx.web.mapper.*;
+import com.hrtx.web.pojo.*;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,10 +25,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Menu;
 import com.hrtx.dto.Result;
-import com.hrtx.global.SessionUtil;
-import com.hrtx.global.Utils;
-import com.hrtx.web.mapper.UserMapper;
-import com.hrtx.web.pojo.User;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -48,15 +40,21 @@ public class UserService {
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private UserService userService;
 	@Autowired private CorporationService corporationService;
+	@Autowired private IccidMapper iccidMapper;
 
 	public void test() {
-        User u = new User(10l);
-        userMapper.insert(u);
-	    try{
-	        userService.paytest();
-        }catch (Exception e) {
-	        e.printStackTrace();
-        }
+        List allImeis = new ArrayList();
+        List imeis = Arrays.asList(new String[]{"A1234","B1234"});
+        allImeis.add(CommonMap.create("iccids",imeis).put("itemId", "111111").getData());
+        allImeis.add(CommonMap.create("iccids",Arrays.asList(new String[]{"C1234","D1234"})).put("itemId", "222222").getData());
+        System.out.println(iccidMapper.batchInsertTemp(allImeis));
+//        User u = new User(10l);
+//        userMapper.insert(u);
+//	    try{
+//	        userService.paytest();
+//        }catch (Exception e) {
+//	        e.printStackTrace();
+//        }
 //		User u = new User(10l);
 //		userMapper.insert(u);
 //		Example example = new Example(User.class);

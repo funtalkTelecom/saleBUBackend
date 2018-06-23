@@ -28,7 +28,6 @@ public class NoRepeatAspect {
         StringBuffer params = new StringBuffer();
         for (Object object:args) {
             if(object != null) {
-                log.info("--------"+String.valueOf(object)+"---"+object.getClass().isPrimitive());
                 if(ArrayUtils.contains(baseClass, object.getClass()) || object.getClass().isPrimitive()) {
                     params.append(String.valueOf(object));
                 }else{
