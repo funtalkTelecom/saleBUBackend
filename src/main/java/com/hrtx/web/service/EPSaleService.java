@@ -270,6 +270,7 @@ public class EPSaleService {
 
 	public Result epSaleEdit(EPSale epSale, HttpServletRequest request, MultipartFile[] files) {
 		epSale.setAddUserId(SessionUtil.getUserId());
+		epSale.setIsShow(0);
 		if (epSale.getId() != null && epSale.getId() > 0) {
 			epSale.setUpdateDate(new Date());
 			epSaleMapper.epSaleEdit(epSale);
