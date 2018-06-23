@@ -7,7 +7,7 @@
         where
             t.id = #{id}
     </update>
-    <insert id="batchInsertTemp"lang="">
+    <insert id="batchInsertTemp">
         INSERT INTO tb_iccid_temp
         (item_id, iccid)
         VALUES

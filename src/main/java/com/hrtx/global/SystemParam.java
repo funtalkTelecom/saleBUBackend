@@ -7,17 +7,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
+@Component
 public final class SystemParam {
 	private final static Logger log = LoggerFactory.getLogger(SystemParam.class);
 	
 	private final static Map<String, String> params = new HashMap<String, String>();
-	
+	@Autowired SystemService systemService;
 	/**
 	 * 加载配置文件
 	 * @return
@@ -34,7 +36,20 @@ public final class SystemParam {
 			log.error("",e);
 		}
 	}
-	
+
+	public final void load1() {
+		params.clear();
+		try {
+//			SystemService systemService  = (SystemService) ContextUtils.getContext().getBean("systemService");
+			List<Map> list = systemService.findSystemParam();
+			for (Map map : list) {
+				params.put(ObjectUtils.toString(map.get("key")), ObjectUtils.toString(map.get("value")));
+			}
+		} catch (Exception e) {
+			log.error("",e);
+		}
+	}
+
 	/**
 	 * 获取参数值
 	 * @param key
