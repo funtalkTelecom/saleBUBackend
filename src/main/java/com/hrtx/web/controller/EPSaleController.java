@@ -103,6 +103,9 @@ public class EPSaleController extends BaseReturn{
 		return map;
 	}
 
+	/*
+	   竟拍商品出价
+	 */
 	@PostMapping("/api/epSaleGoodsAuciton")
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
