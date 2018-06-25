@@ -14,6 +14,7 @@ import com.hrtx.web.mapper.NumMapper;
 import com.hrtx.web.mapper.OrderItemMapper;
 import com.hrtx.web.mapper.OrderMapper;
 import com.hrtx.web.pojo.*;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,6 @@ public class OrderService extends BaseService {
     @Autowired private NumMapper numMapper;
     @Autowired private IccidMapper iccidMapper;
     @Autowired private FundOrderService fundOrderService;
-    @Autowired
 
 
     public Result pageOrder(Order order) {
@@ -60,26 +60,32 @@ public class OrderService extends BaseService {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 2) return new Result(Result.ERROR, "订单状态异常");
-
-        //更新号码
-        int notFreezeCount = 0;
-        List<Map> nums = orderItemMapper.queryOrderNums(orderId);
-        if(nums.size() == 0) return new Result(Result.ERROR, "订单未找到可更新号码");
-        for (Map num:nums) {
-            int status = NumberUtils.toInt(ObjectUtils.toString(num.get("status")));
-            if(status != 3) notFreezeCount++;
+        //1白卡 2普号 3普靓  4超靓
+        String[] goodsTypes = new String[]{"1","2","3","4"};
+        String goodsType = order.getSkuGoodsType();
+        if(!ArrayUtils.contains(goodsTypes, goodsType)) return new Result(Result.ERROR, "订单业务类型不存在，终止发货。");
+        if(!"1".equals(goodsType)) {//非白卡
+            //更新号码
+            int notFreezeCount = 0;
+            List<Map> nums = orderItemMapper.queryOrderNums(orderId);
+            if(nums.size() == 0) return new Result(Result.ERROR, "订单未找到可更新号码");
+            for (Map num:nums) {
+                int status = NumberUtils.toInt(ObjectUtils.toString(num.get("status")));
+                if(status != 3) notFreezeCount++;
+            }
+            if(notFreezeCount > 0) return new Result(Result.ERROR, "号码处于非冻结数量["+notFreezeCount+"]，状态异常");
+            numMapper.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
         }
-        if(notFreezeCount > 0) return new Result(Result.ERROR, "号码处于非冻结数量["+notFreezeCount+"]，状态异常");
-        numMapper.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
 
-        Example example = new Example(OrderItem.class);
-        example.createCriteria().andEqualTo("orderId", order.getOrderId()).andEqualTo("isShipment", 1);
-        List<OrderItem> items = orderItemMapper.selectByExample(example);
-        if(items.size() == 0) {
+        if("3".equals(goodsType)) {//普靓
             order.setStatus(4);//待配卡
             orderMapper.updateByPrimaryKey(order);
             return new Result(Result.OK, "订单下未找到需要发货的产品");
         }
+
+        Example example = new Example(OrderItem.class);
+        example.createCriteria().andEqualTo("orderId", order.getOrderId()).andEqualTo("isShipment", 1);
+        List<OrderItem> items = orderItemMapper.selectByExample(example);
         List commodities = new ArrayList();
         for (OrderItem orderItem:items) {
             commodities.add(CommonMap.create("item_id",orderItem.getItemId()).put("companystock_id", orderItem.getCompanystockId()).put("quantity", orderItem.getQuantity()).getData());
@@ -123,12 +129,6 @@ public class OrderService extends BaseService {
      */
     @NoRepeat
     public Result updateDeliverCallbackInfo(StorageInterfaceRequest storageInterfaceRequest) {
-//        commodities	object []
-//        item_id	string
-//        companystock_id	number
-//        commodity_name	string
-//        quantity	number
-//        imeis
         Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
         String orderId = ObjectUtils.toString(platrequest.get("order_id"));
         Order order = orderMapper.selectByPrimaryKey(orderId);
@@ -156,6 +156,7 @@ public class OrderService extends BaseService {
             }
             iccidMapper.delete(null);
             int insertCount = iccidMapper.batchInsertTemp(allImeis);
+
             int noFundCount = iccidMapper.batchInsertNoFund(order.getConsumer());
 //          更新已找到的
             int updateCount  = iccidMapper.batchUpdate(order.getConsumer());
