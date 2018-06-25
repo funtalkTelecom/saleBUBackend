@@ -47,7 +47,7 @@ public class UserService {
         List imeis = Arrays.asList(new String[]{"A1234","B1234"});
         allImeis.add(CommonMap.create("iccids",imeis).put("itemId", "111111").getData());
         allImeis.add(CommonMap.create("iccids",Arrays.asList(new String[]{"C1234","D1234"})).put("itemId", "222222").getData());
-//        System.out.println(iccidMapper.batchInsertTemp(allImeis));
+        System.out.println(iccidMapper.batchInsertTemp(allImeis));
 //        User u = new User(10l);
 //        userMapper.insert(u);
 //	    try{

@@ -27,7 +27,7 @@ public class BasePojo {
 	@Value("${app.idworker.workerid}")
 	private static int workerId;
 	@Transient
-	protected static IdWorker idWorker = new IdWorker(workerId, 0);
+	public static IdWorker idWorker = new IdWorker(workerId, 0);
 	@Transient
 	private long generalId = idWorker.nextId();
 

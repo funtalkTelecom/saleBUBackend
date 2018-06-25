@@ -13,12 +13,16 @@ import com.hrtx.web.mapper.IccidMapper;
 import com.hrtx.web.mapper.NumMapper;
 import com.hrtx.web.mapper.OrderItemMapper;
 import com.hrtx.web.mapper.OrderMapper;
-import com.hrtx.web.pojo.*;
+import com.hrtx.web.pojo.Corporation;
+import com.hrtx.web.pojo.Order;
+import com.hrtx.web.pojo.OrderItem;
+import com.hrtx.web.pojo.User;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -34,6 +38,8 @@ public class OrderService extends BaseService {
     @Autowired private IccidMapper iccidMapper;
     @Autowired private FundOrderService fundOrderService;
 
+    //订单业务类型 //1白卡 2普号 3普靓  4超靓
+    private String[] goodsTypes = new String[]{"1","2","3","4"};
 
     public Result pageOrder(Order order) {
         User user = SessionUtil.getUser();
@@ -60,8 +66,6 @@ public class OrderService extends BaseService {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 2) return new Result(Result.ERROR, "订单状态异常");
-        //1白卡 2普号 3普靓  4超靓
-        String[] goodsTypes = new String[]{"1","2","3","4"};
         String goodsType = order.getSkuGoodsType();
         if(!ArrayUtils.contains(goodsTypes, goodsType)) return new Result(Result.ERROR, "订单业务类型不存在，终止发货。");
         if(!"1".equals(goodsType)) {//非白卡
@@ -130,7 +134,7 @@ public class OrderService extends BaseService {
     @NoRepeat
     public Result updateDeliverCallbackInfo(StorageInterfaceRequest storageInterfaceRequest) {
         Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
-        String orderId = ObjectUtils.toString(platrequest.get("order_id"));
+        long orderId = NumberUtils.toLong(ObjectUtils.toString(platrequest.get("order_id")));
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getStatus() != 3) return new Result(Result.ERROR, "订单状态异常");
@@ -143,60 +147,21 @@ public class OrderService extends BaseService {
             log.error("解析回填时间异常", e);
         }
         order.setPickupDate(new Date());
-        order.setStatus(4);
+        order.setStatus(4);//待配卡
+
+        /**插入仓库回调回来的条码**/
+        List<Map> commodities = (List) platrequest.get("commodities");
+        List allImeis = new ArrayList();
+        for (Map commodity:commodities) {
+            List imeis = (List) commodity.get("imeis");
+            String item_id = ObjectUtils.toString(commodity.get("item_id"));
+            allImeis.add(CommonMap.create("iccids",imeis).put("itemId", item_id));
+        }
+        iccidMapper.deleteTempByBatchNum(orderId);
+        int insertCount = iccidMapper.batchInsertTemp(allImeis, orderId);
+        /**插入仓库回调回来的条码**/
         orderMapper.updateByPrimaryKey(order);
-        Result result = null;
-        try{
-            List<Map> commodities = (List) platrequest.get("commodities");
-            List allImeis = new ArrayList();
-            for (Map commodity:commodities) {
-                List imeis = (List) commodity.get("imeis");
-                String item_id = ObjectUtils.toString(commodity.get("item_id"));
-                allImeis.add(CommonMap.create("iccids",imeis).put("itemId", item_id));
-            }
-            iccidMapper.delete(null);
-            int insertCount = iccidMapper.batchInsertTemp(allImeis);
-
-            int noFundCount = iccidMapper.batchInsertNoFund(order.getConsumer());
-//          更新已找到的
-            int updateCount  = iccidMapper.batchUpdate(order.getConsumer());
-            log.info("得到本地卡和回调卡的匹配信息[回调数量"+insertCount+", 未找到数量"+noFundCount+", 更新数量"+updateCount+"]");
-
-            if(noFundCount == 0) {//卡库中找到了全部的回调卡
-                if(updateCount == insertCount) {//更新数量等于回调数量
-                    //绑卡
-                    result = this.batchBlindNum(allImeis);
-                }else {
-                    result = new Result(Result.ERROR, "卡库中更新数量与回调数量不一致，数据异常");
-                }
-            }else {
-                result = new Result(Result.ERROR, "回调卡中有["+noFundCount+"]个在卡库中未找到");
-            }
-        }catch (Exception e){
-            log.error("绑卡异常", e);
-            result = new Result(Result.ERROR, "绑卡未知异常");
-        }finally {
-
-        }
-        return new Result(Result.OK, "success");
-    }
-
-    private Result batchBlindNum(List<Map> allImeis) {
-        for (Map item:allImeis) {
-            List imeis = (List) item.get("iccids");
-            long item_id = NumberUtils.toLong(ObjectUtils.toString(item.get("itemId")));
-            OrderItem orderItem = orderItemMapper.selectByPrimaryKey(item_id);
-            if(orderItem == null) return new Result(Result.ERROR, "未找到仓库回调的itemId["+item_id+"]");
-            if(orderItem.getIsShipment() != 1) return new Result(Result.ERROR, "仓库回调的itemId["+item_id+"]在平台为不需发货，数据异常");
-            Example example = new Example(OrderItem.class);
-            example.createCriteria().andEqualTo("pItemId", item_id);
-            List<OrderItem> list = orderItemMapper.selectByExample(example);
-            if(imeis.size() != list.size()) return new Result(Result.ERROR, "仓库回调的itemId["+item_id+"]数量["+imeis.size()+"]与平台数量["+list.size()+"]不一致");
-            if(imeis.size() > 0) {
-
-            }
-        }
-        return null;
+        return new Result(Result.OK, order);
     }
 
     /**
@@ -210,6 +175,18 @@ public class OrderService extends BaseService {
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getStatus() !=1 || order.getIsDel() != 0) return new Result(Result.ERROR, "订单状态异常");
         return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
+    }
+
+    /**
+     * 更新订单为待签收
+     * @param orderId
+     */
+    public Result updateDqx(Long orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order == null) return new Result(Result.ERROR, "订单不存在");
+        order.setStatus(5);
+        orderMapper.updateByPrimaryKey(order);
+        return new Result(Result.OK, "success");
     }
 }
 

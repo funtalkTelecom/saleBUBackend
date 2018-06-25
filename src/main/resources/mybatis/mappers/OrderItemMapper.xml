@@ -121,4 +121,7 @@
             )
         </foreach>
     </insert>
+    <select id="queryOrderNums" resultType="java.util.Map">
+        select n.id, n.`status` from tb_order_item oi, tb_num n where oi.num_id = n.id and oi.order_id = #{orderId}
+    </select>
 </mapper>
