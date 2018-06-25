@@ -48,6 +48,46 @@ public class ApiOrderService {
 	@Autowired
 	private RedisUtil redisUtil;
 
+	public Result signOrder(Order order,HttpServletRequest request)
+	{
+		Long orderId=0L;
+		orderId=order.getOrderId();
+		int status=0;
+		Long consumerId=0L;
+		if(orderId>0)
+		{
+			Order order2=orderMapper.selectByPrimaryKey(order.getOrderId());
+			if(order2!=null)
+			{
+				consumerId=order2.getConsumer();
+				if(!(this.apiSessionUtil.getConsumer().getId().toString().equals(consumerId.toString())))
+				{
+					return new Result(Result.ERROR, "该订单不属于当前用户");
+				}
+				if(!(order2.getStatus()==4))//4待签收(仓储物流已取件)；5完成
+				{
+					if(order2.getStatus()==5)
+					{
+						return new Result(Result.ERROR, "该订单处于完成状态，请选待签收状态的订单");
+					}else
+					{
+						return new Result(Result.ERROR, "该订单不是待签收状态的订单");
+					}
+				}
+			}else
+			{
+				return new Result(Result.ERROR, "该订单系统不存在");
+			}
+		}else
+		{
+			return new Result(Result.ERROR, "该订单系统不存在");
+		}
+		order.setStatus(5);
+		order.setSignDate(new Date());//签收时间
+		order.setSignType(1);//签收方式1用户自动签收2系统
+		orderMapper.signByOrderid(order);
+		return new Result(Result.OK, "提交成功");
+	}
 
 	/**
 	 * 根据商品id创建订单
