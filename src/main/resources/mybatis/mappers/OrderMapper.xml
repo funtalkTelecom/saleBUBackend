@@ -32,6 +32,7 @@
         a.sub_total as subTotal,
         a.total as total,
         a.conment as conment,
+        a.sku_goods_type as skuGoodsType,
         a.is_del as isDel
     </sql>
     <select id="findOrderInfo" resultType="Order">
@@ -87,6 +88,7 @@
             sub_total,
             total,
             conment,
+            sku_goods_type,
             is_del
         ) values
         <foreach collection="orderList" item="order" separator=",">
@@ -121,6 +123,7 @@
             #{order.subTotal},
             #{order.total},
             #{order.conment},
+            #{order.skuGoodsType},
             0
             )
         </foreach>
@@ -133,5 +136,13 @@
     <update id="deleteByOrderid">
         delete from tb_order where order_id = #{orderid};
         delete from tb_order_item where order_id = #{orderid};
+    </update>
+
+    <update id="signByOrderid">
+        update tb_order a
+        set a.sign_type = #{signType},
+        a.sign_date= #{signDate},
+        a.status= #{status}
+        where  a.order_id = #{orderId}
     </update>
 </mapper>

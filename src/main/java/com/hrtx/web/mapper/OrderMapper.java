@@ -13,6 +13,8 @@ public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
 
     void deleteByOrderid(@Param("orderid") Long orderId);
 
+    void signByOrderid(Order order);
+
     Order findOrderInfo(@Param("orderid") Long id);
 
     Page<Object> getOrderByConsumer(Order order);

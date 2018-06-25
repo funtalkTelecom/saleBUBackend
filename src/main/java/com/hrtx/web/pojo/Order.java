@@ -59,12 +59,12 @@ public class Order extends BasePojo implements java.io.Serializable {
     private double total;//合计
     private String conment;//摘要
     private int isDel;//
+    private String skuGoodsType;
 
     public Order() {
     }
 
-    public Order(Long orderId, Long consumer, String consumerName, int status, String reqUserAgent, String reqIp, Date addDate, int orderType, String shippingMenthodId, String shippingMenthod, Long addressId, String personName, String personTel, String address, Date noticeShipmentDate, String payMenthodId, String payMenthod, Date payDate, String expressId, String expressName, String expressNumber, Date deliverDate, Date pickupDate, int signType, Date signDate, double commission, double shippingTotal, double subTotal, double total, String conment, int isDel) {
-
+    public Order(Long orderId, Long consumer, String consumerName, int status, String reqUserAgent, String reqIp, Date addDate, int orderType, String shippingMenthodId, String shippingMenthod, Long addressId, String personName, String personTel, String address, Date noticeShipmentDate, String payMenthodId, String payMenthod, Date payDate, String expressId, String expressName, String expressNumber, Date deliverDate, Date pickupDate, int signType, Date signDate, double commission, double shippingTotal, double subTotal, double total, String conment, int isDel, String skuGoodsType) {
         this.orderId = orderId;
         this.consumer = consumer;
         this.consumerName = consumerName;
@@ -96,6 +96,7 @@ public class Order extends BasePojo implements java.io.Serializable {
         this.total = total;
         this.conment = conment;
         this.isDel = isDel;
+        this.skuGoodsType = skuGoodsType;
     }
 
     public Long getOrderId() {
@@ -344,5 +345,13 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public void setIsDel(int isDel) {
         this.isDel = isDel;
+    }
+
+    public String getSkuGoodsType() {
+        return skuGoodsType;
+    }
+
+    public void setSkuGoodsType(String skuGoodsType) {
+        this.skuGoodsType = skuGoodsType;
     }
 }

@@ -109,7 +109,7 @@ public class EPSaleService {
    * 竟拍的号码是否结束
    * "0 0/5 14,18 * * ?" 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发
 	*/
-   @Scheduled(cron = "0 30 17 * * ?")
+   @Scheduled(cron = "0 3 18 * * ?")
 	public void checkEPsaleNum() {
 		List<Map> list=epSaleMapper.findEPSaleGoods();
 		String endTimeStr="";//结束时间
@@ -128,19 +128,6 @@ public class EPSaleService {
 		{
 			for (Map map:list)
 			{
-
-                Long depositId3=0L;
-                AuctionDeposit auctionDeposit2=new AuctionDeposit();
-                depositId3=Long.valueOf("1009708343893164032");
-                auctionDeposit2.setId(depositId3);
-                //1009708343893164032
-                if(fundOrderService.payDepositRefund(auctionDeposit2.getId().toString(),"保证金").getCode()==200)
-                {
-                    auctionDeposit2.setStatus(3);//status 3 已退款
-                    auctionDepositMapper.auctionDepositEdit(auctionDeposit2);
-                }
-
-
 				endTimeStr=map.get("endTime").toString();
 				numId=Long.valueOf(map.get("numId").toString());
 				startNum=Integer.valueOf(map.get("startNum").toString());
