@@ -29,6 +29,7 @@
         <if test="pid!=null and pid !=''">
             and c.pid=#{pid} or c.id=#{pid}
         </if>
+        and c.grade in ('1','2')
         order by id asc
     </select>
 

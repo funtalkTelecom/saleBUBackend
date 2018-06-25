@@ -10,6 +10,7 @@ import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.mapper.PosterMapper;
 import com.hrtx.web.pojo.Poster;
+import com.hrtx.web.service.ApiPosterService;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class ApiPosterController extends BaseReturn{
 
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	private PosterMapper posterMapper;
+	private ApiPosterService apiPosterService;
 
 	/**
 	 * 海报接口-根据海报位置查询有效海报
@@ -40,28 +41,6 @@ public class ApiPosterController extends BaseReturn{
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Result posterList(Poster poster, HttpServletRequest request){
-		PageInfo<Object> pm = null;
-		try {
-			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
-			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-			poster.setStart(limit*(pageNum-1));
-			poster.setLimit(limit);
-
-			PageHelper.startPage(poster.getPageNum(),poster.getLimit());
-			Page<Object> ob=this.posterMapper.queryPageListApi(poster);
-            if(ob!=null && ob.size()>0){
-                for (Object obj : ob) {
-                	Poster p = (Poster) obj;
-					p.setPic(SystemParam.get("domain-full") + "/get-img/posterImages/" + p.getPic());
-                }
-            }
-			pm = new PageInfo<Object>(ob);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			pm = new PageInfo<Object>(null);
-			return new Result(Result.ERROR, pm);
-		}
-
-		return new Result(Result.OK, pm);
+		return apiPosterService.posterList(poster, request);
 	}
 }
