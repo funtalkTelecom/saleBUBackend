@@ -759,9 +759,11 @@ public class ApiOrderService {
 		try{
 			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
 			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+			int status = request.getParameter("status")==null?0: Integer.parseInt(request.getParameter("status"));
 			order.setStart(limit*(pageNum-1));
 			order.setLimit(limit);
 			order.setConsumer(consumer.getId());
+			order.setStatus(status);
 
 			PageHelper.startPage(order.getPageNum(),order.getLimit());
 			Page<Object> ob=orderMapper.getOrderByConsumer(order);

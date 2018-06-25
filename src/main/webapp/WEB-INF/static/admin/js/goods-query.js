@@ -55,6 +55,8 @@ $(function() {
                                             editor.html(data.kindeditor);
                                             $.fn.zTree.init($("#cityTree"), setting, zNodes);
                                             formInit($("#goodsInfo form"), _data);
+                                            $("#gStartTime").val(_data["gStartTime"]);
+                                            $("#gEndTime").val(_data["gEndTime"]);
                                             //给cityTree赋值
                                             var zTree = $.fn.zTree.getZTreeObj("cityTree");
                                             var gSaleCitys = record.gSaleCity.split(",");
@@ -164,6 +166,8 @@ $(function() {
 	}
 
     $(document).on("click","#goodsInfo .modal-footer .btn-success",function() {
+        //是竞拍,就出发选择活动下拉框的change事件
+        if($("input[name=gIsAuc]:checked").val()=="1") $("#gActive").change();
         //验证填写数量和库存数量
         var isError = false;
         var msg = "";
@@ -473,25 +477,6 @@ $(function() {
     $("#gSaleCityStr").off("click").on("click", showCityMenu);
     //销售地市下拉框end
 
-    //有效期
-    $('#gStartTime').bind('focus',function() {
-        WdatePicker({
-            maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',
-            dateFmt : 'yyyy-MM-dd HH:mm:ss',
-            onpicked : function(item) {
-                $(this).change();
-            }
-        });
-    });
-    $('#gEndTime').bind('focus',function() {
-        WdatePicker({
-            minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',
-            dateFmt : 'yyyy-MM-dd HH:mm:ss',
-            onpicked : function(item) {
-                $(this).change();
-            }
-        });
-    });
     //所售号码确定按钮
     $(document).on("click","#saleNumInfo .modal-footer .btn-success",function() {
         var saleNums = $("#saleNum").val();
@@ -529,6 +514,26 @@ $(function() {
         param:{t:new Date().getTime()}
     };
     dictSelect($("#gLoopTime"), "gLoopTime", option, true);
+
+    //有效期
+    $('#gStartTime').bind('focus',function() {
+        WdatePicker({
+            maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',
+            dateFmt : 'yyyy-MM-dd HH:mm:ss',
+            onpicked : function(item) {
+                $(this).change();
+            }
+        });
+    });
+    $('#gEndTime').bind('focus',function() {
+        WdatePicker({
+            minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',
+            dateFmt : 'yyyy-MM-dd HH:mm:ss',
+            onpicked : function(item) {
+                $(this).change();
+            }
+        });
+    });
     $("input[name=gIsAuc]").off("click").on("click", gIsAucOnClick);
     function gIsAucOnClick(){
         var isAucContent = $("#isAucContent");
@@ -536,9 +541,34 @@ $(function() {
         if($("input[name=gIsAuc]:checked").val()=="1"){
             isAucContent.show();
             gActive.show();
+            setTimeout(function () {
+                $('#gStartTime').unbind('focus');
+                $('#gStartTime').unbind().bind('focus', function(){console.log(1)});
+                $('#gEndTime').unbind('focus');
+                $('#gEndTime').unbind().bind('focus', function(){console.log(1)});
+            }, 100);
         }else{
             isAucContent.hide();
             gActive.hide();
+            $("#gStartTime").off("click");
+            $('#gStartTime').bind('focus',function() {
+                WdatePicker({
+                    maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',
+                    dateFmt : 'yyyy-MM-dd HH:mm:ss',
+                    onpicked : function(item) {
+                        $(this).change();
+                    }
+                });
+            });
+            $('#gEndTime').bind('focus',function() {
+                WdatePicker({
+                    minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',
+                    dateFmt : 'yyyy-MM-dd HH:mm:ss',
+                    onpicked : function(item) {
+                        $(this).change();
+                    }
+                });
+            });
         }
     }
     function initGoodsPics(picList){
@@ -591,7 +621,7 @@ function getActive(){
                 activeSelectOptions = data.data;
                 var option = '';
                 for(var i=0; i<activeSelectOptions.length; i++){
-                    option += '<option value="'+activeSelectOptions[i]["id"]+'">'+activeSelectOptions[i]["title"]+'</option>';
+                    option += '<option value="'+activeSelectOptions[i]["id"]+'" startTime="'+activeSelectOptions[i]["startTime"]+'" endTime="'+activeSelectOptions[i]["endTime"]+'">'+activeSelectOptions[i]["title"]+'</option>';
                 }
                 activeSelectOptions=option;
                 $("#gActive").html(activeSelectOptions);
@@ -600,6 +630,13 @@ function getActive(){
             }
         }
     });
+}
+function activeChange(obj){
+    // console.log($(obj).find("option:selected").attr("startTime"));
+    var gStartTime = $("#gStartTime");
+    var gEndTime = $("#gEndTime");
+    gStartTime.val(dateFtt("yyyy-MM-dd hh:mm:ss", new Date(Number($(obj).find("option:selected").attr("startTime")))));
+    gEndTime.val(dateFtt("yyyy-MM-dd hh:mm:ss", new Date(Number($(obj).find("option:selected").attr("endTime")))));
 }
 var titleStrObj = {
     "skuId":{
@@ -740,3 +777,21 @@ function deleteSkuRow(obj){
     $("#delSkus").val($("#delSkus").val()+$(obj).parent().parent().find("input[tag^=sku_][name=skuId]").eq(0).val()+",");
     $(obj).parent().parent().remove();
 }
+// 用法dateFtt("yyyy-MM-dd hh:mm:ss",new Date(1528271207000));
+function dateFtt(fmt,date) {
+    var o = {
+        "M+" : date.getMonth()+1,                 //月份
+        "d+" : date.getDate(),                    //日
+        "h+" : date.getHours(),                   //小时
+        "m+" : date.getMinutes(),                 //分
+        "s+" : date.getSeconds(),                 //秒
+        "q+" : Math.floor((date.getMonth()+3)/3), //季度
+        "S"  : date.getMilliseconds()             //毫秒
+    };
+    if(/(y+)/.test(fmt))
+        fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
+    for(var k in o)
+        if(new RegExp("("+ k +")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+    return fmt;
+} ;

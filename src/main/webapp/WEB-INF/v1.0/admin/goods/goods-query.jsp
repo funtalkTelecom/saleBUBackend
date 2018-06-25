@@ -159,7 +159,7 @@
 								</div>
 								<div class="col-xs-4">
 									<div class="control-group">
-										<select class="form-control" id="gActive" name="gActive">
+										<select class="form-control" id="gActive" name="gActive" onchange="activeChange(this)">
 										</select>
 									</div>
 								</div>

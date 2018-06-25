@@ -43,7 +43,7 @@
     <select id="getOrderByConsumer" resultType="Order">
         select
         <include refid="col_list"/>
-        from tb_order a where a.consumer = #{consumer}
+        from tb_order a where a.consumer = #{consumer} and a.status = #{status}
     </select>
 
     <select id="queryPageList" resultType="Order">
