@@ -81,13 +81,13 @@ public class ApiOrderService {
 
 
 		//模拟登陆
-		Consumer u = new Consumer();
-		u.setId(1L);
-		u.setName("周元强");
-		u.setCity("396");
-		u.setIsAgent(2);//设置为一级代理商
-		String token=TokenGenerator.generateValue();
-		apiSessionUtil.saveOrUpdate(token,u);
+//		Consumer u = new Consumer();
+//		u.setId(1L);
+//		u.setName("周元强");
+//		u.setCity("396");
+//		u.setIsAgent(2);//设置为一级代理商
+//		String token=TokenGenerator.generateValue();
+//		apiSessionUtil.saveOrUpdate(token,u);
 
 //		Consumer user = apiSessionUtil.getConsumer();
 		log.info("获取用户信息");
@@ -101,7 +101,7 @@ public class ApiOrderService {
 			}
 			else {
 				type = request.getParameter("type");
-				user = u;//apiSessionUtil.getConsumer();
+				user = apiSessionUtil.getConsumer();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -314,9 +314,9 @@ public class ApiOrderService {
 								log.info("判断商品地市和代理商地市");
 								//判断商品地市和代理商地市
 
-									if(!StringUtils.equals(number.get("city_id")+"",user.getAgentCity()+"")) {
-										freezeNum(numid, String.valueOf(number.get("status")));
-										return new Result(Result.ERROR, "不属于您的地市,无法操作");
+								if(!StringUtils.equals(number.get("city_id")+"",user.getAgentCity()+"")) {
+									freezeNum(numid, String.valueOf(number.get("status")));
+									return new Result(Result.ERROR, "不属于您的地市,无法操作");
 								}
 								/*if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
 									freezeNum(numid, String.valueOf(number.get("status")));
@@ -330,6 +330,7 @@ public class ApiOrderService {
 							double twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
 							//超级靓号添加卡的item
 							if("4".equals(sku.get("skuGoodsType"))){
+								log.info("超级靓号添加卡体item");
 								orderItem = new OrderItem();
 								orderItem.setItemId(orderItem.getGeneralId());
 								orderItem.setOrderId(order.getOrderId());
@@ -354,6 +355,7 @@ public class ApiOrderService {
 								orderItems.add(orderItem);
 							}
 
+							log.info("添加号码item");
 							//号码item
 							orderItem = new OrderItem();
 							orderItem.setpItemId(pOrderItem.getItemId());
@@ -380,6 +382,7 @@ public class ApiOrderService {
 							orderItems.add(orderItem);
 						}
 
+						log.info("设置订单信息");
 						//设置订单
 						order.setConsumer(user.getId());
 						order.setConsumerName(user.getName());
@@ -471,6 +474,7 @@ public class ApiOrderService {
 
 							int num = 1;
 							double twobPrice = Double.parseDouble(price);
+							log.info("添加卡体item");
 							//添加卡的item
 							orderItem = new OrderItem();
 							orderItem.setItemId(orderItem.getGeneralId());
@@ -496,6 +500,7 @@ public class ApiOrderService {
 							pOrderItem=orderItem;
 							orderItems.add(orderItem);
 
+							log.info("添加号码item");
 							//号码item
 							orderItem = new OrderItem();
 							orderItem.setItemId(orderItem.getGeneralId());
@@ -520,6 +525,7 @@ public class ApiOrderService {
 							orderItems.add(orderItem);
 						}
 
+						log.info("设置订单信息");
 						//设置订单
 						order.setConsumer(user.getId());
 						order.setConsumerName(user.getName());
@@ -590,6 +596,7 @@ public class ApiOrderService {
 			}
 
 			param.put("commodities", items);
+			//要发货的item,调用仓储接口
 			if(items!=null && items.size()>0) {
 				log.info("调用仓储接口");
 				Result res = StorageApiCallUtil.storageApiCall(param, "HK0003");
@@ -616,7 +623,7 @@ public class ApiOrderService {
 						return new Result(Result.ERROR, "创建订单异常");
 					}
 				}
-			}else{
+			}else{//不要发货的直接写入表
 				orderMapper.insertBatch(orderList);
 				orderItemMapper.insertBatch(orderItems);
 			}
