@@ -96,46 +96,13 @@ public class GoodsService {
                     String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));
                     sku.setSkuId(Long.parseLong(tskuId==null||tskuId.equals("null")||tskuId.equals("")?String.valueOf(sku.getGeneralId()): tskuId));
                     skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
-                    sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
-                    sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
-                    sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
+//                    sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
+//                    sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
+//                    sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
 
                     //有错误号码
                     if(skuSaleNum.split("★").length>1){
                         return new Result(Result.ERROR, "第"+(i+1)+"行,以下号码不符合,请重新确认\n"+skuSaleNum.split("★")[1]);
-                    }
-                    //调用仓储接口
-                    Map param = new HashMap();
-                    param.put("supply_id", sku.getSkuId());//供货单编码(sku_id)
-                    param.put("companystock_id", sku.getSkuRepoGoods());//库存编码(skuRepoGoods)
-                    //获取目前sku信息
-                    Sku nowSku = skuMapper.getSkuBySkuid(sku.getSkuId());
-                    Result res;
-                    if(goods.getGeneralId()!=goods.getgId()) {
-                        //先解冻现有库存
-                        param.put("type", "2");//处理类型1上架；2下架
-                        param.put("quantity", nowSku == null ? 0 : nowSku.getSkuNum());//数量
-                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                        if (200 != (res.getCode())) {
-                            return new Result(Result.ERROR, "库存验证失败");
-                        } else {
-                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                            if (!"00000".equals(sir.getCode())) {
-                                return new Result(Result.ERROR, sir.getDesc());
-                            }
-                        }
-                    }
-                    //再冻结新库存
-                    param.put("type", "1");//处理类型1上架；2下架
-                    param.put("quantity", sku.getSkuNum());//数量
-                    res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                    if(200!=(res.getCode())){
-                        return new Result(Result.ERROR, "库存验证失败");
-                    }else{
-                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                        if(!"00000".equals(sir.getCode())){
-                            return new Result(Result.ERROR, sir.getDesc());
-                        }
                     }
                 }
             }
@@ -157,10 +124,18 @@ public class GoodsService {
                     Iterator it = obj.keySet().iterator();
 
                     //,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuGoodsType,skuRepoGoods,
-                    sku.setSkuTobPrice(Double.parseDouble(((JSONObject) obj.get("skuTobPrice")).get("value")==null||((JSONObject) obj.get("skuTobPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value")));
-                    sku.setSkuTocPrice(Double.parseDouble(((JSONObject) obj.get("skuTocPrice")).get("value")==null||((JSONObject) obj.get("skuTocPrice")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuTocPrice")).get("value")));
+                    String price = ((JSONObject) obj.get("skuTobPrice")).get("value")==null||((JSONObject) obj.get("skuTobPrice")).get("value").equals("null")||((JSONObject) obj.get("skuTobPrice")).get("value").equals("")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value");
+                    if("".equals(price)) return new Result(Result.ERROR, "第"+(i+1)+"行2B价格为空");
+                    sku.setSkuTobPrice(Double.parseDouble(price));
+
+                    price = ((JSONObject) obj.get("skuTocPrice")).get("value")==null||((JSONObject) obj.get("skuTocPrice")).get("value").equals("null")||((JSONObject) obj.get("skuTocPrice")).get("value").equals("")?"": (String) ((JSONObject) obj.get("skuTocPrice")).get("value");
+                    if("".equals(price)) return new Result(Result.ERROR, "第"+(i+1)+"行2C价格为空");
+                    sku.setSkuTocPrice(Double.parseDouble(price));
+
 //                    sku.setSkuIsNum(((JSONObject) obj.get("skuIsNum")).get("value")==null||((JSONObject) obj.get("skuIsNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuIsNum")).get("value"));
-                    sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
+                    price = ((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?"": ((JSONObject) obj.get("skuNum")).get("value").toString();
+                    if("".equals(price)) return new Result(Result.ERROR, "第"+(i+1)+"行数量为空");
+                    sku.setSkuNum(Integer.parseInt(price));
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
 //                    验证号码可用性之前赋值旧的skuId,便于tb_num表复原状态
                     String tskuId = String.valueOf(((JSONObject) obj.get("skuId")).get("value"));
@@ -169,11 +144,49 @@ public class GoodsService {
 //                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, true, Long.parseLong(tskuId));
                     skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, true, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
 
-                    sku.setSkuId(sku.getGeneralId());
+//                    sku.setSkuId(sku.getGeneralId());
                     sku.setSkuSaleNum(skuSaleNum.split("★")[0].split("\n")[0]);
                     sku.setSkuGoodsType(((JSONObject) obj.get("skuGoodsType")).get("value")==null||((JSONObject) obj.get("skuGoodsType")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuGoodsType")).get("value"));
                     sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
                     sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
+
+                    //调用仓储接口
+                    Map param = new HashMap();
+                    param.put("supply_id", sku.getSkuId());//供货单编码(sku_id)
+                    param.put("companystock_id", sku.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                    //获取目前sku信息
+                    Sku nowSku = skuMapper.getSkuBySkuid(sku.getSkuId());
+                    Result res;
+                    if(goods.getGeneralId()!=goods.getgId()) {
+                        //先解冻现有库存
+                        param.put("type", "2");//处理类型1上架；2下架
+                        param.put("quantity", nowSku == null ? 0 : nowSku.getSkuNum());//数量
+                        if(!"0".equals(param.get("quantity").toString())) {
+                            res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                            if (200 != (res.getCode())) {
+                                return new Result(Result.ERROR, "库存验证失败");
+                            } else {
+                                StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                                if (!"00000".equals(sir.getCode())) {
+                                    return new Result(Result.ERROR, sir.getDesc());
+                                }
+                            }
+                        }
+                    }
+                    //再冻结新库存
+                    param.put("type", "1");//处理类型1上架；2下架
+                    param.put("quantity", sku.getSkuNum());//数量
+                    if(!"0".equals(param.get("quantity").toString())) {
+                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                        if (200 != (res.getCode())) {
+                            return new Result(Result.ERROR, "库存验证失败");
+                        } else {
+                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                            if (!"00000".equals(sir.getCode())) {
+                                return new Result(Result.ERROR, sir.getDesc());
+                            }
+                        }
+                    }
 
                     //sku属性表操作end
                     //判断是否存在,存在就update,否则加到list中insert
