@@ -256,12 +256,14 @@ public class EPSaleService {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}*/
+
 			if(Utils.compareDate(startTimeStr,currentTimeStr)<0&&Utils.compareDate(currentTimeStr,endTimeStr)<0)//addTime 处于 （结束时间-轮询时间）与结束时间 之间
 			{
 				return  true;
 			}
 		}
 		return false;
+
 	}
 
 	public Result goodsAuciton(Auction auciton, HttpServletRequest request) {

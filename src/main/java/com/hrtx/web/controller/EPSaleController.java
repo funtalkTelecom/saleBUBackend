@@ -15,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 import java.util.*;
 
 @RestController
@@ -108,6 +109,26 @@ public class EPSaleController extends BaseReturn{
 	@ResponseBody
 	public void goodsAuciton(Auction auction, HttpServletRequest request) {
 		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息
+
+		Date endTime=null;//结束时间
+		Date currentTime=new Date();//当前时间
+		List<Map> numList=epSaleService.findNumById(auction.getNumId());
+		if(numList.size()>0)
+		{
+			try {
+				endTime=Utils.stringToDate(String.valueOf(numList.get(0).get("end_time")),"yyyy-MM-dd HH:mm:ss");
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			if(currentTime.compareTo(endTime)>0)
+			{
+				returnResult(new Result(500, "竟拍已经结束"));
+			}
+		}
+		else
+		{
+			returnResult(new Result(500, "该商品不存在"));
+		}
 		double startPrice=0L;
 		Map numMap=epSaleService.findEPSaleNumInfoByNumId(auction.getNumId());
 		if(numMap!=null&&numMap.size()>0)
@@ -263,6 +284,7 @@ public class EPSaleController extends BaseReturn{
 		map.put("data",mapData);
 		return map;
 	}
+
 	/**
 	 * 查询竟拍活动的商品信息
 	 * 详情
