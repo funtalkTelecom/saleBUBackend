@@ -114,6 +114,7 @@ public class ApiOrderService {
 		List<OrderItem> orderItems = new ArrayList<OrderItem>();
 		List<Order> orderList = new ArrayList<Order>();
 		String type = null;
+		String skuGoodsType = null;
 
 
 		//模拟登陆
@@ -193,6 +194,7 @@ public class ApiOrderService {
 							if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
 								return new Result(Result.ERROR, "不属于您的地市,无法操作");
 							}
+							skuGoodsType = String.valueOf(sku.get("skuGoodsType"));
 							//卡体item
 							orderItem.setGoodsId(goods.getgId());
 							orderItem.setSkuId(Long.parseLong(skuid));
@@ -258,6 +260,7 @@ public class ApiOrderService {
 						}
 						log.info("设置订单信息");
 						//设置订单
+						order.setSkuGoodsType(skuGoodsType);
 						order.setConsumer(user.getId());
 						order.setConsumerName(user.getName());
 						order.setStatus(1);//设置成待付款
@@ -391,6 +394,7 @@ public class ApiOrderService {
 								orderItems.add(orderItem);
 							}
 
+							skuGoodsType = String.valueOf(sku.get("skuGoodsType"));
 							log.info("添加号码item");
 							//号码item
 							orderItem = new OrderItem();
@@ -420,6 +424,7 @@ public class ApiOrderService {
 
 						log.info("设置订单信息");
 						//设置订单
+						order.setSkuGoodsType(skuGoodsType);
 						order.setConsumer(user.getId());
 						order.setConsumerName(user.getName());
 						order.setStatus(1);//设置成待付款
@@ -507,6 +512,7 @@ public class ApiOrderService {
 							goods = goodsMapper.findGoodsInfoBySkuid(skuid);
 							List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 
+							skuGoodsType = String.valueOf(sku.get("skuGoodsType"));
 
 							int num = 1;
 							double twobPrice = Double.parseDouble(price);
@@ -563,6 +569,7 @@ public class ApiOrderService {
 
 						log.info("设置订单信息");
 						//设置订单
+						order.setSkuGoodsType(skuGoodsType);
 						order.setConsumer(user.getId());
 						order.setConsumerName(user.getName());
 						order.setStatus(1);//设置成待付款
