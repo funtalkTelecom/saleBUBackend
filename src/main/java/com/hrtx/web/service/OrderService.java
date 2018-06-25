@@ -15,6 +15,7 @@ import com.hrtx.web.mapper.OrderItemMapper;
 import com.hrtx.web.mapper.OrderMapper;
 import com.hrtx.web.pojo.*;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,7 @@ public class OrderService extends BaseService {
     @Autowired private NumMapper numMapper;
     @Autowired private IccidMapper iccidMapper;
     @Autowired private FundOrderService fundOrderService;
+    @Autowired
 
 
     public Result pageOrder(Order order) {
@@ -57,11 +59,27 @@ public class OrderService extends BaseService {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 2) return new Result(Result.ERROR, "订单状态异常");
-        List commodities = new ArrayList();
+
+        //更新号码
+        int notFreezeCount = 0;
+        List<Map> nums = orderItemMapper.queryOrderNums(orderId);
+        if(nums.size() == 0) return new Result(Result.ERROR, "订单未找到可更新号码");
+        for (Map num:nums) {
+            int status = NumberUtils.toInt(ObjectUtils.toString(num.get("status")));
+            if(status != 3) notFreezeCount++;
+        }
+        if(notFreezeCount > 0) return new Result(Result.ERROR, "号码处于非冻结数量["+notFreezeCount+"]，状态异常");
+        numMapper.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
+
         Example example = new Example(OrderItem.class);
         example.createCriteria().andEqualTo("orderId", order.getOrderId()).andEqualTo("isShipment", 1);
         List<OrderItem> items = orderItemMapper.selectByExample(example);
-        if(items.size() == 0) return new Result(Result.OK, "订单下未找到需要发货的产品");
+        if(items.size() == 0) {
+            order.setStatus(4);//待配卡
+            orderMapper.updateByPrimaryKey(order);
+            return new Result(Result.OK, "订单下未找到需要发货的产品");
+        }
+        List commodities = new ArrayList();
         for (OrderItem orderItem:items) {
             commodities.add(CommonMap.create("item_id",orderItem.getItemId()).put("companystock_id", orderItem.getCompanystockId()).put("quantity", orderItem.getQuantity()).getData());
         }
@@ -72,7 +90,7 @@ public class OrderService extends BaseService {
         if(result.getCode() != Result.OK) return result;
         StorageInterfaceResponse storageInterfaceResponse = StorageInterfaceResponse.create(String.valueOf(result.getData()), SystemParam.get("key"));
         if("00000".equals(storageInterfaceResponse.getCode())) {
-            order.setStatus(3);
+            order.setStatus(3);//待配货
             order.setNoticeShipmentDate(new Date());
             orderMapper.updateByPrimaryKey(order);
         }else {
@@ -126,6 +144,7 @@ public class OrderService extends BaseService {
         order.setPickupDate(new Date());
         order.setStatus(4);
         orderMapper.updateByPrimaryKey(order);
+        Result result = null;
         try{
             List<Map> commodities = (List) platrequest.get("commodities");
             List allImeis = new ArrayList();
@@ -134,26 +153,48 @@ public class OrderService extends BaseService {
                 String item_id = ObjectUtils.toString(commodity.get("item_id"));
                 allImeis.add(CommonMap.create("iccids",imeis).put("itemId", item_id));
             }
+            iccidMapper.delete(null);
+            int insertCount = iccidMapper.batchInsertTemp(allImeis);
+            int noFundCount = iccidMapper.batchInsertNoFund(order.getConsumer());
+//          更新已找到的
+            int updateCount  = iccidMapper.batchUpdate(order.getConsumer());
+            log.info("得到本地卡和回调卡的匹配信息[回调数量"+insertCount+", 未找到数量"+noFundCount+", 更新数量"+updateCount+"]");
 
-            iccidMapper.batchInsertTemp(allImeis);
-
-            Example example = new Example(Iccid.class);
-            example.createCriteria().andIn("iccid", allImeis).andEqualTo("stockStatus", 1).andEqualTo("dealStatus", 1);
-            List<Iccid> iccids = iccidMapper.selectByExample(example);
-            if(allImeis.size() > iccids.size()) {//卡库中有未找到的回调卡
-                allImeis.removeAll(iccids);
-                //添加未找到的
-//                iccidMapper.batchInsert(allImeis);
-                //更新已找到的
-//                iccidMapper.batchUpdate(iccids);
+            if(noFundCount == 0) {//卡库中找到了全部的回调卡
+                if(updateCount == insertCount) {//更新数量等于回调数量
+                    //绑卡
+                    result = this.batchBlindNum(allImeis);
+                }else {
+                    result = new Result(Result.ERROR, "卡库中更新数量与回调数量不一致，数据异常");
+                }
             }else {
-                //更新已找到的
-//                iccidMapper.batchUpdate(iccids);
+                result = new Result(Result.ERROR, "回调卡中有["+noFundCount+"]个在卡库中未找到");
             }
         }catch (Exception e){
             log.error("绑卡异常", e);
+            result = new Result(Result.ERROR, "绑卡未知异常");
+        }finally {
+
         }
         return new Result(Result.OK, "success");
+    }
+
+    private Result batchBlindNum(List<Map> allImeis) {
+        for (Map item:allImeis) {
+            List imeis = (List) item.get("iccids");
+            long item_id = NumberUtils.toLong(ObjectUtils.toString(item.get("itemId")));
+            OrderItem orderItem = orderItemMapper.selectByPrimaryKey(item_id);
+            if(orderItem == null) return new Result(Result.ERROR, "未找到仓库回调的itemId["+item_id+"]");
+            if(orderItem.getIsShipment() != 1) return new Result(Result.ERROR, "仓库回调的itemId["+item_id+"]在平台为不需发货，数据异常");
+            Example example = new Example(OrderItem.class);
+            example.createCriteria().andEqualTo("pItemId", item_id);
+            List<OrderItem> list = orderItemMapper.selectByExample(example);
+            if(imeis.size() != list.size()) return new Result(Result.ERROR, "仓库回调的itemId["+item_id+"]数量["+imeis.size()+"]与平台数量["+list.size()+"]不一致");
+            if(imeis.size() > 0) {
+
+            }
+        }
+        return null;
     }
 
     /**
