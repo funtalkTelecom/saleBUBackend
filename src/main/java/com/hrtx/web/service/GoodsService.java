@@ -16,6 +16,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -256,11 +257,13 @@ public class GoodsService {
                 } catch (Exception e) {
                     e.printStackTrace();
                     if(result==null) result = new Result(Result.ERROR, "保存图片异常");
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return result;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new Result(Result.ERROR, "操作异常");
         }
 
