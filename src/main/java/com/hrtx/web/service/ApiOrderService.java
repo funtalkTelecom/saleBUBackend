@@ -353,7 +353,7 @@ public class ApiOrderService {
 								log.info("判断商品地市和代理商地市");
 								//判断商品地市和代理商地市
 
-								if(!StringUtils.equals(number.get("city_id")+"",user.getAgentCity()+"")) {
+								if(!StringUtils.equals(number.get("cityId")+"",user.getAgentCity()+"")) {
 									freezeNum(numid, String.valueOf(number.get("status")));
 									return new Result(Result.ERROR, "不属于您的地市,无法操作");
 								}
