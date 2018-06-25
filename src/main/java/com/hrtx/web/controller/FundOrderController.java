@@ -9,6 +9,7 @@ import com.hrtx.web.pojo.Groups;
 import com.hrtx.web.pojo.User;
 import com.hrtx.web.service.FundOrderService;
 import com.hrtx.web.service.OrderService;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class FundOrderController extends BaseReturn{
     @PostMapping("/pay-order")
     @Powers({PowerConsts.NOPOWER})
     public Result payOrder(String orderId){
-        return orderService.payOrder(orderId);
+        return orderService.payOrder(NumberUtils.toLong(orderId));
     }
 
 	@PostMapping("/add-fund-order")

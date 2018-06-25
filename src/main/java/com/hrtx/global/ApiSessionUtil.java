@@ -26,13 +26,11 @@ public class ApiSessionUtil {
     }
 
     public String getTokenStr(){
+        if(RequestContextHolder.getRequestAttributes()==null)return null;
         HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
         return request.getParameter(JESSION_ID_NAME);
     }
-    public User getUser(){
-        String key = getApiKey(this.getTokenStr());
-        return (User) (redisUtils.get(key));
-    }
+
     public void saveOrUpdate(String apiKey,User user) {
         if(apiKey == null) return ;
         String key1 = getApiKey(apiKey);
@@ -68,7 +66,9 @@ public class ApiSessionUtil {
 
 
     public Consumer getConsumer(){
-        String key = getApiKey(this.getTokenStr());
+        String token=this.getTokenStr();
+        if(token==null)return null;
+        String key = getApiKey(token);
         return (Consumer) (redisUtils.get(key));
     }
 }

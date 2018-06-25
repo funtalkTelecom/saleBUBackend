@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hrtx.web.mapper.IccidMapper">
+    <update id="iccidEditStatus">
+        update tb_iccid t set
+         t.deal_status=#{dealStatus}
+        where
+            t.id = #{id}
+    </update>
+    <insert id="batchInsertTemp">
+        INSERT INTO tb_iccid_temp
+        (item_id, iccid)
+        VALUES
+        <foreach collection ="list" item="item" separator =",">
+            <foreach collection="item.iccids" item="iccid"  separator =",">
+            (#{item.itemId}, #{iccid})
+            </foreach>
+        </foreach >
+    </insert>
 </mapper>

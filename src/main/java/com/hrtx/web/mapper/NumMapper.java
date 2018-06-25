@@ -16,4 +16,9 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
      * 更新失效号码
      */
     void updateLoseNum();
+
+    /**
+     * 绑定号码
+     */
+    void updateBoundNum(Num num);
 }

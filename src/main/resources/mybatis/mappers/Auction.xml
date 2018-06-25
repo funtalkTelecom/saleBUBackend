@@ -55,9 +55,14 @@
 	  tb_auction.price,
 	  tb_auction.confirm_date as addDate,
 	  tb_consumer.name as consumerName,
-	   concat(tb_auction.consumer_id,'')as consumerId
+	  concat(tb_auction.consumer_id,'')as consumerId,
+	  case when tb_auction.order_id is null then ''
+	  else tb_auction.order_id end
+	  as orderId,
+	  tb_num.end_time as endTime
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
+	  inner join tb_num on tb_num.id=tb_auction.num_id
 	   where tb_auction.status in(2,4) and  tb_auction.num_id = #{numId}
 	  order by tb_auction.confirm_date desc limit 10
     </select>

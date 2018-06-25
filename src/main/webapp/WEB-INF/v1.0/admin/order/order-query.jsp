@@ -241,11 +241,11 @@
 							<div class="form-group">
 								<label class="col-xs-2 control-label">应收</label>
 								<div class="col-xs-3">
-									<input type="text" class="form-control" name="">
+									<input type="text" class="form-control" name="receivable" id="receivable">
 								</div>
 								<label class="col-xs-2 control-label">实收</label>
 								<div class="col-xs-3">
-									<input type="text" class="form-control" name="">
+									<input type="text" class="form-control" name="receipts" id="receipts">
 								</div>
 							</div>
 						</div>

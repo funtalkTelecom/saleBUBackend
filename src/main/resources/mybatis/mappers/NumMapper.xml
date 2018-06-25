@@ -10,4 +10,14 @@
   <update id="updateLoseNum">
   	update tb_num n set n.`status` = 8 where n.id in (select a.id from ( select nun.id from tb_num nun left join tb_num_base b on b.num_resource = nun.num_resource  where nun.`status` in (1,2) and ifnull(b.id,0) = 0 ) a )
   </update>
+
+    <update id="updateBoundNum">
+        update tb_num a
+        set a.iccid_id = #{iccidId},
+        a.iccid = #{iccid},
+        a.meal_mid = #{mealMid},
+        a.status = #{status}
+        where a.id = #{id}
+    </update>
+
 </mapper>

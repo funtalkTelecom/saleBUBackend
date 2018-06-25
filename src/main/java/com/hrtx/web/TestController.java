@@ -209,8 +209,8 @@ public class TestController {
     @Powers({PowerConsts.NOPOWER})
     @ResponseBody
     public Result helloworld11(HttpServletRequest request) {
-        User user= this.apiSessionUtil.getUser();
-        System.out.println("method{user}  "+user.getLoginName());
+        Consumer user= this.apiSessionUtil.getConsumer();
+        System.out.println("method{user}  "+user.getName());
         Result result=new Result(Result.OK,"[]");
         return result;
 //        return "[]";

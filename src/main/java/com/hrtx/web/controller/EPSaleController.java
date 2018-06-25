@@ -2,10 +2,7 @@ package com.hrtx.web.controller;
 
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
-import com.hrtx.global.ApiSessionUtil;
-import com.hrtx.global.Messager;
-import com.hrtx.global.PowerConsts;
-import com.hrtx.global.SystemParam;
+import com.hrtx.global.*;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.service.*;
 import org.apache.commons.lang.math.NumberUtils;
@@ -103,6 +100,9 @@ public class EPSaleController extends BaseReturn{
 		return map;
 	}
 
+	/*
+	   竟拍商品出价
+	 */
 	@PostMapping("/api/epSaleGoodsAuciton")
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
@@ -156,7 +156,7 @@ public class EPSaleController extends BaseReturn{
 					{
 						isDeposit=false;
 					}
-				}else
+				}else//当前用户无保证金记录，先生成status:1保证金记录
 				{
 					AuctionDeposit auctionDeposit=new AuctionDeposit();
 					auctionDeposit.setStatus(1);
@@ -164,6 +164,7 @@ public class EPSaleController extends BaseReturn{
 					auctionDeposit.setNumId(auction.getNumId());
 					auctionDeposit.setSkuId(auction.getSkuId());
 					auctionDeposit.setAmt(Double.valueOf(goods.getgDeposit()));//保证金记录  状态：1初始
+					auctionDeposit.setAddIp(SessionUtil.getUserIp());
 					auctionDepositService.auctionDepositEdit(auctionDeposit);
 					auctionDepositId=auctionDeposit.getId();
 					isDeposit=false;
@@ -176,6 +177,7 @@ public class EPSaleController extends BaseReturn{
 					auction.setStatus(2);
 					auction.setAddDate(addDate);
 					auction.setConfirmDate(addDate);//status 2 确认时间
+					auction.setAddIp(SessionUtil.getUserIp());
 					auctionService.auctionEdit(auction);//出价记录 状态：2成功
 					//**************当前出价记录是处于（结束时间-轮询时间）与结束时间 之间************************************************
 					if(epSaleService.isLoopTime(addDate,loopTime,auction.getNumId())) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
@@ -214,6 +216,7 @@ public class EPSaleController extends BaseReturn{
 				}else //当前用户保证金未支付成功 status:2    出价记录 状态：1初始   保证金记录  状态：1 初始
 				{
 					auction.setStatus(1);
+					auction.setAddIp(SessionUtil.getUserIp());
 					auctionService.auctionEdit(auction);//出价记录 状态：1初始
 					String orderNameStr="商品"+auction.getgName()+",保证金支付,额度:"+deposit;
 					Result res=fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(deposit),orderNameStr,auctionDepositId.toString());
