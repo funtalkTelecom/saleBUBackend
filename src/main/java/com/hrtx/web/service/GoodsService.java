@@ -364,6 +364,7 @@ public class GoodsService {
 
         } catch (Exception e) {
             e.printStackTrace();
+            return new Result(Result.ERROR, "下架库存异常");
         }
         goodsMapper.goodsUnsale(goods);
         res = new Result(Result.OK, "下架成功");

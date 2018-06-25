@@ -13,6 +13,10 @@ var skuGoodsTypes = {
     "3":"普靓",
     "4":"超靓"
 };
+var signTypes = {
+    "1":"用户签收",
+    "2":"系统"
+};
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
@@ -130,6 +134,7 @@ $(function() {
                                 var _data = data.data;
                                 formInit($("#orderInfo form"), _data);
                                 $("input[name=status]").val(orderStatus[$("input[name=status]").val()]);
+                                $("input[name=signType]").val(signTypes[$("input[name=signType]").val()]);
 
                                 itemList.load();
                                 $('#orderInfo').modal('show');
