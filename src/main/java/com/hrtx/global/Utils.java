@@ -296,7 +296,7 @@ public class Utils {
        "1995-11-12 15:21", "1999-12-11 09:59"  DATE1<DATE2 =1
     */
 	public static int compareDate(String DATE1, String DATE2) {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		try {
 			Date dt1 = df.parse(DATE1);
 			Date dt2 = df.parse(DATE2);
