@@ -41,6 +41,8 @@ public class ConsumerService {
 		ConsumerLog param = new ConsumerLog();
 		param.setOpenid(openid);
 		consumerLog = consumerLogMapper.selectOne(param);
+		Map<String,String> _map=new HashMap<>();
+		_map.put("__sessid",token);
 		if(consumerLog == null){
 			//向userclient，userclientlog存数据
 			Consumer userC = new Consumer();
@@ -62,14 +64,16 @@ public class ConsumerService {
 			consumerLogMapper.insert(log);
 
 			this.apiSessionUtil.saveOrUpdate(token,userC);
+			_map.put("consumer_id",String.valueOf(userC.getId()));
 		}else {
 			Consumer Cparam = new Consumer();
 			Long id = consumerLog.getUserId();
 			Cparam.setId(id);
 			Consumer consumer = consumerMapper.selectOne(Cparam);
 			this.apiSessionUtil.saveOrUpdate(token,consumer);
+			_map.put("consumer_id",String.valueOf(Cparam.getId()));
 		}
-		return new Result(Result.OK, token);
+		return new Result(Result.OK, _map);
 
 
 	}
