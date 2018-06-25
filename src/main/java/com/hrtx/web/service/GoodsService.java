@@ -154,7 +154,6 @@ public class GoodsService {
                     //调用仓储接口
                     Map param = new HashMap();
                     param.put("supply_id", sku.getSkuId());//供货单编码(sku_id)
-                    param.put("companystock_id", sku.getSkuRepoGoods());//库存编码(skuRepoGoods)
                     //获取目前sku信息
                     Sku nowSku = skuMapper.getSkuBySkuid(sku.getSkuId());
                     Result res;
@@ -162,6 +161,7 @@ public class GoodsService {
                         //先解冻现有库存
                         param.put("type", "2");//处理类型1上架；2下架
                         param.put("quantity", nowSku == null ? 0 : nowSku.getSkuNum());//数量
+                        param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
                         if(!"0".equals(param.get("quantity").toString())) {
                             res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                             if (200 != (res.getCode())) {
@@ -177,6 +177,7 @@ public class GoodsService {
                     //再冻结新库存
                     param.put("type", "1");//处理类型1上架；2下架
                     param.put("quantity", sku.getSkuNum());//数量
+                    param.put("companystock_id", sku.getSkuRepoGoods());//库存编码(skuRepoGoods)
                     if(!"0".equals(param.get("quantity").toString())) {
                         res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                         if (200 != (res.getCode())) {
