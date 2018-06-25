@@ -1,5 +1,18 @@
 var dataList = null;
 var itemList = null;
+var orderStatus = {
+    "1":"待付款",
+    "2":"已付款待推送（已付款尚未推送到仓储期）",
+    "3":"待配货(仓储系统已收到)",
+    "4":"待签收(仓储物流已取件)",
+    "5":"完成"
+};
+var skuGoodsTypes = {
+    "1":"白卡",
+    "2":"普号",
+    "3":"普靓",
+    "4":"超靓"
+};
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
@@ -14,10 +27,13 @@ $(function() {
                 }*/,{
                     "header" : "用户名称",
                     "dataIndex" : "consumerName"
-                }/*,{
-                    "header" : "状态",
-                    "dataIndex" : "1待付款；2已付款待推送（已付款尚未推送到仓储期）；3待配货(仓储系统已收到)；4待签收(仓储物流已取件)；5完成	status"
                 },{
+                    "header" : "状态",
+                    "dataIndex" : "status",//1待付款；2已付款待推送（已付款尚未推送到仓储期）；3待配货(仓储系统已收到)；4待签收(仓储物流已取件)；5完成
+                    "renderer":function(v,record) {
+                        return orderStatus[v];
+                    }
+                }/*,{
                     "header" : "请求的userAgent",
                     "dataIndex" : "reqUserAgent"
                 },{
@@ -46,10 +62,10 @@ $(function() {
                     "dataIndex" : "personTel"
                 },{
                     "header" : "收货地址",
-                    "dataIndex" : "地区+街道	address"
+                    "dataIndex" : "address"
                 },{
                     "header" : "通知出货时间",
-                    "dataIndex" : "即调用发货成功时间	noticeShipmentDate"
+                    "dataIndex" : "noticeShipmentDate"
                 }/*,{
                     "header" : "支付方式编码",
                     "dataIndex" : "字典表	payMenthodId"
@@ -108,16 +124,21 @@ $(function() {
                         }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
+						//点击详情
                         $operate.find(".detail").click(function () {
                             $.post("order/order-info", {orderId: v}, function (data) {
                                 var _data = data.data;
                                 formInit($("#orderInfo form"), _data);
+                                $("input[name=status]").val(orderStatus[$("input[name=status]").val()]);
 
                                 itemList.load();
                                 $('#orderInfo').modal('show');
                             }, "json");
                         });
+                        //点击收款
                         $operate.find(".receipt").click(function () {
+                            $("#receivable").val(record.total);
+                            $("#receipts").val(record.total);
                             $('#receiptInfo').modal('show');
                         });
 						return $operate;
@@ -153,12 +174,7 @@ $(function() {
                     }
                 }
                 pro = pro.substring(0, pro.length-1);
-                var skuGoodsType = record.skuGoodsType;
-                if(skuGoodsType=="1") skuGoodsType="白卡";
-                else if(skuGoodsType=="2") skuGoodsType="普号";
-                else if(skuGoodsType=="3") skuGoodsType="普靓";
-                else if(skuGoodsType=="4") skuGoodsType="超靓";
-                return skuGoodsType+" ("+pro+")";
+                return skuGoodsTypes[record.skuGoodsType]+" ("+pro+")";
             }
         },{
             "header" : "手机号码",

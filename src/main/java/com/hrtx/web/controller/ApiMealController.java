@@ -50,7 +50,7 @@ public class ApiMealController extends BaseReturn{
 	@GetMapping("/meal/n{id}")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public Result mealListForNum(String id, HttpServletRequest request){
+	public Result mealListForNum(@PathVariable("id") String id, HttpServletRequest request){
 		return apiMealService.mealListForNum(id, request);
 	}
 }
