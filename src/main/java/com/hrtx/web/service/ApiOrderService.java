@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -80,13 +81,13 @@ public class ApiOrderService {
 
 
 		//模拟登陆
-//		Consumer u = new Consumer();
-//		u.setId(1L);
-//		u.setName("周元强");
-//		u.setCity("396");
-//		u.setIsAgent(2);//设置为一级代理商
-//		String token=TokenGenerator.generateValue();
-//		apiSessionUtil.saveOrUpdate(token,u);
+		Consumer u = new Consumer();
+		u.setId(1L);
+		u.setName("周元强");
+		u.setCity("396");
+		u.setIsAgent(2);//设置为一级代理商
+		String token=TokenGenerator.generateValue();
+		apiSessionUtil.saveOrUpdate(token,u);
 
 //		Consumer user = apiSessionUtil.getConsumer();
 		log.info("获取用户信息");
@@ -100,10 +101,11 @@ public class ApiOrderService {
 			}
 			else {
 				type = request.getParameter("type");
-				user = apiSessionUtil.getConsumer();
+				user = u;//apiSessionUtil.getConsumer();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return new Result(Result.ERROR, "未获取到参数");
 		}
 
@@ -256,6 +258,7 @@ public class ApiOrderService {
 					log.info("解冻号码");
 					//解冻号码,把冻结之前的状态还原
 					freezeNumByIds(nlist, "2");
+					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new Result(Result.ERROR, "获取数据异常");
 				}
 
@@ -352,6 +355,7 @@ public class ApiOrderService {
 							}
 
 							//号码item
+							orderItem = new OrderItem();
 							orderItem.setpItemId(pOrderItem.getItemId());
 							orderItem.setItemId(orderItem.getGeneralId());
 							orderItem.setOrderId(order.getOrderId());
@@ -410,6 +414,7 @@ public class ApiOrderService {
 					deleteOrder(orderList);
 					//解冻号码,把冻结之前的状态还原
 					freezeNum(numid, String.valueOf(number.get("status")));
+					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new Result(Result.ERROR, "获取数据异常");
 				}
 			}
@@ -492,6 +497,7 @@ public class ApiOrderService {
 							orderItems.add(orderItem);
 
 							//号码item
+							orderItem = new OrderItem();
 							orderItem.setItemId(orderItem.getGeneralId());
 							orderItem.setOrderId(order.getOrderId());
 							orderItem.setGoodsId(goods.getgId());
@@ -551,20 +557,23 @@ public class ApiOrderService {
 					deleteOrder(orderList);
 					//解冻号码,把冻结之前的状态还原
 					freezeNum(numid, String.valueOf(number.get("status")));
+					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new Result(Result.ERROR, "获取数据异常");
 				}
 			}
+			log.info("判断商品有效期");
 			//判断商品是否在有效期内
 			if (goods.getgStartTime()==null || goods.getgEndTime()==null || !betweenCalendar(new Date(), goods.getgStartTime(), goods.getgEndTime()))
 				return new Result(Result.ERROR, "商品不在有效期内");
 
-			log.info("调用仓储接口");
+			log.info("调用仓储接口前封装参数");
 			//调用仓储接口
 			//callback SystemParam.get("Storage_domain")+"/deliver-order-callback"
 			Map param = new HashMap();
 			List items = new ArrayList();
 			Long preOrderId = 0L;
 			for (OrderItem i : orderItems) {
+				if(i.getIsShipment()==0) continue;
 				if(preOrderId!=i.getOrderId()) {
 					preOrderId = i.getOrderId();
 					param = new HashMap();
@@ -573,7 +582,6 @@ public class ApiOrderService {
 				}
 
 				Map item = new HashMap();
-				if(i.getIsShipment()==0) continue;
 				item.put("item_id", i.getItemId());
 				item.put("companystock_id", i.getCompanystockId());
 				item.put("quantity", i.getQuantity());
@@ -582,26 +590,35 @@ public class ApiOrderService {
 			}
 
 			param.put("commodities", items);
-			Result res = StorageApiCallUtil.storageApiCall(param, "HK0003");
-			if(200!=(res.getCode())){
-				return new Result(Result.ERROR, "库存验证失败");
-			}else{
-				StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-				if("00000".equals(sir.getCode())){
-					//调用仓储接口成功之后写入
-					for (Order o : orderList) {
-						o.setNoticeShipmentDate(new Date());
+			if(items!=null && items.size()>0) {
+				log.info("调用仓储接口");
+				Result res = StorageApiCallUtil.storageApiCall(param, "HK0003");
+				if (200 != (res.getCode())) {
+					return new Result(Result.ERROR, "库存验证失败");
+				} else {
+					StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+					if ("00000".equals(sir.getCode())) {
+						//调用仓储接口成功之后写入
+						for (Order o : orderList) {
+							o.setNoticeShipmentDate(new Date());
+						}
+						orderMapper.insertBatch(orderList);
+						orderItemMapper.insertBatch(orderItems);
+						if (type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+						{
+							action.setOrderId(preOrderId);
+							auctionMapper.auctionEditOrderIDByNumId(action);
+						}
+					} else {
+						for (OrderItem i : orderItems) {
+							freezeNum(i.getNumId().toString(), "2");
+						}
+						return new Result(Result.ERROR, "创建订单异常");
 					}
-					orderMapper.insertBatch(orderList);
-					orderItemMapper.insertBatch(orderItems);
-					if(type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
-					{
-						action.setOrderId(preOrderId);
-						auctionMapper.auctionEditOrderIDByNumId(action);
-					}
-				}else{
-					return new Result(Result.ERROR, "创建订单异常");
 				}
+			}else{
+				orderMapper.insertBatch(orderList);
+				orderItemMapper.insertBatch(orderItems);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -612,6 +629,7 @@ public class ApiOrderService {
 				action.setOrderId(0L);
 				auctionMapper.auctionEditOrderIDByNumId(action);
 			}
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return new Result(Result.ERROR, "创建订单异常");
 		}
 
