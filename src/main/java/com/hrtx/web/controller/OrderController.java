@@ -10,6 +10,7 @@ import com.hrtx.web.pojo.FundOrder;
 import com.hrtx.web.pojo.Groups;
 import com.hrtx.web.pojo.Order;
 import com.hrtx.web.pojo.OrderItem;
+import com.hrtx.web.service.NumService;
 import com.hrtx.web.service.OrderItemService;
 import com.hrtx.web.service.OrderService;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
@@ -36,6 +37,7 @@ public class OrderController extends BaseReturn{
 	private OrderService orderService;
 	@Autowired
 	private OrderItemService orderItemService;
+	@Autowired private NumService numService;
 
 	@RequestMapping("/order-query")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
@@ -81,8 +83,24 @@ public class OrderController extends BaseReturn{
 			log.info("接收到发货回调参数["+param+"]");
 			StorageInterfaceRequest storageInterfaceRequest = StorageInterfaceRequest.create(param, SystemParam.get("key"));
 			Result result = orderService.updateDeliverCallbackInfo(storageInterfaceRequest);
-			if(result.getCode() == 200) return renderHtml("success");
-			return renderHtml(String.valueOf(result.getData()));
+			if(result.getCode() == 200) {
+                renderHtml("success");
+				Order order = (Order) result.getData();
+                String goodsType = order.getSkuGoodsType();
+                if("1".equals(goodsType) || "2".equals(goodsType) || "4".equals(goodsType)) {//白卡 或 普号 或 超靓
+                    try{
+                        result = numService.blindNum(order.getOrderId());
+                        if(result.getCode() == Result.OK) {
+                            orderService.updateDqx(order.getOrderId());
+                        }
+                    }catch (Exception e){
+                        log.error("绑卡异常", e);
+                    }
+                }
+                return null;
+			}else {
+                return renderHtml(String.valueOf(result.getData()));
+            }
 		}catch (ServiceException e) {
 			log.error(e.getMessage(), e);
 			return renderHtml(e.getMessage());
