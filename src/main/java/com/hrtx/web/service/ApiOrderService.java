@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -588,6 +587,7 @@ public class ApiOrderService {
 				}
 
 				Map item = new HashMap();
+				if(i.getIsShipment()==0) continue;
 				item.put("item_id", i.getItemId());
 				item.put("companystock_id", i.getCompanystockId());
 				item.put("quantity", i.getQuantity());
