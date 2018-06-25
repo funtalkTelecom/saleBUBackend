@@ -759,12 +759,25 @@ public class ApiOrderService {
 		try{
 			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
 			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+			int status = request.getParameter("status")==null?0: Integer.parseInt(request.getParameter("status"));
+			String st = "";
 			order.setStart(limit*(pageNum-1));
 			order.setLimit(limit);
 			order.setConsumer(consumer.getId());
+			if(status==0){
+				st = "";
+			}else if(status==1){
+				st = "'1'";
+			}else if(status==2){
+				st = "'2','3'";
+			}else if(status==3){
+				st = "'4','5'";
+			}else if(status==4){
+				st = "'6'";
+			}
 
 			PageHelper.startPage(order.getPageNum(),order.getLimit());
-			Page<Object> ob=orderMapper.getOrderByConsumer(order);
+			Page<Object> ob=orderMapper.getOrderByConsumer(order, st);
 			pm = new PageInfo<Object>(ob);
 		}catch(Exception e){
 			return new Result(Result.ERROR, "获取列表异常");
