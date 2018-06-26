@@ -147,7 +147,7 @@
         left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
         and tb_file_info.file_group='goodsPic'
-        and tb_file_info.seq=1  and  tb_num.status=2
+        and tb_file_info.seq=1
         ) goodsInfo
         left join
         (select count(tb_auction.id) as priceCount,

@@ -115,7 +115,7 @@ public class EPSaleService {
    *
 	*/
 	//@Scheduled(cron = "0 3 18 * * ?")
-   @Scheduled(fixedRate=1000)
+   @Scheduled(fixedRate=10000000)
 	public void checkEPsaleNum() {
 		List<Map> list=epSaleMapper.findEPSaleGoods2();//已出价的Num列表
 		String endTimeStr="";//结束时间
