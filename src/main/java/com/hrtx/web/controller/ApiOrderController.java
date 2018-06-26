@@ -23,8 +23,8 @@ public class ApiOrderController extends BaseReturn{
 
 
     @PostMapping("/order")
-//    @Powers(PowerConsts.NOPOWER)
-    @Powers(PowerConsts.NOLOGINPOWER)
+    @Powers(PowerConsts.NOPOWER)
+//    @Powers(PowerConsts.NOLOGINPOWER)
     @ResponseBody
     public Result createOrder(HttpServletRequest request){
         return apiOrderService.createOrder(request, null);

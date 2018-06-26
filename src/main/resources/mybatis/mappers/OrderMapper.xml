@@ -40,10 +40,66 @@
         <include refid="col_list"/>
         from tb_order a where a.order_id = #{orderid};
     </select>
-    <select id="getOrderByConsumer" resultType="Order">
+    <resultMap id="orderList" type="java.util.HashMap">
+        <result property="gId" column="g_id" javaType="java.lang.String"></result>
+        <result property="gType1" column="g_type1"></result>
+        <result property="gType2" column="g_type2"></result>
+        <result property="gName" column="g_name"></result>
+        <result property="gAd" column="g_ad"></result>
+        <result property="gStartTime" column="g_start_time"></result>
+        <result property="gEndTime" column="g_end_time"></result>
+        <result property="gSaleCity" column="g_sale_city"></result>
+        <result property="gIsAuc" column="g_is_auc"></result>
+        <result property="gActive" column="g_active"></result>
+        <result property="gIsPack" column="g_is_pack"></result>
+        <result property="gLoopTime" column="g_loop_time"></result>
+        <result property="gDeposit" column="g_deposit"></result>
+        <result property="gStartNum" column="g_start_num"></result>
+        <result property="gPriceUp" column="g_price_up"></result>
+        <result property="gSellerId" column="g_seller_id" javaType="java.lang.String"></result>
+        <result property="gSellerName" column="g_seller_name"></result>
+        <result property="gIsSale" column="g_is_sale"></result>
+        <result property="fileId" column="file_id" javaType="java.lang.String"></result>
+        <result property="refId" column="ref_id" javaType="java.lang.String"></result>
+        <result property="fileName" column="file_name"></result>
+        <result property="fileGroup" column="file_group"></result>
+        <result property="seq" column="seq"></result>
+    </resultMap>
+    <select id="getOrderByConsumer" resultMap="orderList">
         select
+        c.file_id,
+        c.ref_id,
+        c.file_name,
+        c.file_group,
+        c.seq,
+
+        d.g_id,
+        d.g_type1,
+        d.g_type2,
+        d.g_name,
+        d.g_ad,
+        d.g_start_time,
+        d.g_end_time,
+        d.g_sale_city,
+        d.g_is_auc,
+        d.g_active,
+        d.g_is_pack,
+        d.g_loop_time,
+        d.g_deposit,
+        d.g_start_num,
+        d.g_price_up,
+        d.g_seller_id,
+        d.g_seller_name,
+        d.g_is_sale,
         <include refid="col_list"/>
-        from tb_order a where a.consumer = #{order.consumer} and a.status in (${st})
+        from tb_order a
+        left join (select max(order_id) as order_id, max(goods_id) as g_id from tb_order_item group by order_id) b
+        on a.order_id = b.order_id
+        left join tb_file_info c on c.ref_id = b.g_id
+        left join tb_goods d on d.g_id = b.g_id
+        where c.seq = 1
+        and a.consumer = #{order.consumer}
+        and a.status in (${st})
     </select>
 
     <select id="queryPageList" resultType="Order">

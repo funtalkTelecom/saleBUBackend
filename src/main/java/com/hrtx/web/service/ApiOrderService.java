@@ -778,6 +778,22 @@ public class ApiOrderService {
 
 			PageHelper.startPage(order.getPageNum(),order.getLimit());
 			Page<Object> ob=orderMapper.getOrderByConsumer(order, st);
+			if(ob!=null && ob.size()>0){
+				for(int i=0; i<ob.size(); i++){
+					Map g = (Map) ob.get(i);
+					g.put("fileName", SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +g.get("gId")+"/"+ g.get("fileName"));
+					//获取sku的属性,追加到名称中
+//					List prolist = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(String.valueOf(g.get("skuId"))));
+//					if(prolist!=null && prolist.size()>0){
+//						StringBuffer pro = new StringBuffer();
+//						for(int j=0; j<prolist.size(); j++){
+//							Map p = (Map) prolist.get(j);
+//							pro.append(p.get("keyValue")+" ");
+//						}
+//						g.put("gName", g.get("gName") + " (" + pro.substring(0, pro.length()-1) + ")");
+//					}
+				}
+			}
 			pm = new PageInfo<Object>(ob);
 		}catch(Exception e){
 			return new Result(Result.ERROR, "获取列表异常");
