@@ -108,39 +108,50 @@ public class EPSaleService {
    *
    * 竟拍的号码是否结束
    * "0 0/5 14,18 * * ?" 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发
+   *
 	*/
-   @Scheduled(cron = "0 3 18 * * ?")
+	//@Scheduled(cron = "0 3 18 * * ?")
+   @Scheduled(fixedRate=3000)
 	public void checkEPsaleNum() {
-		List<Map> list=epSaleMapper.findEPSaleGoods();
+		List<Map> list=epSaleMapper.findEPSaleGoods2();//已出价的Num列表
 		String endTimeStr="";//结束时间
 		String currentTimeStr="";//当前时间
 		Long numId=0L;//条码ID
 	    Long skuId=0L;//skuId
 	    Long addrid=0L;//最后成功出价成功=》默认地此
+	    String num="";//出价的号码
         double successAutionPrice=0.00;//最后成功出价记录价格
-		int startNum=0;//竟拍人数
+		int startNum=0;//起拍人数
 		boolean isEPSaleValid=false;//是否竟拍成功
+	    boolean isStartNum=false;//起拍人数是否足够
 	    int priceCumsumerCount=0;//出价人数
 	    long successConsumerId=0L;//最后成功出价记录 用户ID
 		double depositPrice=0.00;//保证金
+
 
 		if(list.size()>0)
 		{
 			for (Map map:list)
 			{
+				log.info(String.format("numId[%s]",map.get("numId")));
 				endTimeStr=map.get("endTime").toString();
 				numId=Long.valueOf(map.get("numId").toString());
+				num=map.get("num").toString();
 				startNum=Integer.valueOf(map.get("startNum").toString());
 				depositPrice=Double.valueOf(map.get("depositPrice").toString());
 				currentTimeStr=Utils.dateToString(new Date(),"yyyy-MM-dd HH:mm:ss");
-				if(Utils.compareDate(currentTimeStr,endTimeStr)==0)//当前时间==结束时间
+
+				//********************************************************************************************************************
+				//***********************************当前时间>=结束时间*******竟拍人数>=起拍人数符合规则******************************
+				if(Utils.compareDate(currentTimeStr,endTimeStr)>=0)//当前时间>=结束时间
 				{
 					List<Map> auctionCustomers=auctionMapper.findCustomersByNumId(numId);//竟拍人数
 					if(auctionCustomers.size()>0)
 					{
 						priceCumsumerCount=auctionCustomers.size();//竟拍人数
-						if(priceCumsumerCount>=startNum)//竟拍人数>=竟拍人数  符合规则
+						if(priceCumsumerCount>=startNum)//竟拍人数>=起拍人数符合规则
 						{
+							isStartNum=true;
 							Auction auction =new Auction();
 							auction.setNumId(numId);
 							auction.setStatus(2);
@@ -156,11 +167,12 @@ public class EPSaleService {
 						}
 					}
 				}
-				isEPSaleValid=true;
+
+				//********************************************************************************************************************
+				//***********************************有效竟拍转订单********************************************************************
+				//isEPSaleValid=true;
 				if(isEPSaleValid)//有效竟拍，最新一条出价转订单，其他用户退回保证金
 				{
-                      //*****************转订单
-
                     Consumer user=this.consumerMapper.findConsumerById(successConsumerId);
 					List<Map> deliveryAddressDefault=deliveryAddressMapper.findDeliveryAddressDefaultByUserId(successConsumerId);
 					/*if(deliveryAddressDefault.size()>0)
@@ -174,16 +186,29 @@ public class EPSaleService {
 					mapOrder.put("numid",numId);//竟拍成功numId
 					mapOrder.put("addrid",addrid);//竟拍成功addrid
 					mapOrder.put("price",successAutionPrice);//竟拍成功price
-					apiOrderService.createOrder(null,mapOrder);
+					if(apiOrderService.createOrder(null,mapOrder).getCode()!=200)
+					{
+						//************************通知管理员，竟拍出价成功转订单失败********************//
+						Messager.send(SystemParam.get("system_phone"),"竟拍结束;出价成功转订单失败;竟拍号:"+num);
+					}
 				}
 
-
-				//****************状态4 落败者 保证金退回并通知
+				//****************************************************************************************************************
+                //******************************保证金退回并通知****************开始***********************************************
+				//****************isEPSaleValid是否竟拍成功***********************************************************************
+				//****************是****状态4 落败者 保证金退回并通知**********否****状态4,2 落败者成功者 保证金全部退回并通知****
 				Long consumerId=0L;
 				Long depositId=0L;
 				String consumerPhone="";
 				AuctionDeposit auctionDeposit=new AuctionDeposit();
-				List<Map> auctionList=auctionMapper.findAuctionListDepositByNumId(numId);
+				List<Map> auctionList=new ArrayList<Map>();
+				if(isEPSaleValid)
+				{
+					auctionList=auctionMapper.findAuctionListDepositByNumId(numId);//退回落败者的保证金
+				}else
+				{
+					auctionList=auctionMapper.findAuctionListDepositByNumId2(numId);//退回所有出价者的保证金
+				}
 				if(auctionList.size()>0)
 				{
 					for(Map map2:auctionList)
@@ -191,7 +216,8 @@ public class EPSaleService {
 						consumerId=Long.valueOf(map2.get("consumerId").toString());
 						consumerPhone=map2.get("consumerPhone").toString();
 						auctionDeposit.setConsumerId(consumerId);
-						auctionDeposit.setNumId(consumerId);
+						auctionDeposit.setNumId(numId);
+						//*************************************出价记录status=4,status<>2 用户保证金
 						List<Map> depositList =auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerId(numId,consumerId);
 						if(depositList.size()>0)
 						{
@@ -203,13 +229,23 @@ public class EPSaleService {
 								{
 									auctionDeposit.setStatus(3);//status 3 已退款
 									auctionDepositMapper.auctionDepositEdit(auctionDeposit);
+									if(!isStartNum)//起拍人数是否足够
+									{
+										Messager.send(consumerPhone,"竟拍结束;竟拍失败,出价人数少于起拍人类;竟拍号:"+num);
+									}
+									Messager.send(consumerPhone,"竟拍结束;你的出价落败,保证金已退回,金额："+depositPrice+"竟拍号:"+num);
+								}else
+								{
+									//************************通知管理员，保证金退回失败********************//
+									Messager.send(SystemParam.get("system_phone"),"竟拍结束;保证金退回失败,金额："+depositPrice+"竟拍号:"+num);
 								}
-								Messager.send(consumerPhone,"竟拍结束;你的出价落败,保证金已退回,金额："+depositPrice);
 							}
 						}
-
 					}
 				}
+				//************************************************************************************************************
+				//******************************保证金退回并通知*******************结束***************************************
+				//************************************************************************************************************
 			}
 		}
 	}

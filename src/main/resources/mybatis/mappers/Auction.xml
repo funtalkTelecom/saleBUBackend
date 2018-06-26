@@ -128,6 +128,20 @@
 	  group by tb_auction.consumer_id
     </select>
 
+	<select id="findAuctionListDepositByNumId2" resultType="java.util.HashMap">
+	  select
+	  tb_auction.id,
+	  tb_consumer.name as consumerName,
+	  tb_consumer.phone as consumerPhone,
+	  tb_auction.consumer_id as consumerId,
+	  tb_auction.num_id as numId
+	  from tb_auction
+	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
+	  where tb_auction.status in(2,4)
+	  and  tb_auction.num_id = #{numId}
+	  group by tb_auction.consumer_id
+    </select>
+
 	<insert id="insertBatch">
 		insert into tb_auction(
 		id,

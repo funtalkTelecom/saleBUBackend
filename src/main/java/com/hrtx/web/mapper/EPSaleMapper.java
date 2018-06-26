@@ -5,7 +5,6 @@ import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.EPSale;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +25,8 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
     List<Map> findEPSaleGoodsByGoodsId(Long goodsId);
 
     List<Map> findEPSaleGoods();
+
+    List<Map> findEPSaleGoods2();
 
     List<Map> findEPSaleGoodsByGoodsId2(Long goodsId);
 

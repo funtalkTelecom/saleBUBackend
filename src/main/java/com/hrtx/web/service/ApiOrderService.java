@@ -610,10 +610,13 @@ public class ApiOrderService {
 					return new Result(Result.ERROR, "获取数据异常");
 				}
 			}
-			log.info("判断商品有效期");
-			//判断商品是否在有效期内
-			if (goods.getgStartTime()==null || goods.getgEndTime()==null || !betweenCalendar(new Date(), goods.getgStartTime(), goods.getgEndTime()))
-				return new Result(Result.ERROR, "商品不在有效期内");
+			if(!type.equals("3"))//竟拍type3,不需要判断商品有效期
+			{
+				log.info("判断商品有效期");
+				//判断商品是否在有效期内
+				if (goods.getgStartTime()==null || goods.getgEndTime()==null || !betweenCalendar(new Date(), goods.getgStartTime(), goods.getgEndTime()))
+					return new Result(Result.ERROR, "商品不在有效期内");
+			}
 
 			log.info("调用仓储接口前封装参数");
 			//调用仓储接口
