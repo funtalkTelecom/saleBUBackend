@@ -223,7 +223,7 @@
     tb_goods.g_start_num as startNum,
     tb_goods.g_deposit as depositPrice,
     tb_num.num_resource as num,
-    concat(tb_goods.g_id,'')as gId,
+    concat(tb_goods.g_id,'')as gId
 	 from tb_auction
 	 inner join tb_num
 	 on tb_num.id=tb_auction.num_id
@@ -324,8 +324,8 @@
         inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
         and  tb_num.status=2
-        and  tb_num.id=#{numId}
-        and  tb_goods.g_id=#{gId}
+        and  tb_num.id=#{0}
+        and  tb_goods.g_id=#{1}
     </select>
 
     <insert id="insertBatch">

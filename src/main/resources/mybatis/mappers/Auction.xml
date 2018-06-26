@@ -147,7 +147,7 @@
 
 	<select id="findAuctionListByOrderId" resultType="java.util.HashMap">
 	select concat(num_id,'') numId,
-	concat(g_id,'') gId,
+	concat(g_id,'') gId
 	from  tb_auction
 	where tb_auction.status=2
 	and tb_auction.order_id=#{orderId}
