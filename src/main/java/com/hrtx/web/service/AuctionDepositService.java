@@ -8,6 +8,7 @@ import com.hrtx.web.pojo.AuctionDeposit;
 import com.hrtx.web.pojo.Auction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.rmi.runtime.Log;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -39,6 +40,39 @@ public class AuctionDepositService {
         return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatus(auctionDeposit);
     }
 
+	/*
+      获取当前用户已支付保证金记录
+     */
+	public List<Map> findAuctionDepositListByNumIdAndGId(AuctionDeposit auctionDeposit){
+		auctionDeposit.setStatus(2);
+		auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
+		//return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatus(auctionDeposit);
+		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(auctionDeposit);
+	}
+
+	/*
+	   通过OrderId获取保证金记录
+	 */
+	public List<Map>  findAuctionDepositListByOrderId(Long orderId)
+	{
+	    List<Map> auctionList=auctionMapper.findAuctionListByOrderId(orderId);
+	    Long numId=0L;//numId;
+		Long gId=0L;//gId
+	    if(auctionList.size()>0)
+		{
+			AuctionDeposit auctionDeposit=new AuctionDeposit();
+			auctionDeposit.setStatus(2);
+			auctionDeposit.setgId(gId);
+			auctionDeposit.setNumId(numId);
+			auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
+			//return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatus(auctionDeposit);
+			return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(auctionDeposit);
+		}else
+		{
+			return  null;
+		}
+	}
+
 	public void auctionDepositEdit(AuctionDeposit auctionDeposit) {
 		List<AuctionDeposit> list = new ArrayList<AuctionDeposit>();
 		auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
@@ -51,6 +85,10 @@ public class AuctionDepositService {
 
 	public List<Map> findAuctionDepositListConsumerByNumId(Long numId) {
 		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerId(numId,apiSessionUtil.getConsumer().getId());
+	}
+
+	public List<Map> findAuctionDepositListConsumerByNumIdAndGId(Long numId,Long gId) {
+		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndGId(numId,apiSessionUtil.getConsumer().getId(),gId);
 	}
 
 	/*

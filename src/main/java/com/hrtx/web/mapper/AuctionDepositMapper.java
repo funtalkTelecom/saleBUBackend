@@ -17,10 +17,14 @@ public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<
 
     List<Map> findAuctionDepositListByNumIdAndConsumerId(@Param("numId") Long numId,@Param("consumerId") Long consumerId);
 
+    List<Map> findAuctionDepositListByNumIdAndConsumerIdAndGId(@Param("numId") Long numId,@Param("consumerId") Long consumerId,@Param("gId") Long gId);
+
     /*
         通过NumId、ConsumerId、Status查询对应AuctionDepositList
      */
     List<Map> findAuctionDepositListByNumIdAndConsumerIdAndStatus(AuctionDeposit auctionDeposit);
+
+    List<Map> findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(AuctionDeposit auctionDeposit);
 
     void insertBatch(@Param("auctionDepositList") List<AuctionDeposit> list);
 
