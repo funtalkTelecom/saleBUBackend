@@ -46,11 +46,11 @@ public class NumService {
             insertCount += count;
         }
         int noFundCount = iccidMapper.batchInsertNoFund(order.getConsumer(), orderId);
-//      更新已找到的
-        int updateCount  = iccidMapper.batchUpdate(order.getConsumer(), orderId);
-        log.info("得到本地卡和回调卡的匹配信息[回调数量"+insertCount+", 未找到数量"+noFundCount+", 更新数量"+updateCount+"]");
         //回调卡中有["+noFundCount+"]个在卡库中未找到
         if(noFundCount != 0) throw new ServiceException("回调卡中有["+noFundCount+"]个在卡库中未找到");
+
+        int updateCount  = iccidMapper.batchUpdate(order.getConsumer(), orderId);
+        log.info("得到本地卡和回调卡的匹配信息[回调数量"+insertCount+", 未找到数量"+noFundCount+", 更新数量"+updateCount+"]");
         if(updateCount != insertCount) throw new ServiceException("卡库中更新数量与回调数量不一致，数据异常");
         String goodsType = order.getSkuGoodsType();
         if("2".equals(goodsType) || "4".equals(goodsType)) {//普号 或者 超靓
