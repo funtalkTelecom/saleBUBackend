@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import sun.rmi.runtime.Log;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class AuctionDepositService {
@@ -53,11 +50,13 @@ public class AuctionDepositService {
 	/*
 	   通过OrderId获取保证金记录
 	 */
-	public List<Map>  findAuctionDepositListByOrderId(Long orderId)
+	public Map  findAuctionDepositListByOrderId(Long orderId)
 	{
+		Map map=new HashMap();
 	    List<Map> auctionList=auctionMapper.findAuctionListByOrderId(orderId);
 	    Long numId=0L;//numId;
 		Long gId=0L;//gId
+		double deposit=0.00;//保证金
 	    if(auctionList.size()>0)
 		{
 			AuctionDeposit auctionDeposit=new AuctionDeposit();
@@ -66,11 +65,14 @@ public class AuctionDepositService {
 			auctionDeposit.setNumId(numId);
 			auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
 			//return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatus(auctionDeposit);
-			return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(auctionDeposit);
-		}else
-		{
-			return  null;
+			List<Map> auctionDepositList=auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(auctionDeposit);
+			if(auctionDepositList.size()>0)
+			{
+				deposit=Double.valueOf(auctionDepositList.get(0).get("price").toString());
+			}
 		}
+		map.put("deposit",deposit);
+		return   map;
 	}
 
 	public void auctionDepositEdit(AuctionDeposit auctionDeposit) {
