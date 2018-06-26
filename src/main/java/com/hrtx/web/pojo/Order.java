@@ -3,10 +3,13 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Table(name = "tb_order")
@@ -14,6 +17,7 @@ public class Order extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "订单不能为空", groups = {Groups.FundOrderPayOrder.class})
     private Long orderId;//编号
     @JsonSerialize(using = ToStringSerializer.class)
     private Long consumer;//用户编码
@@ -21,13 +25,13 @@ public class Order extends BasePojo implements java.io.Serializable {
     private int status;//状态 1待付款；2已付款待推送（已付款尚未推送到仓储期）；3待配货(仓储系统已收到)；4待签收(仓储物流已取件)；5完成
     private String reqUserAgent;//请求的user_agent
     private String reqIp;//请求的ip
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date addDate;//添加时间
     private int orderType;//1商品；2号码；3竞拍
     private String shippingMenthodId;//运输方式编码 字典表
     private String shippingMenthod;//运输方式
     @JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "地址不能为空", groups = {Groups.FundOrderPayOrder.class})
     private Long addressId;//收货地址编码
     private String personName;//收货人
     private String personTel;//收货电话
@@ -35,6 +39,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date noticeShipmentDate;//通知出货时间 即调用发货成功时间
+    @NotBlank(message = "支付方式不能为空", groups = {Groups.FundOrderPayOrder.class})
     private String payMenthodId;//支付方式编码 字典表
     private String payMenthod;//支付方式
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
