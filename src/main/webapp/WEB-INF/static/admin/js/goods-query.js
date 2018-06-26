@@ -514,61 +514,46 @@ $(function() {
         param:{t:new Date().getTime()}
     };
     dictSelect($("#gLoopTime"), "gLoopTime", option, true);
-
     //有效期
-    $('#gStartTime').bind('focus',function() {
-        WdatePicker({
-            maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',
-            dateFmt : 'yyyy-MM-dd HH:mm:ss',
-            onpicked : function(item) {
-                $(this).change();
-            }
-        });
-    });
-    $('#gEndTime').bind('focus',function() {
-        WdatePicker({
-            minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',
-            dateFmt : 'yyyy-MM-dd HH:mm:ss',
-            onpicked : function(item) {
-                $(this).change();
-            }
-        });
-    });
+    // $('#gStartTime').bind('click',function() {
+    //     WdatePicker({maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});
+    // });
+    // $('#gEndTime').bind('click',function() {
+    //     WdatePicker({minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});
+    // });
     $("input[name=gIsAuc]").off("click").on("click", gIsAucOnClick);
     function gIsAucOnClick(){
         var isAucContent = $("#isAucContent");
         var gActive = $("#gActive");
+        console.log($("input[name=gIsAuc]:checked").val()=="1");
         if($("input[name=gIsAuc]:checked").val()=="1"){
             isAucContent.show();
             gActive.show();
-            setTimeout(function () {
-                $('#gStartTime').unbind('focus');
-                $('#gStartTime').unbind().bind('focus', function(){console.log(1)});
-                $('#gEndTime').unbind('focus');
-                $('#gEndTime').unbind().bind('focus', function(){console.log(1)});
-            }, 100);
+            $('#gStartTime').prop("disabled", true);
+            $('#gEndTime').prop("disabled", true);
         }else{
             isAucContent.hide();
             gActive.hide();
-            $("#gStartTime").off("click");
-            $('#gStartTime').bind('focus',function() {
-                WdatePicker({
-                    maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',
-                    dateFmt : 'yyyy-MM-dd HH:mm:ss',
-                    onpicked : function(item) {
-                        $(this).change();
-                    }
-                });
-            });
-            $('#gEndTime').bind('focus',function() {
-                WdatePicker({
-                    minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',
-                    dateFmt : 'yyyy-MM-dd HH:mm:ss',
-                    onpicked : function(item) {
-                        $(this).change();
-                    }
-                });
-            });
+            $('#gStartTime').prop("disabled", false);
+            $('#gEndTime').prop("disabled", false);
+            // $('#gStartTime').bind('click',function() {
+            //     WdatePicker({
+            //         maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',
+            //         dateFmt : 'yyyy-MM-dd HH:mm:ss',
+            //         onpicked : function(item) {
+            //             $(this).change();
+            //         }
+            //     });
+            // });
+            // $('#gEndTime').bind('click',function() {
+            //     WdatePicker({
+            //         minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',
+            //         dateFmt : 'yyyy-MM-dd HH:mm:ss',
+            //         onpicked : function(item) {
+            //             $(this).change();
+            //         }
+            //     });
+            // });
         }
     }
     function initGoodsPics(picList){

@@ -751,8 +751,8 @@ public class ApiOrderService {
 	public Result getOrderByConsumer(HttpServletRequest request) {
 		Consumer consumer = apiSessionUtil.getConsumer();
 		//模拟登陆
-		consumer = new Consumer();
-		consumer.setId(1L);
+//		consumer = new Consumer();
+//		consumer.setId(1L);
 		if(consumer==null) return new Result(Result.ERROR, "未获取到用户");
 		PageInfo<Object> pm = null;
 		Order order = new Order();
