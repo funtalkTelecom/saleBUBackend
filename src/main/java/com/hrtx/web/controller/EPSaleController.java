@@ -136,7 +136,7 @@ public class EPSaleController extends BaseReturn{
 		}
 		//最近10次数出价记录
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
-		int priceCumsumerCount=0;//出价人数
+		int priceCount=0;//出价次数
 		double priceUp=Double.valueOf(goods.getgPriceUp());//每次加价
 		int loopTime=Integer.valueOf(goods.getgLoopTime());//轮咨时间分钟
 		double deposit=Double.valueOf(goods.getgDeposit());//保证金
@@ -221,19 +221,19 @@ public class EPSaleController extends BaseReturn{
 						List<Map> goodsAuctionListAfter=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
 						//String goodsAuctionListStr="";
 						Map goodsAuctionMap=new HashMap();
-						List<Map> auctionCustomers=auctionService.findCustomersByNumIdAndGId(auction.getNumId(),auction.getgId());//竟拍人数
-						if(auctionCustomers.size()>0) {
-							priceCumsumerCount = auctionCustomers.size();//竟拍人数
+						List<Map> epSaleGoodsAuctionPriceInfo=auctionService.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
+						if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
+							priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
 						}
 						if(goodsAuctionListAfter!=null&&goodsAuctionListAfter.size()>0)
 						{
 							goodsAuctionMap.put("goodsAuctionList",goodsAuctionListAfter);
-							goodsAuctionMap.put("priceCumsumerCount",priceCumsumerCount);
+							goodsAuctionMap.put("priceCount",priceCount);
 							//goodsAuctionListStr="goodsAuctionList:"+goodsAuctionListAfter;
 						}else
 						{
 							goodsAuctionMap.put("goodsAuctionList","");
-							goodsAuctionMap.put("priceCumsumerCount","");
+							goodsAuctionMap.put("priceCount","");
 							//goodsAuctionListStr="goodsAuctionList:"+"";
 						}
 
@@ -278,21 +278,21 @@ public class EPSaleController extends BaseReturn{
 	public Map findAuctions(@PathVariable("numId") String numId,@PathVariable("gId") String gId){
 		Map<String, Object> map = new HashMap<String, Object>();
         Map<String, Object> mapData= new HashMap<String, Object>();
-        int priceCumsumerCount=0;//出价人数
+        int priceCount=0;//出价次数
 		//最近10次出价记录
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
-        List<Map> auctionCustomers=auctionService.findCustomersByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));//竟拍人数
-		if(auctionCustomers.size()>0) {
-			priceCumsumerCount = auctionCustomers.size();//竟拍人数
-	    }
+		List<Map> epSaleGoodsAuctionPriceInfo=auctionService.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
+		if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
+			priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
+		}
 		if(goodsAuctionList!=null&&goodsAuctionList.size()>0)
 		{
             mapData.put("goodsAuctionList",goodsAuctionList);
-			mapData.put("priceCumsumerCount",priceCumsumerCount);
+			mapData.put("priceCount",priceCount);
 		}else
 		{
             mapData.put("goodsAuctionList","");
-			mapData.put("priceCumsumerCount","");
+			mapData.put("priceCount","");
 		}
 		map.put("code", Result.OK);
 		map.put("data",mapData);
