@@ -292,6 +292,7 @@ public class Utils {
 		System.out.println("i=="+doubleToInt(12.1));
 		System.out.println("i=="+doubleToInt(12.01));
 	}
+
    /*
        "1995-11-12 15:21", "1999-12-11 09:59"  DATE1<DATE2 =1
     */

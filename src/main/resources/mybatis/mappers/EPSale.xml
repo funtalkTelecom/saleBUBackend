@@ -215,6 +215,23 @@
     where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1  and  tb_num.status=2
    </select>
 
+    <select id="findEPSaleGoods2" resultType="java.util.HashMap">
+    select
+	tb_num.id as numId,
+    tb_num.end_time as endTime,
+    tb_goods.g_start_num as startNum,
+    tb_goods.g_deposit as depositPrice,
+    tb_num.num_resource as num
+	 from tb_auction
+	 inner join tb_num
+	 on tb_num.id=tb_auction.num_id
+	 inner join tb_sku
+	 on tb_sku.sku_id=tb_num.sku_id
+	 inner join tb_goods on tb_goods.g_id=tb_sku.g_id
+    where tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+	 and  tb_num.status=2 and  tb_auction.status=2
+   </select>
+
     <select id="findEPSaleGoodsByGoodsId2" resultType="java.util.HashMap">
         select
         concat(tb_num.id,'')as numId,

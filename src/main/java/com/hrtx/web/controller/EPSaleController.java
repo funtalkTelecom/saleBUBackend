@@ -109,7 +109,6 @@ public class EPSaleController extends BaseReturn{
 	@ResponseBody
 	public void goodsAuciton(Auction auction, HttpServletRequest request) {
 		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息
-
 		Date endTime=null;//结束时间
 		Date currentTime=new Date();//当前时间
 		List<Map> numList=epSaleService.findNumById(auction.getNumId());
