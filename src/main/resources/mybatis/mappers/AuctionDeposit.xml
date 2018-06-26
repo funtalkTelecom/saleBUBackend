@@ -29,10 +29,25 @@
 	  and tb_auction_deposit.status=#{status}
     </select>
 
+	<select id="findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId" resultType="java.util.HashMap">
+	  select * from 	tb_auction_deposit
+	  where tb_auction_deposit.num_id = #{numId}
+	  and tb_auction_deposit.consumer_id=#{consumerId}
+	  and tb_auction_deposit.status=#{status}
+	  and tb_auction_deposit.g_id=#{gId}
+    </select>
+
 	<select id="findAuctionDepositListByNumIdAndConsumerId" resultType="java.util.HashMap">
 	  select * from 	tb_auction_deposit
 	  where  tb_auction_deposit.num_id = #{numId}
 	       and tb_auction_deposit.consumer_id=#{consumerId}
+    </select>
+
+	<select id="findAuctionDepositListByNumIdAndConsumerIdAndGId" resultType="java.util.HashMap">
+	  select * from 	tb_auction_deposit
+	  where  tb_auction_deposit.num_id = #{numId}
+	       and tb_auction_deposit.consumer_id=#{consumerId}
+	       and tb_auction_deposit.g_id=#{gId}
     </select>
 
 	<insert id="insertBatch">
@@ -41,6 +56,7 @@
 		sku_id,
 		num_id,
 		num,
+		g_id,
 		amt,
 		status,
 		add_date,
@@ -58,6 +74,7 @@
 			#{AuctionDeposit.skuId},
 			#{AuctionDeposit.numId},
 			#{AuctionDeposit.num},
+			#{AuctionDeposit.gId},
 			#{AuctionDeposit.amt},
 			#{AuctionDeposit.status},
 			#{AuctionDeposit.addDate},

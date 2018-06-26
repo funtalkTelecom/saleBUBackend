@@ -221,7 +221,8 @@
     tb_num.end_time as endTime,
     tb_goods.g_start_num as startNum,
     tb_goods.g_deposit as depositPrice,
-    tb_num.num_resource as num
+    tb_num.num_resource as num,
+    tb_goods.g_id as gId
 	 from tb_auction
 	 inner join tb_num
 	 on tb_num.id=tb_auction.num_id
@@ -262,7 +263,70 @@
         and  tb_num.status=2
         and  tb_goods.g_id = #{goodsId}
     </select>
-    
+
+    <select id="findEPSaleGoodsByNumId" resultType="java.util.HashMap">
+        select
+        concat(tb_num.id,'')as numId,
+        concat(tb_goods.g_id,'')as gId,
+        case
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice,
+        concat(tb_sku.sku_id,'')as skuId,
+        tb_num.num_resource as num,
+        tb_goods.g_price_up as gPriceUp,
+        tb_goods.g_deposit as gDeposit,
+        tb_goods.g_loop_time as gLoopTime,
+        tb_num.start_time as gStartTime,
+        tb_num.end_time as gEndTime
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and  tb_num.status=2
+        and  tb_num.id=#{numId}
+    </select>
+
+    <select id="findEPSaleGoodsByNumIdAndGId" resultType="java.util.HashMap">
+        select
+        concat(tb_num.id,'')as numId,
+        concat(tb_goods.g_id,'')as gId,
+        case
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice,
+        concat(tb_sku.sku_id,'')as skuId,
+        tb_num.num_resource as num,
+        tb_goods.g_price_up as gPriceUp,
+        tb_goods.g_deposit as gDeposit,
+        tb_goods.g_loop_time as gLoopTime,
+        tb_num.start_time as gStartTime,
+        tb_num.end_time as gEndTime
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and  tb_num.status=2
+        and  tb_num.id=#{numId}
+        and  tb_goods.g_id=#{gId}
+    </select>
+
     <insert id="insertBatch">
         insert into tb_ep_sale(
         id,

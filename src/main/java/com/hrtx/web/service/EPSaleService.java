@@ -91,9 +91,13 @@ public class EPSaleService {
 		return list;
 	}
 
-	public List<Map> findEPSaleGoodsByGoodsId(Long goodsId) {
-		return epSaleMapper.findEPSaleGoodsByGoodsId2(goodsId);
+	public List<Map> findEPSaleGoodsByGoodsId(Long numId) {
+		return epSaleMapper.findEPSaleGoodsByNumId(numId);
 	}
+
+    public List<Map> findEPSaleGoodsByGoodsId(Long numId,Long gId) {
+        return epSaleMapper.findEPSaleGoodsByNumIdAndGId(numId,gId);
+    }
 
 	public Map findEPSaleNumInfoByNumId(Long numId) {
 		return  numberMapper.getNumInfoById(numId.toString());
@@ -111,12 +115,13 @@ public class EPSaleService {
    *
 	*/
 	//@Scheduled(cron = "0 3 18 * * ?")
-   @Scheduled(fixedRate=3000)
+   @Scheduled(fixedRate=30000000)
 	public void checkEPsaleNum() {
 		List<Map> list=epSaleMapper.findEPSaleGoods2();//已出价的Num列表
 		String endTimeStr="";//结束时间
 		String currentTimeStr="";//当前时间
 		Long numId=0L;//条码ID
+        Long gId=0L;//gId
 	    Long skuId=0L;//skuId
 	    Long addrid=0L;//最后成功出价成功=》默认地此
 	    String num="";//出价的号码
@@ -128,7 +133,6 @@ public class EPSaleService {
 	    long successConsumerId=0L;//最后成功出价记录 用户ID
 		double depositPrice=0.00;//保证金
 
-
 		if(list.size()>0)
 		{
 			for (Map map:list)
@@ -136,6 +140,7 @@ public class EPSaleService {
 				log.info(String.format("numId[%s]",map.get("numId")));
 				endTimeStr=map.get("endTime").toString();
 				numId=Long.valueOf(map.get("numId").toString());
+                gId=Long.valueOf(map.get("gId").toString());
 				num=map.get("num").toString();
 				startNum=Integer.valueOf(map.get("startNum").toString());
 				depositPrice=Double.valueOf(map.get("depositPrice").toString());
@@ -145,7 +150,7 @@ public class EPSaleService {
 				//***********************************当前时间>=结束时间*******竟拍人数>=起拍人数符合规则******************************
 				if(Utils.compareDate(currentTimeStr,endTimeStr)>=0)//当前时间>=结束时间
 				{
-					List<Map> auctionCustomers=auctionMapper.findCustomersByNumId(numId);//竟拍人数
+					List<Map> auctionCustomers=auctionMapper.findCustomersByNumIdAndGId(numId,gId);//竟拍人数
 					if(auctionCustomers.size()>0)
 					{
 						priceCumsumerCount=auctionCustomers.size();//竟拍人数
@@ -155,7 +160,8 @@ public class EPSaleService {
 							Auction auction =new Auction();
 							auction.setNumId(numId);
 							auction.setStatus(2);
-							List<Map> successAution=auctionMapper.findAuctionByNumIdAndStatus(auction);//最后成功出价记录 status:2
+							auction.setgId(gId);
+							List<Map> successAution=auctionMapper.findAuctionByNumIdAndStatusAndGId(auction);//最后成功出价记录 status:2
 							if(successAution.size()>0)
 							{
 								successConsumerId=Long.valueOf(successAution.get(0).get("consumerId").toString());//最后成功出价记录 用户ID
@@ -204,10 +210,10 @@ public class EPSaleService {
 				List<Map> auctionList=new ArrayList<Map>();
 				if(isEPSaleValid)
 				{
-					auctionList=auctionMapper.findAuctionListDepositByNumId(numId);//退回落败者的保证金
+					auctionList=auctionMapper.findAuctionListDepositByNumIdAndGId(numId,gId);//退回落败者的保证金
 				}else
 				{
-					auctionList=auctionMapper.findAuctionListDepositByNumId2(numId);//退回所有出价者的保证金
+					auctionList=auctionMapper.findAuctionListDepositByNumIdAndGId2(numId,gId);//退回所有出价者的保证金
 				}
 				if(auctionList.size()>0)
 				{
@@ -218,7 +224,7 @@ public class EPSaleService {
 						auctionDeposit.setConsumerId(consumerId);
 						auctionDeposit.setNumId(numId);
 						//*************************************出价记录status=4,status<>2 用户保证金
-						List<Map> depositList =auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerId(numId,consumerId);
+						List<Map> depositList =auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndGId(numId,consumerId,gId);
 						if(depositList.size()>0)
 						{
 							depositId=Long.valueOf(depositList.get(0).get("id").toString());

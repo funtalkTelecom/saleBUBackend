@@ -18,6 +18,7 @@ public class AuctionDeposit extends BasePojo implements java.io.Serializable {
     private Long skuId;//	tb_sku.id  二级属性关联到一级商品保证金;号码三级
     private Long numId;//	号码编码
     private String num;//	号码  来自 tb_num.num_resource
+    private Long gId;//商品编码tb_goods.id
     private double amt;//	金额
     private int status;//	状态  1初始；2已支付；3已退款
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
@@ -38,12 +39,13 @@ public class AuctionDeposit extends BasePojo implements java.io.Serializable {
     public AuctionDeposit() {
     }
 
-    public AuctionDeposit(Long id, Long skuId, Long numId, String num, double amt, int status, Date addDate, Long consumerId, String addIp, String paySnn, Date payDate,
+    public AuctionDeposit(Long id, Long skuId, Long numId,Long gId, String num, double amt, int status, Date addDate, Long consumerId, String addIp, String paySnn, Date payDate,
                           double refundAmt, String refundSnn, Date refundDate) {
         this.id = id;
         this.skuId = skuId;
         this.numId = numId;
         this.num = num;
+        this.gId=gId;
         this.amt = amt;
         this.status = status;
         this.addDate = addDate;
@@ -74,6 +76,14 @@ public class AuctionDeposit extends BasePojo implements java.io.Serializable {
 
     public void setNumId(Long numId) {
         this.numId = numId;
+    }
+
+    public Long getgId() {
+        return gId;
+    }
+
+    public void setgId(Long gId) {
+        this.gId = gId;
     }
 
     public String getNum() {
