@@ -44,11 +44,11 @@
 
 	<select id="findAuctionByNumIdAndStatus" resultType="java.util.HashMap">
 	select
-    id as id,
-	sku_id as skuId,
-	num_id as numId,
+	concat(id,'') id,
+	concat(sku_id,'') skuId,
+	concat(num_id,'') numId,
 	num,
-	g_id as gId,
+	concat(g_id,'') gId,
 	g_name as gName,
 	price,
 	add_date as addDate,
@@ -63,11 +63,11 @@
 
 	<select id="findAuctionByNumIdAndStatusAndGId" resultType="java.util.HashMap">
 	select
-    id as id,
-	sku_id as skuId,
-	num_id as numId,
+   	concat(id,'') id,
+	concat(sku_id,'') skuId,
+	concat(num_id,'') numId,
 	num,
-	g_id as gId,
+	concat(g_id,'') gId,
 	g_name as gName,
 	price,
 	add_date as addDate,
@@ -146,8 +146,8 @@
     </select>
 
 	<select id="findAuctionListByOrderId" resultType="java.util.HashMap">
-	select num_id as numId,
-	g_id as gId
+	select concat(num_id,'') numId,
+	concat(g_id,'') gId,
 	from  tb_auction
 	where tb_auction.status=2
 	and tb_auction.order_id=#{orderId}
@@ -170,11 +170,11 @@
 
 	<select id="findAuctionListDepositByNumId" resultType="java.util.HashMap">
 	  select
-	  tb_auction.id,
+	  concat(tb_auction.id,'')as id,
 	  tb_consumer.name as consumerName,
 	  tb_consumer.phone as consumerPhone,
 	  tb_auction.consumer_id as consumerId,
-	  tb_auction.num_id as numId
+	  concat(tb_auction.num_id,'')as numId
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(4)
@@ -190,11 +190,11 @@
 
 	<select id="findAuctionListDepositByNumIdAndGId" resultType="java.util.HashMap">
 	  select
-	  tb_auction.id,
+	  concat(tb_auction.id,'')as id,
 	  tb_consumer.name as consumerName,
 	  tb_consumer.phone as consumerPhone,
 	  tb_auction.consumer_id as consumerId,
-	  tb_auction.num_id as numId
+	  concat(tb_auction.num_id,'')as numId
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(4)
@@ -212,11 +212,11 @@
 
 	<select id="findAuctionListDepositByNumId2" resultType="java.util.HashMap">
 	  select
-	  tb_auction.id,
+	  concat(tb_auction.id,'')as id,
 	  tb_consumer.name as consumerName,
 	  tb_consumer.phone as consumerPhone,
 	  tb_auction.consumer_id as consumerId,
-	  tb_auction.num_id as numId
+	   concat(tb_auction.num_id,'')as numId
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(2,4)
@@ -226,11 +226,11 @@
 
 	<select id="findAuctionListDepositByNumIdAndGId2" resultType="java.util.HashMap">
 	  select
-	  tb_auction.id,
+	   concat(tb_auction.id,'')as id,
 	  tb_consumer.name as consumerName,
 	  tb_consumer.phone as consumerPhone,
 	  tb_auction.consumer_id as consumerId,
-	  tb_auction.num_id as numId
+	   concat(tb_auction.num_id,'')as numId
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(2,4)
