@@ -28,6 +28,20 @@ public class FundOrderService extends BaseService {
 	@Autowired private ApiSessionUtil apiSessionUtil;
 
     /**
+     * 平台订单支付（线下支付方式）
+     * @param amt  金额（分）
+     * @param payee 收款方
+     * @param payer 付款方
+     * @param orderName 订单描述
+     * @param sourceId 订单号
+     * @return
+     */
+    @NoRepeat
+    public Result payOffLineOrder(int amt, String payee, String payer, String orderName, String sourceId) {
+        return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, payee, payer, orderName, FundOrder.THIRD_PAY_OFFLINE, sourceId, "");
+    }
+
+    /**
      * 平台订单支付（平安微信小程序支付方式）
      * @param amt 支付金额(分)
      * @param orderName 订单描述
@@ -71,11 +85,13 @@ public class FundOrderService extends BaseService {
 	    String orderMark = busiType+"-"+sourceId;
         if(!LockUtils.tryLock(orderMark)) return new Result(Result.ERROR, "正在支付，请勿重复请求");
         try {
-            Example example = new Example(FundOrder.class);
-            example.createCriteria().andEqualTo("busi", busiType).andEqualTo("sourceId", sourceId).andIn("status",Arrays.asList(new Integer[]{3,5,7}));
-            List fundOrders = fundOrderMapper.selectByExample(example);
-//            if(true) return new Result(Result.ERROR, "订单已支付");
-            if(fundOrders.size()>0) return new Result(Result.ERROR, "订单已支付");
+            if(!FundOrder.THIRD_PAY_OFFLINE.equals(third)) {
+                Example example = new Example(FundOrder.class);
+                example.createCriteria().andEqualTo("busi", busiType).andEqualTo("sourceId", sourceId).andIn("status",Arrays.asList(new Integer[]{3,5,7}));
+                List fundOrders = fundOrderMapper.selectByExample(example);
+//              if(true) return new Result(Result.ERROR, "订单已支付");
+                if(fundOrders.size()>0) return new Result(Result.ERROR, "订单已支付");
+            }
             String contractno = "PAY"+Utils.randomNoByDateTime();
             FundOrder fundOrder = new FundOrder(0l, busiType, amt, payee, payer, 1, orderName, contractno, third, amt, remark, sourceId);
             fundOrder.setId(fundOrder.getGeneralId());
@@ -107,6 +123,9 @@ public class FundOrderService extends BaseService {
                         return result = new Result(Result.OK, _map);
                     }
                 }
+                if(FundOrder.THIRD_PAY_OFFLINE.equals(third)) {
+                    result = new Result(Result.OK, "支付成功");
+                }
                 if(result == null) result = new Result(Result.ERROR,"第三方支付接口不存在");
                 return result;
             } catch (Exception e) {
@@ -121,8 +140,12 @@ public class FundOrderService extends BaseService {
                     fundDetail.setStatus(2);//请求中
                 }
                 if(result.getCode() == Result.OK) {//请求成功
+                    if(FundOrder.THIRD_PAY_OFFLINE.equals(third)) {//线下支付
+                        fundOrder.setStatus(3);//已支付
+                    }else {
+                        fundOrder.setStatus(2);//等待付款
+                    }
                     fundDetail.setStatus(3);//请求结束
-                    fundOrder.setStatus(2);//等待付款
                 }
                 if(result.getCode() == Result.ERROR) {//请求失败
                     fundDetail.setStatus(4);//请求失败
@@ -268,6 +291,7 @@ public class FundOrderService extends BaseService {
                     String status = json1.getString("status");
                     if ("1".equals(status)) {
                         fundOrder.setStatus(5);//已退款
+                        fundOrder.setActualAmt(0);
                     }
                 }
                 if(result.getCode() == Result.ERROR) {//请求失败
@@ -297,6 +321,22 @@ public class FundOrderService extends BaseService {
         consumerLog = consumerLogMapper.selectOne(consumerLog);
         if(consumerLog == null || StringUtils.isBlank(consumerLog.getOpenid())) return new Result(Result.ERROR, "未找到付款账户");
         return new Result(Result.OK, consumerLog.getOpenid());
+    }
+
+    /**
+     * 查询业务订单支付成功总额
+     * @param sourceId 订单号
+     * @return result code == 200 data == 金额（分）   否则失败
+     */
+    public Result queryPayAmt(String sourceId) {
+        Example example = new Example(FundOrder.class);
+        example.createCriteria().andEqualTo("busi", FundOrder.BUSI_TYPE_PAYORDER).andEqualTo("status", 3).andEqualTo("sourceId", sourceId);
+        List<FundOrder> list = fundOrderMapper.selectByExample(example);
+        int amt = 0;
+        for (FundOrder fundOrder:list) {
+            amt = ((Double)Arith.add(amt, fundOrder.getAmt())).intValue();
+        }
+        return new Result(Result.OK, amt);
     }
 
     @NoRepeat

@@ -9,12 +9,35 @@
     </update>
     <insert id="batchInsertTemp">
         INSERT INTO tb_iccid_temp
-        (item_id, iccid)
+        (id, item_id, iccid, order_id)
         VALUES
         <foreach collection ="list" item="item" separator =",">
             <foreach collection="item.iccids" item="iccid"  separator =",">
-            (#{item.itemId}, #{iccid})
+            (
+              '${@com.hrtx.web.pojo.BasePojo.idWorker@nextId()}',
+              #{item.itemId}, #{iccid}, #{orderId})
             </foreach>
         </foreach >
     </insert>
+    <insert id="batchInsertNoFund">
+        INSERT INTO `egt_hk`.`tb_iccid`(`id`, `city_code`, `city_name`, `sections`, `net_type`, `iccid`, `deal_status`, `order_id`, `consumer_id`, `stock_status`, `in_stock_date`, `out_stock_date`)
+        select it.id, null, null, '', null, it.iccid, 1, it.item_id, #{consumer}, 2, NOW(), NOW()
+        from tb_iccid_temp it left join tb_iccid i on it.iccid = i.iccid and i.stock_status = 1 and i.deal_status = '1' where it.order_id = #{orderId} and ifnull(i.id,99) = 99
+    </insert>
+    <update id="batchUpdate">
+        update tb_iccid i set i.stock_status = 2, i.out_stock_date = NOW(), i.consumer_id = #{consumer}, i.order_id = (select it.item_id from tb_iccid_temp it where i.iccid = it.iccid and it.order_id = #{orderId})
+        where i.stock_status = 1 and i.deal_status = '1'
+    </update>
+    <delete id="deleteTempByBatchNum">
+        delete from tb_iccid_temp it where it.order_id = #{orderId}
+    </delete>
+    <select id="queryTempItemsByBatchNum" resultType="java.util.Map">
+        select it.item_id itemId, count(*) count from tb_iccid_temp it where it.order_id = #{orderId} group by it.item_id
+    </select>
+    <select id="matchOrderItem" resultType="java.util.Map">
+        select i.* from tb_iccid i, tb_order_item oi, tb_num n
+        where i.order_id = oi.p_item_id and oi.num_id = n.id
+        and (n.`status`  != 4  or i.sections != n.section_no or i.consumer_id != n.buyer_id)
+        and i.order_id = #{item_id};
+    </select>
 </mapper>

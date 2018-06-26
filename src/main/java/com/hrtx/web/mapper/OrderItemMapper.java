@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+
 @Component
 public interface OrderItemMapper extends Mapper<OrderItem>,BaseMapper<OrderItem>{
     void insertBatch(@Param("orderItemList") List<OrderItem> orderItems);
@@ -14,4 +16,11 @@ public interface OrderItemMapper extends Mapper<OrderItem>,BaseMapper<OrderItem>
     Page<Object> queryPageListDetail(OrderItem orderItem);
 
     List queryPageListDetailForConsumer(OrderItem orderItem);
+
+    /**
+     * 查询订单下的号码
+     * @param orderId
+     * @return
+     */
+    List<Map> queryOrderNums(@Param("orderId") Long orderId);
 }

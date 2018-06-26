@@ -19,5 +19,12 @@
         a.status = #{status}
         where a.id = #{id}
     </update>
+    <update id="batchUpdateDpk">
+        update tb_num n set n.buyer_id=#{item.buyerId}, n.buyer = #{item.buyer}, n.`status` = 4 where n.id in (
+        <foreach collection ="list" item="item" separator =",">
+            #{item.id}
+        </foreach >
+        )
+    </update>
 
 </mapper>
