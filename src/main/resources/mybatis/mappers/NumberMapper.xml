@@ -39,7 +39,7 @@
         <include refid="ex_col_list"/>
         <include refid="col_list"/>
         from tb_num a
-        where a.sku_id = #{skuid}
+        where a.sku_id = #{skuid} and a.status = 2
     </select>
 
     <select id="getListBySkuidAndStatus" resultType="Number">
@@ -167,7 +167,7 @@
         <if test="status==1">
             a.status=1
             where
-            a.sku_id = #{skuId}
+            a.sku_id = #{skuId} and a.status = 2
         </if>
         <if test="status==2">
             a.sku_id=#{skuId},
