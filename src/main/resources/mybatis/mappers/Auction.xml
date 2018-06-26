@@ -198,14 +198,14 @@
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(4)
-	  and  tb_auction.num_id = #{0}
-	  and tb_auction.g_id= #{1}
+	  and  tb_auction.num_id = #{numId}
+	  and tb_auction.g_id= #{gId}
 	  and tb_auction.consumer_id not in(
 	   select tb_auction.consumer_id
 	   from tb_auction
 	   where tb_auction.status in(2)
-	    and  tb_auction.num_id = #{0}
-	    and tb_auction.g_id= #{1}
+	    and  tb_auction.num_id = #{numId}
+	    and tb_auction.g_id= #{gId}
 	  )
 	  group by tb_auction.consumer_id
     </select>
@@ -234,8 +234,8 @@
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(2,4)
-	  and  tb_auction.num_id = #{0}
-	  and tb_auction.g_id= #{1}
+	  and  tb_auction.num_id = #{numId}
+	  and tb_auction.g_id= #{gId}
 	  group by tb_auction.consumer_id
     </select>
 

@@ -324,8 +324,8 @@
         inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
         and  tb_num.status=2
-        and  tb_num.id=#{0}
-        and  tb_goods.g_id=#{1}
+        and  tb_num.id=#{numId}
+        and  tb_goods.g_id=#{gId}
     </select>
 
     <insert id="insertBatch">
