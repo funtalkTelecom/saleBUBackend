@@ -76,7 +76,8 @@
   </select>
 
     <select id="findEPSaleById" resultType="EPSale">
-      select t.id,
+      select
+       concat(t.id,'')as id,
        t.title,
        t.ep_rule as epRule,
        t.start_time as  startTime,
@@ -115,8 +116,8 @@
         goodsInfo.gStartPrice,
         numSaleInfo.priceCount,
         numSaleInfo.currentPrice,
-        goodsInfo.numId,
-        goodsInfo.skuId,
+        concat(goodsInfo.numId,'')as numId,
+        concat(goodsInfo.skuId,'')as skuId,
         goodsInfo.num
         from
         (
@@ -161,7 +162,7 @@
 
     <select id="findEPSaleGoodsByGoodsId" resultType="java.util.HashMap">
         select
-        goodsInfo.gId,
+        concat(goodsInfo.gId,'')as gId,
         goodsInfo.gName,
         goodsInfo.gAd,
         goodsInfo.gSatus,
@@ -205,7 +206,7 @@
 
     <select id="findEPSaleGoods" resultType="java.util.HashMap">
     select
-    tb_num.id as numId,
+    concat(tb_num.id,'')as numId,
     tb_num.end_time as endTime,
     tb_goods.g_start_num as startNum,
     tb_goods.g_deposit as depositPrice
@@ -217,12 +218,12 @@
 
     <select id="findEPSaleGoods2" resultType="java.util.HashMap">
     select
-	tb_num.id as numId,
+	concat(tb_num.id,'')as numId,
     tb_num.end_time as endTime,
     tb_goods.g_start_num as startNum,
     tb_goods.g_deposit as depositPrice,
     tb_num.num_resource as num,
-    tb_goods.g_id as gId
+    concat(tb_goods.g_id,'')as gId,
 	 from tb_auction
 	 inner join tb_num
 	 on tb_num.id=tb_auction.num_id
