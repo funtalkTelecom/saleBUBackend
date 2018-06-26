@@ -619,8 +619,6 @@ public class ApiOrderService {
 			}
 
 			log.info("调用仓储接口前封装参数");
-			//调用仓储接口
-			//callback SystemParam.get("Storage_domain")+"/deliver-order-callback"
 			Map param = new HashMap();
 			List items = new ArrayList();
 			Long preOrderId = 0L;
@@ -643,6 +641,20 @@ public class ApiOrderService {
 			}
 
 			param.put("commodities", items);
+			//先写入表,再调用仓储
+			try{
+				orderMapper.insertBatch(orderList);
+				orderItemMapper.insertBatch(orderItems);
+				if (type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+				{
+					action.setOrderId(preOrderId);
+					auctionMapper.auctionEditOrderIDByNumId(action);
+				}
+			}catch(Exception e){
+			    //写入数据异常,回滚
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+				return new Result(Result.ERROR, "写入订单数据异常");
+			}
 			//要发货的item,调用仓储接口
 			if(items!=null && items.size()>0) {
 				log.info("调用仓储接口");
@@ -651,31 +663,17 @@ public class ApiOrderService {
 					return new Result(Result.ERROR, "库存验证失败");
 				} else {
 					StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-					if ("00000".equals(sir.getCode())) {
-						//调用仓储接口成功之后写入
-						for (Order o : orderList) {
-							o.setNoticeShipmentDate(new Date());
-						}
-						orderMapper.insertBatch(orderList);
-						orderItemMapper.insertBatch(orderItems);
-						if (type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
-						{
-							action.setOrderId(preOrderId);
-							auctionMapper.auctionEditOrderIDByNumId(action);
-						}
-					} else {
-						for (OrderItem i : orderItems) {
-							freezeNum(i.getNumId().toString(), "2");
-						}
-						return new Result(Result.ERROR, "创建订单异常");
+					if (!"00000".equals(sir.getCode())) {
+						throw new Exception();
 					}
 				}
-			}else{//不要发货的直接写入表
-				orderMapper.insertBatch(orderList);
-				orderItemMapper.insertBatch(orderItems);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			//解冻号码
+			for (OrderItem i : orderItems) {
+				freezeNum(i.getNumId().toString(), "2");
+			}
 			//清除已生成的订单
 			deleteOrder(orderList);
 			if(type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段

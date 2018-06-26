@@ -41,6 +41,38 @@
         from tb_order a where a.order_id = #{orderid};
     </select>
     <resultMap id="orderList" type="java.util.HashMap">
+        <result property="order_id" column="orderId" javaType="java.lang.String"></result>
+        <result property="consumer" column="consumer" javaType="java.lang.String"></result>
+        <result property="consumer_name" column="consumerName"></result>
+        <result property="status" column="status"></result>
+        <result property="req_user_agent" column="reqUserAgent"></result>
+        <result property="req_ip" column="reqIp"></result>
+        <result property="add_date" column="addDate"></result>
+        <result property="order_type" column="orderType"></result>
+        <result property="shipping_menthod_id" column="shippingMenthodId" javaType="java.lang.String"></result>
+        <result property="shipping_menthod" column="shippingMenthod"></result>
+        <result property="address_id" column="addressId" javaType="java.lang.String"></result>
+        <result property="person_name" column="personName"></result>
+        <result property="person_tel" column="personTel"></result>
+        <result property="address" column="address"></result>
+        <result property="notice_shipment_date" column="noticeShipmentDate"></result>
+        <result property="pay_menthod_id" column="payMenthodId" javaType="java.lang.String"></result>
+        <result property="pay_menthod" column="payMenthod"></result>
+        <result property="pay_date" column="payDate"></result>
+        <result property="express_id" column="expressId" javaType="java.lang.String"></result>
+        <result property="express_name" column="expressName"></result>
+        <result property="express_number" column="expressNumber"></result>
+        <result property="deliver_date" column="deliverDate"></result>
+        <result property="pickup_date" column="pickupDate"></result>
+        <result property="sign_type" column="signType"></result>
+        <result property="sign_date" column="signDate"></result>
+        <result property="commission" column="commission"></result>
+        <result property="shipping_total" column="shippingTotal"></result>
+        <result property="sub_total" column="subTotal"></result>
+        <result property="total" column="total"></result>
+        <result property="conment" column="conment"></result>
+        <result property="sku_goods_type" column="skuGoodsType"></result>
+
         <result property="gId" column="g_id" javaType="java.lang.String"></result>
         <result property="gType1" column="g_type1"></result>
         <result property="gType2" column="g_type2"></result>
