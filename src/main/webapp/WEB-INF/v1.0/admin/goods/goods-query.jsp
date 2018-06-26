@@ -211,13 +211,15 @@
 								<div class="col-xs-8">
 									<div class="control-group">
 										<div class="col-xs-3">
-											<input type="text" class="form-control" name="gStartTime" id="gStartTime" onclick="WdatePicker({maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});" readonly>
+											<input type="hidden" name="gStartTime" id="gStartTime">
+											<input type="text" class="form-control" id="gStartTimePicker" onclick="WdatePicker({maxDate : '#F{$dp.$D(\'gEndTimePicker\',{s:-1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});" readonly>
 										</div>
 										<div class="col-xs-3" style="width: 10px; padding: 0px; height: 34px; line-height: 34px;">
 											-
 										</div>
 										<div class="col-xs-3">
-											<input type="text" class="form-control" name="gEndTime" id="gEndTime" onclick="WdatePicker({minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});" readonly>
+											<input type="hidden" name="gEndTime" id="gEndTime">
+											<input type="text" class="form-control" id="gEndTimePicker" onclick="WdatePicker({minDate : '#F{$dp.$D(\'gStartTimePicker\',{s:1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});" readonly>
 										</div>
 									</div>
 								</div>

@@ -55,6 +55,8 @@ $(function() {
                                             editor.html(data.kindeditor);
                                             $.fn.zTree.init($("#cityTree"), setting, zNodes);
                                             formInit($("#goodsInfo form"), _data);
+                                            $("#gStartTimePicker").val(_data["gStartTime"]);
+                                            $("#gEndTimePicker").val(_data["gEndTime"]);
                                             $("#gStartTime").val(_data["gStartTime"]);
                                             $("#gEndTime").val(_data["gEndTime"]);
                                             //给cityTree赋值
@@ -166,6 +168,8 @@ $(function() {
 	}
 
     $(document).on("click","#goodsInfo .modal-footer .btn-success",function() {
+        $('#gStartTime').val($('#gStartTimePicker').val());
+        $('#gEndTime').val($('#gEndTimePicker').val());
         //是竞拍,就出发选择活动下拉框的change事件
         if($("input[name=gIsAuc]:checked").val()=="1") $("#gActive").change();
         //验证填写数量和库存数量
@@ -515,11 +519,13 @@ $(function() {
     };
     dictSelect($("#gLoopTime"), "gLoopTime", option, true);
     //有效期
-    // $('#gStartTime').bind('click',function() {
-    //     WdatePicker({maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});
+    // $('#gStartTimePicker').change(function() {
+    //     // WdatePicker({maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});
+    //     $('#gStartTime').val($('#gStartTimePicker').val());
     // });
-    // $('#gEndTime').bind('click',function() {
-    //     WdatePicker({minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});
+    // $('#gEndTimePicker').change(function() {
+    //     // WdatePicker({minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});
+    //     $('#gEndTime').val($('#gEndTimePicker').val());
     // });
     $("input[name=gIsAuc]").off("click").on("click", gIsAucOnClick);
     function gIsAucOnClick(){
@@ -529,13 +535,13 @@ $(function() {
         if($("input[name=gIsAuc]:checked").val()=="1"){
             isAucContent.show();
             gActive.show();
-            $('#gStartTime').prop("disabled", true);
-            $('#gEndTime').prop("disabled", true);
+            $('#gStartTimePicker').prop("disabled", true);
+            $('#gEndTimePicker').prop("disabled", true);
         }else{
             isAucContent.hide();
             gActive.hide();
-            $('#gStartTime').prop("disabled", false);
-            $('#gEndTime').prop("disabled", false);
+            $('#gStartTimePicker').prop("disabled", false);
+            $('#gEndTimePicker').prop("disabled", false);
             // $('#gStartTime').bind('click',function() {
             //     WdatePicker({
             //         maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',
@@ -764,19 +770,23 @@ function deleteSkuRow(obj){
 }
 // 用法dateFtt("yyyy-MM-dd hh:mm:ss",new Date(1528271207000));
 function dateFtt(fmt,date) {
-    var o = {
-        "M+" : date.getMonth()+1,                 //月份
-        "d+" : date.getDate(),                    //日
-        "h+" : date.getHours(),                   //小时
-        "m+" : date.getMinutes(),                 //分
-        "s+" : date.getSeconds(),                 //秒
-        "q+" : Math.floor((date.getMonth()+3)/3), //季度
-        "S"  : date.getMilliseconds()             //毫秒
-    };
-    if(/(y+)/.test(fmt))
-        fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
-    for(var k in o)
-        if(new RegExp("("+ k +")").test(fmt))
-            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+    try {
+        var o = {
+            "M+": date.getMonth() + 1,                 //月份
+            "d+": date.getDate(),                    //日
+            "h+": date.getHours(),                   //小时
+            "m+": date.getMinutes(),                 //分
+            "s+": date.getSeconds(),                 //秒
+            "q+": Math.floor((date.getMonth() + 3) / 3), //季度
+            "S": date.getMilliseconds()             //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    } catch (e) {
+        return "";
+    }
     return fmt;
 } ;
