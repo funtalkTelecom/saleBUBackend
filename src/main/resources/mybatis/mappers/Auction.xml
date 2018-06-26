@@ -16,8 +16,8 @@
 	  tb_auction.num_id as numId
 	  from tb_auction
 	  where  tb_auction.status in(2,4)
-	  and tb_auction.num_id = #{0}
-	  and tb_auction.g_id = #{1}
+	  and tb_auction.num_id = #{numId}
+	  and tb_auction.g_id = #{gId}
 	  group by tb_auction.num_id
     </select>
 
@@ -37,8 +37,8 @@
 	count(tb_auction.id) as consumerCount
 	from tb_auction
 	where tb_auction.status in(2,4)
-	and tb_auction.num_id = #{0}
-	and tb_auction.g_id = #{1}
+	and tb_auction.num_id = #{numId}
+	and tb_auction.g_id = #{gId}
 	group by tb_auction.consumer_id
    </select>
 
@@ -114,8 +114,8 @@
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  inner join tb_num on tb_num.id=tb_auction.num_id
 	   where tb_auction.status in(2,4)
-	   and  tb_auction.num_id = #{0}
-	   and  tb_auction.g_id = #{1}
+	   and  tb_auction.num_id = #{numId}
+	   and  tb_auction.g_id = #{gId}
 	  order by tb_auction.confirm_date desc limit 10
     </select>
 
@@ -126,8 +126,9 @@
 	  tb_auction.confirm_date as addDate,
 	  concat(tb_auction.consumer_id,'')as consumerId
 	  from tb_auction
-	  where tb_auction.status in(1) and  tb_auction.num_id = #{0}
-      and  tb_auction.consumer_id = #{1}
+	  where tb_auction.status in(1)
+	  and  tb_auction.num_id = #{numId}
+      and  tb_auction.consumer_id = #{consumerId}
     </select>
 
 	<select id="findAuctionListByNumIdAndPrice" resultType="java.util.HashMap">
@@ -140,8 +141,8 @@
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(2,4)
-	  and  tb_auction.num_id = #{0}
-	  and tb_auction.price = #{1}
+	  and  tb_auction.num_id = #{numId}
+	  and tb_auction.price = #{price}
 	  order by tb_auction.confirm_date
     </select>
 
@@ -163,8 +164,8 @@
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(2,4)
-	  and  tb_auction.num_id = #{0}
-	  and tb_auction.price > #{1}
+	  and  tb_auction.num_id = #{numId}
+	  and tb_auction.price > #{price}
 	  order by tb_auction.confirm_date
     </select>
 
