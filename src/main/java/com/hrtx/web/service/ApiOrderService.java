@@ -842,6 +842,10 @@ public class ApiOrderService {
 					}
 				}
 			}
+
+			DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(order.getAddressId());
+			order.setAddress(getFullAddress(deliveryAddress));
+
 			o.put("order", order);
 			o.put("goods", goods);
 			o.put("orderItem", list);
@@ -850,5 +854,15 @@ public class ApiOrderService {
 		}
 
 		return new Result(Result.OK, o);
+	}
+
+	private String getFullAddress(DeliveryAddress deliveryAddress) {
+		StringBuffer addr = new StringBuffer();
+		addr.append(deliveryAddress.getProvinceName());
+		addr.append(deliveryAddress.getCityName());
+		addr.append(deliveryAddress.getDistrictName());
+		addr.append(deliveryAddress.getAddress());
+
+		return addr.toString();
 	}
 }
