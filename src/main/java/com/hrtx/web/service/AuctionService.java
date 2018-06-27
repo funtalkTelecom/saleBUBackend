@@ -48,6 +48,12 @@ public class AuctionService {
 		return auctionMapper.findAuctionGoodsByNumId(numId);
 	}
 
+	public List<Map> findAuctionOrderList() {
+		Auction auction=new Auction();
+		auction.setConsumerId(apiSessionUtil.getConsumer().getId());
+		return auctionMapper.findAuctionOrderListByConsumerId(auction);
+	}
+
 	public void auctionEdit(Auction auction) {
 			List<Auction> list = new ArrayList<Auction>();
 			auction.setConsumerId(apiSessionUtil.getConsumer().getId());

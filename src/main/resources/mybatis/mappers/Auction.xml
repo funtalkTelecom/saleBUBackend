@@ -119,6 +119,17 @@
 	  order by tb_auction.confirm_date desc limit 10
     </select>
 
+	<select id="findAuctionOrderListByConsumerId" resultType="java.util.HashMap">
+	 select
+	 auction.order_id as orderId,
+	o.status as orderStatus
+	from tb_auction auction
+	inner join  tb_order o
+	on o.order_id=auction.order_id
+	where auction.status=2 and o.is_del=0
+    and  auction.consumer_id = #{consumerId}
+    </select>
+
 	<select id="findAuctionListByNumIdAndConsumerId" resultType="java.util.HashMap">
 	  select
 	  concat(tb_auction.id,'')as id,

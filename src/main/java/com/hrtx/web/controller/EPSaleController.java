@@ -265,6 +265,24 @@ public class EPSaleController extends BaseReturn{
 		}
 	}
 
+	@GetMapping("/api/epSaleAuctionOrders")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public Map findAuctionOrders(){
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> mapData= new HashMap<String, Object>();
+		List<Map> auctionOrderList=auctionService.findAuctionOrderList();//竟拍订单
+		if(auctionOrderList!=null&&auctionOrderList.size()>0)
+		{
+			mapData.put("auctionOrderList",auctionOrderList);
+		}else
+		{
+			mapData.put("auctionOrderList","");
+		}
+		map.put("code", Result.OK);
+		map.put("data",mapData);
+		return map;
+	}
 	/**
 	 * 查询竟拍活动的商品的最近10条出价记录
 	 * 最近出价记录10条
