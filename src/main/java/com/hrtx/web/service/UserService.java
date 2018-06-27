@@ -43,13 +43,16 @@ public class UserService {
 	@Autowired private IccidMapper iccidMapper;
 
 	public void test() {
-        List allImeis = new ArrayList();
-        List imeis = Arrays.asList(new String[]{"A1234","B1234"});
-        allImeis.add(CommonMap.create("iccids",imeis).put("itemId", "111111").getData());
-        allImeis.add(CommonMap.create("iccids",Arrays.asList(new String[]{"C1234","D1234"})).put("itemId", "222222").getData());
-        System.out.println(iccidMapper.batchInsertTemp(allImeis, 1111111l));
-//        User u = new User(10l);
-//        userMapper.insert(u);
+//        List allImeis = new ArrayList();
+//        List imeis = Arrays.asList(new String[]{"A1234","B1234"});
+//        allImeis.add(CommonMap.create("iccids",imeis).put("itemId", "111111").getData());
+//        allImeis.add(CommonMap.create("iccids",Arrays.asList(new String[]{"C1234","D1234"})).put("itemId", "222222").getData());
+//        System.out.println(iccidMapper.batchInsertTemp(allImeis, 1111111l));
+        User u = new User(10l);
+        userMapper.insert(u);
+        u = userMapper.selectByPrimaryKey(u);
+		userMapper.insert(u);
+		System.out.println("aaaaaaaaaaaaaaaa");
 //	    try{
 //	        userService.paytest();
 //        }catch (Exception e) {
