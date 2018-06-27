@@ -228,13 +228,14 @@
 					<form role="form" class="form-horizontal">
 						<div class="modal-body">
 							<div class="form-group">
-								<label class="col-xs-2 control-label">收款人</label>
+								<input type="hidden" name="orderId" id="receiptInfo-orderId">
+								<label class="col-xs-2 control-label">付款账号</label>
 								<div class="col-xs-3">
-									<input type="text" class="form-control" name="">
+									<input type="text" class="form-control" name="payAccount">
 								</div>
 								<label class="col-xs-2 control-label">收款账号</label>
 								<div class="col-xs-3">
-									<input type="text" class="form-control" name="">
+									<input type="text" class="form-control" name="receivableAccount">
 								</div>
 							</div>
 

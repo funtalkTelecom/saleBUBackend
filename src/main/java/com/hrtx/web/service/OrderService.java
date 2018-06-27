@@ -19,11 +19,13 @@ import com.hrtx.web.pojo.OrderItem;
 import com.hrtx.web.pojo.User;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +39,7 @@ public class OrderService extends BaseService {
     @Autowired private NumMapper numMapper;
     @Autowired private IccidMapper iccidMapper;
     @Autowired private FundOrderService fundOrderService;
+    @Autowired private OrderService orderService;
 
     //订单业务类型 //1白卡 2普号 3普靓  4超靓
     private String[] goodsTypes = new String[]{"1","2","3","4"};
@@ -187,6 +190,69 @@ public class OrderService extends BaseService {
         order.setStatus(5);
         orderMapper.updateByPrimaryKey(order);
         return new Result(Result.OK, "success");
+    }
+
+    /**
+     * 线下付款
+     * @param order
+     * @param request
+     * @return
+     */
+    public Result receipt(Order order, HttpServletRequest request) {
+        //付款账号
+        String payAccount = request.getParameter("payAccount");
+        if(StringUtils.isBlank(payAccount)) return new Result(Result.ERROR, "付款账号不能为空");
+        //收款账号
+        String receivableAccount = request.getParameter("receivableAccount");
+        if(StringUtils.isBlank(receivableAccount)) return new Result(Result.ERROR, "收款账号不能为空");
+        //应收
+        String receivable = request.getParameter("receivable");
+        if(StringUtils.isBlank(receivable)) return new Result(Result.ERROR, "应收不能为空");
+        if(receivable.split("\\.")[1].length()>2) return new Result(Result.ERROR, "请填写不要超过2位小数的数字");
+        //实收
+        String receipts = request.getParameter("receipts");
+        if(StringUtils.isBlank(receipts)) return new Result(Result.ERROR, "实收不能为空");
+        if(receipts.split("\\.")[1].length()>2) return new Result(Result.ERROR, "请填写不要超过2位小数的数字");
+        int receivableInt = 0;
+        int receiptsInt = 0;
+        try {
+            receivableInt = ((Double)Arith.add(Double.parseDouble(receivable)*100, 0.0)).intValue();
+            receiptsInt = ((Double)Arith.add(Double.parseDouble(receipts)*100, 0.0)).intValue();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return new Result(Result.ERROR, "请输入有效数字");
+        }
+
+        Result result = fundOrderService.queryPayAmt(String.valueOf(order.getOrderId()));
+        //已支付金额(分)
+        int aamt = 0;
+        if(result.getCode()==200){
+            aamt = Integer.parseInt(String.valueOf(result.getData()));
+        }else{
+            return new Result(Result.ERROR, "查询已支付金额失败");
+        }
+        //本次收款金额
+        int amt = receiptsInt;
+        if(amt+aamt > receivableInt) return new Result(Result.ERROR, "本次实收金额加已支付金额不能大于应收金额");
+        result = fundOrderService.payOffLineOrder(amt, receivableAccount, payAccount, order.getOrderId()+"线下支付", String.valueOf(order.getOrderId()));
+        if(result.getCode()==200){
+            if(amt+aamt == receivableInt){
+                result = orderService.payOrderSuccess(order.getOrderId());
+                if(result.getCode()==200) {
+                    result = orderService.payDeliverOrder(order.getOrderId());
+                    if(result.getCode()==200){
+                        return new Result(Result.OK, "收款成功");
+                    }else{
+                        return new Result(Result.ERROR, "调用发货失败\n" + result.getData());
+                    }
+                }else{
+                    return new Result(Result.ERROR, "调用支付成功失败\n" + result.getData());
+                }
+            }
+            return new Result(Result.ERROR, result.getData());
+        }else{
+            return new Result(Result.ERROR, result.getData());
+        }
     }
 }
 

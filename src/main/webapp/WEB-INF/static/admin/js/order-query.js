@@ -142,6 +142,7 @@ $(function() {
                         });
                         //点击收款
                         $operate.find(".receipt").click(function () {
+                            $("#receiptInfo-orderId").val(v);
                             $("#receivable").val(record.total);
                             $("#receipts").val(record.total);
                             $('#receiptInfo').modal('show');
@@ -210,7 +211,6 @@ $(function() {
 
     $(document).on("click","#receiptInfo .modal-footer .btn-success",function() {
         $.post("order/order-receipt",$("#receiptInfo form").serialize(),function(data){
-            dataList.reload();
             $('#receiptInfo').modal('hide');
             alert(data.data);
         },"json");
