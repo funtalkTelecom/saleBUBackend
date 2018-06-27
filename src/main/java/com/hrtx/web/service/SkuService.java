@@ -37,7 +37,7 @@ public class SkuService {
 				LinkedHashMap<String, String> skuMap = new LinkedHashMap<String, String>();
 				skuMap.put("skuId", String.valueOf(sku.getSkuId()));
 				skuMap.put("skuTobPrice", df.format(sku.getSkuTobPrice()));
-				skuMap.put("skuTocPrice", df.format(sku.getSkuTocPrice()));
+//				skuMap.put("skuTocPrice", df.format(sku.getSkuTocPrice()));
 //				skuMap.put("skuIsNum", sku.getSkuIsNum());
 				skuMap.put("skuSaleNum", concatSaleNumBySkuid(String.valueOf(sku.getSkuId())));
 //				skuMap.put("skuSaleNum", sku.getSkuSaleNum().replaceAll(",", "\n"));

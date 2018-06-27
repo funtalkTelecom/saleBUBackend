@@ -143,11 +143,26 @@ public class AuctionDepositService {
 			Boolean isUpdateStatus=false;
 			Long autionId=0L;
 			double price=0.00;//出价价格
+			double beforePrice=0.00;//前一次出价记录
 			//auction.status=1记录状态调整
-			List<Map> auctionList =auctionMapper.findAuctionListByNumIdAndConsumerId(auctionDeposit.getNumId(),auctionDeposit.getConsumerId());
+			List<Map> auctionList =auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getConsumerId(),auctionDeposit.getgId());
 			if(auctionList.size()>0)
 			{
 				Auction auction=new Auction();
+				auction.setConfirmDate(auctionDeposit.getPayDate());
+				auction.setId(autionId);
+				//最近10次数出价记录
+				List<Map> goodsAuctionList=auctionMapper.findAuctionListByNumIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getgId());
+                if(goodsAuctionList.size()>0)
+				{
+
+				}else
+				{
+					auction.setStatus(2);
+					auctionMapper.auctionEditStatusById(auction);
+				}
+
+				/*Auction auction=new Auction();
 				autionId=Long.valueOf(auctionList.get(0).get("id").toString());
 				price=Double.valueOf(auctionList.get(0).get("price").toString());
 				auction.setConfirmDate(auctionDeposit.getPayDate());
@@ -173,7 +188,7 @@ public class AuctionDepositService {
 				{
 					auction.setStatus(2);
 					auctionMapper.auctionEditStatusById(auction);
-				}
+				}*/
 			}
 		}
 	}

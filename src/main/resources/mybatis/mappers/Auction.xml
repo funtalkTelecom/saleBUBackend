@@ -109,11 +109,14 @@
 	  case when tb_auction.order_id is null then ''
 	  else tb_auction.order_id end
 	  as orderId,
-	  tb_num.end_time as endTime
+	  tb_num.end_time as endTime,
+	  tb_order.status as orderStatus
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  inner join tb_num on tb_num.id=tb_auction.num_id
+	  left join tb_order on tb_order.order_id=tb_auction.order_id
 	   where tb_auction.status in(2,4)
+	   and tb_order.is_del=0
 	   and  tb_auction.num_id = #{numId}
 	   and  tb_auction.g_id = #{gId}
 	  order by tb_auction.confirm_date desc limit 10
@@ -130,7 +133,7 @@
     and  auction.consumer_id = #{consumerId}
     </select>
 
-	<select id="findAuctionListByNumIdAndConsumerId" resultType="java.util.HashMap">
+	<select id="findAuctionListByNumIdAndConsumerIdAndGId" resultType="java.util.HashMap">
 	  select
 	  concat(tb_auction.id,'')as id,
 	  tb_auction.price,
@@ -140,6 +143,7 @@
 	  where tb_auction.status in(1)
 	  and  tb_auction.num_id = #{numId}
       and  tb_auction.consumer_id = #{consumerId}
+      and tb_auction.g_id= #{gId}
     </select>
 
 	<select id="findAuctionListByNumIdAndPrice" resultType="java.util.HashMap">

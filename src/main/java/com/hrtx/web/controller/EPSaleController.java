@@ -66,13 +66,6 @@ public class EPSaleController extends BaseReturn{
 		return epSaleService.findEPSaleList();
 	}
 
-	@GetMapping("/epSales")
-	@Powers({PowerConsts.NOPOWER})
-	@ResponseBody
-	public Result findEpSaleList(EPSale epSale){
-		return epSaleService.findEPSaleList();
-	}
-
 	/**
 	 * 查询竟拍活动的商品列表
 	 * 未过期
@@ -299,6 +292,7 @@ public class EPSaleController extends BaseReturn{
         int priceCount=0;//出价次数
 		//最近10次出价记录
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
+		//出价次数
 		List<Map> epSaleGoodsAuctionPriceInfo=auctionService.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
 		if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
 			priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
@@ -328,6 +322,7 @@ public class EPSaleController extends BaseReturn{
 	@ResponseBody
 	public Map findEPSaleGoods(@PathVariable("numId") String numId,@PathVariable("gId") String gId){
 		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> mapData= new HashMap<String, Object>();
 		List<Map> goodsList=epSaleService.findEPSaleGoodsByGoodsId(Long.valueOf(numId),Long.valueOf(gId));
 		if(goodsList.size()>0){
 			Map<String, Object> goodsMap= goodsList.get(0);
@@ -384,16 +379,18 @@ public class EPSaleController extends BaseReturn{
 			}
 
 			//goodsList.get(0).remove("numId");
+			map.put("data", goodsList.get(0));
 		}else
 		{
-			goodsList.get(0).put("gImgList","");
-			goodsList.get(0).put("goodsAuctionList","");
-			goodsList.get(0).put("idDeposit","0");
-			goodsList.get(0).put("priceCount",0);
-			goodsList.get(0).put("currentPrice","");
+			mapData.put("gImgList","");
+			mapData.put("goodsAuctionList","");
+			mapData.put("idDeposit","0");
+			mapData.put("priceCount",0);
+			mapData.put("currentPrice","");
+			map.put("data",mapData);
 		}
 		map.put("code", Result.OK);
-		map.put("data", goodsList.get(0));
+
 		return map;
 	}
 

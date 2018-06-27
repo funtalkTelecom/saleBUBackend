@@ -47,6 +47,8 @@ public class ApiOrderService {
 	private AuctionMapper auctionMapper;
 	@Autowired
 	private RedisUtil redisUtil;
+	@Autowired
+	private FileMapper fileMapper;
 
 	public Result signOrder(Order order,HttpServletRequest request)
 	{
@@ -810,12 +812,57 @@ public class ApiOrderService {
 			OrderItem orderItem = new OrderItem();
 			orderItem.setOrderId(Long.parseLong(id));
 			List list = orderItemMapper.queryPageListDetailForConsumer(orderItem);
+			List<File> fileList = new ArrayList<File>();
+			Goods goods = new Goods();
+			if(list!=null && list.size()>0) {
+				goods = goodsMapper.findGoodsInfo(Long.parseLong(String.valueOf(((Map) list.get(0)).get("goodsId"))));
+
+				fileList = fileMapper.findFilesByRefid(String.valueOf(goods.getgId()));
+				String picUrl = "";
+				if (fileList != null && fileList.size() > 0) {
+					for (File file : fileList) {
+						file.setFileName(SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +goods.getgId()+"/"+ file.getFileName());
+						picUrl = file.getFileName();
+						break;
+					}
+				}
+				for (int i = 0; i < list.size(); i++) {
+					Map m = (Map) list.get(i);
+					m.put("picUrl", picUrl);
+					//获取sku的属性,追加到名称中
+					JSONArray prolist = JSONArray.fromObject(m.get("skuProperty"));
+					if(prolist!=null && prolist.size()>0){
+						StringBuffer pro = new StringBuffer();
+						for(int j=0; j<prolist.size(); j++){
+							Map p = (Map) prolist.get(j);
+							pro.append(p.get("keyValue")+" ");
+						}
+						String n = goods.getgName() + " (" + pro.substring(0, pro.length() - 1) + ")";
+						m.put("itemName", pro.length()>0?n:n.substring(0, n.length()-3));
+					}
+				}
+			}
+
+			DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(order.getAddressId());
+			order.setAddress(getFullAddress(deliveryAddress));
+
 			o.put("order", order);
+			o.put("goods", goods);
 			o.put("orderItem", list);
 		}catch(Exception e){
 			return new Result(Result.ERROR, "获取异常");
 		}
 
 		return new Result(Result.OK, o);
+	}
+
+	private String getFullAddress(DeliveryAddress deliveryAddress) {
+		StringBuffer addr = new StringBuffer();
+		addr.append(deliveryAddress.getProvinceName());
+		addr.append(deliveryAddress.getCityName());
+		addr.append(deliveryAddress.getDistrictName());
+		addr.append(deliveryAddress.getAddress());
+
+		return addr.toString();
 	}
 }

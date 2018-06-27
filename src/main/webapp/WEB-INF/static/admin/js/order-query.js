@@ -190,7 +190,7 @@ $(function() {
                     }
                 }
                 pro = pro.substring(0, pro.length-1);
-                return skuGoodsTypes[record.skuGoodsType]+" ("+pro+")";
+                return pro.length==0?skuGoodsTypes[record.skuGoodsType]:skuGoodsTypes[record.skuGoodsType]+" ("+pro+")";
             }
         },{
             "header" : "手机号码",

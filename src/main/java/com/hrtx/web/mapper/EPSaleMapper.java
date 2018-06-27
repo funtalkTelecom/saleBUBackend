@@ -36,7 +36,11 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     List<Map> findEPSaleList();
 
+    List<Map> findEPSaleList2();
+
     List<Map>  findEPSaleByEPSaleId(Long epSaleId);
+
+    List<Map>  findEPSaleByEPSaleId2(Long epSaleId);
 
     List<Map>  findEPSalePriceCountByEPSaleId(Long epSaleId);
 
@@ -47,4 +51,11 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
     void epSaleDelete(EPSale epSale);
 
     void insertBatch(@Param("epSaleList") List<EPSale> list);
+
+    //////////////////////////////////////////////////////
+    List<Map> queryEndAuction();
+    List<Map> freezeOneRecord();
+    List<Map> queryActiveAuction(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
+    List<Map> countAuctions(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
+    List<Map> queryNeedReturn(@Param("num_id") Long num_id,@Param("g_id") Long g_id,@Param("consumer_id") Long consumer_id);
 }

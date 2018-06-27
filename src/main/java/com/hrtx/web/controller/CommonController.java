@@ -18,6 +18,10 @@ import com.hrtx.global.PowerConsts;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.acl.Group;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class CommonController extends BaseReturn{
@@ -75,6 +79,22 @@ public class CommonController extends BaseReturn{
         String group=request.getParameter("group");
         Object list = dictService.findDictByGroup(group);
         return list;
+    }
+
+    @RequestMapping("dict-to-map")
+    @Powers( { PowerConsts.NOLOGINPOWER })
+    @ResponseBody
+    public Object dictToMap(HttpServletRequest request) {
+        String group=request.getParameter("group");
+        List list = dictService.findDictByGroup(group);
+        Map map = new HashMap<>();
+        if (list != null && list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                Map m = (Map) list.get(i);
+                map.put(m.get("keyId"), m.get("keyValue"));
+            }
+        }
+        return map;
     }
 
     @RequestMapping("type-group-dict")
