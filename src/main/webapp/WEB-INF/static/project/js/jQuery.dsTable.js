@@ -86,7 +86,8 @@
                         var value = record[column['dataIndex']];
                         if(column.renderer && $.isFunction(column.renderer))
                             value = column.renderer(value,record);
-                        if(value == 0){
+
+                        if(value != "" && value == 0){
                             $("<td "+(column.nowrap ? "nowrap":"")+"></td>").append("0").appendTo(tr);
                         }else {
                             $("<td "+(column.nowrap ? "nowrap":"")+"></td>").append(value&&value!="null"?value:"--").appendTo(tr);
