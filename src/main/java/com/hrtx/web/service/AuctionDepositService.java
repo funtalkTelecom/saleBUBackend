@@ -1,14 +1,16 @@
 package com.hrtx.web.service;
 
 import com.hrtx.global.ApiSessionUtil;
+import com.hrtx.global.Messager;
 import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.AuctionDepositMapper;
 import com.hrtx.web.mapper.AuctionMapper;
-import com.hrtx.web.pojo.AuctionDeposit;
+import com.hrtx.web.mapper.ConsumerMapper;
 import com.hrtx.web.pojo.Auction;
+import com.hrtx.web.pojo.AuctionDeposit;
+import com.hrtx.web.pojo.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.rmi.runtime.Log;
 
 import java.text.ParseException;
 import java.util.*;
@@ -18,6 +20,7 @@ public class AuctionDepositService {
 
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
 	@Autowired private AuctionMapper auctionMapper;
+	@Autowired private ConsumerMapper consumerMapper;
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 	public List<Map> findAuctionDepositSumEPSaleGoodsByNumId(Long numId) {
@@ -141,23 +144,65 @@ public class AuctionDepositService {
 		{
 			//****************保证金支付成功************************
 			Boolean isUpdateStatus=false;
-			Long autionId=0L;
+
 			double price=0.00;//出价价格
 			double beforePrice=0.00;//前一次出价记录
+			Long autionId=0L;
+			Long  beforeAutionId=0L;//前一次出价记录Id
+			Long beforeConsumerId=0L;//前一次出价记录用户Id
 			//auction.status=1记录状态调整
+			Auction auction=new Auction();
+			Auction auctonBef=new Auction();
 			List<Map> auctionList =auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getConsumerId(),auctionDeposit.getgId());
 			if(auctionList.size()>0)
 			{
-				Auction auction=new Auction();
+				autionId=Long.valueOf(auctionList.get(0).get("id").toString());
+				price=Double.valueOf(auctionList.get(0).get("price").toString());
 				auction.setConfirmDate(auctionDeposit.getPayDate());
 				auction.setId(autionId);
 				//最近10次数出价记录
 				List<Map> goodsAuctionList=auctionMapper.findAuctionListByNumIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getgId());
                 if(goodsAuctionList.size()>0)
 				{
-
+					beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
+					beforeAutionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
+					beforeConsumerId=Long.valueOf(goodsAuctionList.get(0).get("consumerId").toString());//前一次出价记录用户Id
+					//1、大于之前的最近出价记录，则前一次出价记录状态：4 落败,当前出价记录状态：2成功
+					if(price>beforePrice)
+					{
+						//auctonBef  状态：4 落败
+						auctonBef.setId(beforeAutionId);
+						auctonBef.setStatus(4);//前一次出价记录   状态：4 落败
+						auctionMapper.auctionEditStatusById2(auctonBef);//通知用户
+						Consumer beforeConsumer=new Consumer();//前一次出价记录用户
+						beforeConsumer.setId(beforeConsumerId);
+						beforeConsumer = consumerMapper.selectOne(beforeConsumer);
+						Messager.send(beforeConsumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
+						//auction  状态：2成功
+						auction.setStatus(2);
+						auctionMapper.auctionEditStatusById(auction);
+					}
+					//2、出现同价的成功出价记录，则当前出价记录状态：3失败
+					else if(price==beforePrice)//出现同价的成功出价记录
+					{
+						//auction  状态：3失败
+						auction.setStatus(3);
+						auctionMapper.auctionEditStatusById(auction);
+					}
+					//3、低于之前的最近出价记录,则当前出价记录状态：4 落败
+					else
+					{
+						//auction  状态：4落败
+						auction.setStatus(4);
+						auctionMapper.auctionEditStatusById(auction);
+						Consumer consumer=new Consumer();//当前出价记录用户
+						consumer.setId(beforeConsumerId);
+						consumer = consumerMapper.selectOne(consumer);
+						Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
+					}
 				}else
 				{
+					//4、当前出价记录为第一次出价记录 状态：2成功
 					auction.setStatus(2);
 					auctionMapper.auctionEditStatusById(auction);
 				}
