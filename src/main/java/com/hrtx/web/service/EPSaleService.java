@@ -45,7 +45,8 @@ public class EPSaleService {
 	}
 
 	public Result findEPSaleList() {
-		List<Map> list=epSaleMapper.findEPSaleList();
+		//List<Map> list=epSaleMapper.findEPSaleList();
+		List<Map> list=epSaleMapper.findEPSaleList2();
 		Long epSaleId=0L;
 		int priceCount=0;
 		for(Map map:list)
@@ -68,7 +69,7 @@ public class EPSaleService {
 	}
 
 	public List<Map> findEPSaleByEPSaleId(Long ePSaleId) {
-		List<Map> list=epSaleMapper.findEPSaleByEPSaleId(ePSaleId);
+		List<Map> list=epSaleMapper.findEPSaleByEPSaleId2(ePSaleId);
 		for(Map map:list)
 		{
 			String urlImg=SystemParam.get("domain-full") +"/"+map.get("epImg").toString();
@@ -224,30 +225,33 @@ public class EPSaleService {
 				depositPrice=Double.valueOf(map.get("depositPrice").toString());
 				currentTimeStr=Utils.dateToString(new Date(),"yyyy-MM-dd HH:mm:ss");
 
+				if(Utils.compareDate(currentTimeStr,endTimeStr)<0){
+					log.info(String.format("竞拍[%s]暂未结束",map.get("numId")));
+					return ;
+				}
 				//********************************************************************************************************************
 				//***********************************当前时间>=结束时间*******竟拍人数>=起拍人数符合规则******************************
-				if(Utils.compareDate(currentTimeStr,endTimeStr)>=0)//当前时间>=结束时间
+				List<Map> auctionCustomers=auctionMapper.findCustomersByNumIdAndGId(numId,gId);//竟拍人数
+
+
+				if(auctionCustomers.size()>0)
 				{
-					List<Map> auctionCustomers=auctionMapper.findCustomersByNumIdAndGId(numId,gId);//竟拍人数
-					if(auctionCustomers.size()>0)
+					priceCumsumerCount=auctionCustomers.size();//竟拍人数
+					if(priceCumsumerCount>=startNum)//竟拍人数>=起拍人数符合规则
 					{
-						priceCumsumerCount=auctionCustomers.size();//竟拍人数
-						if(priceCumsumerCount>=startNum)//竟拍人数>=起拍人数符合规则
+						isStartNum=true;
+						Auction auction =new Auction();
+						auction.setNumId(numId);
+						auction.setStatus(2);
+						auction.setgId(gId);
+						List<Map> successAution=auctionMapper.findAuctionByNumIdAndStatusAndGId(auction);//最后成功出价记录 status:2
+						if(successAution.size()>0)
 						{
-							isStartNum=true;
-							Auction auction =new Auction();
-							auction.setNumId(numId);
-							auction.setStatus(2);
-							auction.setgId(gId);
-							List<Map> successAution=auctionMapper.findAuctionByNumIdAndStatusAndGId(auction);//最后成功出价记录 status:2
-							if(successAution.size()>0)
-							{
-								successConsumerId=Long.valueOf(successAution.get(0).get("consumerId").toString());//最后成功出价记录 用户ID
-								numId=Long.valueOf(successAution.get(0).get("numId").toString());//条码ID
-								skuId=Long.valueOf(successAution.get(0).get("skuId").toString());//skuId
-								successAutionPrice=Double.valueOf(successAution.get(0).get("price").toString());//最后成功出价记录价格
-								isEPSaleValid=true;
-							}
+							successConsumerId=Long.valueOf(successAution.get(0).get("consumerId").toString());//最后成功出价记录 用户ID
+							numId=Long.valueOf(successAution.get(0).get("numId").toString());//条码ID
+							skuId=Long.valueOf(successAution.get(0).get("skuId").toString());//skuId
+							successAutionPrice=Double.valueOf(successAution.get(0).get("price").toString());//最后成功出价记录价格
+							isEPSaleValid=true;
 						}
 					}
 				}
