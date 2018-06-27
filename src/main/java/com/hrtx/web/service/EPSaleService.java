@@ -3,23 +3,19 @@ package com.hrtx.web.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.hrtx.config.annotation.Powers;
-import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.web.controller.BaseReturn;
-import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
-import net.sf.json.JSONArray;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -107,6 +103,88 @@ public class EPSaleService {
 		EPSale epSale = epSaleMapper.findEPSaleById(id);
 		return epSale;
 	}
+    @Scheduled(fixedRate=1000)
+    public void newEpsaleOrder() {
+	    this.epSaleMapper.freezeOneRecord();
+        this.payEpsaleOrder();
+
+    }
+
+	public void payEpsaleOrder() {
+		/**
+		 * 1、取出所有竞拍的上架单的时间到期未生成订单的号码
+		 * 2、取唯一一条有效出价单(价格最高、时间升序)
+		 * 3、校验规则 取出价人数是否大于起拍人数  >> 符合 则 2 转单(转单内部更新号码状态=3)  ；否则流拍 & 号码状态=1(在库)
+		 * 4、实生成订单的客户不退保证金，其他用户退还保证金
+		 * 5、短信通知
+		 *
+		 */
+		List<Map> list=this.epSaleMapper.queryEndAuction();
+		if(list.isEmpty()){
+			log.info(String.format("暂无上架中的时间到期的竞拍单(号码)"));return;
+		}
+		for (Map map:list ) {
+			//n.id num_id,g.g_id,s.sku_id,n.`status`,n.num_resource,n.g_start_num
+			Long sku_id=NumberUtils.toLong(String.valueOf(map.get("sku_id")));
+			Long num_id=NumberUtils.toLong(String.valueOf(map.get("num_id")));
+			Long g_id=NumberUtils.toLong(String.valueOf(map.get("g_id")));
+			Long success_consumer_id=null;
+			int g_start_num=NumberUtils.toInt(String.valueOf(map.get("g_start_num")));
+			String num_resource=String.valueOf(map.get("num_resource"));
+			log.info(String.format("号码[%s]时间已到期，准备生成订单、退还保证金",num_resource));
+
+			List<Map> countAuctions=this.epSaleMapper.countAuctions(num_id,g_id);
+			if(countAuctions.size()>=g_start_num){//参与人数足
+				List<Map> activeAuction=epSaleMapper.queryActiveAuction(num_id,g_id);
+				if(activeAuction.size()>0){
+					Map mapa=activeAuction.get(0);//
+					//a.sku_id,a.num_id,a.g_id,a.consumer_id,a.price
+					Map mapOrder=new HashMap();
+					success_consumer_id=NumberUtils.toLong(String.valueOf(mapa.get("consumer_id")));
+					Consumer user=this.consumerMapper.findConsumerById(success_consumer_id);
+					Double price=NumberUtils.toDouble(String.valueOf(mapa.get("price")));
+					mapOrder.put("type","3");//竟拍订单
+					mapOrder.put("user",user);//竟拍成功用户
+					mapOrder.put("skuid",sku_id);//竟拍成功skuId
+					mapOrder.put("numid",num_id);//竟拍成功numId
+					mapOrder.put("addrid",0);//竟拍成功addrid
+					mapOrder.put("price",price);//竟拍成功price
+                    log.info("准备生成订单："+mapOrder);
+					Result result=apiOrderService.createOrder(null,mapOrder);
+					if(result.getCode()!=200){
+						log.error(String.format("竟拍结束;出价成功转订单失败;竟拍号[%s]",num_resource));
+						Messager.send(SystemParam.get("system_phone"),"竟拍结束;出价成功转订单失败;竟拍号:"+num_resource);
+					}
+				}
+			}else{//人数不足  流拍
+			    //号码状态已变更，但库存未扣减
+				/*Number number=numberMapper.selectByPrimaryKey(num_id);
+				number.setStatus(1);
+				this.numberMapper.updateByPrimaryKey(number);*/
+			}
+			List<Map> needReturn=epSaleMapper.queryNeedReturn(num_id,g_id,success_consumer_id);//success_consumer_id为空时查询该号码所有出价结果
+			if(needReturn.isEmpty()){
+				log.info(String.format("竞拍单[%s]无可退保证金",num_resource));return;
+			}
+			for (Map map_return: needReturn) {
+				String id=String.valueOf(map_return.get("id"));
+				Long consumer_id=NumberUtils.toLong(String.valueOf(map_return.get("consumer_id")));
+				Result result= fundOrderService.payDepositRefund(id,String.format("[%s]%s号码保证金退还",SystemParam.get("system_name"),StringUtils.replace(num_resource,StringUtils.substring(num_resource,3,7),"****")));
+				Consumer user=this.consumerMapper.findConsumerById(consumer_id);
+				AuctionDeposit auctionDeposit=this.auctionDepositMapper.selectByPrimaryKey(Long.valueOf(id));
+				if(result.getCode()==200){
+					Messager.send(user.getPhone(),"竟拍结束;保证金退还成功，您参与的竞拍号[%s]由于参与人数不足或者出价金额被赶超");
+					auctionDeposit.setStatus(3);//status 3 已退款
+					auctionDepositMapper.auctionDepositEdit(auctionDeposit);
+				}else{
+					Messager.send(SystemParam.get("system_phone"),"竟拍结束;保证金退回失败["+num_resource+"]");
+				}
+			}
+		}
+
+
+
+	}
 
    /*
    *
@@ -115,7 +193,7 @@ public class EPSaleService {
    *
 	*/
 	//@Scheduled(cron = "0 3 18 * * ?")
-   @Scheduled(fixedRate=1000)
+//   @Scheduled(fixedRate=-1)
 	public void checkEPsaleNum() {
 		List<Map> list=epSaleMapper.findEPSaleGoods2();//已出价的Num列表
 		String endTimeStr="";//结束时间
