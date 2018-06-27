@@ -158,6 +158,7 @@ public class AuctionDepositService {
 			//auction.status=1记录状态调整
 			Auction auction=new Auction();
 			Auction auctonBef=new Auction();
+            //auction.status=1记录状态的记录
 			List<Map> auctionList =auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getConsumerId(),auctionDeposit.getgId());
 			if(auctionList.size()>0)
 			{

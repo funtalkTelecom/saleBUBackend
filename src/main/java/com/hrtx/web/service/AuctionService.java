@@ -40,6 +40,11 @@ public class AuctionService {
 		return auctionMapper.findAuctionListByNumId(numId);
 	}
 
+	/*
+	  status:1状态记录
+	 */
+    public List<Map> findAuctionListByNumIdAndGId2(Long numId,Long gId) { return auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(numId,apiSessionUtil.getConsumer().getId(),gId);};
+
 	public List<Map> findAuctionListByNumIdAndGId(Long numId,Long gId) {
 		return auctionMapper.findAuctionListByNumIdAndGId(numId,gId);
 	}

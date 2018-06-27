@@ -170,7 +170,7 @@ public class EPSaleController extends BaseReturn{
 					{
 						isDeposit=false;
 					}
-				}else//当前用户无保证金记录，先生成status:1保证金记录
+				}else//当前用户无保证金记录，预先生成status:1保证金记录
 				{
 					AuctionDeposit auctionDeposit=new AuctionDeposit();
 					auctionDeposit.setStatus(1);
@@ -222,23 +222,29 @@ public class EPSaleController extends BaseReturn{
 						{
 							goodsAuctionMap.put("goodsAuctionList",goodsAuctionListAfter);
 							goodsAuctionMap.put("priceCount",priceCount);
+							goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
 							//goodsAuctionListStr="goodsAuctionList:"+goodsAuctionListAfter;
 						}else
 						{
 							goodsAuctionMap.put("goodsAuctionList","");
 							goodsAuctionMap.put("priceCount","");
+							goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
 							//goodsAuctionListStr="goodsAuctionList:"+"";
 						}
-
 						returnResult(new Result(200, goodsAuctionMap));
-
 						Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
 					}
-				}else //当前用户保证金未支付成功 status:2    出价记录 状态：1初始   保证金记录  状态：1 初始
+				}else //当前用户保证金未支付成功    预先生成出价记录 状态：1初始     保证金记录状态：1 初始
 				{
-					auction.setStatus(1);
-					auction.setAddIp(SessionUtil.getUserIp());
-					auctionService.auctionEdit(auction);//出价记录 状态：1初始
+					//*******************先测
+					//*******************先检测是否有auction.status=1状态的记录
+					List<Map> auctionListStatus1=auctionService.findAuctionListByNumIdAndGId2(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
+					if(auctionListStatus1==null||auctionListStatus1.size()==0)
+					{
+						auction.setStatus(1);
+						auction.setAddIp(SessionUtil.getUserIp());
+						auctionService.auctionEdit(auction);//出价记录 状态：1初始
+					}
 					String orderNameStr=SystemParam.get("system_name")+auction.getNum()+"号码保证金";
 					Result res=fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(deposit),orderNameStr,auctionDepositId.toString());
 					if(res.getCode()==200)
@@ -301,10 +307,12 @@ public class EPSaleController extends BaseReturn{
 		{
             mapData.put("goodsAuctionList",goodsAuctionList);
 			mapData.put("priceCount",priceCount);
+			mapData.put("serviceTime",java.lang.System.currentTimeMillis());;
 		}else
 		{
             mapData.put("goodsAuctionList","");
 			mapData.put("priceCount","");
+			mapData.put("serviceTime",java.lang.System.currentTimeMillis());;
 		}
 		map.put("code", Result.OK);
 		map.put("data",mapData);
@@ -379,6 +387,7 @@ public class EPSaleController extends BaseReturn{
 			}
 
 			//goodsList.get(0).remove("numId");
+			goodsList.get(0).put("serviceTime",java.lang.System.currentTimeMillis());
 			map.put("data", goodsList.get(0));
 		}else
 		{
@@ -387,6 +396,7 @@ public class EPSaleController extends BaseReturn{
 			mapData.put("idDeposit","0");
 			mapData.put("priceCount",0);
 			mapData.put("currentPrice","");
+			mapData.put("serviceTime",java.lang.System.currentTimeMillis());
 			map.put("data",mapData);
 		}
 		map.put("code", Result.OK);
