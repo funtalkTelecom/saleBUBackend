@@ -21,10 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.System;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class OrderService extends BaseService {
@@ -206,19 +203,29 @@ public class OrderService extends BaseService {
         order = orderMapper.selectByPrimaryKey(order.getOrderId());
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
-        DeliveryAddress address = deliveryAddressMapper.selectByPrimaryKey(addresId);
-        if(address == null) return new Result(Result.ERROR, "地址不存在");
-        City city = cityMapper.selectByPrimaryKey(address.getDistrictId());
+//        DeliveryAddress address = deliveryAddressMapper.selectByPrimaryKey(addresId);
+//        if(address == null) return new Result(Result.ERROR, "地址不存在");
+        List<Map> list=this.deliveryAddressMapper.findDeliveryAddressById(addresId);
+        if(list.isEmpty()) return new Result(Result.ERROR, "地址不存在");
+        Map addressmap=list.get(0);
+        String districtId=String.valueOf(addressmap.get("districtId"));
+        Example example = new Example(City.class);
+        example.createCriteria().andEqualTo("id", NumberUtils.toInt(districtId));
+        List<City> fundOrders = cityMapper.selectByExample(example);
+        if(fundOrders.isEmpty()) return new Result(Result.ERROR, "地址不存在");
+        City city =fundOrders.get(0);
         if(city == null) return new Result(Result.ERROR, "所选地址区县不存在");
         order.setPayMenthodId(payMenthod);
         order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payMenthod));
         order.setAddressId(addresId);
-        order.setAddress(city.getFullName()+address.getAddress());
-        order.setPersonName(address.getPersonName());
-        order.setPersonTel(address.getPersonTel());
+        order.setAddress(city.getFullName()+String.valueOf(addressmap.get("address")));
+        order.setPersonName( String.valueOf(addressmap.get("personName")));
+        order.setPersonTel(String.valueOf(addressmap.get("personTel")));
         orderMapper.updateByPrimaryKey(order);
         if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_1.getStringKey())) {//微信支付
-            List<OrderItem> items = orderItemMapper.selectByExample(new Example(OrderItem.class).createCriteria().andEqualTo("orderId", orderId).andEqualTo("isShipment", 0));
+            example = new Example(OrderItem.class);
+            example.createCriteria().andEqualTo("orderId", orderId).andEqualTo("isShipment", 0);
+            List<OrderItem> items = orderItemMapper.selectByExample(example);
             if(items.size() == 0) return new Result(Result.ERROR, "竞拍号码未找到");
             String num = items.get(0).getNum();
             num = StringUtils.isNotBlank(num) && num.length() >=11 ? StringUtils.replace(num, num.substring(3,7),"****") : num;
