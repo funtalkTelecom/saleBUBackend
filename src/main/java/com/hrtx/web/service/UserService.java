@@ -111,7 +111,7 @@ public class UserService {
 	public Map<String, Object> login(String loginName, String pwd) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		Map<String, Object> info = new HashMap<String, Object>();
 		User u = null;
-		pwd = Utils.encodeByMD5(pwd);
+//		pwd = Utils.encodeByMD5(pwd);
 //		u = userMapper.getUserByLoginName(loginName);
 		User param = new User();
 		param.setLoginName(loginName);
