@@ -62,6 +62,8 @@ public class AuctionDepositService {
 		double deposit=0.00;//保证金
 	    if(auctionList.size()>0)
 		{
+			numId=Long.valueOf(auctionList.get(0).get("numId").toString());
+			gId=Long.valueOf(auctionList.get(0).get("gId").toString());
 			AuctionDeposit auctionDeposit=new AuctionDeposit();
 			auctionDeposit.setStatus(2);
 			auctionDeposit.setgId(gId);
