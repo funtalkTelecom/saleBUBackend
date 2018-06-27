@@ -105,7 +105,7 @@ public class EPSaleService {
 		return epSale;
 	}
 
-    @Scheduled(fixedRate=1000)
+    @Scheduled(fixedRate=10000000)
     public void newEpsaleOrder() {
 	    this.epSaleMapper.freezeOneRecord();
         this.payEpsaleOrder();

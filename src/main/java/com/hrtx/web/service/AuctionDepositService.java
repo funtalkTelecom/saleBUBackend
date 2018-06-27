@@ -115,14 +115,17 @@ public class AuctionDepositService {
 				//auctionDepositMapper.findAuctionDepositListById(Id);
 		Long consumerId=0L;
 		Long numId=0L;
+		Long gId=0L;
 		if(auctionDepositList.size()>0)
 		{
 			consumerId=Long.valueOf(auctionDepositList.get(0).get("consumer_id").toString());
 			numId=Long.valueOf(auctionDepositList.get(0).get("num_id").toString());
+			gId=Long.valueOf(auctionDepositList.get(0).get("g_id").toString());
 		}
 		auctionDeposit.setConsumerId(consumerId);
 		auctionDeposit.setNumId(numId);
 		auctionDeposit.setId(Id);
+		auctionDeposit.setgId(gId);
 		if(status)
 		{
             Date payDate1=new Date();
