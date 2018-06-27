@@ -293,5 +293,14 @@ public class OrderService extends BaseService {
             return new Result(Result.ERROR, result.getData());
         }
     }
+
+    public Result payDeliver(Order order, HttpServletRequest request) {
+        Result result = this.payDeliverOrder(order.getOrderId());
+        if(result.getCode()==200){
+            return new Result(Result.OK, "发货成功");
+        }else{
+            return new Result(Result.ERROR, "调用发货失败\n" + result.getData());
+        }
+    }
 }
 

@@ -126,6 +126,9 @@ $(function() {
 						if(p_receipt && record.status=="1") {
 							node.push('<a class="btn btn-success btn-xs receipt" href="javascript:void(0);">收款</a>');
                         }
+						if(p_receipt && record.status=="2") {
+							node.push('<a class="btn btn-success btn-xs payDeliver" href="javascript:void(0);">发货</a>');
+                        }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
 						//点击详情
@@ -146,6 +149,13 @@ $(function() {
                             $("#receivable").val(record.total);
                             $("#receipts").val(record.total);
                             $('#receiptInfo').modal('show');
+                        });
+                        //点击发货
+                        $operate.find(".payDeliver").click(function () {
+                            $.post("order/order-payDeliver", {orderId: v}, function (data) {
+                                dataList.reload();
+                                alert(data.data);
+                            }, "json");
                         });
 						return $operate;
 					}
