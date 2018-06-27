@@ -66,20 +66,21 @@ public class OrderService extends BaseService {
         if(order.getIsDel() == 1 || order.getStatus() != 2) return new Result(Result.ERROR, "订单状态异常");
         String goodsType = order.getSkuGoodsType();
         if(!ArrayUtils.contains(goodsTypes, goodsType)) return new Result(Result.ERROR, "订单业务类型不存在，终止发货。");
+        List<Map> nums = null;
         if(!"1".equals(goodsType)) {//非白卡
             //更新号码
             int notFreezeCount = 0;
-            List<Map> nums = orderItemMapper.queryOrderNums(orderId);
+            nums = orderItemMapper.queryOrderNums(orderId);
             if(nums.size() == 0) return new Result(Result.ERROR, "订单未找到可更新号码");
             for (Map num:nums) {
                 int status = NumberUtils.toInt(ObjectUtils.toString(num.get("status")));
                 if(status != 3) notFreezeCount++;
             }
             if(notFreezeCount > 0) return new Result(Result.ERROR, "号码处于非冻结数量["+notFreezeCount+"]，状态异常");
-            numMapper.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
         }
 
         if("3".equals(goodsType)) {//普靓
+            if(nums != null && nums.size() > 0) numMapper.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
             order.setStatus(4);//待配卡
             orderMapper.updateByPrimaryKey(order);
             return new Result(Result.OK, "订单下未找到需要发货的产品");
@@ -99,6 +100,7 @@ public class OrderService extends BaseService {
         if(result.getCode() != Result.OK) return result;
         StorageInterfaceResponse storageInterfaceResponse = StorageInterfaceResponse.create(String.valueOf(result.getData()), SystemParam.get("key"));
         if("00000".equals(storageInterfaceResponse.getCode())) {
+            if(nums != null && nums.size() > 0) numMapper.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
             order.setStatus(3);//待配货
             order.setNoticeShipmentDate(new Date());
             orderMapper.updateByPrimaryKey(order);
