@@ -8,12 +8,14 @@ import com.hrtx.web.mapper.NumRuleMapper;
 import com.hrtx.web.mapper.NumberMapper;
 import com.hrtx.web.pojo.NumRule;
 import com.hrtx.web.pojo.Number;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -24,9 +26,9 @@ public class NumberService {
 	@Autowired
 	private NumRuleMapper numRuleMapper;
 
-	public Result pageNumber(Number number) {
+	public Result pageNumber(Number number, Map param) {
 		PageHelper.startPage(number.getPageNum(),number.getLimit());
-		Page<Object> ob=this.numberMapper.queryPageList(number);
+		Page<Object> ob=this.numberMapper.queryPageList(number, param);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);
 	}
@@ -39,6 +41,15 @@ public class NumberService {
 				boolean isExist = false;
 				if(newTags!=null && newTags.length>0) {
                     List insertList = new ArrayList();
+                    //验证号码是否在库中
+					StringBuffer errorNums = new StringBuffer();
+					for(String num : numbers){
+						Map cn = numberMapper.getNumInfoByNum(num);
+						if(cn==null || cn.get("id")==null) errorNums.append(num + "\n");
+					}
+					if(!StringUtils.isBlank(errorNums.toString())){
+						return new Result(Result.ERROR, "以下号码不在库中,无法设置\n" + errorNums.toString());
+					}
 					for(String num : numbers){
 						//获取号码现有的所有标签,然后和新标签比对,无则新增
                         String tnt = "";

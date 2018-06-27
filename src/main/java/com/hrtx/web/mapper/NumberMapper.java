@@ -26,4 +26,8 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
     List<Number> getListBySkuidAndStatus(@Param("skuid") String skuid, @Param("status") String status, @Param("numcount") int numcount);
 
     Page<Object> queryPageListApiForNumber3(@Param("skuGoodsType") String skuGoodsType,@Param("agentCity") Long agentCity,@Param("isAgent") Integer isAgent);
+
+    Map getNumInfoByNum(@Param("num") String num);
+
+    Page<Object> queryPageList(Number number, @Param("param") Map param);
 }

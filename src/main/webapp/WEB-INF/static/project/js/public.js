@@ -148,7 +148,7 @@ function dictCheckBoxDefault($domId, group, option) {
             var preGroup="";
             for (var index = 0; index < data.length; index++) {
                 if(index==0) {
-                    html+='<label class="col-xs-2 control-label">'+data[index]['note']+'</label>';
+                    html+='<label class="'+option.labelClass+' control-label">'+data[index]['note']+'</label>';
                 }
                 html+='<div class="checkbox col-xs-2" style="width: auto;"><label>' +
                     '<input name="'+data[index]['keyGroup']+'" class="ace ace-checkbox-2" type="checkbox" value="'+data[index][option.key]+'"><span class="lbl">'+data[index][option.value]+'</span></label></div>';
@@ -245,12 +245,13 @@ $(document).ready(function() {
     });
 	
 	$("#reset").click(function() {
-		$(".query input").each(function(index,v2){ 
+		$(".query input[type!=checkbox]").each(function(index,v2){
 			$(v2).val("");
 		});
         $(".query select").each(function(index,v2){
             $(v2).val("-1");
         });
+        $(".query input[type=checkbox]:checked").prop("checked", false);
 	});
 	
 });

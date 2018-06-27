@@ -102,6 +102,8 @@ public class GoodsService {
 
                     //白卡不验证号码
                     if(!"1".equals(sku.getSkuGoodsType())) {
+                        String repeatNum = getRepeatNum(skuSaleNum);
+                        if(repeatNum!=null && repeatNum.length()>0) return new Result(Result.ERROR, "以下号码重复\n"+repeatNum);
                         skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
     //                    sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
     //                    sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
@@ -311,6 +313,22 @@ public class GoodsService {
 
         return new Result(Result.OK, "提交成功");
 	}
+
+    private String getRepeatNum(String skuSaleNum) {
+	    if(skuSaleNum==null || skuSaleNum.length() <=0) return "";
+        String repeatNum = "";
+	    String[] nums = skuSaleNum.split("\\r?\\n");
+        Set set = new HashSet();
+        int psize = set.size();
+        for (String n : nums) {
+            set.add(n);
+            if(set.size()<= psize){
+                repeatNum += n + "\n";
+            }
+            psize = set.size();
+        }
+        return repeatNum;
+    }
 
     private String checkSkuSaleNum(String skuSaleNum, Sku sku, boolean isUpdate, Long skuid) {
 	    //把tb_num里面skuid下的所有状态改成1

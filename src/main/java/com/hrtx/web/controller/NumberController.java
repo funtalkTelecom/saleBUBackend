@@ -36,8 +36,33 @@ public class NumberController extends BaseReturn{
 
 	@RequestMapping("/number-list")
 	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_QUEYR})
-	public Result listNumber(Number number){
-		return numberService.pageNumber(number);
+	public Result listNumber(Number number, HttpServletRequest request){
+		Map param = new HashMap();
+
+		//标签
+		String tags = request.getParameter("num_tags")==null?"": request.getParameter("num_tags");
+		tags = "'"+ tags.replaceAll(",", "','") +"'";
+		param.put("tags", tags);
+
+		//号码(多号码)
+		String numbers = request.getParameter("numbers")==null?"": request.getParameter("numbers");
+		numbers = "'"+ numbers.replaceAll(",", "','") +"'";
+		param.put("numbers", numbers);
+
+		//号段
+		String numberBlock = request.getParameter("numberBlock")==null?"": request.getParameter("numberBlock");
+		param.put("numberBlock", numberBlock);
+
+		//状态
+		String qstatus = request.getParameter("qstatus")==null?"": request.getParameter("qstatus");
+		param.put("qstatus", qstatus);
+
+		//地市
+		String city = request.getParameter("gSaleCity")==null?"": request.getParameter("gSaleCity");
+		city = "'"+ city.replaceAll(",", "','") +"'";
+		param.put("city", city);
+
+		return numberService.pageNumber(number, param);
 	}
 
 	@RequestMapping("/numRule-addTags")

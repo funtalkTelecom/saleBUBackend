@@ -1,4 +1,5 @@
 var dataList = null;
+var with4s, numStatus;
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
@@ -24,7 +25,10 @@ $(function() {
 					"dataIndex" : "lowConsume"
 				},{
 					"header" : "是否带4",
-					"dataIndex" : "with4"
+					"dataIndex" : "with4",
+            		"renderer":function(v,record){
+                        return with4s[v];
+					}
 				},{
 					"header" : "特征",
 					"dataIndex" : "feature"
@@ -45,7 +49,10 @@ $(function() {
 					"dataIndex" : "iccid"
 				},{
 					"header" : "状态",
-					"dataIndex" : "status"
+					"dataIndex" : "status",
+					"renderer":function(v,record){
+						return numStatus[v];
+					}
 				},{
 					"header" : "运营商类型",
 					"dataIndex" : "teleType"
@@ -56,13 +63,29 @@ $(function() {
 		},
 		"getParam" : function() {
 			var obj={};
-			$(".query input,.query select").each(function(index,v2){
-				var name=$(v2).attr("name");
-				obj[name]=$(v2).val();
-			});
+            $(".query input[type!=checkbox],.query select").each(function(index,v2){
+                var name=$(v2).attr("name");
+                obj[name]=$(v2).val();
+            });
+            var c = $(".query input[type=checkbox]:checked").length;
+            $(".query input[type=checkbox]:checked").each(function(index,v2){
+            	console.log($(v2).val());
+                var name=$(v2).attr("name");
+                obj[name] = obj[name]==undefined?"":obj[name];
+                obj[name]=obj[name]+$(v2).val()+",";
+                if(c<=(index+1)) obj[name] = obj[name].substring(0, obj[name].length - 1);
+            });
 			return obj;
 		}
 	});
+
+    $.post("dict-to-map", {group: "with4"},function(data){
+        with4s = data;
+    },"json");
+
+    $.post("dict-to-map", {group: "num_status"},function(data){
+        numStatus = data;
+    },"json");
 	dataList.load();
 
 	$("#query").click(function() {
@@ -79,9 +102,30 @@ $(function() {
         value:"keyValue",
         onchange:"",
         onclick:"",
+        labelClass:"col-xs-2",
         param:{t:new Date().getTime()}
     };
     dictCheckBoxDefault($("#numberTags"), "num_tags", option);
+    var qoption = {
+        url:"",
+        key:"keyId",
+        value:"keyValue",
+        onchange:"",
+        onclick:"",
+        labelClass:"col-xs-1",
+        param:{t:new Date().getTime()}
+    };
+    dictCheckBoxDefault($("#qnumberTags"), "num_tags", qoption);
+
+    var soption = {
+        url:"",
+        key:"keyId",
+        value:"keyValue",
+        onchange:"",
+        onclick:"",
+        param:{t:new Date().getTime()}
+    };
+    dictSelect($("#qstatus"), "num_status", soption, false);
 
     //添加标签确定按钮
     $(document).on("click","#editTags .modal-footer .btn-success",function() {
@@ -98,4 +142,17 @@ $(function() {
         $("#numberTags").html("");
         dictCheckBoxDefault($("#numberTags"), "num_tags", option);
 	});
+
+
+    //地市下拉框
+    var zNodes;
+    $.post("query-city-ztree", {pid: 0, isopen:false}, function (data) {
+        zNodes = data;
+        $.fn.zTree.init($("#cityTree"), setting, zNodes);
+        $("#gSaleCityStr").off("click").on("click", showCityMenu);
+    }, "json");
+    $("#reset").click(function(){
+        $.fn.zTree.init($("#cityTree"), setting, zNodes);
+	});
+    //地市下拉框end
 });
