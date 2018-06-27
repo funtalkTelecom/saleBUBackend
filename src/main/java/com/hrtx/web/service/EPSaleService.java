@@ -117,7 +117,6 @@ public class EPSaleService {
 		 * 3、校验规则 取出价人数是否大于起拍人数  >> 符合 则 2 转单(转单内部更新号码状态=3)  ；否则流拍 & 号码状态=1(在库)
 		 * 4、实生成订单的客户不退保证金，其他用户退还保证金
 		 * 5、短信通知
-		 *
 		 */
 		List<Map> list=this.epSaleMapper.queryEndAuction();
 		if(list.isEmpty()){
