@@ -104,6 +104,7 @@ public class EPSaleService {
 		EPSale epSale = epSaleMapper.findEPSaleById(id);
 		return epSale;
 	}
+
     @Scheduled(fixedRate=1000)
     public void newEpsaleOrder() {
 	    this.epSaleMapper.freezeOneRecord();

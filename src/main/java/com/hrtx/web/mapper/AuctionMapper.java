@@ -17,7 +17,7 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
 
     List<Map> findAuctionListByNumIdAndGId(@Param("numId") Long numId,@Param("gId") Long gId);
 
-    List<Map> findAuctionListByNumIdAndConsumerId(@Param("numId") Long numId,@Param("consumerId") Long consumerId);
+    List<Map> findAuctionListByNumIdAndConsumerIdAndGId(@Param("numId") Long numId,@Param("consumerId") Long consumerId,@Param("gId") Long gId);
 
     List<Map> findAuctionOrderListByConsumerId(Auction auction);
 

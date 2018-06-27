@@ -60,9 +60,9 @@
         case
         when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[<0]]> then 1
         when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[>=0]]> and
-        TIMESTAMPDIFF(second,ep.end_time, now())<![CDATA[<=0]]>
+        TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[<=0]]>
         then 2
-        when TIMESTAMPDIFF(second,ep.end_time, now())<![CDATA[>0]]>
+        when TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[>0]]>
         then 3
         else 0
         end as erSatus
@@ -110,7 +110,16 @@
     ep.start_time as startTime,
     epSaleEndTime.endTime,
     case when epImg.file_name is null then ''
-		  else concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) end as epImg
+		  else concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) end as epImg,
+	case
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as erSatus
     from tb_ep_sale ep
     inner join
     tb_file_info epImg
@@ -389,7 +398,6 @@
         tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
         inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
-        and  tb_num.status=2
         and  tb_num.id=#{0}
         and  tb_goods.g_id=#{1}
     </select>
