@@ -44,6 +44,7 @@ public class Auction extends BasePojo implements java.io.Serializable {
         this.skuId = skuId;
         this.numId = numId;
         this.num = num;
+        this.gId=gId;
         this.price = price;
         this.status = status;
         this.addDate = addDate;

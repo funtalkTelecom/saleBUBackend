@@ -11,9 +11,17 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
 
     List<Map> findAuctionSumEPSaleGoodsByNumId(@Param("numId") Long numId);
 
+    List<Map> findAuctionSumEPSaleGoodsByNumIdAndGId(@Param("numId") Long numId,@Param("gId") Long gId);
+
     List<Map> findAuctionListByNumId(@Param("numId") Long numId);
 
+    List<Map> findAuctionListByNumIdAndGId(@Param("numId") Long numId,@Param("gId") Long gId);
+
     List<Map> findAuctionListByNumIdAndConsumerId(@Param("numId") Long numId,@Param("consumerId") Long consumerId);
+
+    List<Map> findAuctionOrderListByConsumerId(Auction auction);
+
+    List<Map>  findAuctionListByOrderId(@Param("orderId") Long orderId);
 
     List<Map>  findAuctionListByNumIdAndPrice(@Param("numId") Long numId,@Param("price") double price);
 
@@ -23,11 +31,17 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
 
     List<Map> findAuctionListDepositByNumId2(@Param("numId") Long numId);
 
+    List<Map> findAuctionListDepositByNumIdAndGId(@Param("numId") Long numId,@Param("gId") Long gId);
+
+    List<Map> findAuctionListDepositByNumIdAndGId2(@Param("numId") Long numId,@Param("gId") Long gId);
+
     List<Map> findAuctionGoodsByNumId(@Param("numId") Long numId);
 
-    List<Map> findCustomersByNumId(@Param("numId") Long numId);
+    List<Map> findCustomersByNumIdAndGId(@Param("numId") Long numId,@Param("gId") Long gId);
 
     List<Map>  findAuctionByNumIdAndStatus(Auction auction);
+
+    List<Map>  findAuctionByNumIdAndStatusAndGId(Auction auction);
 
     void insertBatch(@Param("auctionList") List<Auction> list);
 

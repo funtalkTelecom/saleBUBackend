@@ -76,7 +76,8 @@
   </select>
 
     <select id="findEPSaleById" resultType="EPSale">
-      select t.id,
+      select
+       concat(t.id,'')as id,
        t.title,
        t.ep_rule as epRule,
        t.start_time as  startTime,
@@ -115,8 +116,8 @@
         goodsInfo.gStartPrice,
         numSaleInfo.priceCount,
         numSaleInfo.currentPrice,
-        goodsInfo.numId,
-        goodsInfo.skuId,
+        concat(goodsInfo.numId,'')as numId,
+        concat(goodsInfo.skuId,'')as skuId,
         goodsInfo.num
         from
         (
@@ -146,7 +147,7 @@
         left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
         and tb_file_info.file_group='goodsPic'
-        and tb_file_info.seq=1  and  tb_num.status=2
+        and tb_file_info.seq=1
         ) goodsInfo
         left join
         (select count(tb_auction.id) as priceCount,
@@ -161,7 +162,7 @@
 
     <select id="findEPSaleGoodsByGoodsId" resultType="java.util.HashMap">
         select
-        goodsInfo.gId,
+        concat(goodsInfo.gId,'')as gId,
         goodsInfo.gName,
         goodsInfo.gAd,
         goodsInfo.gSatus,
@@ -205,7 +206,7 @@
 
     <select id="findEPSaleGoods" resultType="java.util.HashMap">
     select
-    tb_num.id as numId,
+    concat(tb_num.id,'')as numId,
     tb_num.end_time as endTime,
     tb_goods.g_start_num as startNum,
     tb_goods.g_deposit as depositPrice
@@ -217,11 +218,12 @@
 
     <select id="findEPSaleGoods2" resultType="java.util.HashMap">
     select
-	tb_num.id as numId,
+	concat(tb_num.id,'')as numId,
     tb_num.end_time as endTime,
     tb_goods.g_start_num as startNum,
     tb_goods.g_deposit as depositPrice,
-    tb_num.num_resource as num
+    tb_num.num_resource as num,
+    concat(tb_goods.g_id,'')as gId
 	 from tb_auction
 	 inner join tb_num
 	 on tb_num.id=tb_auction.num_id
@@ -229,7 +231,7 @@
 	 on tb_sku.sku_id=tb_num.sku_id
 	 inner join tb_goods on tb_goods.g_id=tb_sku.g_id
     where tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
-	 and  tb_num.status=2 and  tb_auction.status=2
+	 and  tb_num.status=2 and  tb_auction.status=2 and tb_num.end_time <![CDATA[<]]> now()
    </select>
 
     <select id="findEPSaleGoodsByGoodsId2" resultType="java.util.HashMap">
@@ -262,7 +264,70 @@
         and  tb_num.status=2
         and  tb_goods.g_id = #{goodsId}
     </select>
-    
+
+    <select id="findEPSaleGoodsByNumId" resultType="java.util.HashMap">
+        select
+        concat(tb_num.id,'')as numId,
+        concat(tb_goods.g_id,'')as gId,
+        case
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice,
+        concat(tb_sku.sku_id,'')as skuId,
+        tb_num.num_resource as num,
+        tb_goods.g_price_up as gPriceUp,
+        tb_goods.g_deposit as gDeposit,
+        tb_goods.g_loop_time as gLoopTime,
+        tb_num.start_time as gStartTime,
+        tb_num.end_time as gEndTime
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and  tb_num.status=2
+        and  tb_num.id=#{numId}
+    </select>
+
+    <select id="findEPSaleGoodsByNumIdAndGId" resultType="java.util.HashMap">
+        select
+        concat(tb_num.id,'')as numId,
+        concat(tb_goods.g_id,'')as gId,
+        case
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice,
+        concat(tb_sku.sku_id,'')as skuId,
+        tb_num.num_resource as num,
+        tb_goods.g_price_up as gPriceUp,
+        tb_goods.g_deposit as gDeposit,
+        tb_goods.g_loop_time as gLoopTime,
+        tb_num.start_time as gStartTime,
+        tb_num.end_time as gEndTime
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and  tb_num.status=2
+        and  tb_num.id=#{0}
+        and  tb_goods.g_id=#{1}
+    </select>
+
     <insert id="insertBatch">
         insert into tb_ep_sale(
         id,

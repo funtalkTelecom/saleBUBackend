@@ -6,6 +6,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.FundOrder;
 import com.hrtx.web.pojo.Groups;
+import com.hrtx.web.pojo.Order;
 import com.hrtx.web.pojo.User;
 import com.hrtx.web.service.FundOrderService;
 import com.hrtx.web.service.OrderService;
@@ -33,6 +34,13 @@ public class FundOrderController extends BaseReturn{
     @Powers({PowerConsts.NOPOWER})
     public Result payOrder(String orderId){
         return orderService.payOrder(NumberUtils.toLong(orderId));
+    }
+
+    @PostMapping("/pay-balance")
+    @Powers({PowerConsts.NOPOWER})
+    public Result payBalance(@Validated(value = {Groups.FundOrderPayOrder.class}) Order order, BindingResult result){
+        if(result.hasErrors()) return new Result(Result.ERROR, this.getErrors(result.getFieldErrors()));
+        return orderService.payBalance(order);
     }
 
 	@PostMapping("/add-fund-order")

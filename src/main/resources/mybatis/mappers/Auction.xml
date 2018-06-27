@@ -10,6 +10,17 @@
 	  group by tb_auction.num_id
     </select>
 
+	<select id="findAuctionSumEPSaleGoodsByNumIdAndGId" resultType="java.util.HashMap">
+      select count(tb_auction.id) as priceCount,
+	  max(tb_auction.price) as  currentPrice,
+	  tb_auction.num_id as numId
+	  from tb_auction
+	  where  tb_auction.status in(2,4)
+	  and tb_auction.num_id = #{numId}
+	  and tb_auction.g_id = #{gId}
+	  group by tb_auction.num_id
+    </select>
+
 	<select id="findAuctionGoodsByNumId" resultType="java.util.HashMap">
 	select
 	sum(case when tb_auction.status=2 then 1 else 0  end ) as succesPriceCount,
@@ -21,22 +32,23 @@
 	group by tb_auction.consumer_id
    </select>
 
-	<select id="findCustomersByNumId" resultType="java.util.HashMap">
+	<select id="findCustomersByNumIdAndGId" resultType="java.util.HashMap">
 	select
 	count(tb_auction.id) as consumerCount
 	from tb_auction
 	where tb_auction.status in(2,4)
 	and tb_auction.num_id = #{numId}
+	and tb_auction.g_id = #{gId}
 	group by tb_auction.consumer_id
    </select>
 
 	<select id="findAuctionByNumIdAndStatus" resultType="java.util.HashMap">
 	select
-    id as id,
-	sku_id as skuId,
-	num_id as numId,
+	concat(id,'') id,
+	concat(sku_id,'') skuId,
+	concat(num_id,'') numId,
 	num,
-	g_id as gId,
+	concat(g_id,'') gId,
 	g_name as gName,
 	price,
 	add_date as addDate,
@@ -46,6 +58,26 @@
 	from tb_auction
 	where tb_auction.status=#{status}
 	and tb_auction.num_id = #{numId}
+	group by tb_auction.consumer_id
+   </select>
+
+	<select id="findAuctionByNumIdAndStatusAndGId" resultType="java.util.HashMap">
+	select
+   	concat(id,'') id,
+	concat(sku_id,'') skuId,
+	concat(num_id,'') numId,
+	num,
+	concat(g_id,'') gId,
+	g_name as gName,
+	price,
+	add_date as addDate,
+	confirm_date as  confirmDate,
+	status,
+	consumer_id as consumerId
+	from tb_auction
+	where tb_auction.status=#{status}
+	and tb_auction.num_id = #{numId}
+	and tb_auction.g_id = #{gId}
 	group by tb_auction.consumer_id
    </select>
 
@@ -67,6 +99,37 @@
 	  order by tb_auction.confirm_date desc limit 10
     </select>
 
+	<select id="findAuctionListByNumIdAndGId" resultType="java.util.HashMap">
+	  select
+	  concat(tb_auction.id,'')as id,
+	  tb_auction.price,
+	  tb_auction.confirm_date as addDate,
+	  tb_consumer.name as consumerName,
+	  concat(tb_auction.consumer_id,'')as consumerId,
+	  case when tb_auction.order_id is null then ''
+	  else tb_auction.order_id end
+	  as orderId,
+	  tb_num.end_time as endTime
+	  from tb_auction
+	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
+	  inner join tb_num on tb_num.id=tb_auction.num_id
+	   where tb_auction.status in(2,4)
+	   and  tb_auction.num_id = #{numId}
+	   and  tb_auction.g_id = #{gId}
+	  order by tb_auction.confirm_date desc limit 10
+    </select>
+
+	<select id="findAuctionOrderListByConsumerId" resultType="java.util.HashMap">
+	 select
+	 auction.order_id as orderId,
+	o.status as orderStatus
+	from tb_auction auction
+	inner join  tb_order o
+	on o.order_id=auction.order_id
+	where auction.status=2 and o.is_del=0
+    and  auction.consumer_id = #{consumerId}
+    </select>
+
 	<select id="findAuctionListByNumIdAndConsumerId" resultType="java.util.HashMap">
 	  select
 	  concat(tb_auction.id,'')as id,
@@ -74,7 +137,8 @@
 	  tb_auction.confirm_date as addDate,
 	  concat(tb_auction.consumer_id,'')as consumerId
 	  from tb_auction
-	  where tb_auction.status in(1) and  tb_auction.num_id = #{numId}
+	  where tb_auction.status in(1)
+	  and  tb_auction.num_id = #{numId}
       and  tb_auction.consumer_id = #{consumerId}
     </select>
 
@@ -93,6 +157,14 @@
 	  order by tb_auction.confirm_date
     </select>
 
+	<select id="findAuctionListByOrderId" resultType="java.util.HashMap">
+	select concat(num_id,'') numId,
+	concat(g_id,'') gId
+	from  tb_auction
+	where tb_auction.status=2
+	and tb_auction.order_id=#{orderId}
+	 </select>
+
 	<select id="findAuctionListByNumIdAndPrice2" resultType="java.util.HashMap">
 	  select
 	  concat(tb_auction.id,'')as id,
@@ -110,11 +182,11 @@
 
 	<select id="findAuctionListDepositByNumId" resultType="java.util.HashMap">
 	  select
-	  tb_auction.id,
+	  concat(tb_auction.id,'')as id,
 	  tb_consumer.name as consumerName,
 	  tb_consumer.phone as consumerPhone,
 	  tb_auction.consumer_id as consumerId,
-	  tb_auction.num_id as numId
+	  concat(tb_auction.num_id,'')as numId
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(4)
@@ -128,17 +200,54 @@
 	  group by tb_auction.consumer_id
     </select>
 
-	<select id="findAuctionListDepositByNumId2" resultType="java.util.HashMap">
+	<select id="findAuctionListDepositByNumIdAndGId" resultType="java.util.HashMap">
 	  select
-	  tb_auction.id,
+	  concat(tb_auction.id,'')as id,
 	  tb_consumer.name as consumerName,
 	  tb_consumer.phone as consumerPhone,
 	  tb_auction.consumer_id as consumerId,
-	  tb_auction.num_id as numId
+	  concat(tb_auction.num_id,'')as numId
+	  from tb_auction
+	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
+	  where tb_auction.status in(4)
+	  and  tb_auction.num_id = #{numId}
+	  and tb_auction.g_id= #{gId}
+	  and tb_auction.consumer_id not in(
+	   select tb_auction.consumer_id
+	   from tb_auction
+	   where tb_auction.status in(2)
+	    and  tb_auction.num_id = #{numId}
+	    and tb_auction.g_id= #{gId}
+	  )
+	  group by tb_auction.consumer_id
+    </select>
+
+	<select id="findAuctionListDepositByNumId2" resultType="java.util.HashMap">
+	  select
+	  concat(tb_auction.id,'')as id,
+	  tb_consumer.name as consumerName,
+	  tb_consumer.phone as consumerPhone,
+	  tb_auction.consumer_id as consumerId,
+	   concat(tb_auction.num_id,'')as numId
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  where tb_auction.status in(2,4)
 	  and  tb_auction.num_id = #{numId}
+	  group by tb_auction.consumer_id
+    </select>
+
+	<select id="findAuctionListDepositByNumIdAndGId2" resultType="java.util.HashMap">
+	  select
+	   concat(tb_auction.id,'')as id,
+	  tb_consumer.name as consumerName,
+	  tb_consumer.phone as consumerPhone,
+	  tb_auction.consumer_id as consumerId,
+	   concat(tb_auction.num_id,'')as numId
+	  from tb_auction
+	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
+	  where tb_auction.status in(2,4)
+	  and  tb_auction.num_id = #{numId}
+	  and tb_auction.g_id= #{gId}
 	  group by tb_auction.consumer_id
     </select>
 
