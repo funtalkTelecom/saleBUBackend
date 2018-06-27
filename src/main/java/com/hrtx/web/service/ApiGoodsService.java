@@ -81,7 +81,8 @@ public class ApiGoodsService {
 							Map p = (Map) prolist.get(j);
 							pro.append(p.get("keyValue")+" ");
 						}
-						g.put("gName", g.get("gName") + " (" + pro.substring(0, pro.length()-1) + ")");
+						String n = g.get("gName") + " (" + pro.substring(0, pro.length()-1) + ")";
+						g.put("gName", pro.length()>0?n:n.substring(0, n.length()-3));
 					}
 				}
 			}
@@ -122,7 +123,8 @@ public class ApiGoodsService {
 					Map p = (Map) prolist.get(j);
 					pro.append(p.get("keyValue")+" ");
 				}
-				goods.setgName(goods.getgName() + " (" + pro.substring(0, pro.length()-1) + ")");
+				String n = goods.getgName() + " (" + pro.substring(0, pro.length()-1) + ")";
+				goods.setgName(pro.length()>0?n:n.substring(0, n.length()-3));
 			}
 
 			fileList = fileMapper.findFilesByRefid(String.valueOf(goods.getgId()));
