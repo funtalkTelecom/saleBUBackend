@@ -34,7 +34,6 @@ public class OrderService extends BaseService {
     @Autowired private IccidMapper iccidMapper;
     @Autowired private DeliveryAddressMapper deliveryAddressMapper;
     @Autowired private FundOrderService fundOrderService;
-    @Autowired private OrderService orderService;
     @Autowired private CityMapper cityMapper;
     @Autowired private AuctionDepositService auctionDepositService;
 
@@ -239,7 +238,7 @@ public class OrderService extends BaseService {
      * @param request
      * @return
      */
-    public Result receipt(Order order, HttpServletRequest request) {
+    public Result payReceipt(Order order, HttpServletRequest request) {
         //付款账号
         String payAccount = request.getParameter("payAccount");
         if(StringUtils.isBlank(payAccount)) return new Result(Result.ERROR, "付款账号不能为空");
@@ -249,11 +248,11 @@ public class OrderService extends BaseService {
         //应收
         String receivable = request.getParameter("receivable");
         if(StringUtils.isBlank(receivable)) return new Result(Result.ERROR, "应收不能为空");
-        if(receivable.split("\\.")[1].length()>2) return new Result(Result.ERROR, "请填写不要超过2位小数的数字");
+        if(receivable.indexOf(".")!=-1 && receivable.split("\\.")[1].length()>2) return new Result(Result.ERROR, "请填写不要超过2位小数的数字");
         //实收
         String receipts = request.getParameter("receipts");
         if(StringUtils.isBlank(receipts)) return new Result(Result.ERROR, "实收不能为空");
-        if(receipts.split("\\.")[1].length()>2) return new Result(Result.ERROR, "请填写不要超过2位小数的数字");
+        if(receivable.indexOf(".")!=-1 && receipts.split("\\.")[1].length()>2) return new Result(Result.ERROR, "请填写不要超过2位小数的数字");
         int receivableInt = 0;
         int receiptsInt = 0;
         try {
@@ -263,7 +262,6 @@ public class OrderService extends BaseService {
             e.printStackTrace();
             return new Result(Result.ERROR, "请输入有效数字");
         }
-
         Result result = fundOrderService.queryPayAmt(String.valueOf(order.getOrderId()));
         //已支付金额(分)
         int aamt = 0;
@@ -278,9 +276,9 @@ public class OrderService extends BaseService {
         result = fundOrderService.payOffLineOrder(amt, receivableAccount, payAccount, order.getOrderId()+"线下支付", String.valueOf(order.getOrderId()));
         if(result.getCode()==200){
             if(amt+aamt == receivableInt){
-                result = orderService.payOrderSuccess(order.getOrderId());
+                result = this.payOrderSuccess(order.getOrderId());
                 if(result.getCode()==200) {
-                    result = orderService.payDeliverOrder(order.getOrderId());
+                    result = this.payDeliverOrder(order.getOrderId());
                     if(result.getCode()==200){
                         return new Result(Result.OK, "收款成功");
                     }else{

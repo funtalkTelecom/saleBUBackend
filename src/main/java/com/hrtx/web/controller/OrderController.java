@@ -54,7 +54,7 @@ public class OrderController extends BaseReturn{
 	@RequestMapping("/order-receipt")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
 	public Result receipt(Order order, HttpServletRequest request){
-		return orderService.receipt(order, request);
+		return orderService.payReceipt(order, request);
 	}
 
 	@RequestMapping("/item-list")

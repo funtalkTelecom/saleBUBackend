@@ -212,6 +212,7 @@ $(function() {
     $(document).on("click","#receiptInfo .modal-footer .btn-success",function() {
         $.post("order/order-receipt",$("#receiptInfo form").serialize(),function(data){
             $('#receiptInfo').modal('hide');
+            dataList.reload();
             alert(data.data);
         },"json");
     });
