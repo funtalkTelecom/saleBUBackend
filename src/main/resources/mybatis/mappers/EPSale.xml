@@ -376,4 +376,40 @@
         where
             a.id = #{id}
     </update>
+
+    <!--查询结束的竞拍-->
+    <select id="freezeOneRecord" resultType="java.util.HashMap">
+        select * from tb_system s where s.key_id='system_name' for update
+    </select>
+    <!--查询结束的竞拍-->
+    <select id="queryEndAuction" resultType="java.util.HashMap">
+        select n.id num_id,g.g_id,s.sku_id,n.`status`,n.num_resource,g.g_start_num from tb_num n left join tb_sku s on n.sku_id=s.sku_id left join tb_goods g on g.g_id=s.g_id
+        where n.`status`=2 and g.g_is_auc=1 and g.g_is_sale=1 and n.end_time<![CDATA[<=]]>now()
+    </select>
+    <!--取唯一一条有效出价单(价格最高、时间升序)-->
+    <select id="queryActiveAuction" resultType="java.util.HashMap">
+        select a.sku_id,a.num_id,a.g_id,a.consumer_id,a.price
+        from tb_auction a where a.`status`=2 and a.num_id=#{num_id} and a.g_id=#{g_id}
+        order by a.price desc,a.confirm_date
+    </select>
+    <!--取出价人数-->
+    <select id="countAuctions" resultType="java.util.HashMap">
+        select a.consumer_id,count(1)
+        from tb_auction a where a.`status`=2 and a.num_id=#{num_id} and a.g_id=#{g_id}
+        group by a.consumer_id
+    </select>
+    <!--查询需要退还保证金的用户-->
+    <select id="queryNeedReturn" resultType="java.util.HashMap">
+        select * from tb_auction_deposit a
+        where  a.num_id=#{num_id} and a.g_id=#{g_id} and a.`status`=2
+        <if test="consumer_id!=null and consumer_id!=''">
+            and a.consumer_id not in (#{consumer_id})
+        </if>
+    </select>
+
+
+
+
+
+
 </mapper>
