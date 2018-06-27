@@ -1,4 +1,5 @@
 var dataList = null;
+var with4s, numStatus;
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
@@ -24,7 +25,10 @@ $(function() {
 					"dataIndex" : "lowConsume"
 				},{
 					"header" : "是否带4",
-					"dataIndex" : "with4"
+					"dataIndex" : "with4",
+            		"renderer":function(v,record){
+                        return with4s[v];
+					}
 				},{
 					"header" : "特征",
 					"dataIndex" : "feature"
@@ -45,7 +49,10 @@ $(function() {
 					"dataIndex" : "iccid"
 				},{
 					"header" : "状态",
-					"dataIndex" : "status"
+					"dataIndex" : "status",
+					"renderer":function(v,record){
+						return numStatus[v];
+					}
 				},{
 					"header" : "运营商类型",
 					"dataIndex" : "teleType"
@@ -63,6 +70,14 @@ $(function() {
 			return obj;
 		}
 	});
+
+    $.post("dict-to-map", {group: "with4"},function(data){
+        with4s = data;
+    },"json");
+
+    $.post("dict-to-map", {group: "num_status"},function(data){
+        numStatus = data;
+    },"json");
 	dataList.load();
 
 	$("#query").click(function() {
