@@ -5,7 +5,12 @@
 		<title>号码管理</title>
 		<%@ include file="../common/basecss.jsp" %>
 		<%--<script type="text/javascript" src="<%=basePath %>query-meal.js"></script>--%>
+        <link rel="stylesheet" href="<%=basePath %>project/js/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
 		<script type="text/javascript" src="<%=basePath %>admin/js/number-query.js"></script>
+
+        <script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/checkboxTree.js"></script>
+        <script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.core.js"></script>
+        <script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.excheck.js"></script>
 	</head>
 	<body class="no-skin">
 		<!-- #section:basics/navbar.layout -->
@@ -38,15 +43,39 @@
 							<div class="col-xs-12">
 								<div class="query" style="margin-bottom: -10px">
 									<form class="form-inline pd5" role="form">
-										<div class="form-group" style="visibility: hidden">
-											<label class="form-control">商品名称</label>
-											<%--<input type="text" class="form-control" style="width:130px;" name="gName">--%>
+										<div class="form-group" style="width: 100%">
+											<div class="form-group" id="qnumberTags" style="width: 100%">
+											</div>
+										</div>
+										<div class="form-group" style="">
+											<label class="control-label">号码</label>
+											<input type="text" class="form-control" style="width:130px;" name="numbers">
+										</div>
+										<div class="form-group" style="">
+											<label class="control-label">号段</label>
+											<input type="text" class="form-control" style="width:130px;" name="numberBlock">
+										</div>
+										<div class="form-group" style="">
+											<label class="control-label">地市</label>
+
+                                            <input type="text" class="form-control" name="gSaleCityStr" id="gSaleCityStr" readonly>
+                                            <input type="hidden" class="form-control" name="gSaleCity" id="gSaleCity">
+                                            <div id="gSaleCityContent" style="z-index: 999999;">
+                                                <div id="menuContent" class="menuContent" style="display:none; position: absolute;z-index: 999999;">
+                                                    <ul id="cityTree" strObj="gSaleCityStr" valObj="gSaleCity" class="ztree" style="height:auto;max-height:500px;margin-top:0; width:180px; height: auto;overflow:auto;"></ul>
+                                                </div>
+                                            </div>
+										</div>
+										<div class="form-group" style="">
+											<label class="control-label">状态</label>
+											<select class="form-control" name="qstatus" id="qstatus">
+											</select>
 										</div>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>">
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#editTags" >设置标签</button>
 										</c:if>
-										<%--<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>--%>
-										<%--<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>--%>
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
 									</form><!-- /form-panel -->
 								</div>
 

@@ -475,10 +475,10 @@ $(function() {
     var zNodes;
     $.post("query-city-ztree", {pid: 0, isopen:false}, function (data) {
         zNodes = data;
+        $.fn.zTree.init($("#cityTree"), setting, zNodes);
+        $("#gSaleCityStr").off("click").on("click", showCityMenu);
     }, "json");
 
-    $.fn.zTree.init($("#cityTree"), setting, zNodes);
-    $("#gSaleCityStr").off("click").on("click", showCityMenu);
     //销售地市下拉框end
 
     //所售号码确定按钮

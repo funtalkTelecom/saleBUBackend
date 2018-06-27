@@ -26,9 +26,9 @@ public class NumberService {
 	@Autowired
 	private NumRuleMapper numRuleMapper;
 
-	public Result pageNumber(Number number) {
+	public Result pageNumber(Number number, Map param) {
 		PageHelper.startPage(number.getPageNum(),number.getLimit());
-		Page<Object> ob=this.numberMapper.queryPageList(number);
+		Page<Object> ob=this.numberMapper.queryPageList(number, param);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);
 	}

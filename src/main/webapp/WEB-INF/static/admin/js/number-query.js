@@ -63,10 +63,18 @@ $(function() {
 		},
 		"getParam" : function() {
 			var obj={};
-			$(".query input,.query select").each(function(index,v2){
-				var name=$(v2).attr("name");
-				obj[name]=$(v2).val();
-			});
+            $(".query input[type!=checkbox],.query select").each(function(index,v2){
+                var name=$(v2).attr("name");
+                obj[name]=$(v2).val();
+            });
+            var c = $(".query input[type=checkbox]:checked").length;
+            $(".query input[type=checkbox]:checked").each(function(index,v2){
+            	console.log($(v2).val());
+                var name=$(v2).attr("name");
+                obj[name] = obj[name]==undefined?"":obj[name];
+                obj[name]=obj[name]+$(v2).val()+",";
+                if(c<=(index+1)) obj[name] = obj[name].substring(0, obj[name].length - 1);
+            });
 			return obj;
 		}
 	});
@@ -94,9 +102,30 @@ $(function() {
         value:"keyValue",
         onchange:"",
         onclick:"",
+        labelClass:"col-xs-2",
         param:{t:new Date().getTime()}
     };
     dictCheckBoxDefault($("#numberTags"), "num_tags", option);
+    var qoption = {
+        url:"",
+        key:"keyId",
+        value:"keyValue",
+        onchange:"",
+        onclick:"",
+        labelClass:"col-xs-1",
+        param:{t:new Date().getTime()}
+    };
+    dictCheckBoxDefault($("#qnumberTags"), "num_tags", qoption);
+
+    var soption = {
+        url:"",
+        key:"keyId",
+        value:"keyValue",
+        onchange:"",
+        onclick:"",
+        param:{t:new Date().getTime()}
+    };
+    dictSelect($("#qstatus"), "num_status", soption, false);
 
     //添加标签确定按钮
     $(document).on("click","#editTags .modal-footer .btn-success",function() {
@@ -113,4 +142,17 @@ $(function() {
         $("#numberTags").html("");
         dictCheckBoxDefault($("#numberTags"), "num_tags", option);
 	});
+
+
+    //地市下拉框
+    var zNodes;
+    $.post("query-city-ztree", {pid: 0, isopen:false}, function (data) {
+        zNodes = data;
+        $.fn.zTree.init($("#cityTree"), setting, zNodes);
+        $("#gSaleCityStr").off("click").on("click", showCityMenu);
+    }, "json");
+    $("#reset").click(function(){
+        $.fn.zTree.init($("#cityTree"), setting, zNodes);
+	});
+    //地市下拉框end
 });
