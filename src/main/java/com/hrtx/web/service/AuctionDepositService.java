@@ -73,7 +73,7 @@ public class AuctionDepositService {
 			List<Map> auctionDepositList=auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(auctionDeposit);
 			if(auctionDepositList.size()>0)
 			{
-				deposit=Double.valueOf(auctionDepositList.get(0).get("price").toString());
+				deposit=Double.valueOf(auctionDepositList.get(0).get("amt").toString());
 			}
 		}
 		map.put("deposit",deposit);
