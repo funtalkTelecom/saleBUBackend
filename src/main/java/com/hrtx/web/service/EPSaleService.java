@@ -8,7 +8,6 @@ import com.hrtx.global.*;
 import com.hrtx.web.controller.BaseReturn;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
-import com.hrtx.web.pojo.Number;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.*;
+import java.lang.System;
 
 @Service
 public class EPSaleService {
@@ -64,6 +64,7 @@ public class EPSaleService {
 				priceCount=0;
 				map.put("priceCount",priceCount);
 			}
+			map.put("serviceTime", java.lang.System.currentTimeMillis());
 		}
 		return new Result(Result.OK, list);
 	}
@@ -74,6 +75,7 @@ public class EPSaleService {
 		{
 			String urlImg=SystemParam.get("domain-full") +"/"+map.get("epImg").toString();
 			map.put("epImg",urlImg);
+            map.put("serviceTime", java.lang.System.currentTimeMillis());
 		}
 		return list;
 	}
