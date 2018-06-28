@@ -49,6 +49,7 @@
         <if test="param.city!=null and param.city!='' and param.city !='\'\''">
             and a.city_id in (${param.city})
         </if>
+        order by a.id
     </select>
 
     <select id="getListBySkuid" resultType="Number">

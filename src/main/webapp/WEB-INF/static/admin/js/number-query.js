@@ -175,4 +175,84 @@ $(function() {
 
     $('.chosen-select').chosen({allow_single_deselect:true});
     //地市下拉框end
+
+    //添加标签确定按钮
+    $(document).on("click","#export",function() {
+        var obj={};
+        $(".query input[type!=checkbox],.query select").each(function(index,v2){
+            var name=$(v2).attr("name");
+            obj[name]=$(v2).val();
+        });
+        var c = $(".query input[type=checkbox]:checked").length;
+        $(".query input[type=checkbox]:checked").each(function(index,v2){
+            var name=$(v2).attr("name");
+            obj[name] = obj[name]==undefined?"":obj[name];
+            obj[name]=obj[name]+$(v2).val()+",";
+            if(c<=(index+1)) obj[name] = obj[name].substring(0, obj[name].length - 1);
+        });
+
+        bootbox.dialog({
+            boxCss:{"width":"400px"},
+            title: "<span class='bigger-110'>确认框</span>",
+            message: "请选择导出哪些数据?",
+            buttons:
+                {
+                    "success" :
+                        {
+                            "label" : "<i class='ace-icon fa fa-check'></i> 当前页",
+                            "className" : "btn-sm btn-success",
+                            "callback": function() {
+                                $("#export").prop("disabled", true);
+                                obj["isCurrentPage"] = "1";
+                                var param = "";
+                                for (key in obj) {
+                                    param += key+"="+obj[key]+"&";
+                                }
+                                downloadFile("number/number-export", param, '号码列表.xlsx','$("#export").prop("disabled", false)');
+                            }
+                        },
+                    "danger" :
+                        {
+                            "label" : "全部",
+                            "className" : "btn-sm btn-danger",
+                            "callback": function() {
+                                $("#export").prop("disabled", true);
+                                obj["isCurrentPage"] = "0";
+                                var param = "";
+                                for (key in obj) {
+                                    param += key+"="+obj[key]+"&";
+                                }
+                                downloadFile("number/number-export", param, '号码列表.xlsx','$("#export").prop("disabled", false)');
+                            }
+                        }
+                }
+        });
+    });
 });
+function downloadFile(url, param, fileName, functionStr){
+    // url = 'number/number-export';
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url+"?"+param, true);        // 也可以使用POST方式，根据接口
+    xhr.responseType = "blob";    // 返回类型blob
+    // 定义请求完成的处理函数，请求前也可以增加加载框/禁用下载按钮逻辑
+    xhr.onload = function () {
+        // 请求完成
+        if (this.status === 200) {
+            // 返回200
+            var blob = this.response;
+            var reader = new FileReader();
+            reader.readAsDataURL(blob);    // 转换为base64，可以直接放入a表情href
+            reader.onload = function (e) {
+                // 转换完成，创建一个a标签用于下载
+                var a = document.createElement('a');
+                a.download = fileName;
+                a.href = e.target.result;
+                $("body").append(a);    // 修复firefox中无法触发click
+                a.click();
+                $(a).remove();
+                eval(functionStr);
+            }
+        }
+    };
+    xhr.send(JSON.stringify(param));
+}

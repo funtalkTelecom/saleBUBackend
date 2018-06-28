@@ -75,6 +75,7 @@
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>">
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#editTags" >设置标签</button>
 										</c:if>
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="export">导出</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
 									</form><!-- /form-panel -->
