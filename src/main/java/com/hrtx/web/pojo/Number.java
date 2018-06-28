@@ -35,11 +35,18 @@ public class Number extends BasePojo implements java.io.Serializable {
     private int status;
     private Long skuId;
     private String teleType;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
 
     public Number() {
     }
 
-    public Number(Long cityId, String cityName, String netType, String numResource, String numType, String numLevel, BigDecimal lowConsume, int with4, String feature, String sectionNo, String moreDigit, Long sellerId, String seller, Long buyerId, String buyer, String iccid, int status, Long skuId, String teleType) {
+    public Number(Long id, Long cityId, String cityName, String netType, String numResource, String numType, String numLevel, BigDecimal lowConsume, int with4, String feature, String sectionNo, String moreDigit, Long sellerId, String seller, Long buyerId, String buyer, String iccid, int status, Long skuId, String teleType, Date startTime, Date endTime) {
+        this.id = id;
         this.cityId = cityId;
         this.cityName = cityName;
         this.netType = netType;
@@ -59,6 +66,8 @@ public class Number extends BasePojo implements java.io.Serializable {
         this.status = status;
         this.skuId = skuId;
         this.teleType = teleType;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     public Long getId() {
@@ -219,5 +228,21 @@ public class Number extends BasePojo implements java.io.Serializable {
 
     public void setTeleType(String teleType) {
         this.teleType = teleType;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 }

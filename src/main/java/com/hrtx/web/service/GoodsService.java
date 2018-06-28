@@ -181,6 +181,11 @@ public class GoodsService {
                             okNumber.setSkuId(sku.getSkuId());
                             okNumber.setStatus(2);
                             okNumber.setNumResource(okNum);
+                            //竞拍商品把时间往tb_num写入
+                            if("1".equals(goods.getgIsAuc())){
+                                okNumber.setStartTime(goods.getgStartTime());
+                                okNumber.setEndTime(goods.getgEndTime());
+                            }
                             numberMapper.updateStatus(okNumber);
                         }
                     }

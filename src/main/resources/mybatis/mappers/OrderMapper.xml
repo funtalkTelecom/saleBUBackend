@@ -132,6 +132,7 @@
         where c.seq = 1
         and a.consumer = #{order.consumer}
         and a.status in (${st})
+        order by a.add_date desc
     </select>
 
     <select id="queryPageList" resultType="Order">
