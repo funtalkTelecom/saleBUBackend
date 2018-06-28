@@ -67,6 +67,19 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/**
+	 * 查询竟拍活动
+	 * @param epSale
+	 * @return
+	 */
+	@GetMapping("/epSales")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public Result findEPSaleList2(EPSale epSale){
+		return epSaleService.findEPSaleList2();
+	}
+
+
+	/**
 	 * 查询竟拍活动的商品列表
 	 * 未过期
 	 * @param
