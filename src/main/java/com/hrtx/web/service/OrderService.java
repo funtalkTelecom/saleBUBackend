@@ -235,7 +235,7 @@ public class OrderService extends BaseService {
             return fundOrderService.payPinganWxxOrder(amt, "["+SystemParam.get("system_name")+"]"+num+"号码尾款", orderId+"");
         }
         if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_3.getStringKey())) {//线下
-            return this.payOrderSuccess(orderId);
+//            return this.payOrderSuccess(orderId);
         }
         return new Result(Result.ERROR, "未找到支付方式");
     }
