@@ -27,24 +27,8 @@ public class WxinController {
     @GetMapping("/get_open_id")
     @Powers({PowerConsts.NOLOGINPOWER})
 	public Result getOpenid(@RequestParam(value="getcode",required=false)String getcode) {
-		String code=getcode;
-		String appid=SystemParam.get("AppID");
-		String appsecret=SystemParam.get("AppSecret");
-		//授权（必填）
-		String grant_type = "authorization_code";
-		//URL
-		String requestUrl = "https://api.weixin.qq.com/sns/jscode2session";
-		//请求参数
-		String params = "appid=" + appid + "&secret=" + appsecret + "&js_code=" + code + "&grant_type=" + grant_type;
-		//发送请求
-		 String data = HttpUtil.get(requestUrl, params);
-		JSONObject json = JSONObject.fromObject(data);
-//		用户的唯一标识（openid）
-		String Openid =String.valueOf(json.get("openid"));
-//		String sessionkey=String.valueOf(json.get("session_key"));
-//		JSONObject jsonObject  = HttpUtil.doGetStr(requestUrl, params);
-//		String Openid =String.valueOf(jsonObject.getString("openid"));
-		Result s  = consumerService.isOpenid(Openid);
-		return s;
+		Result result = this.consumerService.getOpenId(getcode);
+		if(result.getCode()==Result.OK)result= consumerService.isOpenid(String.valueOf(result.getData()));
+		return result;
 	}
 }

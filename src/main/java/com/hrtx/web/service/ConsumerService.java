@@ -1,15 +1,15 @@
 package com.hrtx.web.service;
 
 import com.hrtx.dto.Result;
-import com.hrtx.global.ApiSessionUtil;
-import com.hrtx.global.SessionUtil;
-import com.hrtx.global.TokenGenerator;
+import com.hrtx.global.*;
 import com.hrtx.web.mapper.ConsumerLogMapper;
 import com.hrtx.web.mapper.ConsumerMapper;
 import com.hrtx.web.mapper.UserMapper;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.ConsumerLog;
 import com.hrtx.web.pojo.User;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class ConsumerService {
+public class ConsumerService extends BaseService {
 	
 	@Autowired SessionUtil sessionUtil;
 	@Autowired private UserMapper userMapper;
@@ -30,6 +30,26 @@ public class ConsumerService {
 		for (User user : list) {
 			System.out.println(user.getName());
 		}
+	}
+
+	public Result getOpenId(String code) {
+		String appid=SystemParam.get("AppID");
+		String appsecret=SystemParam.get("AppSecret");
+		String grant_type = "authorization_code";//授权（必填）
+		String requestUrl = "https://api.weixin.qq.com/sns/jscode2session";
+		String params = "appid=" + appid + "&secret=" + appsecret + "&js_code=" + code + "&grant_type=" + grant_type;//请求参数
+		String Openid = null;//发送请求
+		try {
+			String data = HttpUtil.get(requestUrl, params);
+			if(StringUtils.isEmpty(data))return new Result(Result.ERROR,"请求错误");
+			JSONObject json = JSONObject.fromObject(data);
+			if(!json.containsKey("openid"))return new Result(Result.ERROR,"微信返回结果错误");
+			Openid=String.valueOf(json.get("openid"));//用户的唯一标识（openid）
+			return new Result(Result.OK,Openid);
+		} catch (Exception e) {
+			log.error("获取用户Openid失败",e);
+		}
+		return new Result(Result.ERROR,"无法获取Openid");
 	}
 	
 	public Result isOpenid(String openid) {
