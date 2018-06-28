@@ -224,7 +224,9 @@ public class OrderService extends BaseService {
         order.setPersonTel(String.valueOf(addressmap.get("personTel")));
         orderMapper.updateByPrimaryKey(order);
         if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_1.getStringKey())) {//微信支付
-            List<OrderItem> items = orderItemMapper.selectByExample(new Example(OrderItem.class).createCriteria().andEqualTo("orderId", orderId).andEqualTo("isShipment", 0));
+            Example example = new Example(OrderItem.class);
+            example.createCriteria().andEqualTo("orderId", orderId).andEqualTo("isShipment", 0);
+            List<OrderItem> items = orderItemMapper.selectByExample(example);
             if(items.size() == 0) return new Result(Result.ERROR, "竞拍号码未找到");
             String num = items.get(0).getNum();
             num = StringUtils.isNotBlank(num) && num.length() >=11 ? StringUtils.replace(num, num.substring(3,7),"****") : num;
