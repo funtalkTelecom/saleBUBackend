@@ -119,10 +119,11 @@ public class ApiNumberService {
 		Map number = new HashMap();
 		try {
 			number = numberMapper.getNumInfoById(id);
+			if(number==null) return new Result(Result.ERROR, "未找到号码");
 			number.put("numBlock", getNumBlock((String) number.get("numResource")));
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
-			return new Result(Result.ERROR, new HashMap());
+			return new Result(Result.ERROR, "查找出错");
 		}
 
 		return new Result(Result.OK, number);
