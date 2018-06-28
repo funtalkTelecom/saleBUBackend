@@ -54,7 +54,6 @@ function showCityMenu(option) {
     var cityOffset = $("#gSaleCity").offset();
     if($("#menuContent").is(":hidden")) $("#menuContent").css({"background-color":"#ffffff", "border":"1px solid #438eb9"}).slideDown("fast");
     if(option.menuContentCss) {
-        console.log(option.menuContentCss);
         eval('$("#menuContent").css('+option.menuContentCss+')');
     }
 
