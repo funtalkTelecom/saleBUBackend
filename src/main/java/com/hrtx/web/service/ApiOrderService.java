@@ -369,6 +369,10 @@ public class ApiOrderService {
 
 							int num = 1;
 							double twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
+							//修改sku数量
+							Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
+							nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
+							skuMapper.updateSkuNum(nowSku);
 							//超级靓号添加卡的item
 							if("4".equals(sku.get("skuGoodsType"))){
 								log.info("超级靓号添加卡体item");
@@ -518,6 +522,10 @@ public class ApiOrderService {
 
 							int num = 1;
 							double twobPrice = Double.parseDouble(price);
+							//修改sku数量
+							Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
+							nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
+							skuMapper.updateSkuNum(nowSku);
 							log.info("添加卡体item");
 							//添加卡的item
 							orderItem = new OrderItem();
