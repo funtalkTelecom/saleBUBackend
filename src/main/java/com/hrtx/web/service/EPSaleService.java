@@ -69,6 +69,31 @@ public class EPSaleService {
 		return new Result(Result.OK, list);
 	}
 
+	public Result findEPSaleList2() {
+		//List<Map> list=epSaleMapper.findEPSaleList();
+		List<Map> list=epSaleMapper.findEPSaleList3();
+		Long epSaleId=0L;
+		int priceCount=0;
+		for(Map map:list)
+		{
+			String urlImg=SystemParam.get("domain-full")+map.get("epImg").toString();
+			map.put("epImg",urlImg);
+			epSaleId=Long.valueOf(map.get("id").toString());
+			List<Map> priceCountList=epSaleMapper.findEPSalePriceCountByEPSaleId(epSaleId);
+			if(priceCountList.size()>0)
+			{
+				priceCount=Integer.valueOf(priceCountList.get(0).get("priceCount").toString());
+				map.put("priceCount",priceCount);
+			}else
+			{
+				priceCount=0;
+				map.put("priceCount",priceCount);
+			}
+			map.put("serviceTime", java.lang.System.currentTimeMillis());
+		}
+		return new Result(Result.OK, list);
+	}
+
 	public List<Map> findEPSaleByEPSaleId(Long ePSaleId) {
 		List<Map> list=epSaleMapper.findEPSaleByEPSaleId2(ePSaleId);
 		for(Map map:list)
