@@ -26,7 +26,7 @@
     </insert>
     <update id="batchUpdate">
         update tb_iccid i set i.stock_status = 2, i.out_stock_date = NOW(), i.consumer_id = #{consumer}, i.order_id = (select it.item_id from tb_iccid_temp it where i.iccid = it.iccid and it.order_id = #{orderId})
-        where i.stock_status = 1 and i.deal_status = '1'
+        where i.stock_status = 1 and i.deal_status = '1' and i.iccid in (select t.iccid from tb_iccid_temp t where t.order_id = #{orderId})
     </update>
     <delete id="deleteTempByBatchNum">
         delete it from tb_iccid_temp it where it.order_id = #{orderId}
