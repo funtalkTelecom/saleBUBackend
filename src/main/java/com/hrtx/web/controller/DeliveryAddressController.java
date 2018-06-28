@@ -36,13 +36,13 @@ public class DeliveryAddressController extends BaseReturn{
 	private ApiSessionUtil apiSessionUtil;
 
 	@RequestMapping("/deliveryAddress/deliveryAddress-query")
-	@Powers({PowerConsts.DELIVERYADDRESSMOUDULE})
+	@Powers({PowerConsts.NOPOWER})
 	public ModelAndView deliveryAddressQuery(DeliveryAddress deliveryAddress){
 		return new ModelAndView("admin/deliveryAddress/deliveryAddress-query");
 	}
 
 	@RequestMapping("/deliveryAddress/deliveryAddress-list")
-	@Powers({PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_QUEYR})
+	@Powers({PowerConsts.NOPOWER})
 	public Result listDeliveryAddress(DeliveryAddress deliveryAddress){
 		return deliveryAddressService.pageDeliveryAddress(deliveryAddress);
 	}
