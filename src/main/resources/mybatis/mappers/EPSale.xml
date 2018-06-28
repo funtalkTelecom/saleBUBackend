@@ -213,7 +213,7 @@
         tb_goods.g_ad as gAd,
         tb_sku.sku_tob_price as gStartPrice,
          case when tb_file_info.file_name is null then ''
-        else  concat("get-img","/",tb_file_info.file_group,"/",tb_file_info.ref_id,"/",tb_file_info.file_name) end as gImg,
+        else  concat("get-img","/",tb_file_info.file_group,"s/",tb_file_info.ref_id,"/",tb_file_info.file_name) end as gImg,
         tb_sku.sku_id as  skuId,
         tb_num.num_resource as num
         from
