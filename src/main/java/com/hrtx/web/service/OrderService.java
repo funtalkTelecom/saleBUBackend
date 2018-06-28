@@ -208,12 +208,13 @@ public class OrderService extends BaseService {
         List<Map> list=this.deliveryAddressMapper.findDeliveryAddressById(addresId);
         if(list.isEmpty()) return new Result(Result.ERROR, "地址不存在");
         Map addressmap=list.get(0);
-        String districtId=String.valueOf(addressmap.get("districtId"));
-        Example example = new Example(City.class);
-        example.createCriteria().andEqualTo("id", NumberUtils.toInt(districtId));
-        List<City> fundOrders = cityMapper.selectByExample(example);
-        if(fundOrders.isEmpty()) return new Result(Result.ERROR, "地址不存在");
-        City city =fundOrders.get(0);
+        int districtId= NumberUtils.toInt(String.valueOf(addressmap.get("districtId")));
+//        Example example = new Example(City.class);
+//        example.createCriteria().andEqualTo("id", NumberUtils.toInt(districtId));
+//        List<City> fundOrders = cityMapper.selectByExample(example);
+//        if(fundOrders.isEmpty()) return new Result(Result.ERROR, "地址不存在");
+//        City city =fundOrders.get(0);
+        City city = cityMapper.selectByPrimaryKey(districtId);
         if(city == null) return new Result(Result.ERROR, "所选地址区县不存在");
         order.setPayMenthodId(payMenthod);
         order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payMenthod));
@@ -223,9 +224,7 @@ public class OrderService extends BaseService {
         order.setPersonTel(String.valueOf(addressmap.get("personTel")));
         orderMapper.updateByPrimaryKey(order);
         if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_1.getStringKey())) {//微信支付
-            example = new Example(OrderItem.class);
-            example.createCriteria().andEqualTo("orderId", orderId).andEqualTo("isShipment", 0);
-            List<OrderItem> items = orderItemMapper.selectByExample(example);
+            List<OrderItem> items = orderItemMapper.selectByExample(new Example(OrderItem.class).createCriteria().andEqualTo("orderId", orderId).andEqualTo("isShipment", 0));
             if(items.size() == 0) return new Result(Result.ERROR, "竞拍号码未找到");
             String num = items.get(0).getNum();
             num = StringUtils.isNotBlank(num) && num.length() >=11 ? StringUtils.replace(num, num.substring(3,7),"****") : num;
