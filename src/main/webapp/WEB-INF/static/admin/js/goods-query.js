@@ -40,7 +40,7 @@ $(function() {
                                 success: function(data){
                                     if(data.code=="200"){
                                         repoGoods = data.data.platresponse;
-                                        var repoGoodsSelect = '<select onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
+                                        var repoGoodsSelect = '<select class="chosen-select" onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
                                         for(var i=0; i<repoGoods.length; i++){
                                             repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'</option>';
                                         }
@@ -525,6 +525,8 @@ $(function() {
     //解决编辑器弹出层文本框不能输入的问题
     $('#goodsInfo').off('shown.bs.modal').on('shown.bs.modal', function (e) {
         $(document).off('focusin.modal');
+
+        $('.chosen-select').chosen({allow_single_deselect:true});
     });
 
     //轮询时间下拉框
@@ -702,7 +704,7 @@ var titleStrObj = {
     "skuRepoGoods":{
         "isShow":true,
         "title":"关联仓库商品",
-        "type":'<select tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
+        "type":'<select class="chosen-select" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
         "titleClass":""
     },
     "operation":{
@@ -722,7 +724,7 @@ function getRepoGodds(){
         success: function(data){
             if(data.code=="200"){
                 repoGoods = data.data.platresponse;
-                var repoGoodsSelect = '<select onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
+                var repoGoodsSelect = '<select class="chosen-select" onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
                 for(var i=0; i<repoGoods.length; i++){
                     repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'</option>';
                 }

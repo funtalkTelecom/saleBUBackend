@@ -11,6 +11,7 @@
         <script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/checkboxTree.js"></script>
         <script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.core.js"></script>
         <script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.excheck.js"></script>
+        <script type="text/javascript" src="<%=basePath %>project/js/chosen.jquery.min.js"></script>
 	</head>
 	<body class="no-skin">
 		<!-- #section:basics/navbar.layout -->
@@ -68,7 +69,7 @@
 										</div>
 										<div class="form-group" style="">
 											<label class="control-label">状态</label>
-											<select class="form-control" name="qstatus" id="qstatus">
+											<select class="chosen-select form-control" name="qstatus" id="qstatus">
 											</select>
 										</div>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>">

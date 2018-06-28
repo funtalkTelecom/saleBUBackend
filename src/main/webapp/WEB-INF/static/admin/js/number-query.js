@@ -172,5 +172,7 @@ $(function() {
     $("#reset").click(function(){
         $.fn.zTree.init($("#cityTree"), setting, zNodes);
 	});
+
+    $('.chosen-select').chosen({allow_single_deselect:true});
     //地市下拉框end
 });

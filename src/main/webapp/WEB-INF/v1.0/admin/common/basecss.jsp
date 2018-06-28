@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="<%=basePath %>bootstrap/css/font-awesome.css" />
 
 <!-- ace styles -->
+<link rel="stylesheet" href="<%=basePath %>project/css/chosen.min.css" type="text/css">
 <link rel="stylesheet" href="<%=basePath %>ace/css/ace.css" class="ace-main-stylesheet" id="main-ace-style" />
 <link href="<%=basePath %>project/css/jquery.loadmask.css" rel="stylesheet">
 <link href="<%=basePath %>project/css/lightbox.css" rel="stylesheet">
