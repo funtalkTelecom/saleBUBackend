@@ -288,6 +288,7 @@ $(function() {
 	function checkboxClick(){
     	setTimeout(function(){
     		setProperty();
+            $('.chosen-select').chosen({allow_single_deselect:true});
 		},100);
 	}
 	function setProperty(){
