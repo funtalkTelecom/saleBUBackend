@@ -115,13 +115,7 @@
         tb_file_info epImg
         on epImg.ref_id=ep.id
         where ep.is_del=0
-        and ep.id in(
-        select tb_goods.g_active
-        from
-        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
-        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
-        left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
-        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1)
+        and ep.end_time>now()
     </select>
 
     <select id="findEPSaleByEPSaleId" resultType="java.util.HashMap">
