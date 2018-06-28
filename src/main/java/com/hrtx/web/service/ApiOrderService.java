@@ -616,8 +616,10 @@ public class ApiOrderService {
 			{
 				log.info("判断商品有效期");
 				//判断商品是否在有效期内
-				if (goods.getgStartTime()==null || goods.getgEndTime()==null || !betweenCalendar(new Date(), goods.getgStartTime(), goods.getgEndTime()))
+				if (goods.getgStartTime()==null || goods.getgEndTime()==null || !betweenCalendar(new Date(), goods.getgStartTime(), goods.getgEndTime())) {
+					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new Result(Result.ERROR, "商品不在有效期内");
+				}
 			}
 
 			log.info("调用仓储接口前封装参数");
