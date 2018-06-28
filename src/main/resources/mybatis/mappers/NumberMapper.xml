@@ -111,6 +111,7 @@
         and a.status in ('2')
         and b.sku_goods_type = '4'
         and c.g_is_sale = '1'
+        and SYSDATE() between c.g_start_time and c.g_end_time
     </select>
 
     <select id="getNumInfoById" resultMap="saleNumber">
@@ -192,6 +193,7 @@
             b.sku_id
 
         from tb_num a left join tb_sku b on b.sku_id = a.sku_id
+        left join tb_goods d on d.g_id = b.g_id
         left join
           (select max(name) as name, max(phone) as phone, agent_city from tb_consumer GROUP BY agent_city) c
         on c.agent_city = a.city_id
@@ -199,8 +201,9 @@
         <if test="isAgent==2">
             and a.city_id = #{agentCity}
         </if>
-
+        and SYSDATE() between d.g_start_time and d.g_end_time
         and a.status = 2
+        and d.g_is_sale = '1'
     </select>
 
     <update id="updateStatus">

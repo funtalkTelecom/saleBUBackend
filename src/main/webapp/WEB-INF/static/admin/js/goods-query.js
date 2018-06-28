@@ -179,7 +179,10 @@ $(function() {
             }
         }
         //判断图片
-
+        if($("input[type=file]").eq(0).val()=="" && $("#picUpload img").eq(1).css("visibility")=="hidden"){
+            alert("请上传第一张图片");
+            return;
+        }
         //验证填写数量和库存数量
         var isError = false;
         var msg = "";
