@@ -344,7 +344,7 @@ public class EPSaleController extends BaseReturn{
 			//fileList = fileService.findFilesByRefid("1003545391213314048");
 			if (fileList != null && fileList.size() > 0) {
 				for (File file : fileList) {
-					String gImgUrl=SystemParam.get("domain-full") + "/get-img/goodsPics/" +gId+"/"+ file.getFileName();
+					String gImgUrl=SystemParam.get("domain-full") + "get-img/goodsPics/" +gId+"/"+ file.getFileName();
 					imgMap.put("seq",file.getSeq());
 					imgMap.put("gImg",gImgUrl);
 					imgList.add(imgMap);

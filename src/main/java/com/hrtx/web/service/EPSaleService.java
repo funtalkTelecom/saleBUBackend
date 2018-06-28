@@ -51,7 +51,7 @@ public class EPSaleService {
 		int priceCount=0;
 		for(Map map:list)
 		{
-			String urlImg=SystemParam.get("domain-full") +"/"+map.get("epImg").toString();
+			String urlImg=SystemParam.get("domain-full")+map.get("epImg").toString();
 			map.put("epImg",urlImg);
             epSaleId=Long.valueOf(map.get("id").toString());
             List<Map> priceCountList=epSaleMapper.findEPSalePriceCountByEPSaleId(epSaleId);
@@ -73,7 +73,7 @@ public class EPSaleService {
 		List<Map> list=epSaleMapper.findEPSaleByEPSaleId2(ePSaleId);
 		for(Map map:list)
 		{
-			String urlImg=SystemParam.get("domain-full") +"/"+map.get("epImg").toString();
+			String urlImg=SystemParam.get("domain-full") +map.get("epImg").toString();
 			map.put("epImg",urlImg);
             map.put("serviceTime", java.lang.System.currentTimeMillis());
 		}
@@ -84,7 +84,7 @@ public class EPSaleService {
 		List<Map> list=epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
 		for(Map map:list)
 		{
-			String urlImg=SystemParam.get("domain-full") +"/"+map.get("gImg").toString();
+			String urlImg=SystemParam.get("domain-full") +map.get("gImg").toString();
 			map.put("gImg",urlImg);
 		}
 		return list;
@@ -429,7 +429,7 @@ public class EPSaleService {
 					MultipartFile file = files[i];
 					File f = new File();
 					f.setFileId(f.getGeneralId());
-					f.setFileGroup("epSalePic");
+					f.setFileGroup("epSalePics");
 					//String kk=SystemParam.get("epSalePics");
 					result = BaseReturn.uploadFile(SystemParam.get("epSalePics")+epSale.getId()+"\\", "jpg,png,gif", file, false, false);
 					f.setFileName(((Map)result.getData()).get("sourceServerFileName").toString());
