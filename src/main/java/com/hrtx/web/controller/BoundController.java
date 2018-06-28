@@ -12,6 +12,7 @@ import com.hrtx.web.service.MealService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -95,4 +96,26 @@ public class BoundController extends BaseReturn{
             returnResult(new Result(Result.OK,"该号码绑定成功！"));
         }
 	}
+
+    /**
+     * 未绑定号列列表
+     * 查询当前用户
+     */
+    @GetMapping("/api/numUnBoundList")
+    @Powers(PowerConsts.NOPOWER)
+    @ResponseBody
+    public Result numUnBoundList(Num num, HttpServletRequest request){
+        return boundService.numUnBoundList(num, request);
+    }
+
+    /**
+     * 已绑定号列列表
+     * 查询当前用户
+     */
+    @GetMapping("/api/numEndBoundList")
+    @Powers(PowerConsts.NOPOWER)
+    @ResponseBody
+    public Result numEndBoundList(Num num, HttpServletRequest request){
+        return boundService.numEndBoundList(num, request);
+    }
 }

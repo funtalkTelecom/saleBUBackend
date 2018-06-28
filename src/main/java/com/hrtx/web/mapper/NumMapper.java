@@ -1,6 +1,7 @@
 package com.hrtx.web.mapper;
 
 import com.github.abel533.mapper.Mapper;
+import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.Num;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -31,4 +32,6 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
      * @param nums
      */
     void batchUpdateDpk(@Param("buyerId") Long buyerId, @Param("buyer") String buyer, @Param("list") List<Map> nums);
+
+    Page<Object> queryPageNumList(Num num,@Param("consumerId") Long consumerId,@Param("status") String status);
 }
