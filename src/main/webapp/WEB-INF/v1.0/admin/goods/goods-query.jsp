@@ -14,6 +14,7 @@
 		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.core.js"></script>
 		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.excheck.js"></script>
 		<script type="text/javascript" src="<%=basePath %>project/js/kindeditor/kindeditor-all.js"></script>
+		<script type="text/javascript" src="<%=basePath %>project/js/chosen.jquery.min.js"></script>
 	</head>
 	<body class="no-skin">
 		<!-- #section:basics/navbar.layout -->
@@ -232,7 +233,7 @@
 							<input type="hidden" name="skuJson" id="skuJson">
 							<input type="hidden" name="delSkus" id="delSkus">
 							<h3 class="header smaller lighter blue">SKU</h3>
-							<div id="skuResult" style="overflow: auto;">
+							<div id="skuResult" style="overflow: visible;">
 							</div>
 							<%--图片上传--%>
 							<h3 class="header smaller lighter blue">图片上传</h3>
