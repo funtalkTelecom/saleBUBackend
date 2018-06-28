@@ -45,7 +45,7 @@ public class BoundController extends BaseReturn{
 		Long mealMid=0L;//mdelMid 套餐记录
 
 		numId=num.getId();
-        iccids=num.getIccid();
+        iccidStr=num.getIccid();
 		mealMid=num.getMealMid();
 
 		Num number=boundService.findNumById(numId);
@@ -83,6 +83,7 @@ public class BoundController extends BaseReturn{
         }
         if(isEdit)
         {
+            num.setIccidId(iccid.getId());
             num.setIccid(iccidStr);
             num.setStatus(5);//4待配卡(已付款 针对2C或电销无需购买卡时、代理商买号而未指定白卡时)、5待受理(代理商已提交或仓库已发货，待提交乐语BOSS)
             Iccid iccidEdit=new Iccid();
