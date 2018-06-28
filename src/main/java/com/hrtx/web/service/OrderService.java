@@ -153,7 +153,7 @@ public class OrderService extends BaseService {
         for (Map commodity:commodities) {
             List imeis = (List) commodity.get("imeis");
             String item_id = ObjectUtils.toString(commodity.get("item_id"));
-            allImeis.add(CommonMap.create("iccids",imeis).put("itemId", item_id));
+            allImeis.add(CommonMap.create("iccids",imeis).put("itemId", item_id).getData());
         }
         iccidMapper.deleteTempByBatchNum(orderId);
         int insertCount = iccidMapper.batchInsertTemp(allImeis, orderId);

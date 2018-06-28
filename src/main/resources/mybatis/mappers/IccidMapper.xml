@@ -14,7 +14,7 @@
         <foreach collection ="list" item="item" separator =",">
             <foreach collection="item.iccids" item="iccid"  separator =",">
             (
-              '${@com.hrtx.web.pojo.BasePojo.idWorker@nextId()}',
+              '${@com.hrtx.web.pojo.BasePojo@nextId()}',
               #{item.itemId}, #{iccid}, #{orderId})
             </foreach>
         </foreach >
@@ -29,7 +29,7 @@
         where i.stock_status = 1 and i.deal_status = '1'
     </update>
     <delete id="deleteTempByBatchNum">
-        delete from tb_iccid_temp it where it.order_id = #{orderId}
+        delete it from tb_iccid_temp it where it.order_id = #{orderId}
     </delete>
     <select id="queryTempItemsByBatchNum" resultType="java.util.Map">
         select it.item_id itemId, count(*) count from tb_iccid_temp it where it.order_id = #{orderId} group by it.item_id

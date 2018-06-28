@@ -31,6 +31,10 @@ public class BasePojo {
 	@Transient
 	private long generalId = idWorker.nextId();
 
+	public static long nextId() {
+		return idWorker.nextId();
+	}
+
 	public int getPageNum() {
 		if(this.limit==0) return 0;
 		return (this.start/this.limit)+1;
