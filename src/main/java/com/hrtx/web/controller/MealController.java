@@ -137,7 +137,7 @@ public class MealController extends BaseReturn{
 			mealids.add(arr.get(0));
 			m.setMealDesc(arr.get(2));
 			m.setSaleType(arr.get(4));
-			m.setSaleType(arr.get(5));
+			m.setTeleType(arr.get(5));
 			m.setCreateBy(SessionUtil.getUserId());
 			m.setCreateDate(now);
 			m.setUpdateBy(SessionUtil.getUserId());

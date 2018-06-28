@@ -21,7 +21,7 @@
     <select id="findMealInfo" resultType="com.hrtx.web.pojo.Meal">
         select
         <include refid="col_list"/>
-        from tb_meal a where a.meal_id = #{mealid};
+        from tb_meal a where a.meal_id = #{mealid} and a.is_del!=1;
     </select>
 
     <select id="findMealById" resultType="com.hrtx.web.pojo.Meal">
