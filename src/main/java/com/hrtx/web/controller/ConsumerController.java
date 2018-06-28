@@ -23,7 +23,7 @@ public class ConsumerController {
 	@Autowired
 	ConsumerService consumerService;
     @PutMapping(value = "/Consumer")
-    @Powers({PowerConsts.NOLOGINPOWER})
+    @Powers({PowerConsts.NOPOWER})
 	public Result InsertConsumer(@RequestParam(value="loginName",required=false) String loginName,
 								   @RequestParam(value="livePhone",required=false) String livePhone,
 								   @RequestParam(value="nickName",required=false) String nickName,
