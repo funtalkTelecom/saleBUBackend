@@ -859,6 +859,7 @@ public class ApiOrderService {
 	}
 
 	private String getFullAddress(DeliveryAddress deliveryAddress) {
+	    if(deliveryAddress == null) return "";
 		StringBuffer addr = new StringBuffer();
 		addr.append(deliveryAddress.getProvinceName());
 		addr.append(deliveryAddress.getCityName());

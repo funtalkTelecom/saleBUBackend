@@ -205,6 +205,12 @@
 
     <update id="updateStatus">
         update tb_num a set
+        <if test="startTime!=null">
+            a.start_time = #{startTime},
+        </if>
+        <if test="endTime!=null">
+            a.end_time = #{endTime},
+        </if>
         <if test="status==1">
             a.status=1
             where

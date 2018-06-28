@@ -171,7 +171,15 @@ $(function() {
         $('#gStartTime').val($('#gStartTimePicker').val());
         $('#gEndTime').val($('#gEndTimePicker').val());
         //是竞拍,就出发选择活动下拉框的change事件
-        if($("input[name=gIsAuc]:checked").val()=="1") $("#gActive").change();
+        if($("input[name=gIsAuc]:checked").val()=="1") {
+            $("#gActive").change();
+            if(!$("#gActive").val()){
+                alert("请选择活动");
+                return;
+            }
+        }
+        //判断图片
+
         //验证填写数量和库存数量
         var isError = false;
         var msg = "";
