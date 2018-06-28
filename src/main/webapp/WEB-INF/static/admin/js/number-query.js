@@ -69,7 +69,6 @@ $(function() {
             });
             var c = $(".query input[type=checkbox]:checked").length;
             $(".query input[type=checkbox]:checked").each(function(index,v2){
-            	console.log($(v2).val());
                 var name=$(v2).attr("name");
                 obj[name] = obj[name]==undefined?"":obj[name];
                 obj[name]=obj[name]+$(v2).val()+",";
