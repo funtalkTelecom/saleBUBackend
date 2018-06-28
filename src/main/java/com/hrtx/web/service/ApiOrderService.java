@@ -439,7 +439,7 @@ public class ApiOrderService {
 							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
 							orderItem.setNumId(Long.parseLong(numid));
 							orderItem.setNum(String.valueOf( number.get("numResource")));
-							orderItem.setIsShipment("3".equals(sku.get("skuGoodsType")) ? 0 : 1);//普通靓号不发货
+							orderItem.setIsShipment(0);//普通靓号不发货
 							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
 							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
 							orderItem.setShipmentApi("egt");
