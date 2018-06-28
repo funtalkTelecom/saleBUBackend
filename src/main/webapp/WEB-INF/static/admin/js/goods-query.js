@@ -178,8 +178,13 @@ $(function() {
                 return;
             }
         }
+        //判断sku列表
+        if($("#skuResult tr").length<2){
+            alert("列表为空,请选择商品属性添加");
+            return;
+        }
         //判断图片
-        if($("input[type=file]").eq(0).val()=="" && $("#picUpload img").eq(1).css("visibility")=="hidden"){
+        if($("input[type=file]").eq(0).val()=="" && $("#picUpload img").eq(0).css("visibility")=="hidden"){
             alert("请上传第一张图片");
             return;
         }
@@ -495,7 +500,9 @@ $(function() {
     //所售号码确定按钮
     $(document).on("click","#saleNumInfo .modal-footer .btn-success",function() {
         var saleNums = $("#saleNum").val();
+        var numcountt = $("#saleNum").val().replace(/(\r\n)|(\n)/g, "sdfsdfsdfsdf").split("sdfsdfsdfsdf").length;
         $(clickSaleNumObj).val(saleNums);
+        $(clickSaleNumObj).parent().parent().find("input[name=skuNum]").val(numcountt);
         $("#saleNum").val("");
         $('#saleNumInfo').modal('hide');
         //滚动条消失问题
@@ -542,7 +549,6 @@ $(function() {
     function gIsAucOnClick(){
         var isAucContent = $("#isAucContent");
         var gActive = $("#gActive");
-        console.log($("input[name=gIsAuc]:checked").val()=="1");
         if($("input[name=gIsAuc]:checked").val()=="1"){
             isAucContent.show();
             gActive.show();
@@ -636,9 +642,13 @@ function getActive(){
 function activeChange(obj){
     // console.log($(obj).find("option:selected").attr("startTime"));
     var gStartTime = $("#gStartTime");
+    var gStartTimePicker = $("#gStartTimePicker");
     var gEndTime = $("#gEndTime");
+    var gEndTimePicker = $("#gEndTimePicker");
     gStartTime.val(dateFtt("yyyy-MM-dd hh:mm:ss", new Date(Number($(obj).find("option:selected").attr("startTime")))));
+    gStartTimePicker.val(dateFtt("yyyy-MM-dd hh:mm:ss", new Date(Number($(obj).find("option:selected").attr("startTime")))));
     gEndTime.val(dateFtt("yyyy-MM-dd hh:mm:ss", new Date(Number($(obj).find("option:selected").attr("endTime")))));
+    gEndTimePicker.val(dateFtt("yyyy-MM-dd hh:mm:ss", new Date(Number($(obj).find("option:selected").attr("endTime")))));
 }
 var titleStrObj = {
     "skuId":{

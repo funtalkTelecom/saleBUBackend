@@ -69,7 +69,6 @@ $(function() {
             });
             var c = $(".query input[type=checkbox]:checked").length;
             $(".query input[type=checkbox]:checked").each(function(index,v2){
-            	console.log($(v2).val());
                 var name=$(v2).attr("name");
                 obj[name] = obj[name]==undefined?"":obj[name];
                 obj[name]=obj[name]+$(v2).val()+",";
@@ -143,13 +142,32 @@ $(function() {
         dictCheckBoxDefault($("#numberTags"), "num_tags", option);
 	});
 
+    var getpos=function(str){
+        //获取元素绝对位置
+        var Left=0,Top=0;
+        do{Left+=str.offsetLeft,Top+=str.offsetTop;}
+        while(str=str.offsetParent);
+        var scr=document.getElementById('scrollDiv');//减去图层滚动条
 
+        if(scr!=null && scr!=undefined){
+            Left=Left-scr.scrollLeft;
+        }
+        return {"Left":Left,"Top":Top};
+    };
     //地市下拉框
+    function showMenu(){
+        //处理地市下拉位置偏移问题
+        var xy = getpos($("#gSaleCityStr").get(0));
+        var option = {
+            "menuContentCss":'{"left":"'+(Number(xy.Left)-Number($("#sidebar").css("height")=="1px"?0:$("#sidebar").css("width").replace("px", ""))-5)+'px"}'
+        };
+        showCityMenu(option);
+    }
     var zNodes;
     $.post("query-city-ztree", {pid: 0, isopen:false}, function (data) {
         zNodes = data;
         $.fn.zTree.init($("#cityTree"), setting, zNodes);
-        $("#gSaleCityStr").off("click").on("click", showCityMenu);
+        $("#gSaleCityStr").off("click").on("click", showMenu);
     }, "json");
     $("#reset").click(function(){
         $.fn.zTree.init($("#cityTree"), setting, zNodes);

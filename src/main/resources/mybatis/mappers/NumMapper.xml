@@ -27,4 +27,16 @@
         )
     </update>
 
+    <select id="queryPageNumList" resultType="java.util.HashMap">
+    select
+    concat(n.id,'')as id,
+    n.num_resource num,
+    n.city_name as cityName,
+    n.low_consume as lowConsume,
+    n.net_type as netType
+    from tb_num n
+    where n.buyer_id=#{consumerId}
+    and  n.status in ( #{status})
+    </select>
+
 </mapper>

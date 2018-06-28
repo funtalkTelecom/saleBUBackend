@@ -46,9 +46,9 @@
 											<label class="control-label">备注</label>
 											<input type="text" class="form-control" style="width:130px;" name="remark">
 										</div>
-										<c:if test="<%=SessionUtil.hasPower(PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_ADD)%>">
+									<%--	<c:if test="<%=SessionUtil.hasPower(PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_ADD)%>">
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#posterInfo" >添加</button>
-										</c:if>
+										</c:if>--%>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right hidden" id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right  hidden" id="reset">重置</button>
 									</form><!-- /form-panel -->
@@ -147,8 +147,7 @@
 		</div>
 		<script type="text/javascript">
             var basePath = "<%=basePath %>";
-            var p_edit = <%=SessionUtil.hasPower(PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_EDIT)%>;
-            var p_delete= <%=SessionUtil.hasPower(PowerConsts.DELIVERYADDRESSMOUDULE_COMMON_DELETE)%>;
+
 		</script>
 	</body>
 </html>

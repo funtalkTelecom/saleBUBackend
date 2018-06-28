@@ -49,10 +49,13 @@ function onCheck(e, treeId, treeNode) {
     cityObj.val(vv);
 }
 
-function showCityMenu() {
+function showCityMenu(option) {
     var cityObj = $("#gSaleCity");
     var cityOffset = $("#gSaleCity").offset();
     if($("#menuContent").is(":hidden")) $("#menuContent").css({"background-color":"#ffffff", "border":"1px solid #438eb9"}).slideDown("fast");
+    if(option.menuContentCss) {
+        eval('$("#menuContent").css('+option.menuContentCss+')');
+    }
 
     $("body").bind("mousedown", onBodyDown);
 }
