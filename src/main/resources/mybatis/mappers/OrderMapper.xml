@@ -145,6 +145,14 @@
         </if>
     </select>
 
+    <select id="findOrderSignList" resultType="java.util.HashMap">
+    select tb_order.order_id as orderId
+    from tb_order
+    where is_del=0
+    and status=4
+    and TIMESTAMPDIFF(hour,tb_order.deliver_date, now())/24>7
+   </select>
+
     <insert id="insertBatch">
         insert into tb_order(
             order_id,

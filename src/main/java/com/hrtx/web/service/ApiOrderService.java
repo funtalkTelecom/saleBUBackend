@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
@@ -89,6 +90,32 @@ public class ApiOrderService {
 		order.setSignType(1);//签收方式1用户自动签收2系统
 		orderMapper.signByOrderid(order);
 		return new Result(Result.OK, "提交成功");
+	}
+
+	/*
+	 订单 已发货未签收>7天
+	 */
+	@Scheduled(fixedRate=1000)
+	public void signOrderSystem() {
+		List<Map> list=this.orderMapper.findOrderSignList();
+		if(list.isEmpty()){
+			log.info(String.format("暂无已发货未签收的订单"));return;
+		}
+		Long orderId=0L;
+		Order order=new Order();
+		if(list.size()>0)
+		{
+			for(Map map :list)
+			{
+				orderId=Long.valueOf(map.get("orderId").toString());
+				order.setOrderId(orderId);
+				order.setStatus(5);
+				order.setSignDate(new Date());//签收时间
+				order.setSignType(2);//签收方式1用户自动签收2系统
+				orderMapper.signByOrderid(order);
+				log.info("订单已发货未签收>7天系统自动签收,OrderId:"+orderId);
+			}
+		}
 	}
 
 	/**

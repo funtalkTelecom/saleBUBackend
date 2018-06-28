@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+
 @Component
 public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
     void insertBatch(@Param("orderList") List<Order> orderList);
@@ -14,6 +16,8 @@ public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
     void deleteByOrderid(@Param("orderid") Long orderId);
 
     void signByOrderid(Order order);
+
+    List<Map> findOrderSignList();
 
     Order findOrderInfo(@Param("orderid") Long id);
 

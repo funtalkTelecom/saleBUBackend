@@ -48,11 +48,13 @@
 											<label class="control-label">备注</label>
 											<input type="text" class="form-control" style="width:130px;" name="remark">
 										</div>
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus" id="query">查询</button>
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus" id="reset">重置</button>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.EPSALEMOUDULE_COMMON_ADD)%>">
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#epSaleInfo" >添加</button>
 										</c:if>
-										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right  " id="reset">重置</button>
-										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
+
+
 									</form><!-- /form-panel -->
 								</div>
 
@@ -98,7 +100,7 @@
 							<div class="form-group">
 								<label class="col-xs-2 control-label">标题</label>
 								<div class="col-xs-10 col-sm-10">
-									<input type="text" class="form-control" name="title" placeholder="请填写标题">
+									<input type="text" class="form-control" name="title" placeholder="请填写标题" required>
 								</div>
 							</div>
 							<div class="form-group">

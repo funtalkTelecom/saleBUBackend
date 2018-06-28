@@ -10,10 +10,10 @@ $(function() {
         },{
             "header" : "标题",
             "dataIndex" : "title"
-        },{
+        }/*,{
             "header" : "竟拍规则",
             "dataIndex" : "epRule"
-        },{
+        }*/,{
             "header" : "开始时间",
             "dataIndex" : "startTime"
         },{
