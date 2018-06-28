@@ -95,7 +95,7 @@ public class ApiOrderService {
 	/*
 	 订单 已发货未签收>7天
 	 */
-	@Scheduled(fixedRate=1000)
+	@Scheduled(fixedRate=10000000)
 	public void signOrderSystem() {
 		List<Map> list=this.orderMapper.findOrderSignList();
 		if(list.isEmpty()){

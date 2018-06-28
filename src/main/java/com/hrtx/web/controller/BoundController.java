@@ -45,7 +45,7 @@ public class BoundController extends BaseReturn{
 		Long mealMid=0L;//mdelMid 套餐记录
 
 		numId=num.getId();
-        iccids=num.getIccid();
+        iccidStr=num.getIccid();
 		mealMid=num.getMealMid();
 
 		Num number=boundService.findNumById(numId);
