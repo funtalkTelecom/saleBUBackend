@@ -30,8 +30,10 @@ public class BoundService {
 		return numMapper.selectByPrimaryKey(Id);
 	}
 
-	public Iccid findIccidById(Long Id) {
-		return iccidMapper.selectByPrimaryKey(Id);
+	public Iccid findIccidByIccid(String iccidStr) {
+		Iccid iccid=new Iccid();
+		iccid.setIccid(iccidStr);
+		return iccidMapper.selectOne(iccid);
 	}
 
 	public void bindNum(Num num) {
@@ -43,15 +45,23 @@ public class BoundService {
 	}
 
 	/*
-	  status4 未绑定
+	  status4 未绑定 5,6,7已绑定
 	 */
-	public Result numUnBoundList(Num num, HttpServletRequest request){
+	public Result numBoundList(String status, HttpServletRequest request){
+		Num num=new Num();
 		PageInfo<Object> pm = null;
 		Result result = null;
+		String statusStr="";
 		try {
 			num.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
 			num.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
-
+            if(status.equals("0"))
+			{
+				statusStr="4";
+			}else if(status.equals("1"))
+			{
+				statusStr="5,6,7";
+			}
 			//模拟登陆
 //			Consumer u = new Consumer();
 //			u.setId(1L);
@@ -62,7 +72,7 @@ public class BoundService {
 			//apiSessionUtil.getConsumer()==null?u.getAgentCity():
 
 			PageHelper.startPage(num.getPageNum(),num.getLimit());
-			Page<Object> ob=this.numMapper.queryPageNumList(num,apiSessionUtil.getConsumer().getId(),"4");
+			Page<Object> ob=this.numMapper.queryPageNumList(num,apiSessionUtil.getConsumer().getId(),statusStr);
 			pm = new PageInfo<Object>(ob);
 			result = new Result(Result.OK, pm);
 		} catch (NumberFormatException e) {
@@ -73,34 +83,4 @@ public class BoundService {
 		return result;
 	}
 
-	/*
-	  status  5,6,7 已绑定
-	 */
-	public Result numEndBoundList(Num num, HttpServletRequest request){
-		PageInfo<Object> pm = null;
-		Result result = null;
-		try {
-			num.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-			num.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
-
-			//模拟登陆
-//			Consumer u = new Consumer();
-//			u.setId(1L);
-//			u.setName("周元强");
-//			u.setCity("396");
-//			u.setIsAgent(2);//设置为一级代理商
-//			u.setAgentCity(396L);
-			//apiSessionUtil.getConsumer()==null?u.getAgentCity():
-
-			PageHelper.startPage(num.getPageNum(),num.getLimit());
-			Page<Object> ob=this.numMapper.queryPageNumList(num,apiSessionUtil.getConsumer().getId(),"5,6,7");
-			pm = new PageInfo<Object>(ob);
-			result = new Result(Result.OK, pm);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			pm = new PageInfo<Object>(null);
-			result = new Result(Result.ERROR, pm);
-		}
-		return result;
-	}
 }

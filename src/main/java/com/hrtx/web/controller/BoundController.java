@@ -12,10 +12,7 @@ import com.hrtx.web.service.MealService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,7 +37,7 @@ public class BoundController extends BaseReturn{
         Long numBuyerId=0L;//buyer_id 用户Id  号码记录
         String numSectionNo="";//号段 号码记录
         int numStatus=0;//状态 号码记录
-		Long iccidId=0L;//Id  iccid记录
+		String iccids="";//iccid  iccid记录 iccid
         String iccidStr="";// iccid  iccid记录
         String iccidSectionNo="";//号段  iccid记录
         Long iccidConsumerId=0L;//用户Id  iccid记录
@@ -48,11 +45,11 @@ public class BoundController extends BaseReturn{
 		Long mealMid=0L;//mdelMid 套餐记录
 
 		numId=num.getId();
-		iccidId=num.getIccidId();
+        iccids=num.getIccid();
 		mealMid=num.getMealMid();
 
 		Num number=boundService.findNumById(numId);
-        Iccid iccid=boundService.findIccidById(iccidId);
+        Iccid iccid=boundService.findIccidByIccid(iccidStr);
         Meal meal =MealService.findMealById(mealMid);
         if(number==null) returnResult(new Result(Result.ERROR,"号码记录为空，请核对！"));
         if(iccid==null) returnResult(new Result(Result.ERROR,"iccid记录为空，请核对！"));
@@ -90,7 +87,7 @@ public class BoundController extends BaseReturn{
             num.setStatus(5);//4待配卡(已付款 针对2C或电销无需购买卡时、代理商买号而未指定白卡时)、5待受理(代理商已提交或仓库已发货，待提交乐语BOSS)
             Iccid iccidEdit=new Iccid();
             boundService.bindNum(num);
-            iccidEdit.setId(iccidId);
+            iccidEdit.setId(iccid.getId());
             iccidEdit.setDealStatus("2");//受理状态(1待绑定=》2已绑定)
             boundService.iccidEditStatus(iccidEdit);
             returnResult(new Result(Result.OK,"该号码绑定成功！"));
@@ -98,24 +95,13 @@ public class BoundController extends BaseReturn{
 	}
 
     /**
-     * 未绑定号列列表
+     * 号码列表
      * 查询当前用户
      */
-    @GetMapping("/api/numUnBoundList")
+    @GetMapping("/api/numBoundList/{status}")
     @Powers(PowerConsts.NOPOWER)
     @ResponseBody
-    public Result numUnBoundList(Num num, HttpServletRequest request){
-        return boundService.numUnBoundList(num, request);
-    }
-
-    /**
-     * 已绑定号列列表
-     * 查询当前用户
-     */
-    @GetMapping("/api/numEndBoundList")
-    @Powers(PowerConsts.NOPOWER)
-    @ResponseBody
-    public Result numEndBoundList(Num num, HttpServletRequest request){
-        return boundService.numEndBoundList(num, request);
+    public Result numBoundList(@PathVariable("status") String status,HttpServletRequest request){
+        return boundService.numBoundList(status,request);
     }
 }

@@ -33,8 +33,11 @@
     n.num_resource num,
     n.city_name as cityName,
     n.low_consume as lowConsume,
-    n.net_type as netType
+    n.net_type as netType,
+    n.iccid,
+    meal.meal_name as mealName
     from tb_num n
+    left join tb_meal meal on meal.mid=n.meal_mid
     where n.buyer_id=#{consumerId}
     and  n.status in ( #{status})
     </select>
