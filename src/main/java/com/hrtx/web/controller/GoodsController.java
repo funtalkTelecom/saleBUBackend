@@ -10,6 +10,7 @@ import com.hrtx.web.pojo.File;
 import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.service.FileService;
 import com.hrtx.web.service.GoodsService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +64,25 @@ public class GoodsController extends BaseReturn{
 
 	@RequestMapping("/goods-edit")
 	@Powers({PowerConsts.GOODSMOUDULE_COMMON_EDIT})
-	public void goodsEdit(Goods goods, @RequestParam(name = "file",required = false) MultipartFile[] files, HttpServletRequest request){
-        returnResult(goodsService.goodsEdit(goods, request, files));
+	public Result goodsEdit(Goods goods, @RequestParam(name = "file",required = false) MultipartFile[] files, HttpServletRequest request){
+		if(StringUtils.isBlank(goods.getgType1()) || "-1".equals(goods.getgType1())) return (new Result(Result.ERROR, "请选择大类"));
+		if(StringUtils.isBlank(goods.getgType2()) || "-1".equals(goods.getgType2())) return (new Result(Result.ERROR, "请选择小类"));
+		if(StringUtils.isBlank(goods.getgName())) return (new Result(Result.ERROR, "商品名称不能为空"));
+		if(StringUtils.isBlank(goods.getgAd())) return (new Result(Result.ERROR, "宣传语不能为空"));
+		if(StringUtils.isBlank(goods.getgSaleCity())) return (new Result(Result.ERROR, "销售地址不能为空"));
+		if(StringUtils.isBlank(goods.getgIsAuc())) return (new Result(Result.ERROR, "请选择是否竞拍"));
+		if(StringUtils.isBlank(goods.getgIsPack())) return (new Result(Result.ERROR, "请选择是否打包"));
+		if("1".equals(goods.getgIsAuc())){
+			if(goods.getgActive() == null) return (new Result(Result.ERROR, "请选择活动"));
+			if(StringUtils.isBlank(goods.getgLoopTime())) return (new Result(Result.ERROR, "轮询时间不能为空"));
+			if(StringUtils.isBlank(goods.getgStartNum())) return (new Result(Result.ERROR, "起拍人数不能为空"));
+			if(StringUtils.isBlank(goods.getgDeposit())) return (new Result(Result.ERROR, "保证金不能为空"));
+			if(StringUtils.isBlank(goods.getgPriceUp())) return (new Result(Result.ERROR, "每次加价不能为空"));
+		}
+		if(goods.getgStartTime()==null) return (new Result(Result.ERROR, "有效期开始时间不能为空"));
+		if(goods.getgEndTime()==null) return (new Result(Result.ERROR, "有效期结束时间不能为空"));
+
+        return (goodsService.goodsEdit(goods, request, files));
 	}
 
 	@RequestMapping("/goods-unsale")

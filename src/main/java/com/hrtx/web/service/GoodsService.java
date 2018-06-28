@@ -93,6 +93,26 @@ public class GoodsService {
                     //sku属性表操作
                     JSONObject obj = (JSONObject) skuPropertyJsonArr.get(i);
                     Iterator it = obj.keySet().iterator();
+                    String price = ((JSONObject) obj.get("skuTobPrice")).get("value")==null||((JSONObject) obj.get("skuTobPrice")).get("value").equals("null")||((JSONObject) obj.get("skuTobPrice")).get("value").equals("")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value");
+                    if("".equals(price)) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return new Result(Result.ERROR, "第"+(i+1)+"行2B价格为空");
+                    }
+                    sku.setSkuTobPrice(Double.parseDouble(price));
+
+//                    price = ((JSONObject) obj.get("skuTocPrice")).get("value")==null||((JSONObject) obj.get("skuTocPrice")).get("value").equals("null")||((JSONObject) obj.get("skuTocPrice")).get("value").equals("")?"": (String) ((JSONObject) obj.get("skuTocPrice")).get("value");
+//                    if("".equals(price)) {
+//                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+//                        return new Result(Result.ERROR, "第"+(i+1)+"行2C价格为空");
+//                    }
+//                    sku.setSkuTocPrice(Double.parseDouble(price));
+
+//                    sku.setSkuIsNum(((JSONObject) obj.get("skuIsNum")).get("value")==null||((JSONObject) obj.get("skuIsNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuIsNum")).get("value"));
+                    price = ((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?"": ((JSONObject) obj.get("skuNum")).get("value").toString();
+                    if("".equals(price)) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return new Result(Result.ERROR, "第" + (i + 1) + "行数量为空");
+                    }
 
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
                     sku.setSkuGoodsType(((JSONObject) obj.get("skuGoodsType")).get("value")==null||((JSONObject) obj.get("skuGoodsType")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuGoodsType")).get("value"));
@@ -141,25 +161,10 @@ public class GoodsService {
 
                     //,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuGoodsType,skuRepoGoods,
                     String price = ((JSONObject) obj.get("skuTobPrice")).get("value")==null||((JSONObject) obj.get("skuTobPrice")).get("value").equals("null")||((JSONObject) obj.get("skuTobPrice")).get("value").equals("")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value");
-                    if("".equals(price)) {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return new Result(Result.ERROR, "第"+(i+1)+"行2B价格为空");
-                    }
                     sku.setSkuTobPrice(Double.parseDouble(price));
-
-//                    price = ((JSONObject) obj.get("skuTocPrice")).get("value")==null||((JSONObject) obj.get("skuTocPrice")).get("value").equals("null")||((JSONObject) obj.get("skuTocPrice")).get("value").equals("")?"": (String) ((JSONObject) obj.get("skuTocPrice")).get("value");
-//                    if("".equals(price)) {
-//                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-//                        return new Result(Result.ERROR, "第"+(i+1)+"行2C价格为空");
-//                    }
-//                    sku.setSkuTocPrice(Double.parseDouble(price));
 
 //                    sku.setSkuIsNum(((JSONObject) obj.get("skuIsNum")).get("value")==null||((JSONObject) obj.get("skuIsNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuIsNum")).get("value"));
                     price = ((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?"": ((JSONObject) obj.get("skuNum")).get("value").toString();
-                    if("".equals(price)) {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return new Result(Result.ERROR, "第" + (i + 1) + "行数量为空");
-                    }
                     sku.setSkuNum(Integer.parseInt(price));
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
 //                    验证号码可用性之前赋值旧的skuId,便于tb_num表复原状态
