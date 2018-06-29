@@ -21,4 +21,7 @@ public interface UserMapper extends Mapper<User>,BaseMapper<User>{
 	public List<String> findRoles(Long id);
 
 
+    void test();
+
+	void test1();
 }

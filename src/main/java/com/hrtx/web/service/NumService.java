@@ -3,10 +3,7 @@ package com.hrtx.web.service;
 import com.github.abel533.entity.Example;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
-import com.hrtx.web.mapper.IccidMapper;
-import com.hrtx.web.mapper.NumMapper;
-import com.hrtx.web.mapper.OrderItemMapper;
-import com.hrtx.web.mapper.OrderMapper;
+import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.Iccid;
 import com.hrtx.web.pojo.Num;
 import com.hrtx.web.pojo.Order;
@@ -29,6 +26,7 @@ public class NumService {
 	@Autowired private IccidMapper iccidMapper;
 	@Autowired private OrderItemMapper orderItemMapper;
 	@Autowired private NumMapper numMapper;
+	@Autowired private MealMapper mealMapper;
 
     /**
      * 绑卡
@@ -80,6 +78,15 @@ public class NumService {
                     num.setIccidId(iccid.getId());
                     num.setIccid(iccid.getIccid());
                     num.setStatus(5);
+                    if("4".equals(goodsType)) {//超靓
+                        if(orderItem.getMealId() == null) throw new ServiceException("订单中未找到套餐");
+                        num.setMealMid(orderItem.getMealId());
+                    }
+                    if("2".equals(goodsType)) {//谱号
+                        List<Map> meals = mealMapper.getMealListByNum(String.valueOf(item1.getNumId()));
+                        if(meals.size()<=0) throw new ServiceException("未找到普号的基础套餐");
+                        num.setMealMid(NumberUtils.toLong(ObjectUtils.toString(meals.get(0).get("mealId"))));
+                    }
                     numMapper.updateByPrimaryKeySelective(num);
                     iccid.setDealStatus("2");
                     iccidMapper.updateByPrimaryKeySelective(iccid);
