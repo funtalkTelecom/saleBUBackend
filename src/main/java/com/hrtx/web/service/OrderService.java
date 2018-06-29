@@ -172,7 +172,7 @@ public class OrderService extends BaseService {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getStatus() !=1 || order.getIsDel() != 0) return new Result(Result.ERROR, "订单状态异常");
-        order.setPayMenthod(Constants.PAY_MENTHOD_TYPE_1.getStringKey());
+        order.setPayMenthodId(Constants.PAY_MENTHOD_TYPE_1.getStringKey());
         order.setPayMenthod(Constants.PAY_MENTHOD_TYPE_1.getValue());
         orderMapper.updateByPrimaryKey(order);
         return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));

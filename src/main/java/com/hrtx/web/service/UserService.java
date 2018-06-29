@@ -42,16 +42,30 @@ public class UserService {
 	@Autowired private CorporationService corporationService;
 	@Autowired private IccidMapper iccidMapper;
 
+	public void test1() {
+		System.out.println("test1 begain--------------------");
+		userMapper.test1();
+		System.out.println("test1 end--------------------");
+	}
 	public void test() {
+//	    Example example = new Example(FundOrder.class);
+//	    example.createCriteria();
+//	    List<User> u = userMapper.selectByExample(new Example(User.class).createCriteria().andEqualTo("id", 1));
+//        System.out.println(u.get(0).getLoginName());
+//		System.out.println("test begain--------------------");
+//		userMapper.test();
+//		System.out.println("test end--------------------");
 //        List allImeis = new ArrayList();
 //        List imeis = Arrays.asList(new String[]{"A1234","B1234"});
 //        allImeis.add(CommonMap.create("iccids",imeis).put("itemId", "111111").getData());
 //        allImeis.add(CommonMap.create("iccids",Arrays.asList(new String[]{"C1234","D1234"})).put("itemId", "222222").getData());
 //        System.out.println(iccidMapper.batchInsertTemp(allImeis, 1111111l));
         User u = new User(10l);
+        u.setLoginName("111");
         userMapper.insert(u);
-        u = userMapper.selectByPrimaryKey(u);
-		userMapper.insert(u);
+		User u1 = new User(11l);
+		u1.setLoginName("111");
+		userMapper.insert(u1);
 		System.out.println("aaaaaaaaaaaaaaaa");
 //	    try{
 //	        userService.paytest();

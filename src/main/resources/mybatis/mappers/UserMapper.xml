@@ -43,4 +43,10 @@
          where
          t.user_id=#{userid}
     </update>
+    <select id="test" resultType="java.util.Map">
+        select a.* from tb_auction a where a.`status` = 1 order by a.price desc limit 1 for update
+    </select>
+    <update id="test1">
+        update tb_auction a set a.remark = 'test' where a.id=1011882487632101377
+    </update>
 </mapper>

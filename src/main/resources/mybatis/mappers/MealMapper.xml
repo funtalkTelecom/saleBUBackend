@@ -65,7 +65,7 @@
         left join tb_third_city b on a.sale_city=b.city_id
         left join tb_num c on c.tele_type = a.tele_type
         where a.is_del = 0
-        and c.id = #{id}
+        and c.id = #{id} order by a.mid
     </select>
 
     <insert id="insertBatch">
