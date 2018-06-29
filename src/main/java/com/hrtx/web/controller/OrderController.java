@@ -63,6 +63,12 @@ public class OrderController extends BaseReturn{
 		return orderService.payDeliver(order, request);
 	}
 
+	@RequestMapping("/order-bindCard")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
+	public Result payBindCard(Order order, HttpServletRequest request){
+		return orderService.payBindCard(order, request);
+	}
+
 	@RequestMapping("/item-list")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
 	public Result listItem(OrderItem orderItem){
