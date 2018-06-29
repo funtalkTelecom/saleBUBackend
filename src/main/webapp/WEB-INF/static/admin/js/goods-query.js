@@ -41,6 +41,7 @@ $(function() {
                                     if(data.code=="200"){
                                         repoGoods = data.data.platresponse;
                                         var repoGoodsSelect = '<select class="chosen-select" onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
+                                        repoGoodsSelect += "<option value=-1>请选择...</option>";
                                         for(var i=0; i<repoGoods.length; i++){
                                             repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'</option>';
                                         }
@@ -168,39 +169,37 @@ $(function() {
 	}
 
     $(document).on("click","#goodsInfo .modal-footer .btn-success",function() {
+        var isError = false;
         $('#gStartTime').val($('#gStartTimePicker').val());
         $('#gEndTime').val($('#gEndTimePicker').val());
         //是竞拍,就出发选择活动下拉框的change事件
         if($("input[name=gIsAuc]:checked").val()=="1") {
             $("#gActive").change();
             if(!$("#gActive").val()){
-                alert("请选择活动");
-                return;
+                msg = "请选择活动";
+                isError = true;
             }
         }
         //判断sku列表
         if($("#skuResult tr").length<2){
-            alert("列表为空,请选择商品属性添加");
-            return;
+            msg = "sku列表为空,请选择商品属性添加";
+            isError = true;
         }
         //判断图片
         if($("input[type=file]").eq(0).val()=="" && $("#picUpload img").eq(0).css("visibility")=="hidden"){
-            alert("请上传第一张图片");
-            return;
+            msg = "请上传第一张图片";
+            isError = true;
         }
         //验证填写数量和库存数量
-        var isError = false;
         var msg = "";
         $("select[name=skuRepoGoods]").each(function(i, e){
             if($(this).find("option:selected").attr("acqu")==undefined){
                 msg = "请选择关联仓库商品";
                 isError = true;
-                return;
             }
             if(parseInt($(this).find("option:selected").attr("acqu"))+parseInt($("select[name=skuRepoGoods]").parent().parent().find("input[name=skuNum]").val())<parseInt($("select[name=skuRepoGoods]").parent().parent().find("input[name=skuNum]").val())){
                 msg = "第" + (i + 1) + "行数量大于库存" + $(this).find("option:selected").attr("acqu") + ",请重新填写";
                 isError = true;
-                return;
             }
         });
         if(isError){
@@ -726,6 +725,7 @@ function getRepoGodds(){
             if(data.code=="200"){
                 repoGoods = data.data.platresponse;
                 var repoGoodsSelect = '<select class="chosen-select" onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
+                repoGoodsSelect += "<option value=-1>请选择...</option>";
                 for(var i=0; i<repoGoods.length; i++){
                     repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'</option>';
                 }
