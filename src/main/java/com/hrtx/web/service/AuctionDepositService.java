@@ -9,6 +9,8 @@ import com.hrtx.web.mapper.ConsumerMapper;
 import com.hrtx.web.pojo.Auction;
 import com.hrtx.web.pojo.AuctionDeposit;
 import com.hrtx.web.pojo.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.*;
 
 @Service
 public class AuctionDepositService {
+	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private AuctionService auctionService;
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
