@@ -54,9 +54,10 @@ public class GoodsService {
 
 	public Result goodsEdit(Goods goods, HttpServletRequest request, MultipartFile[] files) {
         try {
-            String ignoreKey = "skuId,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuNum,skuGoodsType,skuRepoGoods,skuRepoGoodsName";
+            String ignoreKey = "undefined,skuId,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuNum,skuGoodsType,skuRepoGoods,skuRepoGoodsName";
             //商品主表操作
             List<Goods> list = new ArrayList<Goods>();
+            String isSale = goods.getgIsSale();
             if (goods.getgId() != null && goods.getgId() > 0) {
                 goodsMapper.goodsEdit(goods);
                 goods = goodsMapper.findGoodsInfo(goods.getgId());
@@ -206,7 +207,7 @@ public class GoodsService {
                     //获取目前sku信息
                     Sku nowSku = skuMapper.getSkuBySkuid(sku.getSkuId());
                     Result res;
-                    if(goods.getGeneralId()!=goods.getgId()) {
+                    if(goods.getGeneralId()!=goods.getgId() && "1".equals(isSale)) {
                         //先解冻现有库存
                         param.put("type", "2");//处理类型1上架；2下架
                         param.put("quantity", nowSku == null ? 0 : nowSku.getSkuNum());//数量
@@ -273,8 +274,42 @@ public class GoodsService {
                 if(skuList!=null && skuList.size()>0) skuMapper.insertBatch(skuList);
                 //删除前台传过来的sku
                 String delSkus = request.getParameter("delSkus");
-                delSkus = "".equalsIgnoreCase(delSkus) ? "" : "'"+delSkus.substring(0, delSkus.length() - 1).replaceAll(",", "','")+"'";
-                if(!"".equals(delSkus)) skuMapper.deleteSkuBySkuids(delSkus);
+                //调用仓储解冻库存
+                if(!StringUtils.isBlank(delSkus)){
+                    String[] delskus = delSkus.split(",");
+                    for (String delSku : delskus) {
+                        if(!StringUtils.isBlank(delSku)){
+                            //获取目前sku信息
+                            Sku s = skuMapper.getSkuBySkuid(Long.parseLong(delSku));
+                            if(s!=null) {
+                                //调用仓储接口
+                                Map param = new HashMap();
+                                param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
+                                Result res;
+                                //解冻现有库存
+                                param.put("type", "2");//处理类型1上架；2下架
+                                param.put("quantity", s == null ? 0 : s.getSkuNum());//数量
+                                param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                                if (!"0".equals(param.get("quantity").toString())) {
+                                    res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                                    if (200 != (res.getCode())) {
+                                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                                        return new Result(Result.ERROR, "解冻库存失败");
+                                    } else {
+                                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                                        if (!"00000".equals(sir.getCode())) {
+                                            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                                            return new Result(Result.ERROR, "解冻库存失败\n"+sir.getDesc());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //删除sku
+                    delSkus = StringUtils.isBlank(delSkus) ? "" : "'"+delSkus.substring(0, delSkus.length() - 1).replaceAll(",", "','")+"'";
+                    skuMapper.deleteSkuBySkuids(delSkus);
+                }
 
                 //富文本信息获取
                 String kindeditorContent = request.getParameter("kindeditorContent");
