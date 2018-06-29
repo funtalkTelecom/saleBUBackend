@@ -55,6 +55,11 @@
 											<label class="control-label">宣传语</label>
 											<input type="text" class="form-control" style="width:130px;" name="gAd">
 										</div>
+										<div class="form-group" style="">
+											<label class="control-label">是否竞拍</label>
+											<select class="chosen-select form-control" name="gIsAuc" id="gIsAuc">
+											</select>
+										</div>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.GOODSMOUDULE_COMMON_ADD)%>">
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#goodsInfo" >上架商品</button>
 										</c:if>

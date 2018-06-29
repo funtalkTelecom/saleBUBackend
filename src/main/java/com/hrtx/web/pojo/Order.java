@@ -25,6 +25,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     private int status;//状态 1待付款；2已付款待推送（已付款尚未推送到仓储期）；3待配货(仓储系统已收到)；4待签收(仓储物流已取件)；5完成
     private String reqUserAgent;//请求的user_agent
     private String reqIp;//请求的ip
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date addDate;//添加时间
     private int orderType;//1商品；2号码；3竞拍

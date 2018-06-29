@@ -195,7 +195,11 @@ function dictCheckBox($domId, group, option) {
             preGroup = data[index]['gtpGroup'];
         }
 		$domId.html(html);
-		$domId.find("span").off("click").on("click",option.onclick);
+		$domId.find("input[type=checkbox]").off("click").on("click", function(){
+			if(option.onclick && $.isFunction(option.onclick)) {
+				option.onclick(this);
+			}
+		});
 	}});
 }
 

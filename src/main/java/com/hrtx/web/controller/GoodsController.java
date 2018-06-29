@@ -69,7 +69,7 @@ public class GoodsController extends BaseReturn{
 		if(StringUtils.isBlank(goods.getgType2()) || "-1".equals(goods.getgType2())) return (new Result(Result.ERROR, "请选择小类"));
 		if(StringUtils.isBlank(goods.getgName())) return (new Result(Result.ERROR, "商品名称不能为空"));
 		if(StringUtils.isBlank(goods.getgAd())) return (new Result(Result.ERROR, "宣传语不能为空"));
-		if(StringUtils.isBlank(goods.getgSaleCity())) return (new Result(Result.ERROR, "销售地址不能为空"));
+		if(StringUtils.isBlank(goods.getgSaleCity())) return (new Result(Result.ERROR, "销售地市不能为空"));
 		if(StringUtils.isBlank(goods.getgIsAuc())) return (new Result(Result.ERROR, "请选择是否竞拍"));
 		if(StringUtils.isBlank(goods.getgIsPack())) return (new Result(Result.ERROR, "请选择是否打包"));
 		if("1".equals(goods.getgIsAuc())){
