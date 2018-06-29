@@ -33,6 +33,7 @@ public class OrderService extends BaseService {
     @Autowired private FundOrderService fundOrderService;
     @Autowired private CityMapper cityMapper;
     @Autowired private AuctionDepositService auctionDepositService;
+    @Autowired private NumService numService;
 
     //订单业务类型 //1白卡 2普号 3普靓  4超靓
     private String[] goodsTypes = new String[]{"1","2","3","4"};
@@ -311,6 +312,15 @@ public class OrderService extends BaseService {
             return new Result(Result.OK, "发货成功");
         }else{
             return new Result(Result.ERROR, "调用发货失败\n" + result.getData());
+        }
+    }
+
+    public Result payBindCard(Order order, org.apache.catalina.servlet4preview.http.HttpServletRequest request) {
+        Result result = numService.blindNum(order.getOrderId());
+        if(result.getCode()==200){
+            return new Result(Result.OK, "绑卡成功");
+        }else{
+            return new Result(Result.ERROR, "绑卡失败\n" + result.getData());
         }
     }
 }

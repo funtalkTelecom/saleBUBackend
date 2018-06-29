@@ -130,6 +130,9 @@ $(function() {
 						if(p_receipt && record.status=="2") {
 							node.push('<a class="btn btn-success btn-xs payDeliver" href="javascript:void(0);">发货</a>');
                         }
+						if(p_bindCard && record.status=="4") {
+							node.push('<a class="btn btn-success btn-xs bindCard" href="javascript:void(0);">绑卡</a>');
+                        }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
 						//点击详情
@@ -154,6 +157,13 @@ $(function() {
                         //点击发货
                         $operate.find(".payDeliver").click(function () {
                             $.post("order/order-payDeliver", {orderId: v}, function (data) {
+                                dataList.reload();
+                                alert(data.data);
+                            }, "json");
+                        });
+                        //点击绑卡
+                        $operate.find(".bindCard").click(function () {
+                            $.post("order/order-bindCard", {orderId: v}, function (data) {
                                 dataList.reload();
                                 alert(data.data);
                             }, "json");
