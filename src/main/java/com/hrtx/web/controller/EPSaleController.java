@@ -117,6 +117,7 @@ public class EPSaleController extends BaseReturn{
 		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息
 		Date endTime=null;//结束时间
 		Date currentTime=new Date();//当前时间
+        int goodsAuctionCount=0;//最近10次数出价记录的次数
 		List<Map> numList=epSaleService.findNumById(auction.getNumId());
 		if(numList.size()>0)
 		{
@@ -142,6 +143,7 @@ public class EPSaleController extends BaseReturn{
 		}
 		//最近10次数出价记录
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
+        goodsAuctionCount=goodsAuctionList.size();
 		int priceCount=0;//出价次数
 		double priceUp=Double.valueOf(goods.getgPriceUp());//每次加价
 		int loopTime=Integer.valueOf(goods.getgLoopTime());//轮咨时间分钟
@@ -152,7 +154,7 @@ public class EPSaleController extends BaseReturn{
 		Long consumerId=0L;//前一次出价记录用户Id
 		boolean isDeposit=false;//是否支付保证金
 		Long auctionDepositId=0L;//保证金Id
-		if(goodsAuctionList.size()>0)//最近10次数出价记录
+		if(goodsAuctionCount>0)//最近10次数出价记录
 		{
 			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
 			 autionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
@@ -168,7 +170,7 @@ public class EPSaleController extends BaseReturn{
 		}
 		if(subPrice>0)
 		{
-			if(subPrice%priceUp>0) {
+			if(goodsAuctionCount>0&&subPrice%priceUp>0) {//比较前后次出价差是===>否按每次加价的倍数,若是第一次出价记录则不要进行比较
 				returnResult(new Result(602, "当前加价不符规则;加价应按" + priceUp + "的倍数进行加价"));
 			}else
 			{
