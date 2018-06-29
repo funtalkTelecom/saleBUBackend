@@ -99,7 +99,8 @@
 
 	<update id="auctionDepositSatusEdit">
         update tb_auction_deposit t set
-         t.status=#{status}
+         t.status=#{status},
+         t.pay_date=#{payDate}
         where
          t.id= #{id}
     </update>
