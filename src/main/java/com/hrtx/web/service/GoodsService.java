@@ -221,7 +221,7 @@ public class GoodsService {
                                 StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                                 if (!"00000".equals(sir.getCode())) {
                                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                    return new Result(Result.ERROR, sir.getDesc());
+                                    return new Result(Result.ERROR, "解冻库存失败\n"+sir.getDesc());
                                 }
                             }
                         }
@@ -239,7 +239,7 @@ public class GoodsService {
                             StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                             if (!"00000".equals(sir.getCode())) {
                                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                return new Result(Result.ERROR, sir.getDesc());
+                                return new Result(Result.ERROR, "解冻库存失败\n"+sir.getDesc());
                             }
                         }
                     }

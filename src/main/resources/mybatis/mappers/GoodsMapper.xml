@@ -45,6 +45,9 @@
         <if test="param.gAd !=null and param.gAd!=''">
             and a.g_ad like "%"#{param.gAd}"%"
         </if>
+        <if test="param.gIsAuc !=null and param.gIsAuc!='' and param.gIsAuc!='-1'">
+            and a.g_is_auc = #{param.gIsAuc}
+        </if>
         order by a.g_start_time
     </select>
 
