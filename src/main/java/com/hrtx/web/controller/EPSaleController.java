@@ -146,6 +146,7 @@ public class EPSaleController extends BaseReturn{
         goodsAuctionCount=goodsAuctionList.size();
 		int priceCount=0;//出价次数
 		double priceUp=Double.valueOf(goods.getgPriceUp());//每次加价
+		int mulPrices=0;//每次加价倍数
 		int loopTime=Integer.valueOf(goods.getgLoopTime());//轮咨时间分钟
 		double deposit=Double.valueOf(goods.getgDeposit());//保证金
 		double beforePrice=0.00;//前一次出价记录
@@ -170,8 +171,11 @@ public class EPSaleController extends BaseReturn{
 		}
 		if(subPrice>0)
 		{
-			if(goodsAuctionCount>0&&subPrice%priceUp>0) {//比较前后次出价差是===>否按每次加价的倍数,若是第一次出价记录则不要进行比较
-				returnResult(new Result(602, "当前加价不符规则;加价应按" + priceUp + "的倍数进行加价"));
+			if((goodsAuctionCount>0)&&(subPrice%priceUp>0)) {//比较前后次出价差是===>否按每次加价的倍数,若是第一次出价记录则不要进行比较
+				if(goodsAuctionCount>0)
+				{
+					returnResult(new Result(602, "当前加价不符规则;加价应按" + priceUp + "的倍数进行加价"));
+				}
 			}else
 			{
 				List<Map> auctionDepositConsumerList=auctionDepositService.findAuctionDepositListConsumerByNumIdAndGId(auction.getNumId(),auction.getgId());//当前用户保证金已支付成功 状态：2成功
