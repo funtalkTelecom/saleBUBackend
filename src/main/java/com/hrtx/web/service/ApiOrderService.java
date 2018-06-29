@@ -342,8 +342,8 @@ public class ApiOrderService {
 					log.info("获取传入参数");
 					skuid = request.getParameter("skuid");
 					numid = request.getParameter("numid");
-					addrid = request.getParameter("addrid");//普通靓号可不填
-					payType = request.getParameter("payMethod");
+					addrid = request.getParameter("addrid") == null ? "" : request.getParameter("addrid");//普通靓号可不填
+					payType = request.getParameter("payMethod") == null ? "" : request.getParameter("payMethod");
 					mealid = request.getParameter("mealid") == null ? "" : request.getParameter("mealid");
 
 					if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
@@ -420,7 +420,7 @@ public class ApiOrderService {
 								orderItem.setQuantity(num);
 								orderItem.setPrice(twobPrice);
 								orderItem.setTotal(twobPrice * num);
-								orderItem.setMealId(Long.parseLong(mealid));
+								if(!StringUtils.isBlank(mealid)) orderItem.setMealId(Long.parseLong(mealid));
 								sub_total += orderItem.getTotal();
 
 								pOrderItem = orderItem;
@@ -449,7 +449,7 @@ public class ApiOrderService {
 							twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
 							orderItem.setPrice(twobPrice);
 							orderItem.setTotal(twobPrice * num);
-							orderItem.setMealId(Long.parseLong(mealid));
+							if(!StringUtils.isBlank(mealid)) orderItem.setMealId(Long.parseLong(mealid));
 							sub_total += orderItem.getTotal();
 
 							orderItems.add(orderItem);
