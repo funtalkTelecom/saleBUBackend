@@ -262,6 +262,7 @@
             var basePath = "<%=basePath %>";
             var p_query = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_QUEYR)%>;
             var p_receipt = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_RECEIPT)%>;
+            var p_bindCard = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_BINDCARD)%>;
 		</script>
 	</body>
 </html>
