@@ -82,7 +82,7 @@ public class ExcelUtil{
         headerStyle.setAlignment(HorizontalAlignment.CENTER);
         HSSFFont headerFont = workbook.createFont();
         headerFont.setFontHeightInPoints((short) 12);
-//        headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        headerFont.setBold(true);
         headerStyle.setFont(headerFont);
         // 单元格样式
         HSSFCellStyle cellStyle = workbook.createCellStyle();
