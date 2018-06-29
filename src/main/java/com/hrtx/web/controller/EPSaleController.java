@@ -290,42 +290,9 @@ public class EPSaleController extends BaseReturn{
 						goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
 						//goodsAuctionListStr="goodsAuctionList:"+"";
 					}
+					goodsAuctionMap.put("idDeposit","1");
 					returnResult(new Result(200, goodsAuctionMap));
 
-					//***************************前一次出价记录******状态4 落败******并通知*****************
-					/*if(autionId>0)
-					{
-						*//*Auction auctonBef=new Auction();
-						auctonBef.setId(autionId);
-						auctonBef.setStatus(4);//前一次出价记录   状态：4 落败
-						auctionService.auctionEditStatusById2(auctonBef);//通知用户
-						Consumer consumer=new Consumer();
-						consumer.setId(consumerId);
-						consumer=consumerService.getConsumerById(consumer);*//*
-						//出价后的最近10次出价记录
-						List<Map> goodsAuctionListAfter=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
-						//String goodsAuctionListStr="";
-						Map goodsAuctionMap=new HashMap();
-						List<Map> epSaleGoodsAuctionPriceInfo=auctionService.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
-						if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
-							priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
-						}
-						if(goodsAuctionListAfter!=null&&goodsAuctionListAfter.size()>0)
-						{
-							goodsAuctionMap.put("goodsAuctionList",goodsAuctionListAfter);
-							goodsAuctionMap.put("priceCount",priceCount);
-							goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
-							//goodsAuctionListStr="goodsAuctionList:"+goodsAuctionListAfter;
-						}else
-						{
-							goodsAuctionMap.put("goodsAuctionList","");
-							goodsAuctionMap.put("priceCount","");
-							goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
-							//goodsAuctionListStr="goodsAuctionList:"+"";
-						}
-						returnResult(new Result(200, goodsAuctionMap));
-						//Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
-					}*/
 				}else //当前用户保证金未支付成功    预先生成出价记录 状态：1初始     保证金记录状态：1 初始
 				{
 					//*******************先测
@@ -405,6 +372,18 @@ public class EPSaleController extends BaseReturn{
             mapData.put("goodsAuctionList","");
 			mapData.put("priceCount","");
 			mapData.put("serviceTime",java.lang.System.currentTimeMillis());;
+		}
+		//当前用户是否支付保证金
+		AuctionDeposit auctionDeposit=new AuctionDeposit();
+		auctionDeposit.setNumId(Long.valueOf(numId));
+		auctionDeposit.setgId(Long.valueOf(gId));
+		List<Map> goodsAuctionDepositList=auctionDepositService.findAuctionDepositListByNumIdAndGId(auctionDeposit);
+		if(goodsAuctionDepositList!=null&&goodsAuctionDepositList.size()>0)
+		{
+			mapData.put("idDeposit","1");
+		}else
+		{
+			mapData.put("idDeposit","0");
 		}
 		map.put("code", Result.OK);
 		map.put("data",mapData);
