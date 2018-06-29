@@ -66,6 +66,7 @@
         left join tb_num c on c.tele_type = a.tele_type
         where a.is_del = 0
         and c.id = #{id}
+        order a.mid
     </select>
 
     <insert id="insertBatch">
