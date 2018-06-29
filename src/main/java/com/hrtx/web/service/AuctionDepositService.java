@@ -17,7 +17,8 @@ import java.util.*;
 
 @Service
 public class AuctionDepositService {
-
+	@Autowired
+	private AuctionService auctionService;
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
 	@Autowired private AuctionMapper auctionMapper;
 	@Autowired private ConsumerMapper consumerMapper;
@@ -140,16 +141,9 @@ public class AuctionDepositService {
 			auctionDeposit.setPayDate(payDate1);
             //**********************************同步
             //AuctionDeposit.setPaySnn(paySnn);
-		}else
-		{
-			auctionDeposit.setStatus(1);
-		}
-		auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
-		if(status)
-		{
-			//****************保证金支付成功************************
-			Boolean isUpdateStatus=false;
 
+
+			//****************auction.status=1记录状态的记录状态调整************************
 			double price=0.00;//出价价格
 			double beforePrice=0.00;//前一次出价记录
 			Long autionId=0L;
@@ -158,7 +152,7 @@ public class AuctionDepositService {
 			//auction.status=1记录状态调整
 			Auction auction=new Auction();
 			Auction auctonBef=new Auction();
-            //auction.status=1记录状态的记录
+			//auction.status=1记录状态的记录
 			List<Map> auctionList =auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getConsumerId(),auctionDeposit.getgId());
 			if(auctionList.size()>0)
 			{
@@ -168,7 +162,7 @@ public class AuctionDepositService {
 				auction.setId(autionId);
 				//最近10次数出价记录
 				List<Map> goodsAuctionList=auctionMapper.findAuctionListByNumIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getgId());
-                if(goodsAuctionList.size()>0)
+				if(goodsAuctionList.size()>0)
 				{
 					beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
 					beforeAutionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
@@ -186,23 +180,33 @@ public class AuctionDepositService {
 						Messager.send(beforeConsumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
 						//auction  状态：2成功
 						auction.setStatus(2);
+						//****************保证金支付成功*****当前出价记录状态：2成功*******************
+						auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 						auctionMapper.auctionEditStatusById(auction);
+						//****************保证金支付成功*******当前出价记录状态：2成功*****************
 					}
 					//2、出现同价的成功出价记录，则当前出价记录状态：3失败
 					else if(price==beforePrice)//出现同价的成功出价记录
 					{
 						//auction  状态：3失败
 						auction.setStatus(3);
+						//****************保证金支付成功*****当前出价记录状态：3失败*******************
+
+						auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 						auctionMapper.auctionEditStatusById(auction);
+						//****************保证金支付成功*******当前出价记录状态：3失败*****************
 					}
 					//3、低于之前的最近出价记录,则当前出价记录状态：4 落败
 					else
 					{
 						//auction  状态：4落败
 						auction.setStatus(4);
+						//****************保证金支付成功*****当前出价记录状态：4落败*******************
+						auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 						auctionMapper.auctionEditStatusById(auction);
+						//****************保证金支付成功*******当前出价记录状态：4落败*****************
 						Consumer consumer=new Consumer();//当前出价记录用户
-						consumer.setId(beforeConsumerId);
+						consumer.setId(consumerId);
 						consumer = consumerMapper.selectOne(consumer);
 						Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
 					}
@@ -210,8 +214,20 @@ public class AuctionDepositService {
 				{
 					//4、当前出价记录为第一次出价记录 状态：2成功
 					auction.setStatus(2);
+					//****************保证金支付成功*****当前出价记录状态：2成功*******************
+					auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 					auctionMapper.auctionEditStatusById(auction);
+					//****************保证金支付成功*******当前出价记录状态：2成功*****************
 				}
+		}else
+		{
+			auctionDeposit.setStatus(1);
+			auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
+		}
+
+		/*if(status)
+		{*/
+
 
 				/*Auction auction=new Auction();
 				autionId=Long.valueOf(auctionList.get(0).get("id").toString());
@@ -240,7 +256,7 @@ public class AuctionDepositService {
 					auction.setStatus(2);
 					auctionMapper.auctionEditStatusById(auction);
 				}*/
-			}
+		/*	}*/
 		}
 	}
 
