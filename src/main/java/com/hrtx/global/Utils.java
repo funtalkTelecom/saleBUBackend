@@ -136,6 +136,19 @@ public class Utils {
 		return new SimpleDateFormat(format, Locale.ENGLISH).format(c.getTime());
 	}
 
+	/**
+	 * @param offset 距离date时间的 分偏移量
+	 * @param format 返回字符串格式
+	 * @return
+	 */
+	public static Date getDate2(int offset, Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		//c.set(Calendar.DATE, c.get(Calendar.MINUTE) + offset);
+		c.add(Calendar.MINUTE,offset);
+		return date;
+	}
+
 	public static int offsetDay(String date, String format) throws ParseException {
 		Calendar c1 = Calendar.getInstance();//当前
 		c1.set(Calendar.MINUTE, 0);

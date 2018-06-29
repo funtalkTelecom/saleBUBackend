@@ -56,6 +56,7 @@ public class EPSaleController extends BaseReturn{
 
 	/**
 	 * 查询竟拍活动
+	 * 限关联有上架商品的竟拍活动
 	 * @param epSale
 	 * @return
 	 */
@@ -68,6 +69,7 @@ public class EPSaleController extends BaseReturn{
 
 	/**
 	 * 查询竟拍活动
+	 * 供商品上架时选竟拍活动进行调用
 	 * @param epSale
 	 * @return
 	 */
@@ -110,6 +112,8 @@ public class EPSaleController extends BaseReturn{
 	private static Object cjLock = new Object();
 	/*
 	   竟拍商品出价
+	   *限 每次gId与numId组合
+	   *
 	 */
 	@PostMapping("/api/epSaleGoodsAuciton")
 	@Powers({PowerConsts.NOPOWER})
@@ -204,9 +208,9 @@ public class EPSaleController extends BaseReturn{
 					auctionDepositId=auctionDeposit.getId();
 					isDeposit=false;
 				}
+				isDeposit=true;
 				if(isDeposit)//当前用户保证金已支付成功 状态：2成功
 				{
-					//*******************先测
 					//*******************先检测是否有auction.status=1状态的记录
 					List<Map> auctionListStatus2=auctionService.findAuctionListByNumIdAndGId2(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
 					//yyyymmddhhiiss 可以用来测试auctionDepositPay接口
@@ -261,14 +265,12 @@ public class EPSaleController extends BaseReturn{
 						}
 
 					}
-
 					//**************当前出价记录是处于（结束时间-轮询时间）与结束时间 之间************************************************
 					if(epSaleService.isLoopTime(addDate,loopTime,auction.getNumId())) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
 					{
 						//***************************则延长结束时间= 结束时间+loopTime*********************
 						epSaleService.numLoopEdit(auction.getNumId(),loopTime);
 					}
-
 					//出价后的最近10次出价记录
 					List<Map> goodsAuctionListAfter=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
 					//String goodsAuctionListStr="";
@@ -341,6 +343,7 @@ public class EPSaleController extends BaseReturn{
 		map.put("data",mapData);
 		return map;
 	}
+
 	/**
 	 * 查询竟拍活动的商品的最近10条出价记录
 	 * 最近出价记录10条
@@ -393,6 +396,7 @@ public class EPSaleController extends BaseReturn{
 	/**
 	 * 查询竟拍活动的商品信息
 	 * 详情
+	 * numId与gId
 	 * @param
 	 * @return
 	 */
