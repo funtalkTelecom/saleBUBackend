@@ -4,10 +4,7 @@ import com.github.abel533.entity.Example;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
 import com.hrtx.web.mapper.*;
-import com.hrtx.web.pojo.Iccid;
-import com.hrtx.web.pojo.Num;
-import com.hrtx.web.pojo.Order;
-import com.hrtx.web.pojo.OrderItem;
+import com.hrtx.web.pojo.*;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -83,9 +80,9 @@ public class NumService {
                         num.setMealMid(orderItem.getMealId());
                     }
                     if("2".equals(goodsType)) {//谱号
-                        List<Map> meals = mealMapper.getMealListByNum(String.valueOf(item1.getNumId()));
+                        List<Meal> meals = mealMapper.getMealListByNum(String.valueOf(item1.getNumId()));
                         if(meals.size()<=0) throw new ServiceException("未找到普号的基础套餐");
-                        num.setMealMid(NumberUtils.toLong(ObjectUtils.toString(meals.get(0).get("mealId"))));
+                        num.setMealMid(meals.get(0).getMid());
                     }
                     numMapper.updateByPrimaryKeySelective(num);
                     iccid.setDealStatus("2");
