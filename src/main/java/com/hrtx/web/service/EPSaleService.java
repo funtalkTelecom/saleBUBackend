@@ -46,6 +46,7 @@ public class EPSaleService {
 
 	public Result findEPSaleList() {
 		//List<Map> list=epSaleMapper.findEPSaleList();
+		//竟拍活动结束时间是以该活动的所有Num中最迟结束时间为主
 		List<Map> list=epSaleMapper.findEPSaleList2();
 		Long epSaleId=0L;
 		int priceCount=0;
@@ -54,6 +55,7 @@ public class EPSaleService {
 			String urlImg=SystemParam.get("domain-full")+map.get("epImg").toString();
 			map.put("epImg",urlImg);
             epSaleId=Long.valueOf(map.get("id").toString());
+            //该活动的所有出价总次数
             List<Map> priceCountList=epSaleMapper.findEPSalePriceCountByEPSaleId(epSaleId);
             if(priceCountList.size()>0)
             {
@@ -72,30 +74,17 @@ public class EPSaleService {
 	public Result findEPSaleList2() {
 		//List<Map> list=epSaleMapper.findEPSaleList();
 		List<Map> list=epSaleMapper.findEPSaleList3();
-		Long epSaleId=0L;
-		int priceCount=0;
 		for(Map map:list)
 		{
 			String urlImg=SystemParam.get("domain-full")+map.get("epImg").toString();
 			map.put("epImg",urlImg);
-			epSaleId=Long.valueOf(map.get("id").toString());
-			List<Map> priceCountList=epSaleMapper.findEPSalePriceCountByEPSaleId(epSaleId);
-			if(priceCountList.size()>0)
-			{
-				priceCount=Integer.valueOf(priceCountList.get(0).get("priceCount").toString());
-				map.put("priceCount",priceCount);
-			}else
-			{
-				priceCount=0;
-				map.put("priceCount",priceCount);
-			}
-			map.put("serviceTime", java.lang.System.currentTimeMillis());
 		}
 		return new Result(Result.OK, list);
 	}
 
 	public List<Map> findEPSaleByEPSaleId(Long ePSaleId) {
-		List<Map> list=epSaleMapper.findEPSaleByEPSaleId2(ePSaleId);
+		//竟拍活动结束时间是以该活动的所有Num中最迟结束时间为主
+		List<Map> list=epSaleMapper.findEPSaleByEPSaleId(ePSaleId);
 		for(Map map:list)
 		{
 			String urlImg=SystemParam.get("domain-full") +map.get("epImg").toString();
@@ -105,15 +94,34 @@ public class EPSaleService {
 		return list;
 	}
 
-	public List<Map> findEPSaleGoodsListByEPSaleId(Long ePSaleId) {
-		List<Map> list=epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
-		for(Map map:list)
-		{
-			String urlImg=SystemParam.get("domain-full") +map.get("gImg").toString();
-			map.put("gImg",urlImg);
-		}
-		return list;
-	}
+    public List<Map> findEPSaleGoodsListByEPSaleId(Long ePSaleId) {
+	    //获取竟拍活动ePSaleId的商品列表信息，图片限商品首图
+        List<Map> list=epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
+        Long numId=0L;
+        Long gId=0L;
+        String urlImg="";
+        int priceCount=0;//出价次数
+        double currentPrice=0.00;//当前价
+        for(Map map:list)
+        {
+            urlImg=SystemParam.get("domain-full") +map.get("gImg").toString();
+            map.put("gImg",urlImg);
+            numId=Long.valueOf(map.get("numId").toString());
+            gId=Long.valueOf(map.get("gId").toString());
+            if(numId>0)
+            {  //每个numId,gId的商品的出价次数及当前价
+               List<Map> listAuction=auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(numId,gId);
+               if(listAuction.size()>0)
+               {
+                   priceCount=Integer.valueOf(listAuction.get(0).get("priceCount").toString());
+                   currentPrice=Double.valueOf(listAuction.get(0).get("currentPrice").toString());
+               }
+               map.put("priceCount",priceCount);
+               map.put("currentPrice",currentPrice);
+            }
+        }
+        return list;
+    }
 
 	public List<Map> findEPSaleGoodsByGoodsId(Long numId) {
 		return epSaleMapper.findEPSaleGoodsByNumId(numId);
@@ -400,22 +408,21 @@ public class EPSaleService {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
+			strtTime=Utils.getDate2(loopTime,endTime);
+/*
 			endTimeStr=Utils.dateToString(endTime,"yyyy-MM-dd HH:mm:ss");
 			String startTimeStr=Utils.getDate2(-loopTime,endTime,"yyyy-MM-dd HH:mm:ss");
 			String currentTimeStr=Utils.dateToString(addTime,"yyyy-MM-dd HH:mm:ss");
-			/*try {
-				strtTime=Utils.date(startTimeStr,"yyyy-MM-dd HH:mm:ss");
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}*/
-
 			if(Utils.compareDate(startTimeStr,currentTimeStr)<0&&Utils.compareDate(currentTimeStr,endTimeStr)<0)//addTime 处于 （结束时间-轮询时间）与结束时间 之间
+			{
+				return  true;
+			}*/
+			if(strtTime.compareTo(currentTime)<0&&currentTime.compareTo(endTime)<0)//addTime 处于 （结束时间-轮询时间）与结束时间 之间
 			{
 				return  true;
 			}
 		}
 		return false;
-
 	}
 
 	public Result goodsAuciton(Auction auciton, HttpServletRequest request) {

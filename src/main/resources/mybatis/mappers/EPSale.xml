@@ -124,23 +124,6 @@
     ep.title,
     ep.ep_rule as erRule,
     ep.start_time as startTime,
-    ep.end_time as endTime,
-    case when epImg.file_name is null then ''
-		  else concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) end as epImg
-    from tb_ep_sale ep
-    inner join
-    tb_file_info epImg
-    on epImg.ref_id=ep.id
-    where ep.is_del=0
-    and ep.id = #{epSaleId};
-    </select>
-
-    <select id="findEPSaleByEPSaleId2" resultType="java.util.HashMap">
-    select
-    concat(ep.id,'') id,
-    ep.title,
-    ep.ep_rule as erRule,
-    ep.start_time as startTime,
     epSaleEndTime.endTime,
     case when epImg.file_name is null then ''
 		  else concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) end as epImg,
@@ -216,24 +199,10 @@
 
     <select id="findEPSaleGoodsListByEPSaleId" resultType="java.util.HashMap">
         select
-        concat(goodsInfo.gId,'')as gId,
-        goodsInfo.gName,
-        goodsInfo.gAd,
-        goodsInfo.gImg,
-        goodsInfo.gSatus,
-        goodsInfo.gStartPrice,
-        numSaleInfo.priceCount,
-        numSaleInfo.currentPrice,
-        concat(goodsInfo.numId,'')as numId,
-        concat(goodsInfo.skuId,'')as skuId,
-        goodsInfo.num
-        from
-        (
-        select
-        tb_num.id as numId,
-        tb_goods.g_active as gEPSaleId,
-        tb_goods.g_id as gId,
-        case
+        concat(tb_num.id,'')as numId,
+        concat(tb_goods.g_active,'')as gEPSaleId,
+        concat(tb_goods.g_id,'')as gId,
+       case
         when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
         when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
         TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
@@ -245,9 +214,9 @@
         tb_goods.g_name as gName,
         tb_goods.g_ad as gAd,
         tb_sku.sku_tob_price as gStartPrice,
-         case when tb_file_info.file_name is null then ''
+        case when tb_file_info.file_name is null then ''
         else  concat("get-img","/",tb_file_info.file_group,"s/",tb_file_info.ref_id,"/",tb_file_info.file_name) end as gImg,
-        tb_sku.sku_id as  skuId,
+        concat(tb_sku.sku_id,'')as skuId,
         tb_num.num_resource as num
         from
         tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
@@ -256,16 +225,7 @@
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
         and tb_file_info.file_group='goodsPic'
         and tb_file_info.seq=1
-        ) goodsInfo
-        left join
-        (select count(tb_auction.id) as priceCount,
-        max(tb_auction.price) as  currentPrice,
-        tb_auction.num_id as numId
-        from tb_auction
-        where tb_auction.status in(2,4)
-        group by tb_auction.num_id) numSaleInfo
-        on     numSaleInfo.numId=goodsInfo.numId
-        where  goodsInfo.gEPSaleId = #{ePSaleId}
+        and tb_goods.g_active= #{ePSaleId}
     </select>
 
     <select id="findEPSaleGoodsByGoodsId" resultType="java.util.HashMap">
@@ -513,10 +473,6 @@
             and a.consumer_id not in (#{consumer_id})
         </if>
     </select>
-
-
-
-
 
 
 </mapper>
