@@ -1,4 +1,5 @@
 var dataList = null;
+var gIsAuc;
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
@@ -8,9 +9,15 @@ $(function() {
                     "header" : "商品名称",
                     "dataIndex" : "gName"
                 },{
-					"header" : "宣传语",
-					"dataIndex" : "gAd"
-				},{
+                    "header" : "宣传语",
+                    "dataIndex" : "gAd"
+                },{
+                    "header" : "是否竞拍",
+                    "dataIndex" : "gIsAuc",
+                    "renderer":function(v,record){
+                        return gIsAuc[v];
+                    }
+                },{
                     "header" : "开始时间",
                     "dataIndex" : "gStartTime"
                 },{
@@ -163,10 +170,24 @@ $(function() {
 	$("#query").click(function() {
 		dataList.load();
 	});
-	
+
 	window.reload = function(){
 		dataList.reload();
 	}
+
+    $.post("dict-to-map", {group: "gIsAuc"},function(data){
+        gIsAuc = data;
+    },"json");
+
+    var soption = {
+        url:"",
+        key:"keyId",
+        value:"keyValue",
+        onchange:"",
+        onclick:"",
+        param:{t:new Date().getTime()}
+    };
+    dictSelect($("#gIsAuc"), "gIsAuc", soption, false);
 
     $(document).on("click","#goodsInfo .modal-footer .btn-success",function() {
         var isError = false;
@@ -284,11 +305,25 @@ $(function() {
         }
     	else $("#gProperty").html("");
 	}
-	function checkboxClick(){
-    	setTimeout(function(){
-    		setProperty();
-            $('.chosen-select').chosen({allow_single_deselect:true});
-		},100);
+	var selectedProperty = "";
+    var preProNum = 0;
+	function checkboxClick(obj){
+        selectedProperty = "";
+        $("input[type=checkbox]:checked").each(function(){
+            var propertyName = $(this).attr("name");
+            if(selectedProperty.indexOf(propertyName+",")==-1){
+                selectedProperty += propertyName + ",";
+            }
+        });
+        if(preProNum!=0 && preProNum != selectedProperty.split(",").length) {
+            if (!confirm("勾选属性组个数变动,将会清除已填写sku列表信息,确定继续吗?")) {
+                $(obj).prop("checked", !$(obj).prop("checked"));
+                return false;
+            }
+        }
+        preProNum = selectedProperty.split(",").length;
+
+        setProperty();
 	}
 	function setProperty(){
         var temparr = [];
@@ -319,8 +354,21 @@ $(function() {
         createBody(ret, 0);
 
 		var html = tablePre+titlePre+titleContent+gtitleContent+titleSuf+tbodyPre+rowContent+tbodySuf+tableSuf;
-        // console.log(html);
-		$("#skuResult").html(html);
+        $("#skuResult").html(html);
+
+        if (targetData) {
+            for (key in targetData) {
+                var targetRow = $("#"+key).parent();
+                for (k in targetData[key]) {
+                    targetRow.find("input[type=text][tag^=sku][name="+k+"]").val(targetData[key][k]);
+                    targetRow.find("select[name="+k+"]").val(targetData[key][k]);
+                    targetRow.find("textarea[name="+k+"]").val(targetData[key][k]);
+                }
+            }
+        }
+        targetData = new Object();
+        //最后再生成模糊下拉,不然上面的赋值无效
+        $('.chosen-select').chosen({allow_single_deselect:true});
 	}
 
 
@@ -361,22 +409,28 @@ $(function() {
         }
     }
     var rowCount=0;
+    var allKey = "";
+    var prowContent = "";
+    //存储目标行数据
+    var targetData = new Object();
     function createBody(ret, type) {
         if(ret == null) return;
         var colIndex=0;
         for (var i = 0; i < ret.length; i++) {
             if(type==0) {
+                allKey = "";
                 rowCount++;
-                rowContent += rowPre;
-                rowContent += '<td>'+(rowCount)+'</td>';
+                prowContent += rowPre;
+                prowContent += '<td>'+(rowCount)+'</td>';
             }
             var r = ret[i];
             if(Array.isArray(r)){
                 createBody(r, 1);
             }else{
-                rowContent += '<input type="hidden" tag="sku_'+(rowCount)+'" name="'+r.key+'" value="'+r.value+'">';
-                rowContent += '<input type="hidden" tag="index_'+(rowCount)+'" name="seq" value="'+(colIndex+1)+'">';
-                rowContent += '<td>'+r.name+'</td>';
+                allKey += "_"+r.key+"_"+r.value
+                prowContent += '<input type="hidden" tag="sku_'+(rowCount)+'" name="'+r.key+'" value="'+r.value+'">';
+                prowContent += '<input type="hidden" tag="index_'+(rowCount)+'" name="seq" value="'+(colIndex+1)+'">';
+                prowContent += '<td>'+r.name+'</td>';
             }
 
 
@@ -384,9 +438,27 @@ $(function() {
                 for(var k in titleStrObj){
                     var cObj = titleStrObj[k]["type"].replace(/skukey/g, k).replace(/skuvalue/g, "").replace(/skuindex/g, i+1);
                     cObj += '<input type="hidden" tag="index_"'+(i+1)+' name="seq" value="'+(colIndex+1)+'">';
-                    rowContent += '<td style="'+(titleStrObj[k]["isShow"]?"":"display:none")+'">'+cObj+'</td>';
+                    prowContent += '<td style="'+(titleStrObj[k]["isShow"]?"":"display:none")+'">'+cObj+'</td>';
                 }
-                rowContent += rowSuf;
+                prowContent += '<input type="hidden" tag="sku_allKey_'+(rowCount)+'" id="'+allKey+'" disabled="true">';
+                if($("#"+allKey).length==1) {
+                    // prowContent = "";
+                    var targetRow = $("#"+allKey).parent();
+                    //获取目标行用户填写的值并存储
+                    targetRow.find("input[type=text][tag^=sku], select, textarea").each(function(){
+                        var el = new Object();
+                        el[$(this).attr("name")] = $(this).val();
+                        $.extend(true, el, targetData[allKey]);
+                        targetData[allKey] = el;
+                    });
+                    // var obj = $(targetRow.prop("outerHTML"));
+                    // obj.find("div.chosen-container.chosen-container-single").remove();
+                    // obj.find("div.chosen-container.chosen-container-single.chosen-container-active.chosen-with-drop").remove();
+                    // console.log(obj.prop("outerHTML"));
+                    // prowContent = obj.prop("outerHTML");
+                }
+                rowContent += prowContent + rowSuf;
+                prowContent = "";
             }
             colIndex++;
         }

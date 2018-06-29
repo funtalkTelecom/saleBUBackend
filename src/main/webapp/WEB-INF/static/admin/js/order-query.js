@@ -4,8 +4,9 @@ var orderStatus = {
     "1":"待付款",
     "2":"已付款待推送（已付款尚未推送到仓储期）",
     "3":"待配货(仓储系统已收到)",
-    "4":"待签收(仓储物流已取件)",
-    "5":"完成"
+    "4":"待配卡",
+    "5":"待签收(仓储物流已取件)",
+    "6":"完成"
 };
 var skuGoodsTypes = {
     "1":"白卡",
@@ -218,6 +219,10 @@ $(function() {
 	window.reload = function(){
 		dataList.reload();
 	}
+
+    $.post("dict-to-map", {group: "orderStatus"},function(data){
+        orderStatus = data;
+    },"json");
 
     $(document).on("click","#receiptInfo .modal-footer .btn-success",function() {
         $.post("order/order-receipt",$("#receiptInfo form").serialize(),function(data){
