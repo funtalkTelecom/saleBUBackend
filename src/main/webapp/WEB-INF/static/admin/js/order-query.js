@@ -137,6 +137,8 @@ $(function() {
 
 						//点击详情
                         $operate.find(".detail").click(function () {
+                            $("input").css({"border-top":"0px","border-left":"0px","border-right":"0px", "border-bottom":"1px soild", "border-style":"dashed"});
+                            $("textarea").css({"border":"1px soild", "border-style":"dashed"});
                             $.post("order/order-info", {orderId: v}, function (data) {
                                 var _data = data.data;
                                 formInit($("#orderInfo form"), _data);
