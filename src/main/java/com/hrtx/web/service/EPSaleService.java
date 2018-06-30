@@ -135,6 +135,13 @@ public class EPSaleService {
         return epSaleMapper.findEPSaleGoodsByNumIdAndGId(numId,gId);
     }
 
+    /*
+      产品首图 numId与gId
+     */
+	public List<Map> findEPSaleGoodsImgByNumIdAndGId(Long numId,Long gId) {
+		return epSaleMapper.findEPSaleGoodsImgByNumIdAndGId(numId,gId);
+	}
+
 	public Map findEPSaleNumInfoByNumId(Long numId) {
 		return  numberMapper.getNumInfoById(numId.toString());
 	}

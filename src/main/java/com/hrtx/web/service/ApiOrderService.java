@@ -67,9 +67,9 @@ public class ApiOrderService {
 				{
 					return new Result(Result.ERROR, "该订单不属于当前用户");
 				}
-				if(!(order2.getStatus()==4))//4待签收(仓储物流已取件)；5完成
+				if(!(order2.getStatus()==5))//5待签收(仓储物流已取件)；6完成
 				{
-					if(order2.getStatus()==5)
+					if(order2.getStatus()==6)
 					{
 						return new Result(Result.ERROR, "该订单处于完成状态，请选待签收状态的订单");
 					}else
@@ -85,7 +85,7 @@ public class ApiOrderService {
 		{
 			return new Result(Result.ERROR, "该订单系统不存在");
 		}
-		order.setStatus(5);
+		order.setStatus(6);
 		order.setSignDate(new Date());//签收时间
 		order.setSignType(1);//签收方式1用户自动签收2系统
 		orderMapper.signByOrderid(order);

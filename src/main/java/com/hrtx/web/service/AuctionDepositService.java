@@ -84,6 +84,14 @@ public class AuctionDepositService {
 		return   map;
 	}
 
+	/*
+	  返回当前用户保证金列表
+	 */
+	public List<Map>  findAuctionDepositList()
+	{
+		return  auctionDepositMapper.findAuctionDepositListByConsumerId(apiSessionUtil.getConsumer().getId());
+	}
+
 	public void auctionDepositEdit(AuctionDeposit auctionDeposit) {
 		List<AuctionDeposit> list = new ArrayList<AuctionDeposit>();
 		auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
