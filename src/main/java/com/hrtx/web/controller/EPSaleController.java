@@ -15,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.*;
 
@@ -160,6 +161,7 @@ public class EPSaleController extends BaseReturn{
 		Long consumerId=0L;//前一次出价记录用户Id
 		boolean isDeposit=false;//是否支付保证金
 		Long auctionDepositId=0L;//保证金Id
+		DecimalFormat df=new DecimalFormat("######0.00");
 		if(goodsAuctionCount>0)//最近10次数出价记录
 		{
 			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
@@ -176,6 +178,7 @@ public class EPSaleController extends BaseReturn{
 		}
 		if(subPrice>0)
 		{
+			subPrice=Double.valueOf(df.format(subPrice));
 			if((goodsAuctionCount>0)&&(subPrice%priceUp>0)) {//比较前后次出价差是===>否按每次加价的倍数,若是第一次出价记录则不要进行比较
 				if(goodsAuctionCount>0)
 				{
