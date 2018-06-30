@@ -13,6 +13,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +28,9 @@ public class EPSaleService {
 
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired SessionUtil sessionUtil;
+
+	@Value("${auction.timer}")
+	private String auction_timer;
 	@Autowired private EPSaleMapper epSaleMapper;
 	@Autowired private AuctionMapper auctionMapper;
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
@@ -140,11 +144,11 @@ public class EPSaleService {
 		return epSale;
 	}
 
-    @Scheduled(fixedRate=10000000)
+    @Scheduled(fixedRate=1000)
     public void newEpsaleOrder() {
+		if(!StringUtils.equals(auction_timer,"true"))return;
 	    this.epSaleMapper.freezeOneRecord();
         this.payEpsaleOrder();
-
     }
 
 	public void payEpsaleOrder() {
