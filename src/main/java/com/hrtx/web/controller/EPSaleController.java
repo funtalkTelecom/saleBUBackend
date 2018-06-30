@@ -208,7 +208,6 @@ public class EPSaleController extends BaseReturn{
 					auctionDepositId=auctionDeposit.getId();
 					isDeposit=false;
 				}
-				isDeposit=true;
 				if(isDeposit)//当前用户保证金已支付成功 状态：2成功
 				{
 					//*******************先检测是否有auction.status=1状态的记录

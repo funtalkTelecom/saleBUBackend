@@ -120,6 +120,11 @@ public class EPSaleService {
                    priceCount=Integer.valueOf(listAuction.get(0).get("priceCount").toString());
                    currentPrice=Double.valueOf(listAuction.get(0).get("currentPrice").toString());
                }
+               else
+			   {
+				   priceCount=0;
+				   currentPrice=0.00;
+			   }
                map.put("priceCount",priceCount);
                map.put("currentPrice",currentPrice);
             }
