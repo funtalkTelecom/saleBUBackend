@@ -19,6 +19,8 @@ public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<
 
     List<Map> findAuctionDepositListByNumIdAndConsumerIdAndGId(@Param("numId") Long numId,@Param("consumerId") Long consumerId,@Param("gId") Long gId);
 
+    List<Map> findAuctionDepositListByConsumerId(@Param("consumerId") Long consumerId);
+
     /*
         通过NumId、ConsumerId、Status查询对应AuctionDepositList
      */

@@ -344,6 +344,42 @@ public class EPSaleController extends BaseReturn{
 		return map;
 	}
 
+	@GetMapping("/api/epSaleAuctionDeposits")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public Map findAuctionDepositList(){
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> mapData= new HashMap<String, Object>();
+		List<Map> auctionDepositList=auctionDepositService.findAuctionDepositList();//我的保证金列表
+		String urlImg="";//首图
+		Long numId=0L;
+		Long gId=0L;
+		if(auctionDepositList!=null&&auctionDepositList.size()>0)
+		{
+			for(Map mapDeposit:auctionDepositList)
+			{
+				numId=Long.valueOf(mapDeposit.get("numId").toString());
+				gId=Long.valueOf((mapDeposit.get("gId").toString()));
+				List<Map> imgList=epSaleService.findEPSaleGoodsImgByNumIdAndGId(numId,gId);
+				if(imgList!=null&&imgList.size()>0)
+				{
+					urlImg =SystemParam.get("domain-full")+imgList.get(0).get("gImg").toString();
+					mapDeposit.put("gImg",urlImg);
+				}else
+				{
+					mapDeposit.put("gImg","");
+				}
+			}
+			mapData.put("auctionDepositList",auctionDepositList);
+		}else
+		{
+			mapData.put("auctionDepositList","");
+		}
+		map.put("code", Result.OK);
+		map.put("data",mapData);
+		return map;
+	}
+
 	/**
 	 * 查询竟拍活动的商品的最近10条出价记录
 	 * 最近出价记录10条
