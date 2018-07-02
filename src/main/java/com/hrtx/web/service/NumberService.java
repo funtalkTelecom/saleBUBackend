@@ -81,7 +81,7 @@ public class NumberService {
 					}
 					if(insertList.size()>0) numRuleMapper.insertBatch(insertList);
 				}else{
-					return new Result(Result.PARAM, "请选择标签后在操作");
+					return new Result(Result.PARAM, "请选择标签");
 				}
 			}else{
 				return new Result(Result.PARAM, "号码不能为空");

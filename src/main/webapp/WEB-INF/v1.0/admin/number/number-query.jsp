@@ -164,7 +164,7 @@
 		<!-- 模态框（Modal） -->
 		<div class="modal fade" id="editTags" tabindex="-1" style="overflow: auto" >
 			<div class="modal-dialog" style="width:300px;">
-				<div class="modal-content" style="width: 300px; max-height:700px; overflow: auto">
+				<div class="modal-content" style="width: 300px; max-height:720px; overflow: auto">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 							&times;
@@ -178,6 +178,7 @@
 							<div class="form-group">
 								<div class="col-xs-12">
 									<textarea name="numResource" id="numResource" class="form-control" style="height:400px;resize: none;"></textarea>
+                                    <span style="color:red">注:输入多个号码时，请使用换行隔开</span>
 								</div>
 							</div>
 							<div class="form-group" id="numberTags">
