@@ -83,8 +83,14 @@ $(function() {
                                             $.post("sku/sku-list-gid", {gId: v}, function (data) {
                                                 if (data.code == "200"){
                                                     var _data = data.data;
-                                                    $("#gProperty").hide();
-                                                    $("#gProperty").prev().hide();
+                                                    //上架中的商品隐藏属性
+                                                    if(record.gIsSale=="1"){
+                                                        $("#gProperty").hide();
+                                                        $("#gProperty").prev().hide();
+                                                    }else{
+                                                        $("#gProperty").show();
+                                                        $("#gProperty").prev().show();
+                                                    }
                                                     //选中属性的checkbox
                                                     for(var key in _data){
                                                         var d = _data[key];
@@ -127,7 +133,7 @@ $(function() {
                         });
                         $operate.find(".delete").click(function () {
                             if (confirm("确认删除？")) {
-                                $.post("goods/goods-delete", {gId: v}, function (data) {
+                                $.post("goods/goods-delete", {gId: v, gIsSale:record.gIsSale}, function (data) {
                                     dataList.reload();
                                     alert(data.data);
                                 }, "json");
@@ -579,7 +585,12 @@ $(function() {
     //所售号码确定按钮
     $(document).on("click","#saleNumInfo .modal-footer .btn-success",function() {
         var saleNums = $("#saleNum").val();
-        var numcountt = $("#saleNum").val().replace(/(\r\n)|(\n)/g, "sdfsdfsdfsdf").split("sdfsdfsdfsdf").length;
+        var numcountt = 0;
+        var nums = $("#saleNum").val().trim().replace(/(\r\n)|(\n)/g, "sdfsdfsdfsdf").split("sdfsdfsdfsdf");
+        for(var i=0; i<nums.length; i++) {
+            if(nums[i]=="") continue;
+            numcountt++;
+        }
         $(clickSaleNumObj).val(saleNums);
         $(clickSaleNumObj).parent().parent().find("input[name=skuNum]").val(numcountt);
         $("#saleNum").val("");

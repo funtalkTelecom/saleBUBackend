@@ -57,7 +57,7 @@
 										</div>
 										<div class="form-group" style="">
 											<label class="control-label">是否竞拍</label>
-											<select class="chosen-select form-control" name="gIsAuc" id="gIsAuc">
+											<select class="form-control" name="gIsAuc" id="gIsAuc">
 											</select>
 										</div>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.GOODSMOUDULE_COMMON_ADD)%>">

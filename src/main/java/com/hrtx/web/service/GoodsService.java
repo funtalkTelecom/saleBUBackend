@@ -417,7 +417,7 @@ public class GoodsService {
                 param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
                 param.put("type", "2");//处理类型1上架；2下架
                 param.put("quantity", s.getSkuNum());//数量
-                if(s.getSkuNum()!=0) {
+                if(s.getSkuNum()!=0 && "1".equals(goods.getgIsSale())) {
                     res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                     if (200 != (res.getCode())) {
                         return new Result(Result.ERROR, "库存验证失败");
