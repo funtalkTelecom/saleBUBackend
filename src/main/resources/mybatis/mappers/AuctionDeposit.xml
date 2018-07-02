@@ -60,14 +60,14 @@
 
 	<select id="queryPageDepositListByConsumerId" resultType="java.util.HashMap">
 	select
- 	id,
+ 	concat(id,'') as id,
  	num,
- 	num_id as numId,
- 	g_id as gId,
+ 	concat(num_id,'') as numId,
+ 	case when g_id is null then '' else  concat(g_id,'') end as gId,
  	status,
- 	pay_date as payDate,
+ 	case when pay_date is null then '' else pay_date end as payDate,
  	amt as price,
- 	refund_date as refundDate
+ 	case when refund_date is null then '' else refund_date end as refundDate
 	from tb_auction_deposit
 	where tb_auction_deposit.consumer_id=#{consumerId}
 	order by tb_auction_deposit.add_date desc

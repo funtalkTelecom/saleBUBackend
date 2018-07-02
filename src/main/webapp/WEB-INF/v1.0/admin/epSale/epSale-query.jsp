@@ -100,26 +100,26 @@
 							<div class="form-group">
 								<label class="col-xs-2 control-label">标题</label>
 								<div class="col-xs-10 col-sm-10">
-									<input type="text" class="form-control" name="title" placeholder="请填写标题" required>
+									<input type="text" class="form-control" name="title" id="title" placeholder="请填写标题" required>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-xs-2 control-label">开始时间</label>
 								<div class="col-xs-4">
-									<input type="text" id="startTime"  name="startTime" class="form-control input-sm"
-										   onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd  HH:mm:ss', isShowToday: false, isShowClear: false })" readonly="readonly" />
+                                    <input type="hidden" name="startTime" id="startTime">
+                                    <input type="text" class="form-control" id="startTimePicker" onclick="WdatePicker({maxDate : '#F{$dp.$D(\'endTimePicker\',{s:-1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});" readonly>
 								</div>
 								<label class="col-xs-2 control-label">结束时间</label>
 								<div class="col-xs-4">
-									<input type="text" id="endTime"  name="endTime"  class="form-control input-sm"
-										   onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd  HH:mm:ss', isShowToday: false, isShowClear: false })" readonly="readonly" />
+                                    <input type="hidden" name="endTime" id="endTime">
+                                    <input type="text" class="form-control" id="endTimePicker" onclick="WdatePicker({minDate : '#F{$dp.$D(\'startTimePicker\',{s:1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});" readonly>
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-xs-2 control-label">最迟付款</label>
+								<label class="col-xs-2 control-label">最迟付款时间</label>
 								<div class="col-xs-4">
-									<input type="text" id="lastPayTime"  name="lastPayTime"  class="form-control input-sm"
-										   onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd  HH:mm:ss', isShowToday: false, isShowClear: false })" readonly="readonly" />
+                                    <input type="hidden" name="lastPayTime" id=lastPayTime">
+                                    <input type="text" class="form-control" id="lastPayTimePicker" onclick="WdatePicker({minDate : '#F{$dp.$D(\'endTimePicker\',{s:1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});" readonly>
 								</div>
 								<label class="col-xs-2 control-label hidden">显示条件</label>
 								<div class="col-xs-2 hidden">
@@ -133,7 +133,7 @@
 						<div class="form-group">
 							<label class="col-xs-2 control-label">竟拍规则</label>
 							<div id="kindeditor" style="overflow: auto;" class="col-xs-10">
-								<textarea name="epRule" style="width:100%;height:200px;visibility:hidden;"></textarea>
+								<textarea  name="epRule" style="width:100%;height:200px;visibility:hidden;"></textarea>
 							</div>
 						</div>
 

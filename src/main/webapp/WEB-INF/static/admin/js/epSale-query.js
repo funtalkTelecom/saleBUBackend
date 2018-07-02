@@ -44,6 +44,12 @@ $(function() {
                 $operate.find(".update").click(function () {
                     $.post("epSale/epSale-info", {id: v}, function (data) {
                         var _data = data.data;
+                        $("#startTimePicker").val(_data.startTime);
+                        $("#endTimePicker").val(_data.endTime);
+                        $("#startTime").val(_data.startTime);
+                        $("#endTime").val(_data.endTime);
+                        $("#lastPayTime").val(_data.lastPayTime);
+                        $("#lastPayTimePicker").val(_data.lastPayTime);
                         initEPSalePics(data.epSalePics);
                         editor.html(_data.epRule);
                         formInit($("#epSaleInfo form"), _data);
@@ -88,11 +94,45 @@ $(function() {
     $("button[data-target=#epSaleInfo]").bind("click", function () {
         editor.html('');
         initEPSalePics();
+
     });
 
 
 
     $(document).on("click","#epSaleInfo .modal-footer .btn-success",function() {
+        $('#startTime').val($('#startTimePicker').val());
+        $('#endTime').val($('#endTimePicker').val());
+        $('#lastPayTime').val($('#lastPayTimePicker').val());
+        var title=$("#title").val();
+        var startTime=$("#startTime").val();
+        var endTime=$("#endTime").val();
+        var lastPayTime=$("#lastPayTime").val();
+        var epRule=$("textarea[name='epRule']").val();
+       if(title=="")
+       {
+           alert("标题不能为空!")
+           return false;
+       }
+        if(startTime=="")
+        {
+            alert("开始时间不能为空!")
+            return false;
+        }
+        if(endTime=="")
+        {
+            alert("结束时间能为空!")
+            return false;
+        }
+        if(lastPayTime=="")
+        {
+            alert("最迟付款时间不能为空!")
+            return false;
+        }
+        if(epRule=="")
+        {
+            alert("竟拍规则不能为空!")
+            return false;
+        }
         //editor.sync();
         // 准备好Options对象
         var options = {
@@ -209,3 +249,26 @@ function fileChange(i){
 
     $("#picSeqs").val(picSeqs);
 }
+
+// 用法dateFtt("yyyy-MM-dd hh:mm:ss",new Date(1528271207000));
+function dateFtt(fmt,date) {
+    try {
+        var o = {
+            "M+": date.getMonth() + 1,                 //月份
+            "d+": date.getDate(),                    //日
+            "h+": date.getHours(),                   //小时
+            "m+": date.getMinutes(),                 //分
+            "s+": date.getSeconds(),                 //秒
+            "q+": Math.floor((date.getMonth() + 3) / 3), //季度
+            "S": date.getMilliseconds()             //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    } catch (e) {
+        return "";
+    }
+    return fmt;
+} ;
