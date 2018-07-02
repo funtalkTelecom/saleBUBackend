@@ -118,7 +118,7 @@
 							<div class="form-group">
 								<label class="col-xs-2 control-label">最迟付款时间</label>
 								<div class="col-xs-4">
-                                    <input type="hidden" name="lastPayTime" id=lastPayTime">
+									<input type="hidden" name="lastPayTime" id="lastPayTime">
                                     <input type="text" class="form-control" id="lastPayTimePicker" onclick="WdatePicker({minDate : '#F{$dp.$D(\'endTimePicker\',{s:1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});" readonly>
 								</div>
 								<label class="col-xs-2 control-label hidden">显示条件</label>
