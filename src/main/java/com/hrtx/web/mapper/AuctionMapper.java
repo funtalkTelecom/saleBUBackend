@@ -1,7 +1,9 @@
 package com.hrtx.web.mapper;
 
 import com.github.abel533.mapper.Mapper;
+import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.Auction;
+import com.hrtx.web.pojo.Num;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -24,6 +26,8 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
     List<Map> findAuctionOrderListByConsumerId(Auction auction);
 
     List<Map>  findAuctionListByOrderId(@Param("orderId") Long orderId);
+
+    Page<Object> queryPageNumList(Num num, @Param("consumerId") Long consumerId, @Param("status") String status);
 
     List<Map>  findAuctionListByNumIdAndPrice(@Param("numId") Long numId,@Param("price") double price);
 

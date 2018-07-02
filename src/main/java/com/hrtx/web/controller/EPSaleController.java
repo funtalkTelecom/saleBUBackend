@@ -1,5 +1,6 @@
 package com.hrtx.web.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.*;
@@ -349,18 +350,22 @@ public class EPSaleController extends BaseReturn{
 	@GetMapping("/api/epSaleAuctionDeposits")
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
-	public Map findAuctionDepositList(){
+	public Map findAuctionDepositList(HttpServletRequest request){
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> mapData= new HashMap<String, Object>();
-		List<Map> auctionDepositList=auctionDepositService.findAuctionDepositList();//我的保证金列表
+		//List<Map> auctionDepositList=auctionDepositService.findAuctionDepositList();//我的保证金列表
+		PageInfo<Object> pm=(PageInfo<Object>)auctionDepositService.queryPageDepositList(request).getData();
+		List<Object> auctionDepositList=(List<Object>)pm.getList();//我的保证金列表
 		String urlImg="";//首图
 		Long numId=0L;
 		Long gId=0L;
+		Map mapDeposit=new HashMap();
 		if(auctionDepositList!=null&&auctionDepositList.size()>0)
 		{
-			for(Map mapDeposit:auctionDepositList)
+			for(Object object:auctionDepositList)
 			{
-				numId=Long.valueOf(mapDeposit.get("numId").toString());
+				mapDeposit=(Map)object;
+				numId=Long.valueOf((mapDeposit.get("numId").toString()));
 				gId=Long.valueOf((mapDeposit.get("gId").toString()));
 				List<Map> imgList=epSaleService.findEPSaleGoodsImgByNumIdAndGId(numId,gId);
 				if(imgList!=null&&imgList.size()>0)
@@ -372,7 +377,7 @@ public class EPSaleController extends BaseReturn{
 					mapDeposit.put("gImg","");
 				}
 			}
-			mapData.put("auctionDepositList",auctionDepositList);
+			mapData.put("auctionDepositList",pm);
 		}else
 		{
 			mapData.put("auctionDepositList","");
