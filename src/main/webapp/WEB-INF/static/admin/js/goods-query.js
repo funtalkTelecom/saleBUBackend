@@ -1,5 +1,8 @@
 var dataList = null;
 var gIsAuc;
+$.post("dict-to-map", {group: "gIsAuc"},function(data){
+    gIsAuc = data;
+},"json");
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
@@ -181,10 +184,6 @@ $(function() {
 		dataList.reload();
 	}
 
-    $.post("dict-to-map", {group: "gIsAuc"},function(data){
-        gIsAuc = data;
-    },"json");
-
     var soption = {
         url:"",
         key:"keyId",
@@ -203,7 +202,7 @@ $(function() {
         //是竞拍,就触发选择活动下拉框的change事件
         if($("input[name=gIsAuc]:checked").val()=="1") {
             $("#gActive").change();
-            if(!$("#gActive").val()){
+            if(!$("#gActive").val() || $("#gActive").val()=="-1"){
                 msg = "请选择活动";
                 isError = true;
             }
@@ -673,6 +672,15 @@ $(function() {
 
         var msg = "";
         //判断sku列表是否有选择白卡的
+        if($("input[name=gIsAuc]:checked").val()=="1"){
+            $("select[name=skuGoodsType]").each(function () {
+                $(this).find("option[value=1]").prop("disabled", true);
+            });
+        }else{
+            $("select[name=skuGoodsType]").each(function () {
+                $(this).find("option[value=1]").prop("disabled", false);
+            });
+        }
         $("select[name=skuGoodsType]").each(function () {
             if($(this).val()=="1" && $("input[name=gIsAuc]:checked").val()=="1") {
                 $(this).val("-1");
@@ -704,7 +712,7 @@ $(function() {
                 }
             }
             html+='<input style="float:left" type="file" name="file" seq="'+(i+1)+'" onchange="fileChange('+(i+1)+')">';
-            html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;"><i title="删除图片" class="raty-cancel cancel-off-png" data-alt="x"></i></div>';
+            html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;'+(filename?"":"visibility:hidden")+'"><i title="删除图片" class="raty-cancel cancel-off-png" data-alt="x"></i></div>';
             html+='<img style="width:150px;'+style+'" src="'+basePath+'get-img/goodsPics/'+refid+'/'+filename+'">';
 
             html+='</div>';

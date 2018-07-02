@@ -65,7 +65,7 @@ public class NumberController extends BaseReturn{
 		JSONArray ja = new JSONArray();
 		String isCurrentPage = request.getParameter("isCurrentPage");
         if("1".equals(isCurrentPage)) {
-            number.setStart(0);
+            number.setStart(Integer.parseInt(request.getParameter("start")));
             number.setLimit(15);
         }else{
             number.setStart(0);
