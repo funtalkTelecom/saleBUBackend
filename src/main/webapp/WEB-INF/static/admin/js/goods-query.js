@@ -380,7 +380,7 @@ $(function() {
         }
         targetData = new Object();
         //最后再生成模糊下拉,不然上面的赋值无效
-        $('.chosen-select').chosen({allow_single_deselect:true});
+        $('.chosen-select').chosen({allow_single_deselect:true, search_contains:true});
 	}
 
 
@@ -615,7 +615,7 @@ $(function() {
     $('#goodsInfo').off('shown.bs.modal').on('shown.bs.modal', function (e) {
         $(document).off('focusin.modal');
 
-        $('.chosen-select').chosen({allow_single_deselect:true});
+        $('.chosen-select').chosen({allow_single_deselect:true, search_contains:true});
     });
 
     //轮询时间下拉框

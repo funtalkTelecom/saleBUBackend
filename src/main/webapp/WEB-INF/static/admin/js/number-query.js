@@ -198,7 +198,7 @@ $(function() {
         $.fn.zTree.init($("#cityTree"), setting, zNodes);
 	});
 
-    $('.chosen-select').chosen({allow_single_deselect:true});
+    $('.chosen-select').chosen({allow_single_deselect:true, search_contains:true});
     //地市下拉框end
 
     //添加标签确定按钮
