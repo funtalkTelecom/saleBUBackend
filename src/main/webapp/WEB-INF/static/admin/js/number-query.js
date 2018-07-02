@@ -1,5 +1,13 @@
 var dataList = null;
 var with4s, numStatus;
+var start;
+$.post("dict-to-map", {group: "with4"},function(data){
+    with4s = data;
+},"json");
+
+$.post("dict-to-map", {group: "num_status"},function(data){
+    numStatus = data;
+},"json");
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
@@ -27,6 +35,8 @@ $(function() {
 					"header" : "是否带4",
 					"dataIndex" : "with4",
             		"renderer":function(v,record){
+                        start = dataList.pm.start;
+                        console.log(start);
                         return with4s[v];
 					}
 				},{
@@ -77,14 +87,6 @@ $(function() {
 			return obj;
 		}
 	});
-
-    $.post("dict-to-map", {group: "with4"},function(data){
-        with4s = data;
-    },"json");
-
-    $.post("dict-to-map", {group: "num_status"},function(data){
-        numStatus = data;
-    },"json");
 	dataList.load();
 
 	$("#query").click(function() {
@@ -204,7 +206,7 @@ $(function() {
                             "callback": function() {
                                 $("#export").prop("disabled", true);
                                 obj["isCurrentPage"] = "1";
-                                var param = "";
+                                var param = "start="+start+"&";
                                 for (key in obj) {
                                     param += key+"="+obj[key]+"&";
                                 }
