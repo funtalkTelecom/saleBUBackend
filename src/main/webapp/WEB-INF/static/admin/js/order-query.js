@@ -134,7 +134,8 @@ $(function() {
 						if(p_receipt && record.status=="2") {
 							node.push('<a class="btn btn-success btn-xs payDeliver" href="javascript:void(0);">发货</a>');
                         }
-						if(p_bindCard && record.status=="4") {
+                        //普号进入“待配卡”状态，应该不允许管理员绑定
+						if(p_bindCard && record.status=="4" && record.skuGoodsType!="2") {
 							node.push('<a class="btn btn-success btn-xs bindCard" href="javascript:void(0);">绑卡</a>');
                         }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
@@ -169,7 +170,7 @@ $(function() {
                         });
                         //点击绑卡
                         $operate.find(".bindCard").click(function () {
-                            $.post("order/order-bindCard", {orderId: v}, function (data) {
+                            $.post("order/order-bindCard", {orderId: v, status:record.status, skuGoodsType:record.skuGoodsType}, function (data) {
                                 dataList.reload();
                                 alert(data.data);
                             }, "json");

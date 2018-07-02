@@ -700,11 +700,13 @@ public class ApiOrderService {
 				log.info("调用仓储接口");
 				Result res = StorageApiCallUtil.storageApiCall(param, "HK0003");
 				if (200 != (res.getCode())) {
+					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new Result(Result.ERROR, "库存验证失败");
 				} else {
 					StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
 					if (!"00000".equals(sir.getCode())) {
-						throw new Exception();
+						TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+						return new Result(Result.ERROR, "库存验证失败\n"+sir.getDesc());
 					}
 				}
 			}

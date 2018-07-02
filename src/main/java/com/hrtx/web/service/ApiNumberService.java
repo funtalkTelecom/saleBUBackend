@@ -7,11 +7,13 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.global.SystemParam;
 import com.hrtx.web.mapper.MealMapper;
 import com.hrtx.web.mapper.NumberMapper;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.Meal;
 import com.hrtx.web.pojo.Number;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +98,9 @@ public class ApiNumberService {
 				for (int i = 0; i < ob.size(); i++) {
 					Map obj= (Map) ob.get(i);
 					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
+					//普靓当对应地市无一级代理商时联系人和联系电话取默认
+					if(StringUtils.isBlank(String.valueOf(obj.get("phone")))) obj.put("phone", SystemParam.get("default_linktel"));
+					if(StringUtils.isBlank(String.valueOf(obj.get("name")))) obj.put("name", SystemParam.get("default_linkman"));
 
 					//不是一级代理商,把价格和保底消费置空
 					if(consumer.getIsAgent()==null || 2!=consumer.getIsAgent()){
