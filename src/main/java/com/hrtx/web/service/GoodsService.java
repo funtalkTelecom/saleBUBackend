@@ -493,4 +493,9 @@ public class GoodsService {
         }
         return res;
     }
+
+    public boolean checkGnameIsExist(Goods goods) {
+	    int n = goodsMapper.checkGnameIsExist(goods);
+	    return n>0?true:false;
+    }
 }

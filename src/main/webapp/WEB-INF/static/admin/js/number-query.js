@@ -1,5 +1,5 @@
 var dataList = null;
-var with4s, numStatus;
+var with4s, numStatus, tags;
 var start;
 $.post("dict-to-map", {group: "with4"},function(data){
     with4s = data;
@@ -7,6 +7,10 @@ $.post("dict-to-map", {group: "with4"},function(data){
 
 $.post("dict-to-map", {group: "num_status"},function(data){
     numStatus = data;
+},"json");
+
+$.post("dict-to-map", {group: "num_tags"},function(data){
+    tags = data;
 },"json");
 $(function() {
 	/* 初始化入库单列表数据 */
@@ -36,12 +40,31 @@ $(function() {
 					"dataIndex" : "with4",
             		"renderer":function(v,record){
                         start = dataList.pm.start;
-                        console.log(start);
                         return with4s[v];
 					}
 				},{
-					"header" : "特征",
-					"dataIndex" : "feature"
+					"header" : "标签",
+					"dataIndex" : "tags",
+                    "renderer":function(v,record){
+                        var t = "";
+                        if(v){
+                            v = v.split(",");
+                            for(var i=0; i<v.length; i++) {
+                                t += tags[v[i]] + "<br>";
+                            }
+                        }
+                        t = t ? t.substring(0, t.length - 1) : "";
+                        $operate = t;
+                        if(t) {
+                            $operate = $("<span data-html=\"true\" class=\"btn-sm tooltip-info\" data-toggle=\"tooltip\" data-placement=\"bottom\" data-original-title=\"" +
+                                t + "\">" +
+                                $.trim(t.split("<br>")[0], '--') +
+                                "</span>");
+
+                            $operate.tooltip();
+                        }
+                        return $operate;
+                    }
 				},{
 					"header" : "号段",
 					"dataIndex" : "sectionNo"
