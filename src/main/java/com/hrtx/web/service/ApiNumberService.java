@@ -72,9 +72,12 @@ public class ApiNumberService {
 	}
 
 	public Result numberTypeList(Number number, HttpServletRequest request){
+		Map map = new HashMap();
 		PageInfo<Object> pm = null;
+		Consumer consumer = apiSessionUtil.getConsumer();
+//		consumer = new Consumer();
+//		consumer.setId(1009758229598568448L);
 		try {
-			Consumer consumer = apiSessionUtil.getConsumer();
 			if(consumer==null) return new Result(Result.ERROR, "未获取到用户");
 
 			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
@@ -109,10 +112,27 @@ public class ApiNumberService {
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			pm = new PageInfo<Object>(null);
-			return new Result(Result.ERROR, pm);
+			map = setIsAgent(consumer, pm);
+			return new Result(Result.ERROR, map);
 		}
 
-		return new Result(Result.OK, pm);
+		map = setIsAgent(consumer, pm);
+
+		return new Result(Result.OK, map);
+	}
+
+	private Map setIsAgent(Consumer consumer, PageInfo<Object> pm) {
+		String isAgent = "";
+		if(consumer.getIsAgent()==null || 2!=consumer.getIsAgent()){
+			isAgent = "0";
+		}else{
+			isAgent = "1";
+		}
+		Map map = new HashMap();
+		map.put("isAgent", isAgent);
+		map.put("pm", pm);
+
+		return map;
 	}
 
 	public Result numberInfo(String id, HttpServletRequest request){
