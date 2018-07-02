@@ -305,6 +305,7 @@ public class OrderService extends BaseService {
     }
 
     public Result payBindCard(Order order, org.apache.catalina.servlet4preview.http.HttpServletRequest request) {
+        if("4".equals(order.getStatus()) && "2".equals(order.getSkuGoodsType())) return new Result(Result.ERROR, "待配卡的普号禁止管理员绑卡");
         Result result = numService.blindNum(order.getOrderId());
         if(result.getCode()==200){
             return new Result(Result.OK, "绑卡成功");
