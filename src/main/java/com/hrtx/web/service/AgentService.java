@@ -42,7 +42,7 @@ public class AgentService {
 		try {
 			if(file!=null){
 				String path = SystemParam.get("trading_url");
-				Result result = BaseReturn.uploadFile(path, "jpg,png,gif", file, true, false);
+				Result result = BaseReturn.uploadFile(path, "jpg,png,gif,jpeg", file, true, false);
 				if(result.getCode()==Result.OK) tradingImg = ((Map)result.getData()).get("sourceServerFileName").toString();
 				else return result;
 			}
