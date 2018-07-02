@@ -25,7 +25,7 @@ public class WxinController {
 	
 	@Autowired ConsumerService consumerService;
     @GetMapping("/get_open_id")
-    @Powers({PowerConsts.NOPOWER})
+    @Powers({PowerConsts.NOLOGINPOWER})
 	public Result getOpenid(@RequestParam(value="getcode",required=false)String getcode) {
 		String code=getcode;
 		String appid=SystemParam.get("AppID");
