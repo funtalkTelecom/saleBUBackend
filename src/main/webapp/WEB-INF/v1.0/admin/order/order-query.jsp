@@ -229,6 +229,7 @@
 						<div class="modal-body">
 							<div class="form-group">
 								<input type="hidden" name="orderId" id="receiptInfo-orderId">
+								<input type="hidden" name="orderType" id="receiptInfo-orderType">
 								<label class="col-xs-2 control-label">付款账号</label>
 								<div class="col-xs-3">
 									<input type="text" class="form-control" name="payAccount">
