@@ -1,6 +1,7 @@
 package com.hrtx.web.mapper;
 
 import com.github.abel533.mapper.Mapper;
+import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.AuctionDeposit;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,6 +22,7 @@ public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<
 
     List<Map> findAuctionDepositListByConsumerId(@Param("consumerId") Long consumerId);
 
+    Page<Object> queryPageDepositListByConsumerId(@Param("consumerId") Long consumerId);
     /*
         通过NumId、ConsumerId、Status查询对应AuctionDepositList
      */

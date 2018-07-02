@@ -1,5 +1,9 @@
 package com.hrtx.web.service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.Messager;
 import com.hrtx.global.Utils;
@@ -14,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.*;
 
@@ -90,6 +95,29 @@ public class AuctionDepositService {
 	public List<Map>  findAuctionDepositList()
 	{
 		return  auctionDepositMapper.findAuctionDepositListByConsumerId(apiSessionUtil.getConsumer().getId());
+	}
+
+	/*
+	  返回当前用户保证金列表
+	 */
+	public Result  queryPageDepositList( HttpServletRequest request)
+	{
+		AuctionDeposit auctionDeposit=new AuctionDeposit();
+		PageInfo<Object> pm = null;
+		Result result = null;
+		try {
+			auctionDeposit.setPageNum(request.getParameter("pageNum") == null ? 1 : Integer.parseInt(request.getParameter("pageNum")));
+			auctionDeposit.setLimit(request.getParameter("limit") == null ? 15 : Integer.parseInt(request.getParameter("limit")));
+			PageHelper.startPage(auctionDeposit.getPageNum(),auctionDeposit.getLimit());
+			Page<Object> ob=this.auctionDepositMapper.queryPageDepositListByConsumerId(apiSessionUtil.getConsumer().getId());
+			pm = new PageInfo<Object>(ob);
+			result = new Result(Result.OK, pm);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			pm = new PageInfo<Object>(null);
+			result = new Result(Result.ERROR, pm);
+		}
+		return result;
 	}
 
 	public void auctionDepositEdit(AuctionDeposit auctionDeposit) {

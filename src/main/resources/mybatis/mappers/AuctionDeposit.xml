@@ -58,6 +58,21 @@
 	order by tb_auction_deposit.add_date desc;
     </select>
 
+	<select id="queryPageDepositListByConsumerId" resultType="java.util.HashMap">
+	select
+ 	id,
+ 	num,
+ 	num_id as numId,
+ 	g_id as gId,
+ 	status,
+ 	pay_date as payDate,
+ 	amt as price,
+ 	refund_date as refundDate
+	from tb_auction_deposit
+	where tb_auction_deposit.consumer_id=#{consumerId}
+	order by tb_auction_deposit.add_date desc
+    </select>
+
 	<select id="findAuctionDepositListByNumIdAndConsumerIdAndGId" resultType="java.util.HashMap">
 	  select * from 	tb_auction_deposit
 	  where  tb_auction_deposit.num_id = #{numId}
