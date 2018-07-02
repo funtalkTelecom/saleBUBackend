@@ -26,12 +26,14 @@ import java.util.*;
 @Component
 public class OrderService extends BaseService {
     @Autowired private OrderMapper orderMapper;
+    @Autowired private SkuMapper skuMapper;
     @Autowired private OrderItemMapper orderItemMapper;
     @Autowired private NumMapper numMapper;
     @Autowired private IccidMapper iccidMapper;
     @Autowired private DeliveryAddressMapper deliveryAddressMapper;
     @Autowired private FundOrderService fundOrderService;
     @Autowired private CityMapper cityMapper;
+    @Autowired private GoodsMapper goodsMapper;
     @Autowired private AuctionDepositService auctionDepositService;
     @Autowired private NumService numService;
 
@@ -284,20 +286,46 @@ public class OrderService extends BaseService {
         }
         //本次收款金额
         int amt = receiptsInt;
-        if(amt+aamt > receivableInt) return new Result(Result.ERROR, "本次实收金额加已支付金额不能大于应收金额");
+        //获取订单信息,判断是不是竞拍订单,再处理保证金
+        order = orderMapper.findOrderInfo(order.getOrderId());
+        //竞拍订单判断金额
+        Map m = auctionDepositService.findAuctionDepositListByOrderId(order.getOrderId());
+        int deposit = ((Double)Arith.add(Double.parseDouble(String.valueOf(m.get("deposit")))*100, 0.0)).intValue();
+        if(order.getOrderType()==3){
+            if (amt + aamt + deposit > receivableInt) return new Result(Result.ERROR, "本次实收金额加已支付金额不能大于应收金额");
+        }else {
+            if (amt + aamt > receivableInt) return new Result(Result.ERROR, "本次实收金额加已支付金额不能大于应收金额");
+        }
         result = fundOrderService.payOffLineOrder(amt, receivableAccount, payAccount, order.getOrderId()+"线下支付", String.valueOf(order.getOrderId()));
         if(result.getCode()==200){
-            if(amt+aamt == receivableInt){
-                result = this.payOrderSuccess(order.getOrderId());
-                if(result.getCode()==200) {
-                    result = this.payDeliverOrder(order.getOrderId());
-                    if(result.getCode()==200){
-                        return new Result(Result.OK, "收款成功");
-                    }else{
-                        return new Result(Result.ERROR, "调用发货失败\n" + result.getData());
+            //竞拍订单判断
+            if(order.getOrderType()==3){
+                if (amt + aamt + deposit == receivableInt){
+                    result = this.payOrderSuccess(order.getOrderId());
+                    if (result.getCode() == 200) {
+                        result = this.payDeliverOrder(order.getOrderId());
+                        if (result.getCode() == 200) {
+                            return new Result(Result.OK, "收款成功");
+                        } else {
+                            return new Result(Result.ERROR, "调用发货失败\n" + result.getData());
+                        }
+                    } else {
+                        return new Result(Result.ERROR, "调用支付成功失败\n" + result.getData());
                     }
-                }else{
-                    return new Result(Result.ERROR, "调用支付成功失败\n" + result.getData());
+                }
+            }else {
+                if (amt + aamt == receivableInt) {
+                    result = this.payOrderSuccess(order.getOrderId());
+                    if (result.getCode() == 200) {
+                        result = this.payDeliverOrder(order.getOrderId());
+                        if (result.getCode() == 200) {
+                            return new Result(Result.OK, "收款成功");
+                        } else {
+                            return new Result(Result.ERROR, "调用发货失败\n" + result.getData());
+                        }
+                    } else {
+                        return new Result(Result.ERROR, "调用支付成功失败\n" + result.getData());
+                    }
                 }
             }
             return new Result(Result.ERROR, result.getData());

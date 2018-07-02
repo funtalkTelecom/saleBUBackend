@@ -157,6 +157,7 @@ $(function() {
                         //点击收款
                         $operate.find(".receipt").click(function () {
                             $("#receiptInfo-orderId").val(v);
+                            $("#receiptInfo-orderType").val(record.orderType);
                             $("#receivable").val(record.total);
                             $("#receipts").val(record.total);
                             $('#receiptInfo').modal('show');
