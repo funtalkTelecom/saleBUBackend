@@ -32,7 +32,7 @@ public class AgentController {
 	AgentService agentService;
 	@Autowired private ApiSessionUtil apiSessionUtil;
     @PostMapping(value = "/api/save-or-update-agent")
-    @Powers({PowerConsts.NOLOGINPOWER})
+    @Powers({PowerConsts.NOPOWER})
 	public Result SaveOrUpdateAgent(@RequestParam(value="id",required=false) Long id,
 								   @RequestParam(value="commpayName",required=false) String commpayName,
 								   @RequestParam(value="person",required=false) String person,
@@ -46,14 +46,14 @@ public class AgentController {
 	}
 
 	@PutMapping(value = "/api/save-agent-leyu")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	public Result SaveAgentLeyu(@RequestParam(value="loginName",required=false) String loginName,
 									@RequestParam(value="pwd",required=false) String pwd) {
 		return agentService.SaveAgentLeyu(loginName,pwd);
 	}
 
 	@GetMapping("/api/query-agent_by_consumerid")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result listAgent(){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
