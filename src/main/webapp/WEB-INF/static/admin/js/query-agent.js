@@ -42,16 +42,13 @@ $(function() {
             "dataIndex" : "id",
             "renderer":function(v,record){
                 var node = [];
+                node.push('<a class="btn btn-success btn-xs deltails" href="javascript:void(0);">详情</a>')
                 if(record.status ==1){
                     if(p_check) {
                         node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">审核</a>')
                     }
-                    // if(p_delete) {
-                    //     node.push('<a class="btn btn-success btn-xs delete" href="javascript:void(0);">删除</a>')
-                    // }
                 }
                 $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
-
                 $operate.find(".update").click(function () {
                     $.post("/find-agent-by-id",{id:v},function(data){
                         var _data=data.data;
@@ -65,6 +62,20 @@ $(function() {
                         $("#id").val(_data.id);
                         $("#addConsumerId").val(_data.addConsumerId);
                         $('#checkModal').modal('show');
+                    },"json");
+                })
+                $operate.find(".deltails").click(function () {
+                    $.post("/find-agent-by-id",{id:v},function(data){
+                        var _data=data.data;
+                        $(".scomm").html(_data.commpayName);
+                        $(".person").html(_data.person);
+                        $(".phone").html(_data.phone);
+                        var addresss = _data.provinceName+_data.cityName+_data.districtName+_data.address;
+                        $(".address").html(addresss);
+                        $("#tradingImgs").attr("src","get-img/trading_url/300/"+_data.tradingImg);
+                        $("#adtradingImgs").attr("href","get-img/trading_url/1000/"+_data.tradingImg);
+                        $(".checkRemark").html(_data.checkRemark);
+                        $('#DetailsModal').modal('show');
                     },"json");
                 })
                 $operate.find(".delete").click(function () {

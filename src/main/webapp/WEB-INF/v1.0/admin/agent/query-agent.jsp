@@ -46,9 +46,17 @@
 									<label class="control-label">法人</label>
 									<input type="text" class="form-control" style="width:130px;" name="person">
 								</div>
+								<div class="form-group">
+									<label class="control-label">状态</label>
+									<select  name="status" id="status" >
+										<option value="-1">请选择</option>
+										<option value="1">待审核</option>
+										<option value="2" >审核通过</option>
+										<option value="3" >审核未通过</option>
+									</select>
+								</div>
 								<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
 								<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
-
 							</form><!-- /form-panel -->
 						</div>
 
@@ -146,6 +154,62 @@
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal -->
 </div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="DetailsModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title">
+					 详情
+				</h4>
+			</div>
+			<form role="form" class="form-horizontal">
+				<div class="modal-body">
+					<div class="form-group">
+						<label class="col-xs-2 control-label">公司名称</label>
+						<div class="col-xs-10">
+							<span class="scomm"></span>
+						</div>
+					</div>
+					<div class="form-group">
+
+						<label class="col-xs-2 control-label">法人</label>
+						<div class="col-xs-4">
+							<span class="person"></span>
+						</div>
+						<label class="col-xs-2 control-label">电话</label>
+						<div class="col-xs-4">
+							<span class="phone"></span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">注册地址</label>
+						<div class="col-xs-10">
+							<span class="address"></span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">营业执照</label>
+						<div class="col-xs-10">
+							<a id="adtradingImgs" data-lightbox="tradingImg"><img id="tradingImgs" style="max-width: 80px;max-height: 80px;"></a>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">审核备注</label>
+						<div class="col-xs-10">
+							<span class="checkRemark"></span>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
 <script type="text/javascript">
     var p_check = <%=SessionUtil.hasPower(PowerConsts.AGENTMOUDULE_COMMON_CHECK)%>;
 </script>
