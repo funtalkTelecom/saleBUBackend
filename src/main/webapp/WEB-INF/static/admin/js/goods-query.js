@@ -191,9 +191,10 @@ $(function() {
 
     $(document).on("click","#goodsInfo .modal-footer .btn-success",function() {
         var isError = false;
+        var msg = "";
         $('#gStartTime').val($('#gStartTimePicker').val());
         $('#gEndTime').val($('#gEndTimePicker').val());
-        //是竞拍,就出发选择活动下拉框的change事件
+        //是竞拍,就触发选择活动下拉框的change事件
         if($("input[name=gIsAuc]:checked").val()=="1") {
             $("#gActive").change();
             if(!$("#gActive").val()){
@@ -211,11 +212,17 @@ $(function() {
             msg = "请上传第一张图片";
             isError = true;
         }
+        //验证商品类型
+        $("select[name=skuGoodsType]").each(function(i, e){
+            if($(this).val()==-1){
+                msg = "第" + (i + 1) + "行,请选择商品类型";
+                isError = true;
+            }
+        });
         //验证填写数量和库存数量
-        var msg = "";
         $("select[name=skuRepoGoods]").each(function(i, e){
             if($(this).find("option:selected").attr("acqu")==undefined){
-                msg = "请选择关联仓库商品";
+                msg = "第" + (i + 1) + "行,请选择关联仓库商品";
                 isError = true;
             }
             if(parseInt($(this).find("option:selected").attr("acqu"))+parseInt($("select[name=skuRepoGoods]").parent().parent().find("input[name=skuNum]").val())<parseInt($("select[name=skuRepoGoods]").parent().parent().find("input[name=skuNum]").val())){
@@ -652,6 +659,19 @@ $(function() {
             //     });
             // });
         }
+
+        var msg = "";
+        //判断sku列表是否有选择白卡的
+        $("select[name=skuGoodsType]").each(function () {
+            if($(this).val()=="1" && $("input[name=gIsAuc]:checked").val()=="1") {
+                $(this).val("-1");
+                msg = "竞拍商品禁止选择白卡!";
+            }
+        });
+        if(msg){
+            alert(msg);
+            return false;
+        }
     }
     function initGoodsPics(picList){
         var html = '<span style="color:red; font-size: 12px;">注:重新上传将删除之前的图片</span>' +
@@ -701,7 +721,7 @@ function getActive(){
         success: function(data){
             if(data.code=="200"){
                 activeSelectOptions = data.data;
-                var option = '';
+                var option = '<option value="-1" startTime="'+new Date().getTime()+'" endTime="'+new Date().getTime()+'">请选择...</option>.>';
                 for(var i=0; i<activeSelectOptions.length; i++){
                     option += '<option value="'+activeSelectOptions[i]["id"]+'" startTime="'+activeSelectOptions[i]["startTime"]+'" endTime="'+activeSelectOptions[i]["endTime"]+'">'+activeSelectOptions[i]["title"]+'</option>';
                 }
@@ -764,7 +784,7 @@ var titleStrObj = {
     "skuGoodsType":{
         "isShow":true,
         "title":"商品类型",
-        "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">普号</option><option value="3">普靓</option><option value="4">超靓</option></select>',
+        "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="-1">请选择...</option><option value="1">白卡</option><option value="2">普号</option><option value="3">普靓</option><option value="4">超靓</option></select>',
         "titleClass":""
     },
     "skuRepoGoodsName":{
@@ -841,7 +861,7 @@ function fileChange(i){
 }
 var clickSaleNumObj;
 function selectSaleNum(obj){
-    if($("select[tag="+$(obj).attr("tag")+"][name=skuGoodsType]").val()==1) {
+    if($("select[tag="+$(obj).attr("tag")+"][name=skuGoodsType]").val()==1 || $("select[tag="+$(obj).attr("tag")+"][name=skuGoodsType]").val()==-1) {
         $("#saleNum").val($(obj).val());
         return false;
     }
@@ -854,6 +874,11 @@ function selectSaleNum(obj){
 }
 function skuIsNumChange(obj){
     if($(obj).val()==1) $("textarea[tag="+$(obj).attr("tag")+"][name=skuSaleNum]").val("");
+    //竞拍活动禁止选白卡
+    if($(obj).val()==1 && $("input[name=gIsAuc]:checked").val()=="1") {
+        $(obj).val("-1");
+        alert("竞拍商品禁止选择白卡!");
+    }
 }
 //sku列表删除行
 function deleteSkuRow(obj){
@@ -861,6 +886,7 @@ function deleteSkuRow(obj){
         alert("至少保留一条记录");
         return false;
     }
+    if (!confirm("确认删除？")) return false;
     $("#delSkus").val($("#delSkus").val()+$(obj).parent().parent().find("input[tag^=sku_][name=skuId]").eq(0).val()+",");
     $(obj).parent().parent().remove();
 }

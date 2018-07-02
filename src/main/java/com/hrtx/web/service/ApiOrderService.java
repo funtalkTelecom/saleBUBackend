@@ -556,6 +556,7 @@ public class ApiOrderService {
 							//号码item
 							orderItem = new OrderItem();
 							orderItem.setItemId(orderItem.getGeneralId());
+							orderItem.setpItemId(pOrderItem.getItemId());
 							orderItem.setOrderId(order.getOrderId());
 							orderItem.setGoodsId(goods.getgId());
 							orderItem.setSkuId(Long.parseLong(skuid));
