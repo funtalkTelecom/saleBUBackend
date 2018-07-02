@@ -185,6 +185,7 @@
 							</div>
 						</div>
 						<div class="modal-footer">
+							<button type="button" class="btn btn-danger">清空标签</button>
 							<button type="button" class="btn btn-success">确定</button>
 							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
 						</div>

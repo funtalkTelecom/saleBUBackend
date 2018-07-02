@@ -59,6 +59,12 @@ public class NumberController extends BaseReturn{
 		returnResult(numberService.addTags(number, request));
 	}
 
+	@RequestMapping("/numRule-clearTags")
+	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG})
+	public void clearTags(Number number, HttpServletRequest request){
+		returnResult(numberService.clearTags(number, request));
+	}
+
 	@RequestMapping("/number-export")
 	public void numberExport(Number number, HttpServletRequest request, HttpServletResponse response){
 //		int count = 200;

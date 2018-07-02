@@ -88,9 +88,31 @@ public class NumberService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new Result(Result.ERROR, "操作异常");
+			return new Result(Result.ERROR, "设置标签出错,请稍后再试");
 		}
 
 		return new Result(Result.OK, "设置成功");
 	}
+
+    public Result clearTags(Number number, HttpServletRequest request) {
+        try {
+            String[] numbers = "".equals(number.getNumResource())?new String[] {}:number.getNumResource().split("\\r?\\n");
+            if(numbers!=null && numbers.length>0){
+                StringBuffer nums = new StringBuffer();
+                for (String n : numbers) {
+                    if(!StringUtils.isBlank(n)) {
+                        nums.append("'" + n.trim() + "'" + ",");
+                    }
+                }
+                numRuleMapper.deleteByNums(nums.length()>0?nums.substring(0, nums.length()-1):"");
+            }else{
+                return new Result(Result.PARAM, "号码不能为空");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(Result.ERROR, "清空标签出错,请稍后再试");
+        }
+
+        return new Result(Result.OK, "清空标签成功");
+    }
 }

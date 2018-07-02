@@ -48,4 +48,8 @@
             )
         </foreach>
     </insert>
+
+    <update id="deleteByNums">
+        delete from tb_num_rule where num_id in (select id from tb_num where num_resource in (${numbers})) AND rule_type = 'tag'
+    </update>
 </mapper>

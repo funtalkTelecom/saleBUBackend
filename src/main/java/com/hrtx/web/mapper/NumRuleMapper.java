@@ -10,4 +10,6 @@ public interface NumRuleMapper extends Mapper<NumRule>,BaseMapper<NumRule>{
     List<NumRule> getNumRuleByNum(@Param("num") String num);
 
     void insertBatch(@Param("numRuleList") List insertList);
+
+    void deleteByNums(@Param("numbers") String numbers);
 }

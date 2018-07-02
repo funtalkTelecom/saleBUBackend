@@ -157,6 +157,18 @@ $(function() {
             $("#editTags .modal-footer .btn-success").attr("disabled", "disabled");
             // dataList.reload();
             $('#editTags').modal('hide');
+            dataList.reload();
+            alert(data.data);
+        },"json");
+	});
+
+    //清空标签按钮
+    $(document).on("click","#editTags .modal-footer .btn-danger",function() {
+        $.post("number/numRule-clearTags",$("#editTags form").serialize(),function(data){
+            $("#editTags .modal-footer .btn-success").attr("disabled", "disabled");
+            // dataList.reload();
+            $('#editTags').modal('hide');
+            dataList.reload();
             alert(data.data);
         },"json");
 	});
