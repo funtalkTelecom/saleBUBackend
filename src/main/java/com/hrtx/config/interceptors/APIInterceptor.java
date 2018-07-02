@@ -37,7 +37,7 @@ public class APIInterceptor implements HandlerInterceptor {
 		Consumer user=apiSessionUtil.getConsumer();
 //		User user=apiSessionUtil.getUser();
 		if(user == null) {
-			Utils.returnResult(new Result(Result.TIME_OUT,"登录超时或未登录，请登录！"));
+			Utils.returnResult(new Result(3000,"登录超时或未登录，请登录！"));//为避免和代码中的300超时混淆，此处调整为3000为登录超时
 			return false;
 		}
 		//token存在更新过期时间
