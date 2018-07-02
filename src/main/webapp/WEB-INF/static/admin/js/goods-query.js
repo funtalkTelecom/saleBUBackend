@@ -704,7 +704,7 @@ $(function() {
                 }
             }
             html+='<input style="float:left" type="file" name="file" seq="'+(i+1)+'" onchange="fileChange('+(i+1)+')">';
-            html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;"><i title="删除图片" class="raty-cancel cancel-off-png" data-alt="x"></i></div>';
+            html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;'+(filename?"":"visibility:hidden")+'"><i title="删除图片" class="raty-cancel cancel-off-png" data-alt="x"></i></div>';
             html+='<img style="width:150px;'+style+'" src="'+basePath+'get-img/goodsPics/'+refid+'/'+filename+'">';
 
             html+='</div>';
