@@ -282,6 +282,7 @@
 							<div class="form-group">
 								<div class="col-xs-12">
 									<textarea id="saleNum" class="form-control" style="height:500px;resize: none;"></textarea>
+									<span style="color:red">注:一行一个号码</span>
 								</div>
 							</div>
 						</div>

@@ -26,8 +26,31 @@
     <sql id="ex_col_list">
     </sql>
 
-    <select id="queryPageList" resultType="Number">
+    <resultMap id="queryPageListMap" type="java.util.HashMap">
+        <result column="id" property="id" javaType="java.lang.String"></result>
+        <result column="city_id" property="cityId" javaType="java.lang.String"></result>
+        <result column="city_name" property="cityName" javaType="java.lang.String"></result>
+        <result column="net_type" property="netType" javaType="java.lang.String"></result>
+        <result column="num_resource" property="numResource" javaType="java.lang.String"></result>
+        <result column="num_type" property="numType" javaType="java.lang.String"></result>
+        <result column="num_level" property="numLevel" javaType="java.lang.String"></result>
+        <result column="low_consume" property="lowConsume" javaType="java.lang.String"></result>
+        <result column="with4" property="with4" javaType="java.lang.String"></result>
+        <result column="feature" property="feature" javaType="java.lang.String"></result>
+        <result column="section_no" property="sectionNo" javaType="java.lang.String"></result>
+        <result column="more_digit" property="moreDigit" javaType="java.lang.String"></result>
+        <result column="seller_id" property="sellerId" javaType="java.lang.String"></result>
+        <result column="seller" property="seller" javaType="java.lang.String"></result>
+        <result column="buyer_id" property="buyerId" javaType="java.lang.String"></result>
+        <result column="buyer" property="buyer" javaType="java.lang.String"></result>
+        <result column="iccid" property="iccid" javaType="java.lang.String"></result>
+        <result column="status" property="status" javaType="java.lang.String"></result>
+        <result column="sku_id" property="skuId" javaType="java.lang.String"></result>
+        <result column="tele_type" property="teleType" javaType="java.lang.String"></result>
+    </resultMap>
+    <select id="queryPageList" resultMap="queryPageListMap">
         select
+        (select GROUP_CONCAT(`value`) from tb_num_rule where num_id = a.id GROUP BY num_id) as tags,
         <include refid="ex_col_list"/>
         <include refid="col_list"/>
         from tb_num a

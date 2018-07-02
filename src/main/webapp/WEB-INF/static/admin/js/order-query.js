@@ -18,6 +18,10 @@ var signTypes = {
     "1":"用户签收",
     "2":"系统"
 };
+
+$.post("dict-to-map", {group: "orderStatus"},function(data){
+    orderStatus = data;
+},"json");
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
@@ -231,10 +235,6 @@ $(function() {
 	window.reload = function(){
 		dataList.reload();
 	}
-
-    $.post("dict-to-map", {group: "orderStatus"},function(data){
-        orderStatus = data;
-    },"json");
 
     $(document).on("click","#receiptInfo .modal-footer .btn-success",function() {
         $.post("order/order-receipt",$("#receiptInfo form").serialize(),function(data){

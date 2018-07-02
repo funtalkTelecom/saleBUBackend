@@ -23,4 +23,6 @@ public interface GoodsMapper extends Mapper<Goods>,BaseMapper<Goods>{
     Goods findGoodsInfoBySkuid(@Param("skuid") String skuid);
 
     Page<Object> queryPageSkuListApi(Goods goods, @Param("gSaleCity") String split);
+
+    int checkGnameIsExist(Goods goods);
 }

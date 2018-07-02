@@ -279,4 +279,7 @@
         where a.g_id = #{gId}
     </update>
 
+    <select id="checkGnameIsExist" resultType="java.lang.Integer">
+        select count(1) as num from tb_goods a where a.g_id != #{gId} and a.g_name = #{gName}
+    </select>
 </mapper>
