@@ -228,6 +228,7 @@
         and SYSDATE() between d.g_start_time and d.g_end_time
         and a.status = 2
         and d.g_is_sale = '1'
+        and d.g_is_auc = '0'
     </select>
 
     <update id="updateStatus">
