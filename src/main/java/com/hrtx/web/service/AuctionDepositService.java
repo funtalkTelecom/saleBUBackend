@@ -106,14 +106,14 @@ public class AuctionDepositService {
 		PageInfo<Object> pm = null;
 		Result result = null;
 		try {
-			int pageNau=request.getParameter("pageNum") == null ? 1 : Integer.parseInt(request.getParameter("pageNum"));
+			int pageNum=request.getParameter("pageNum") == null ? 1 : Integer.parseInt(request.getParameter("pageNum"));
 			int limit=request.getParameter("limit") == null ? 15 : Integer.parseInt(request.getParameter("limit"));
-			auctionDeposit.setPageNum(pageNau);
+			auctionDeposit.setPageNum(pageNum);
 			//auctionDeposit.setStart(request.getParameter("start") == null ? 0 : Integer.parseInt(request.getParameter("start")));
 			auctionDeposit.setLimit(limit);
-			auctionDeposit.setStart(limit*(pageNau-1));
+			auctionDeposit.setStart(limit*(pageNum-1));
 			//auctionDeposit.setLimit(auctionDeposit.getLimit());
-			PageHelper.startPage(pageNau,limit);
+			PageHelper.startPage(pageNum,limit);
 			Page<Object> ob=this.auctionDepositMapper.queryPageDepositListByConsumerId(auctionDeposit,apiSessionUtil.getConsumer().getId());
 			pm = new PageInfo<Object>(ob);
 			result = new Result(Result.OK, pm);

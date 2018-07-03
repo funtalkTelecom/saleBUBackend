@@ -73,10 +73,10 @@ public class BoundService {
 //			u.setAgentCity(396L);
 			//apiSessionUtil.getConsumer()==null?u.getAgentCity():
 
-			PageHelper.startPage(pageNum,limit);
-			num.setStart(limit*(pageNum-1));
 			num.setPageNum(pageNum);
 			num.setLimit(limit);
+			num.setStart(limit*(pageNum-1));
+			PageHelper.startPage(pageNum,limit);
 			Page<Object> ob=this.numMapper.queryPageNumList(num,apiSessionUtil.getConsumer().getId(),statusStr);
 			pm = new PageInfo<Object>(ob);
 			result = new Result(Result.OK, pm);

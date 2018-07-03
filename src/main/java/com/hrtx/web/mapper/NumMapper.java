@@ -33,5 +33,5 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
      */
     void batchUpdateDpk(@Param("buyerId") Long buyerId, @Param("buyer") String buyer, @Param("list") List<Map> nums);
 
-    Page<Object> queryPageNumList(Num num,@Param("consumerId") Long consumerId,@Param("status") String status);
+    Page<Object> queryPageNumList(Num   num, @Param("consumerId") Long consumerId, @Param("status") String status);
 }
