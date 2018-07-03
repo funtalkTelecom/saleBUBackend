@@ -216,12 +216,12 @@ public class GoodsService {
                             res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                             if (200 != (res.getCode())) {
                                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                return new Result(Result.ERROR, "库存验证失败");
+                                return new Result(Result.ERROR, "第"+(i+1)+"行,库存验证失败");
                             } else {
                                 StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                                 if (!"00000".equals(sir.getCode())) {
                                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                    return new Result(Result.ERROR, "解冻库存失败\n"+sir.getDesc());
+                                    return new Result(Result.ERROR, "第"+(i+1)+"行,解冻库存失败\n"+sir.getDesc());
                                 }
                             }
                         }
@@ -234,12 +234,12 @@ public class GoodsService {
                         res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                         if (200 != (res.getCode())) {
                             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                            return new Result(Result.ERROR, "库存验证失败");
+                            return new Result(Result.ERROR, "第"+(i+1)+"行,库存验证失败");
                         } else {
                             StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                             if (!"00000".equals(sir.getCode())) {
                                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                return new Result(Result.ERROR, "解冻库存失败\n"+sir.getDesc());
+                                return new Result(Result.ERROR, "第"+(i+1)+"行,冻结库存失败\n"+sir.getDesc());
                             }
                         }
                     }
@@ -276,30 +276,33 @@ public class GoodsService {
                 String delSkus = request.getParameter("delSkus");
                 //调用仓储解冻库存
                 if(!StringUtils.isBlank(delSkus)){
-                    String[] delskus = delSkus.split(",");
-                    for (String delSku : delskus) {
-                        if(!StringUtils.isBlank(delSku)){
-                            //获取目前sku信息
-                            Sku s = skuMapper.getSkuBySkuid(Long.parseLong(delSku));
-                            if(s!=null) {
-                                //调用仓储接口
-                                Map param = new HashMap();
-                                param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
-                                Result res;
-                                //解冻现有库存
-                                param.put("type", "2");//处理类型1上架；2下架
-                                param.put("quantity", s == null ? 0 : s.getSkuNum());//数量
-                                param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
-                                if (!"0".equals(param.get("quantity").toString())) {
-                                    res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                                    if (200 != (res.getCode())) {
-                                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                        return new Result(Result.ERROR, "解冻库存失败");
-                                    } else {
-                                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                                        if (!"00000".equals(sir.getCode())) {
+                    //上架中的才需要解冻库存
+                    if("1".equals(isSale)) {
+                        String[] delskus = delSkus.split(",");
+                        for (String delSku : delskus) {
+                            if (!StringUtils.isBlank(delSku)) {
+                                //获取目前sku信息
+                                Sku s = skuMapper.getSkuBySkuid(Long.parseLong(delSku));
+                                if (s != null) {
+                                    //调用仓储接口
+                                    Map param = new HashMap();
+                                    param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
+                                    Result res;
+                                    //解冻现有库存
+                                    param.put("type", "2");//处理类型1上架；2下架
+                                    param.put("quantity", s == null ? 0 : s.getSkuNum());//数量
+                                    param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                                    if (!"0".equals(param.get("quantity").toString())) {
+                                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                                        if (200 != (res.getCode())) {
                                             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                            return new Result(Result.ERROR, "解冻库存失败\n"+sir.getDesc());
+                                            return new Result(Result.ERROR, "解冻库存失败");
+                                        } else {
+                                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                                            if (!"00000".equals(sir.getCode())) {
+                                                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                                                return new Result(Result.ERROR, "解冻库存失败\n" + sir.getDesc());
+                                            }
                                         }
                                     }
                                 }
