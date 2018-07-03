@@ -275,7 +275,7 @@
 
     <update id="goodsUnsale">
         update tb_goods a set
-            a.g_is_sale = '2'
+            a.g_is_sale = '0'
         where a.g_id = #{gId}
     </update>
 

@@ -106,6 +106,7 @@
 					</div>
 					<form role="form" class="form-horizontal" enctype="multipart/form-data">
 						<input name="gId" id="gId" type="hidden">
+						<input name="gIsSale" id="gIsSale" type="hidden">
 						<div class="modal-body">
 							<div class="form-group">
 								<label class="col-xs-2 control-label">大类</label>

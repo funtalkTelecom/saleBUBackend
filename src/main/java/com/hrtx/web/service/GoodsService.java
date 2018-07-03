@@ -61,7 +61,6 @@ public class GoodsService {
             if (goods.getgId() != null && goods.getgId() > 0) {
                 goodsMapper.goodsEdit(goods);
                 goods = goodsMapper.findGoodsInfo(goods.getgId());
-                isSale = goods.getgIsSale();
             } else {
 //                User user = SessionUtil.getUser();
                 Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");
