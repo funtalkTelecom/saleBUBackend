@@ -30,6 +30,8 @@ public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<
 
     List<Map> findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(AuctionDeposit auctionDeposit);
 
+    List<Map> findAuctionDepositListByNumIdAndStatusAndGId(AuctionDeposit auctionDeposit);
+
     void insertBatch(@Param("auctionDepositList") List<AuctionDeposit> list);
 
     void auctionDepositEdit(AuctionDeposit auctionDeposit);

@@ -66,6 +66,7 @@ public class AuctionDepositService {
 	{
 		Map map=new HashMap();
 	    List<Map> auctionList=auctionMapper.findAuctionListByOrderId(orderId);
+		List<Map> auctionDepositList=null;
 	    Long numId=0L;//numId;
 		Long gId=0L;//gId
 		double deposit=0.00;//保证金
@@ -77,10 +78,15 @@ public class AuctionDepositService {
 			auctionDeposit.setStatus(2);
 			auctionDeposit.setgId(gId);
 			auctionDeposit.setNumId(numId);
-			auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
-			//return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatus(auctionDeposit);
-			List<Map> auctionDepositList=auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(auctionDeposit);
-			if(auctionDepositList.size()>0)
+            if(apiSessionUtil.getConsumer()==null)//非api调用,则不关联ConsumerId的记录
+			{
+				auctionDepositList=auctionDepositMapper.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
+			}else
+			{
+				auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
+				auctionDepositList=auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(auctionDeposit);
+			}
+			if(auctionDepositList!=null&&auctionDepositList.size()>0)
 			{
 				deposit=Double.valueOf(auctionDepositList.get(0).get("amt").toString());
 			}

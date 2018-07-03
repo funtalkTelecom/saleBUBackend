@@ -37,6 +37,13 @@
 	  and tb_auction_deposit.g_id=#{gId}
     </select>
 
+	<select id="findAuctionDepositListByNumIdAndStatusAndGId" resultType="java.util.HashMap">
+	  select * from 	tb_auction_deposit
+	  where tb_auction_deposit.num_id = #{numId}
+	  and tb_auction_deposit.status=#{status}
+	  and tb_auction_deposit.g_id=#{gId}
+    </select>
+
 	<select id="findAuctionDepositListByNumIdAndConsumerId" resultType="java.util.HashMap">
 	  select * from 	tb_auction_deposit
 	  where  tb_auction_deposit.num_id = #{numId}
