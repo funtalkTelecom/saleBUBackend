@@ -5,6 +5,8 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.Poster;
 import com.hrtx.web.service.PosterService;
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/poster")
@@ -50,9 +54,32 @@ public class PosterController extends BaseReturn{
 
 	@RequestMapping("/poster-edit")
 	@Powers({PowerConsts.POSTERMOUDULE_COMMON_EDIT})
-	public void posterEdit(Poster poster, @RequestParam(name = "file",required = false) MultipartFile file, HttpServletRequest request){
-		returnResult(posterService.posterEdit(poster, file, request));
+	public Result posterEdit(Poster poster, @RequestParam(name = "file",required = false) MultipartFile file, HttpServletRequest request){
+        if(StringUtils.isBlank(poster.getTitle())) return new Result(Result.ERROR, "海报标题不能为空");
+        if(StringUtils.isBlank(poster.getPosition())) return new Result(Result.ERROR, "海报位置不能为空");
+        if(StringUtils.isBlank(poster.getUrl())) {
+            return new Result(Result.ERROR, "海报url不能为空");
+        }/*else{
+            String pattern = "^(((http|https):\\/\\/)|(www\\.))+(\\.?)\\w+(\\.{1})\\w+$";
+
+            Pattern r = Pattern.compile(pattern);
+            Matcher m = r.matcher(poster.getUrl());
+            if(!m.matches()){
+                return new Result(Result.ERROR, "url格式错误");
+            }
+        }*/
+        if(poster.getStartTime() == null) return new Result(Result.ERROR, "海报开始时间不能为空");
+        if(poster.getEndTime() == null) return new Result(Result.ERROR, "海报结束时间不能为空");
+		return posterService.posterEdit(poster, file, request);
 	}
+
+    public static void main(String[] args) {
+        String pattern = "^(((http|https):\\/\\/)|(www\\.))+(\\.?)\\w+(\\.{1})\\w+$";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher("baidu.com");
+        System.out.println(m.matches());
+    }
 
 	@RequestMapping("/poster-delete")
 	@Powers({PowerConsts.POSTERMOUDULE_COMMON_DELETE})
