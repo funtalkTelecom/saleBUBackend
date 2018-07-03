@@ -424,19 +424,20 @@ public class EPSaleService {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-			strtTime=Utils.getDate2(loopTime,endTime);
-/*
+			//strtTime=Utils.getDate2(loopTime,endTime);
+
 			endTimeStr=Utils.dateToString(endTime,"yyyy-MM-dd HH:mm:ss");
 			String startTimeStr=Utils.getDate2(-loopTime,endTime,"yyyy-MM-dd HH:mm:ss");
 			String currentTimeStr=Utils.dateToString(addTime,"yyyy-MM-dd HH:mm:ss");
 			if(Utils.compareDate(startTimeStr,currentTimeStr)<0&&Utils.compareDate(currentTimeStr,endTimeStr)<0)//addTime 处于 （结束时间-轮询时间）与结束时间 之间
 			{
 				return  true;
-			}*/
-			if(strtTime.compareTo(currentTime)<0&&currentTime.compareTo(endTime)<0)//addTime 处于 （结束时间-轮询时间）与结束时间 之间
+			}
+
+		/*	if(strtTime.compareTo(currentTime)<0&&currentTime.compareTo(endTime)<0)//addTime 处于 （结束时间-轮询时间）与结束时间 之间
 			{
 				return  true;
-			}
+			}*/
 		}
 		return false;
 	}
