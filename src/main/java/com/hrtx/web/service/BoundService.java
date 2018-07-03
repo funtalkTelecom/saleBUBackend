@@ -52,9 +52,11 @@ public class BoundService {
 		PageInfo<Object> pm = null;
 		Result result = null;
 		String statusStr="";
+		int pageNum=0;
+		int limit=0;
 		try {
-			num.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-			num.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
+			pageNum=request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+			limit=request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
             if(status.equals("0"))
 			{
 				statusStr="4";
@@ -71,7 +73,10 @@ public class BoundService {
 //			u.setAgentCity(396L);
 			//apiSessionUtil.getConsumer()==null?u.getAgentCity():
 
-			PageHelper.startPage(num.getPageNum(),num.getLimit());
+			PageHelper.startPage(pageNum,limit);
+			num.setStart(limit*(pageNum-1));
+			num.setPageNum(pageNum);
+			num.setLimit(limit);
 			Page<Object> ob=this.numMapper.queryPageNumList(num,apiSessionUtil.getConsumer().getId(),statusStr);
 			pm = new PageInfo<Object>(ob);
 			result = new Result(Result.OK, pm);
