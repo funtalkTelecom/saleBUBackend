@@ -80,7 +80,7 @@
         <include refid="ex_col_list"/>
         <include refid="col_list"/>
         from tb_num a
-        where a.sku_id = #{skuid} and a.status = 2
+        where a.sku_id = #{skuid} and a.status in (1, 2)
     </select>
 
     <select id="getListBySkuidAndStatus" resultType="Number">

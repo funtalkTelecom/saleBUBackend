@@ -468,6 +468,12 @@ public class GoodsService {
                         StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                         if (!"00000".equals(sir.getCode())) {
                             return new Result(Result.ERROR, "库存验证失败");
+                        }else{
+                            //成功之后吧上架的号码状态还原成1
+                            Number number = new Number();
+                            number.setSkuId(s.getSkuId());
+                            number.setStatus(1);
+                            numberMapper.updateStatus(number);
                         }
                     }
                 }
