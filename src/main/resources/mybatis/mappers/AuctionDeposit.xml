@@ -69,7 +69,8 @@
  	amt as price,
  	case when refund_date is null then '' else refund_date end as refundDate
 	from tb_auction_deposit
-	where tb_auction_deposit.consumer_id=#{consumerId}
+	where tb_auction_deposit.status in(2,3)
+	and tb_auction_deposit.consumer_id=#{consumerId}
 	order by tb_auction_deposit.add_date desc
     </select>
 
