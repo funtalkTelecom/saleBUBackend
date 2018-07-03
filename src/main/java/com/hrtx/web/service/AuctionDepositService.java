@@ -106,11 +106,15 @@ public class AuctionDepositService {
 		PageInfo<Object> pm = null;
 		Result result = null;
 		try {
-			//auctionDeposit.setPageNum(request.getParameter("pageNum") == null ? 1 : Integer.parseInt(request.getParameter("pageNum")));
-			auctionDeposit.setStart(request.getParameter("start") == null ? 0 : Integer.parseInt(request.getParameter("start")));
-			auctionDeposit.setLimit(request.getParameter("limit") == null ? 15 : Integer.parseInt(request.getParameter("limit")));
-			PageHelper.startPage(auctionDeposit.getPageNum(),auctionDeposit.getLimit());
-			Page<Object> ob=this.auctionDepositMapper.queryPageDepositListByConsumerId(apiSessionUtil.getConsumer().getId());
+			int pageNaum=request.getParameter("pageNum") == null ? 1 : Integer.parseInt(request.getParameter("pageNum"));
+			int limit=request.getParameter("limit") == null ? 15 : Integer.parseInt(request.getParameter("limit"));
+			auctionDeposit.setPageNum(pageNaum);
+			//auctionDeposit.setStart(request.getParameter("start") == null ? 0 : Integer.parseInt(request.getParameter("start")));
+			auctionDeposit.setLimit(limit);
+			auctionDeposit.setStart(limit*(pageNaum-1));
+			//auctionDeposit.setLimit(auctionDeposit.getLimit());
+			PageHelper.startPage(pageNaum,limit);
+			Page<Object> ob=this.auctionDepositMapper.queryPageDepositListByConsumerId(auctionDeposit,apiSessionUtil.getConsumer().getId());
 			pm = new PageInfo<Object>(ob);
 			result = new Result(Result.OK, pm);
 		} catch (NumberFormatException e) {

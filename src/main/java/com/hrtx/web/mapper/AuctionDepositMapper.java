@@ -22,7 +22,7 @@ public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<
 
     List<Map> findAuctionDepositListByConsumerId(@Param("consumerId") Long consumerId);
 
-    Page<Object> queryPageDepositListByConsumerId(@Param("consumerId") Long consumerId);
+    Page<Object> queryPageDepositListByConsumerId(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Long consumerId);
     /*
         通过NumId、ConsumerId、Status查询对应AuctionDepositList
      */
