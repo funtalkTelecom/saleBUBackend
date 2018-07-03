@@ -106,7 +106,8 @@ public class AuctionDepositService {
 		PageInfo<Object> pm = null;
 		Result result = null;
 		try {
-			auctionDeposit.setPageNum(request.getParameter("pageNum") == null ? 1 : Integer.parseInt(request.getParameter("pageNum")));
+			//auctionDeposit.setPageNum(request.getParameter("pageNum") == null ? 1 : Integer.parseInt(request.getParameter("pageNum")));
+			auctionDeposit.setStart(request.getParameter("start") == null ? 0 : Integer.parseInt(request.getParameter("start")));
 			auctionDeposit.setLimit(request.getParameter("limit") == null ? 15 : Integer.parseInt(request.getParameter("limit")));
 			PageHelper.startPage(auctionDeposit.getPageNum(),auctionDeposit.getLimit());
 			Page<Object> ob=this.auctionDepositMapper.queryPageDepositListByConsumerId(apiSessionUtil.getConsumer().getId());
