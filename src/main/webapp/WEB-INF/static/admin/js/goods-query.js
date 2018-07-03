@@ -325,7 +325,7 @@ $(function() {
         $("#skuResult tr.sku_row").each(function(){
             dsku += $(this).find("input[name=skuId]").val() + ",";
         });
-        $("#delSkus").val(dsku);
+        if(!$("#delSkus").val()) $("#delSkus").val(dsku);
 
         selectedProperty = "";
         $("input[type=checkbox]:checked").each(function(){
