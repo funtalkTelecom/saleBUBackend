@@ -61,6 +61,7 @@ public class GoodsService {
             if (goods.getgId() != null && goods.getgId() > 0) {
                 goodsMapper.goodsEdit(goods);
                 goods = goodsMapper.findGoodsInfo(goods.getgId());
+                isSale = goods.getgIsSale();
             } else {
 //                User user = SessionUtil.getUser();
                 Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");
@@ -366,6 +367,7 @@ public class GoodsService {
         Set set = new HashSet();
         int psize = set.size();
         for (String n : nums) {
+            if(StringUtils.isBlank(n)) continue;
             set.add(n);
             if(set.size()<= psize){
                 repeatNum += n + "\n";
@@ -387,18 +389,19 @@ public class GoodsService {
 	    if(skuSaleNumbs!=null && skuSaleNumbs.length>0 && !"".equals(skuSaleNumbs[0])){
             skuSaleNum = "";
             for (int i = 0; i < skuSaleNumbs.length; i++) {
+                if(StringUtils.isBlank(skuSaleNumbs[i])) continue;
                 //验证号码可用性
                 number = new Number();
-                number.setNumResource(skuSaleNumbs[i]);
+                number.setNumResource(skuSaleNumbs[i].trim());
                 number.setSkuId(skuid);
                 if(numberMapper.checkNumberIsOk(number) > 0) {
-                    skuSaleNum += skuSaleNumbs[i]+"\n";
+                    skuSaleNum += skuSaleNumbs[i].trim()+"\n";
                     //更新状态
                     number.setSkuId(skuid);
                     number.setStatus(2);
 //                    if(isUpdate) numberMapper.updateStatus(number);
                 }else{
-                    errorNum += skuSaleNumbs[i] + "\n";
+                    errorNum += skuSaleNumbs[i].trim() + "\n";
                 }
             }
         }else return "";
