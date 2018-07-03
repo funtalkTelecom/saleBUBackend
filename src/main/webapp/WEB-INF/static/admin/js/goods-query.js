@@ -320,6 +320,13 @@ $(function() {
 	var selectedProperty = "";
     var preProNum = 0;
 	function checkboxClick(obj){
+	    //商品下架中,重新选属性,要把现有列表的skuid放到delSku里面,后台才能删除sku
+        var dsku="";
+        $("#skuResult tr.sku_row").each(function(){
+            dsku += $(this).find("input[name=skuId]").val() + ",";
+        });
+        $("#delSkus").val(dsku);
+
         selectedProperty = "";
         $("input[type=checkbox]:checked").each(function(){
             var propertyName = $(this).attr("name");
