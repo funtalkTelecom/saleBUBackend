@@ -99,8 +99,8 @@ public class ApiNumberService {
 					Map obj= (Map) ob.get(i);
 					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
 					//普靓当对应地市无一级代理商时联系人和联系电话取默认
-					if(StringUtils.isBlank(String.valueOf(obj.get("phone")))) obj.put("phone", SystemParam.get("default_linktel"));
-					if(StringUtils.isBlank(String.valueOf(obj.get("name")))) obj.put("name", SystemParam.get("default_linkman"));
+					if(obj.get("phone")==null || StringUtils.isBlank(String.valueOf(obj.get("phone")))) obj.put("phone", SystemParam.get("default_linktel"));
+					if(obj.get("name")==null || StringUtils.isBlank(String.valueOf(obj.get("name")))) obj.put("name", SystemParam.get("default_linkman"));
 
 					//不是一级代理商,把价格和保底消费置空
 					if(consumer.getIsAgent()==null || 2!=consumer.getIsAgent()){
