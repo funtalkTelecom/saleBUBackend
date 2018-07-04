@@ -178,7 +178,7 @@ public class BaseReturn {
 		String originalFilename = file.getOriginalFilename();
 		String suffix_v = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
 		if(!(","+file_suffix_s+",").contains(","+suffix_v+",")){
-			return new Result(Result.ERROR, "请上次格式为["+file_suffix_s+"]的文件");
+			return new Result(Result.ERROR, "请上传格式为["+file_suffix_s+"]的文件");
 		}
 		// ==========验证文件后缀end==========//
 		Map<String, Object> map = new HashMap<>();
