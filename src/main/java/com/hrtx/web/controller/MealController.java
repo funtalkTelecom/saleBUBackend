@@ -103,6 +103,7 @@ public class MealController extends BaseReturn{
 		Map<String, Object> thirdCity = null;
 		for(int i=1;i<list.size();i++){
 			ArrayList<String> arr=list.get(i);
+			if(StringUtils.isBlank(arr.get(0)) && checkItemIsSame(arr)) continue;
 			Meal m = new Meal();
 			if(StringUtils.isBlank(arr.get(0))){
 				return returnError("数据错误，系统检测到第"+(i+1)+"行套餐ID为空。");
@@ -146,7 +147,18 @@ public class MealController extends BaseReturn{
 			mealList.add(m);
 		}
 //		recCardService.importRecCard(list, sourceServerFileName);
+		if(mealList.size()==0) return returnError("导入文件无数据");
 		mealService.insertBatch(mealList);
 		return returnOk();
+	}
+
+	private boolean checkItemIsSame(ArrayList<String> arr) {
+		if(arr.size()==1) return true;
+		for (int i = 1; i < arr.size(); i++) {
+			if (!arr.get(i - 1).equals(arr.get(i))) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
