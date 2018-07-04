@@ -160,7 +160,12 @@ public class EPSaleService {
     public void newEpsaleOrder() {
 		if(!StringUtils.equals(auction_timer,"true"))return;
 	    this.epSaleMapper.freezeOneRecord();
-        this.payEpsaleOrder();
+	    try {
+			this.payEpsaleOrder();
+		}catch (Exception e){
+	    	log.error("生成竞拍订单&退还保证金异常",e);
+		}
+
     }
 
 	public void payEpsaleOrder() {
@@ -215,6 +220,7 @@ public class EPSaleService {
 				number.setStatus(1);
 				this.numberMapper.updateByPrimaryKey(number);*/
 			}
+			//if(true) throw  new RuntimeException("测试。。。。。。。。。。。。。。。。。");
 			List<Map> needReturn=epSaleMapper.queryNeedReturn(num_id,g_id,success_consumer_id);//success_consumer_id为空时查询该号码所有出价结果
 			if(needReturn.isEmpty()){
 				log.info(String.format("竞拍单[%s]无可退保证金",num_resource));return;
