@@ -72,7 +72,7 @@ public class AgentService {
 	public Result SaveAgentLeyu(String loginName,String pwd){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		long consumerId = consumer.getId();
-//		String a = "1006420771322462208";
+//		String a = "1014426510456520704";
 //		long consumerId = Long.valueOf(a);
 		Agent param = new Agent();
 		param.setLoginName(loginName);
@@ -83,10 +83,11 @@ public class AgentService {
 		if(agent==null) return new Result(Result.ERROR, "绑定乐语的账号或密码不对");
 
 		agent.setAddConsumerId(consumerId);
+
 		Agent params = new Agent();
 		params.setLoginName(loginName);
 		params.setPwd(pwd);
-		params.setStatus(1);
+		params.setStatus(2);
 		params.setType(2);    //乐语导入
 		params.setAddConsumerId(consumerId);
 		Agent ag = agentMapper.selectOne(params);
@@ -95,28 +96,32 @@ public class AgentService {
 		Consumer consparam = new Consumer();
 		consparam.setId(consumerId);
 		consparam.setStatus(1);
+		consparam.setIsAgent(1);
 		Consumer  consumer1 = consumerMapper.selectOne(consparam);
 		if(consumer1 ==null ) return new Result(Result.ERROR, "当前客商已是代理商，无法绑定");
 		//更新agent 状态2，客商id
 		agent.setStatus(2);
 		agentMapper.updateAgentStatusToLeyu(agent);
-		consumer.setIsAgent(2);
-		consumer.setCommpayName(agent.getCommpayName());
-		consumer.setName(agent.getPerson());
-		consumer.setPhone(agent.getPhone());
-		consumer.setAgentProvince(agent.getProvince());
-		consumer.setAgentCity(agent.getCity());
-		consumer.setAgentDistrict(agent.getDistrict());
-		consumer.setAgentAddress(agent.getAddress());
-		consumer.setTradingImg(agent.getTradingImg());
+		consumer1.setIsAgent(2);
+		consumer1.setCommpayName(agent.getCommpayName());
+		consumer1.setName(agent.getPerson());
+		consumer1.setPhone(agent.getPhone());
+		consumer1.setAgentProvince(agent.getProvince());
+		consumer1.setAgentCity(agent.getCity());
+		consumer1.setAgentDistrict(agent.getDistrict());
+		consumer1.setAgentAddress(agent.getAddress());
+		consumer1.setTradingImg(agent.getTradingImg());
 		//绑定后，重新存用户信息
-		this.apiSessionUtil.saveOrUpdate(apiSessionUtil.getTokenStr(),consumer);
-		consumerMapper.insertAgentToConsumer(consumer);
+		this.apiSessionUtil.saveOrUpdate(apiSessionUtil.getTokenStr(),consumer1);
+		consumerMapper.insertAgentToConsumer(consumer1);
 
 		return new Result(Result.OK, "绑定成功");
 	}
 	public List<Map> findAgentListByaddConsumerId(Long ConsumerId) {
 		return this.agentMapper.findAgentListByConsumerId( ConsumerId);
+	}
+	public List<Map> findIsLyByConsumerId(Long ConsumerId) {
+		return this.agentMapper.findIsLyByConsumerId( ConsumerId);
 	}
 
     public Result pageAgent(Agent agent) {

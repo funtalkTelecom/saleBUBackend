@@ -42,7 +42,7 @@
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
         left join tb_consumer u on t.add_consumer_id = u.id
-        where t.is_del=0
+        where t.is_del=0 and t.type=1
         and t.add_consumer_id=#{ConsumerId}
     </select>
 
@@ -62,7 +62,7 @@
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
         left join tb_consumer u on t.add_consumer_id = u.id
-        where t.is_del=0
+        where t.is_del=0 and t.type=1
         <if test="param.commpayName!=null and param.commpayName!=''">
             and  t.commpay_name  like "%"#{param.commpayName}"%"
         </if>
@@ -103,4 +103,26 @@
             a.add_consumer_id =#{addConsumerId}
         where a.id = #{id}
     </update>
+
+
+    <select id="findIsLyByConsumerId" resultType="java.util.HashMap">
+         select t.add_consumer_id, t.id, t.commpay_name,t.person,t.phone,
+        y.name as provinceName ,c.name as cityName,d.name as districtName,
+        t.address,u.nick_name as userName,
+        t.status as status,
+        case
+				when t.status =1 then '待审核'
+				when t.status =2 then '审核通过'
+                when t.status =3 then '审核未通过'
+				else '未知'
+				end as statustext,
+        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,t.login_name as loginName,
+        t.trading_img ,t.check_remark checkRemark,t.type tyep
+        from tb_agent t left join tb_city y on t.province = y.id
+        left join tb_city c on t.city = c.id
+        left join tb_city d on t.district = d.id
+        left join tb_consumer u on t.add_consumer_id = u.id
+        where t.is_del=0 and t.type=2
+        and t.add_consumer_id=#{ConsumerId}
+    </select>
 </mapper>
