@@ -15,6 +15,7 @@ import com.hrtx.web.service.NumService;
 import com.hrtx.web.service.OrderItemService;
 import com.hrtx.web.service.OrderService;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,8 @@ public class OrderController extends BaseReturn{
 
 	@RequestMapping("/order-list")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
-	public Result listOrder(Order order){
+	public Result listOrder(Order order, HttpServletRequest request){
+		order.setStatus(Integer.parseInt(StringUtils.isBlank(request.getParameter("qstatus"))?"-1":request.getParameter("qstatus")));
 		return orderService.pageOrder(order);
 	}
 

@@ -143,6 +143,9 @@
         <if test="param.orderId!=null and param.orderId!=''">
             and a.order_id = #{param.orderId}
         </if>
+        <if test="param.status!=null and param.status!='' and param.status!='-1'">
+            and a.status = #{param.status}
+        </if>
         order by a.add_date desc
     </select>
 

@@ -237,6 +237,16 @@ $(function() {
     });
 	dataList.load();
 
+    var soption = {
+        url:"",
+        key:"keyId",
+        value:"keyValue",
+        onchange:"",
+        onclick:"",
+        param:{t:new Date().getTime()}
+    };
+    dictSelect($("#qstatus"), "orderStatus", soption, false);
+
 	$("#query").click(function() {
 		dataList.load();
 	});
