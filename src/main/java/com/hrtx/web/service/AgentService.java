@@ -109,6 +109,8 @@ public class AgentService {
 		consumer.setAgentDistrict(agent.getDistrict());
 		consumer.setAgentAddress(agent.getAddress());
 		consumer.setTradingImg(agent.getTradingImg());
+		//绑定后，重新存用户信息
+		this.apiSessionUtil.saveOrUpdate(apiSessionUtil.getTokenStr(),consumer);
 		consumerMapper.insertAgentToConsumer(consumer);
 
 		return new Result(Result.OK, "绑定成功");
@@ -159,9 +161,13 @@ public class AgentService {
 			consumer.setAgentDistrict(aa.getDistrict());
 			consumer.setAgentAddress(aa.getAddress());
 			consumer.setTradingImg(aa.getTradingImg());
+			long consumerId = consumer.getId();
+			this.apiSessionUtil.saveOrUpdate(apiSessionUtil.getTokenStr(),consumer);
 			consumerMapper.insertAgentToConsumer(consumer);
+
 		}
 		agentMapper.updateAgentStatus(aa);
+
 		return new Result(Result.OK, "提交成功");
 	}
 }
