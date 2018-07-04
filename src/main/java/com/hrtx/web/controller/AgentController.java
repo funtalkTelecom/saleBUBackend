@@ -46,7 +46,7 @@ public class AgentController {
 	}
 
 	@PutMapping(value = "/api/save-agent-leyu")
-	@Powers({PowerConsts.NOPOWER})
+	@Powers({PowerConsts.NOLOGINPOWER})
 	public Result SaveAgentLeyu(@RequestParam(value="loginName",required=false) String loginName,
 									@RequestParam(value="pwd",required=false) String pwd) {
 		return agentService.SaveAgentLeyu(loginName,pwd);
@@ -61,14 +61,22 @@ public class AgentController {
 //		String  a = "1006420771322462209";
 //		long consumerId =Long.valueOf(a);
 		Map map = new HashMap();
-		List list = agentService.findAgentListByaddConsumerId(consumerId);
-		if(list.size()==0){
-			map.put("isAgent","false");
-		}else {
-			map = (Map) list.get(0);
+		List listly = agentService.findIsLyByConsumerId(consumerId);
+		if(listly.size()>0){
+			map = (Map) listly.get(0);
 			map.put("isAgent","true");
 			map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +map.get("trading_img").toString());
+		}else {
+			List list = agentService.findAgentListByaddConsumerId(consumerId);
+			if(list.size()==0){
+				map.put("isAgent","false");
+			}else {
+				map = (Map) list.get(0);
+				map.put("isAgent","true");
+				map.put("tradingImgUrl", "");
+			}
 		}
+
 		return new Result(Result.OK, map);
 	}
 
