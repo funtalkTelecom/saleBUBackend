@@ -75,9 +75,10 @@ public class PosterController extends BaseReturn{
 
     public static void main(String[] args) {
         String pattern = "^(((http|https):\\/\\/)|(www\\.))+(\\.?)\\w+(\\.{1})\\w+$";
+        pattern = "[1-9]\\d*";
 
         Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher("baidu.com");
+        Matcher m = r.matcher("11.");
         System.out.println(m.matches());
     }
 

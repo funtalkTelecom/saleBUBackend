@@ -1,27 +1,30 @@
 package com.hrtx.web.controller;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.hrtx.dto.Result;
+import com.hrtx.global.Arith;
+import com.hrtx.global.SystemParam;
 import com.hrtx.web.service.CityService;
 import com.hrtx.web.service.DictService;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.global.PowerConsts;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.security.acl.Group;
-import java.util.ArrayList;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.hrtx.global.ImageZipUtil.zipWidthHeightImageFile;
 
 @Controller
 public class CommonController extends BaseReturn{
@@ -134,5 +137,40 @@ public class CommonController extends BaseReturn{
     @Powers({PowerConsts.NOLOGINPOWER})
     public void getImg2(@PathVariable String str, @PathVariable String str1,  @PathVariable String str2, HttpServletResponse response) {
         this.downLoadImg(str+"/"+str1+"/"+str2, response);
+    }
+
+    @RequestMapping("/kindeditorUploadFile")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Map kindeditorUploadFile(@RequestParam(name = "imgFile",required = false)MultipartFile file, HttpServletResponse response) {
+        Map resultMap = new HashMap();
+        try {
+            Result result = uploadFile(SystemParam.get("kindeditorPicDir"), "jpg,png,gif", file, false, false);
+            if(result.getCode()!=200){
+                resultMap.put("error", 1);
+                resultMap.put("message", "上传失败"+result.getData());
+            }else{
+                String sourceServerFileName = ((Map) result.getData()).get("sourceServerFileName").toString();
+                BufferedImage image = ImageIO.read(file.getInputStream());
+                //图片宽度大于1000进行等比例压缩
+                if(image.getWidth()>1000) {
+                    double xs = 1000D/image.getWidth();
+                    String rootPath = SystemParam.get("upload_root_path") + SystemParam.get("kindeditorPicDir");
+                    int width, height;
+                    width = ((Double)Arith.add(image.getWidth()*xs, 0D)).intValue();
+                    height = ((Double)Arith.add(image.getHeight()*xs, 0D)).intValue();
+                    sourceServerFileName = zipWidthHeightImageFile(new File(rootPath + sourceServerFileName), new File(rootPath + "zip" + sourceServerFileName), width, height, 0.7f);
+                }
+                resultMap.put("error", 0);
+                resultMap.put("url", SystemParam.get("domain-full") + "/get-img" + SystemParam.get("kindeditorPicDir") + sourceServerFileName);
+                resultMap.put("message", "上传成功");
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("error", 1);
+            resultMap.put("message", "上传失败");
+        }
+        return resultMap;
     }
 }

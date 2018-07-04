@@ -126,6 +126,12 @@ $(function() {
                                             //获取sku列表end
 
                                             $('#goodsInfo').modal('show');
+
+                                            //获取高度,然后设置
+                                            setTimeout(function () {
+                                                var autoheight=editor.edit.doc.body.scrollHeight;
+                                                editor.edit.setHeight(autoheight);
+                                            }, 500);
                                         }, "json");
                                     }else{
                                         repoGoods = "";
@@ -235,6 +241,16 @@ $(function() {
                 isError = true;
             }
         });
+
+        //竞拍订单只能选超靓
+        if($("input[name=gIsAuc]:checked").val()=="1"){
+            $("select[name=skuGoodsType]").each(function (i, e) {
+                if($(this).find("option:selected").val()!=4){
+                    msg = "第"+(i+1)+"行,商品类型必须选择超靓!";
+                    isError = true;
+                }
+            });
+        }
         if(isError){
             alert(msg);
             return false;
@@ -610,14 +626,17 @@ $(function() {
         editor = K.create('textarea[name="kindeditorContent"]', {
             resizeType : 1,
             allowPreviewEmoticons : false,
-            allowImageUpload : false,
+            allowImageUpload : true,
+            allowFlashUpload : true,
+            uploadJson : "/kindeditorUploadFile",
             afterBlur: function () { editor.sync(); },
             items : [
-                'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                'source', '|', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
                 'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
-                'insertunorderedlist', '|', 'emoticons', 'link']
+                'insertunorderedlist', '|', 'emoticons', 'link','image']
         });
     });
+
     //解决编辑器弹出层文本框不能输入的问题
     $('#goodsInfo').off('shown.bs.modal').on('shown.bs.modal', function (e) {
         $(document).off('focusin.modal');
@@ -677,7 +696,7 @@ $(function() {
             // });
         }
 
-        var msg = "";
+        /*var msg = "";
         //判断sku列表是否有选择白卡的
         if($("input[name=gIsAuc]:checked").val()=="1"){
             $("select[name=skuGoodsType]").each(function () {
@@ -697,7 +716,7 @@ $(function() {
         if(msg){
             alert(msg);
             return false;
-        }
+        }*/
     }
     function initGoodsPics(picList){
         var html = '<span style="color:red; font-size: 12px;">注:重新上传将删除之前的图片</span>' +
@@ -900,11 +919,11 @@ function selectSaleNum(obj){
 }
 function skuIsNumChange(obj){
     if($(obj).val()==1) $("textarea[tag="+$(obj).attr("tag")+"][name=skuSaleNum]").val("");
-    //竞拍活动禁止选白卡
+    /*//竞拍活动禁止选白卡
     if($(obj).val()==1 && $("input[name=gIsAuc]:checked").val()=="1") {
         $(obj).val("-1");
         alert("竞拍商品禁止选择白卡!");
-    }
+    }*/
 }
 //sku列表删除行
 function deleteSkuRow(obj){

@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.System;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -98,6 +100,11 @@ public class GoodsService {
                     if("".equals(price)) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return new Result(Result.ERROR, "第"+(i+1)+"行2B价格为空");
+                    }else{
+                        String pattern = "[1-9]\\d*.\\d*|0.\\d*[1-9]\\d*";
+                        Pattern r = Pattern.compile(pattern);
+                        Matcher m = r.matcher(price);
+                        if(!m.matches()) return new Result(Result.ERROR, "第" + (i + 1) + "行2B价格格式错误,请输入两位正小数");
                     }
                     sku.setSkuTobPrice(Double.parseDouble(price));
 
@@ -113,6 +120,11 @@ public class GoodsService {
                     if("".equals(price)) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return new Result(Result.ERROR, "第" + (i + 1) + "行数量为空");
+                    }else{
+                        String pattern = "[1-9]\\d*";
+                        Pattern r = Pattern.compile(pattern);
+                        Matcher m = r.matcher(price);
+                        if(!m.matches()) return new Result(Result.ERROR, "第" + (i + 1) + "行数量格式错误,请输入正整数");
                     }
 
                     skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
