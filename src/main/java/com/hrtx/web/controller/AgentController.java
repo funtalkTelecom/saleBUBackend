@@ -46,7 +46,7 @@ public class AgentController {
 	}
 
 	@PutMapping(value = "/api/save-agent-leyu")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	public Result SaveAgentLeyu(@RequestParam(value="loginName",required=false) String loginName,
 									@RequestParam(value="pwd",required=false) String pwd) {
 		return agentService.SaveAgentLeyu(loginName,pwd);
