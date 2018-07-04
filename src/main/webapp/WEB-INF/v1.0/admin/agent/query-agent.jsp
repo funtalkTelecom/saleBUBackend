@@ -170,37 +170,37 @@
 			<form role="form" class="form-horizontal">
 				<div class="modal-body">
 					<div class="form-group">
-						<label class="col-xs-2 control-label">公司名称</label>
-						<div class="col-xs-10">
-							<span class="scomm"></span>
+						<label  class="col-xs-2 col-sm-2 ">公司名称:</label>
+						<div class="col-xs-10 ">
+							<span class="scomm text-left"></span>
 						</div>
 					</div>
 					<div class="form-group">
 
-						<label class="col-xs-2 control-label">法人</label>
-						<div class="col-xs-4">
-							<span class="person"></span>
+						<label class="col-xs-2">法人:</label>
+						<div class="col-xs-3 ">
+							<span class="person text-left"></span>
 						</div>
-						<label class="col-xs-2 control-label">电话</label>
-						<div class="col-xs-4">
-							<span class="phone"></span>
+						<label class="col-xs-2">电话:</label>
+						<div class="col-xs-3">
+							<span class="phone text-left"></span>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-xs-2 control-label">注册地址</label>
-						<div class="col-xs-10">
+						<label class="col-xs-2">注册地址:</label>
+						<div class="col-xs-8 ">
 							<span class="address"></span>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-xs-2 control-label">营业执照</label>
-						<div class="col-xs-10">
+						<label class="col-xs-2">营业执照:</label>
+						<div class="col-xs-8">
 							<a id="adtradingImgs" data-lightbox="tradingImg"><img id="tradingImgs" style="max-width: 80px;max-height: 80px;"></a>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-xs-2 control-label">审核备注</label>
-						<div class="col-xs-10">
+						<label class="col-xs-2 ">审核备注:</label>
+						<div class="col-xs-8 ">
 							<span class="checkRemark"></span>
 						</div>
 					</div>
