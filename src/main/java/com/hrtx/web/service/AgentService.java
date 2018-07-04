@@ -161,8 +161,8 @@ public class AgentService {
 			consumer.setAgentDistrict(aa.getDistrict());
 			consumer.setAgentAddress(aa.getAddress());
 			consumer.setTradingImg(aa.getTradingImg());
-			long consumerId = consumer.getId();
-			this.apiSessionUtil.saveOrUpdate(apiSessionUtil.getTokenStr(),consumer);
+//			long consumerId = consumer.getId();
+//			this.apiSessionUtil.saveOrUpdate(apiSessionUtil.getTokenStr(),consumer);
 			consumerMapper.insertAgentToConsumer(consumer);
 
 		}
