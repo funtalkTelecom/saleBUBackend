@@ -253,6 +253,8 @@ public class OrderService extends BaseService {
      * @return
      */
     public Result payReceipt(Order order, HttpServletRequest request) {
+        //获取订单信息
+        order = orderMapper.findOrderInfo(order.getOrderId());
         //付款账号
         String payAccount = request.getParameter("payAccount");
         if(StringUtils.isBlank(payAccount)) return new Result(Result.ERROR, "付款账号不能为空");
@@ -260,9 +262,9 @@ public class OrderService extends BaseService {
         String receivableAccount = request.getParameter("receivableAccount");
         if(StringUtils.isBlank(receivableAccount)) return new Result(Result.ERROR, "收款账号不能为空");
         //应收
-        String receivable = request.getParameter("receivable");
-        if(StringUtils.isBlank(receivable)) return new Result(Result.ERROR, "应收不能为空");
-        if(receivable.indexOf(".")!=-1 && receivable.split("\\.")[1].length()>2) return new Result(Result.ERROR, "请填写不要超过2位小数的数字");
+        String receivable = ((Double)Arith.add(order.getTotal()*100, 0.0)).toString();//request.getParameter("receivable");
+        if(StringUtils.isBlank(receivable)) return new Result(Result.ERROR, "获取应收金额失败");
+        if(receivable.indexOf(".")!=-1 && receivable.split("\\.")[1].length()>2) return new Result(Result.ERROR, "应收金额格式错误");
         //实收
         String receipts = request.getParameter("receipts");
         if(StringUtils.isBlank(receipts)) return new Result(Result.ERROR, "实收不能为空");
@@ -270,7 +272,7 @@ public class OrderService extends BaseService {
         int receivableInt = 0;
         int receiptsInt = 0;
         try {
-            receivableInt = ((Double)Arith.add(Double.parseDouble(receivable)*100, 0.0)).intValue();
+            receivableInt = ((Double)Arith.add(order.getTotal()*100, 0.0)).intValue();
             receiptsInt = ((Double)Arith.add(Double.parseDouble(receipts)*100, 0.0)).intValue();
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -286,13 +288,11 @@ public class OrderService extends BaseService {
         }
         //本次收款金额
         int amt = receiptsInt;
-        //获取订单信息,判断是不是竞拍订单,再处理保证金
-        order = orderMapper.findOrderInfo(order.getOrderId());
         //竞拍订单判断金额
         Map m = auctionDepositService.findAuctionDepositListByOrderId(order.getOrderId());
         int deposit = ((Double)Arith.add(Double.parseDouble(String.valueOf(m.get("deposit")))*100, 0.0)).intValue();
         if(order.getOrderType()==3){
-            if (amt + aamt + deposit > receivableInt) return new Result(Result.ERROR, "本次实收金额加已支付金额不能大于应收金额");
+            if (amt + aamt + deposit > receivableInt) return new Result(Result.ERROR, "本次实收金额加已支付金额家保证金不能大于应收金额");
         }else {
             if (amt + aamt > receivableInt) return new Result(Result.ERROR, "本次实收金额加已支付金额不能大于应收金额");
         }

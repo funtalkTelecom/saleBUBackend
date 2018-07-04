@@ -10,6 +10,7 @@ import com.hrtx.web.pojo.FundOrder;
 import com.hrtx.web.pojo.Groups;
 import com.hrtx.web.pojo.Order;
 import com.hrtx.web.pojo.OrderItem;
+import com.hrtx.web.service.AuctionDepositService;
 import com.hrtx.web.service.NumService;
 import com.hrtx.web.service.OrderItemService;
 import com.hrtx.web.service.OrderService;
@@ -37,6 +38,8 @@ public class OrderController extends BaseReturn{
 	private OrderService orderService;
 	@Autowired
 	private OrderItemService orderItemService;
+	@Autowired
+	private AuctionDepositService auctionDepositService;
 	@Autowired private NumService numService;
 
 	@RequestMapping("/order-query")
@@ -85,6 +88,14 @@ public class OrderController extends BaseReturn{
 		map.put("code", Result.OK);
 		map.put("data", orderService.findOrderById(order.getOrderId()));
 		return map;
+	}
+
+	@RequestMapping("/order-deposit")
+	@ResponseBody
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
+	public Map orderDeposit(Order order){
+		Map m = auctionDepositService.findAuctionDepositListByOrderId(order.getOrderId());
+		return m;
 	}
 
 	@RequestMapping("/deliver-order-callback")

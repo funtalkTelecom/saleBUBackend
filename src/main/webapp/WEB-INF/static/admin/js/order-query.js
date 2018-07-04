@@ -158,8 +158,15 @@ $(function() {
                         $operate.find(".receipt").click(function () {
                             $("#receiptInfo-orderId").val(v);
                             $("#receiptInfo-orderType").val(record.orderType);
-                            $("#receivable").val(record.total);
-                            $("#receipts").val(record.total);
+                            //如果是竞拍订单获取保证金
+                            if(record.orderType=="3"){
+                                var deposit;
+                                $.post("order/order-deposit", {orderId: v}, function (data) {
+                                    deposit = data["deposit"];
+                                    $("#receivable").val(Number(record.total)-Number(deposit));
+                                    $("#receipts").val(Number(record.total)-Number(deposit));
+                                }, "json");
+                            }
                             $('#receiptInfo').modal('show');
                         });
                         //点击发货
