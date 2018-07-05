@@ -352,5 +352,6 @@ public class OrderService extends BaseService {
             return new Result(Result.ERROR, "绑卡失败\n" + result.getData());
         }
     }
+
 }
 

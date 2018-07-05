@@ -51,6 +51,10 @@ public class ApiOrderService {
 	@Autowired
 	private FileMapper fileMapper;
 
+	public  List<Map> findOrderListByNumId(Long numId)
+	{
+		return  orderMapper.findOrderListByNumIdAndConsumerId(numId,this.apiSessionUtil.getConsumer().getId());
+	}
 	public Result signOrder(Order order,HttpServletRequest request)
 	{
 		Long orderId=0L;
@@ -93,9 +97,9 @@ public class ApiOrderService {
 	}
 
 	/*
-	 订单 已发货未签收>7天
+	 订单 已发货待签收>7天
 	 */
-	@Scheduled(fixedRate=10000000)
+	@Scheduled(fixedRate=3000)
 	public void signOrderSystem() {
 		List<Map> list=this.orderMapper.findOrderSignList();
 		if(list.isEmpty()){
@@ -109,7 +113,7 @@ public class ApiOrderService {
 			{
 				orderId=Long.valueOf(map.get("orderId").toString());
 				order.setOrderId(orderId);
-				order.setStatus(5);
+				order.setStatus(6);
 				order.setSignDate(new Date());//签收时间
 				order.setSignType(2);//签收方式1用户自动签收2系统
 				orderMapper.signByOrderid(order);

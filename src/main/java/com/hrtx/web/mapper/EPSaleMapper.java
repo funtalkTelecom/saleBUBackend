@@ -22,6 +22,8 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     List<Map> findEPSaleGoodsListByEPSaleId(Long epSaleId);
 
+    List<Map> findEPSaleGoodsListByEPSaleId2(Long epSaleId);
+
     List<Map> findEPSaleGoodsByGoodsId(Long goodsId);
 
     List<Map> findEPSaleGoods();

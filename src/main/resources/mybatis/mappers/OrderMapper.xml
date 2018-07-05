@@ -150,9 +150,23 @@
     select tb_order.order_id as orderId
     from tb_order
     where is_del=0
-    and status=4
+    and status=5
     and TIMESTAMPDIFF(hour,tb_order.deliver_date, now())/24>7
    </select>
+
+    <select id="findOrderListByNumIdAndConsumerId" resultType="java.util.HashMap">
+    select
+    tb_order.order_id as orderId,
+    tb_order.status as orderStatus,
+    tb_order.consumer as consumerId
+    from tb_order
+    inner join tb_order_item orderItem
+    on  tb_order.order_id=orderItem.order_id
+    where tb_order.is_del=0
+    and tb_order.sku_goods_type=3
+    and orderItem.num_id=#{numId}
+    and tb_order.consumer=#{consumerId}
+    </select>
 
     <insert id="insertBatch">
         insert into tb_order(

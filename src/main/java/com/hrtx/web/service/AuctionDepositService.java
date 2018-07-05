@@ -13,6 +13,7 @@ import com.hrtx.web.mapper.ConsumerMapper;
 import com.hrtx.web.pojo.Auction;
 import com.hrtx.web.pojo.AuctionDeposit;
 import com.hrtx.web.pojo.Consumer;
+import com.hrtx.web.pojo.Goods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,9 @@ import java.util.*;
 @Service
 public class AuctionDepositService {
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
-	@Autowired
-	private AuctionService auctionService;
+	@Autowired private AuctionService auctionService;
+	@Autowired private EPSaleService epSaleService;
+	@Autowired private GoodsService goodsService;
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
 	@Autowired private AuctionMapper auctionMapper;
 	@Autowired private ConsumerMapper consumerMapper;
@@ -163,17 +165,21 @@ public class AuctionDepositService {
 	     3）、本次出价出价状态status:1 调整status:2 成功
 	 */
 	public void newAuctionDepositPay(Long Id,boolean status,String payDate) {
+
 		AuctionDeposit auctionDeposit=new AuctionDeposit();
 		List<Map> auctionDepositList=auctionDepositMapper.findAuctionDepositById(Id);
 				//auctionDepositMapper.findAuctionDepositListById(Id);
 		Long consumerId=0L;
 		Long numId=0L;
 		Long gId=0L;
+		int loopTime=0;//轮咨时间分钟
 		if(auctionDepositList.size()>0)
 		{
 			consumerId=Long.valueOf(auctionDepositList.get(0).get("consumer_id").toString());
 			numId=Long.valueOf(auctionDepositList.get(0).get("num_id").toString());
 			gId=Long.valueOf(auctionDepositList.get(0).get("g_id").toString());
+			Goods goods=goodsService.findGoodsById(gId);//上架商品信息
+			loopTime=Integer.valueOf(goods.getgLoopTime());
 		}
 		auctionDeposit.setConsumerId(consumerId);
 		auctionDeposit.setNumId(numId);
@@ -233,6 +239,11 @@ public class AuctionDepositService {
 						//****************保证金支付成功*****当前出价记录状态：2成功*******************
 						auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 						auctionMapper.auctionEditStatusById(auction);
+						if(epSaleService.isLoopTime(auction.getConfirmDate(),loopTime,numId)) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
+						{
+							//***************************则延长结束时间= 结束时间+loopTime*********************
+							epSaleService.numLoopEdit(numId,loopTime);
+						}
 						//****************保证金支付成功*******当前出价记录状态：2成功*****************
 					}
 					//2、出现同价的成功出价记录，则当前出价记录状态：3失败
@@ -268,6 +279,11 @@ public class AuctionDepositService {
 					auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 					auctionMapper.auctionEditStatusById(auction);
 					//****************保证金支付成功*******当前出价记录状态：2成功*****************
+					if(epSaleService.isLoopTime(auction.getConfirmDate(),loopTime,numId)) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
+					{
+						//***************************则延长结束时间= 结束时间+loopTime*********************
+						epSaleService.numLoopEdit(numId,loopTime);
+					}
 				}
 		}else
 		{

@@ -44,12 +44,17 @@ $(function() {
                 $operate.find(".update").click(function () {
                     $.post("epSale/epSale-info", {id: v}, function (data) {
                         var _data = data.data;
+                        var isSale=data.isSale=="1"?true:false;
+
                         $("#startTimePicker").val(_data.startTime);
+                        $("#startTimePicker").attr("disabled",isSale);
                         $("#endTimePicker").val(_data.endTime);
+                        $("#endTimePicker").attr("disabled",isSale);
                         $("#startTime").val(_data.startTime);
                         $("#endTime").val(_data.endTime);
                         $("#lastPayTime").val(_data.lastPayTime);
                         $("#lastPayTimePicker").val(_data.lastPayTime);
+                        $("#lastPayTimePicker").attr("disabled",isSale);
                         initEPSalePics(data.epSalePics);
                         editor.html(_data.epRule);
                         formInit($("#epSaleInfo form"), _data);
@@ -108,6 +113,7 @@ $(function() {
         var endTime=$("#endTime").val();
         var lastPayTime=$("#lastPayTime").val();
         var epRule=$("textarea[name='epRule']").val();
+        var file=$("#file").val();
        if(title=="")
        {
            alert("标题不能为空!")
@@ -131,6 +137,11 @@ $(function() {
         if(epRule=="")
         {
             alert("竟拍规则不能为空!")
+            return false;
+        }
+        if(file=="")
+        {
+            alert("图片不能为空!")
             return false;
         }
         //editor.sync();
@@ -195,6 +206,7 @@ $(function() {
         var style = 'visibility: hidden;';
         var refid,filename;
         var pcount=0;
+        var imgClass="";
         for(var i=0;i<1;i++){
             if(pcount==0) html += '<div class="form-group" style="padding-bottom: 10px; padding-top:10px;">';
             html += '<div class="col-xs-4">';
@@ -207,8 +219,12 @@ $(function() {
                     break;
                 }
             }
-            html+='<input style="float:left" type="file" name="file" seq="'+(i+1)+'" onchange="fileChange('+(i+1)+')">';
-            html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;"><i title="删除图片" class="raty-cancel cancel-off-png" data-alt="x"></i></div>';
+            if((typeof picList !='undefined')&&(filename!=''))
+            {
+                imgClass="raty-cancel cancel-off-png";
+            }
+            html+='<input style="float:left" type="file" name="file" id="file" seq="'+(i+1)+'" onchange="fileChange('+(i+1)+')">';
+            html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;"><i  id="delImgI" title="删除图片" class="'+imgClass+'" data-alt="x"></i></div>';
             html+='<img style="width:150px;'+style+'" src="'+basePath+'get-img/epSalePics/'+refid+'/'+filename+'">';
 
             html+='</div>';
@@ -222,6 +238,7 @@ $(function() {
             refid = '';
             filename = '';
         }
+
         $("#picUpload").html(html);
     }
 });
@@ -229,6 +246,7 @@ $(function() {
 function deletePic(obj){
     if($("#delPicSeqs").val().indexOf($(obj).prev().attr("seq"))==-1) $("#delPicSeqs").val($("#delPicSeqs").val()+'"'+$(obj).prev().attr("seq")+'",');
     $(obj).parent().find("img").eq(0).css("visibility","hidden");
+    $("#delImgI").attr("class","");
 }
 var allowFileType = ".png,.jpg,.gif";
 
