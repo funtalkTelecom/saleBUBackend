@@ -1,6 +1,7 @@
 package com.hrtx.web.service;
 
 import com.hrtx.config.advice.ServiceException;
+import com.hrtx.dto.Result;
 import com.hrtx.global.FtpUtils;
 import com.hrtx.global.Messager;
 import com.hrtx.global.SystemParam;
@@ -132,56 +133,88 @@ public class LyCrmService {
         return result;
     }
 
-	/*<CityCode>110</CityCode>
-	<CustName>李兵</CustName>
-	<IdendityCode>131121198510025018</IdendityCode>
-	<CustAddress>河北省石家庄市长安区</CustAddress>
-	<PhoneNumber>15931108200</PhoneNumber>
-	<AIdendityCode>HRCS12345678</AIdendityCode>*/
+    @Scheduled(cron = "0 0 23 * * ?")
+    public void createAgentCardFile() {
+        try {
+            int date_offset = 0;
+            int count = 1;
+            String order = "1000000009"+Utils.getDate(0, "yyyyMMddHHmmss")+StringUtils.leftPad(count+"", 4, "0");
+//          list.add(new Object[]{"190",order,"17003564498","8986031754351004498","LYHR_ZYQ1141","1370761","zhouyq","01","350782198706203512","29号","zhouyq11","18965902603"});
+            List<Map> nums = numMapper.queryDslNum();
+            int start = 0;
+            int len = nums.size();
+            int maxCapacity = 100000000;
+            List<Long> snums = new ArrayList<>();
+            while(start < len){
+                List<Object[]> list = new ArrayList<>();
+                int end = start + maxCapacity;
+                end = end > len ? len : end;
+                for (int i = start; i < end ; i++) {
+                    Map num = nums.get(i);
+                    list.add(new Object[]{num.get("third_id"), order, num.get("num_resource"), num.get("iccid"), SystemParam.get("ly_work_login_name"),
+                            num.get("meal_id"), SystemParam.get("ly_work_name"), SystemParam.get("ly_work_card_type"), SystemParam.get("ly_work_card_code"),
+                            SystemParam.get("ly_work_address"), SystemParam.get("ly_work_contact"), SystemParam.get("ly_work_contact_phone")});
+                    snums.add(NumberUtils.toLong(String.valueOf(num.get("id"))));
+                }
+                start = end;
+                this.createOpenCardFile(snums, list, count, date_offset);
+                count++;
+            }
+        }catch (ServiceException e) {
+            log.error(e.getMessage(), e);
+            Messager.send(SystemParam.get("system_phone"),"上传开卡文件异常("+e.getMessage()+")");
+        }catch (Exception e) {
+            log.error(e.getMessage(), e);
+            Messager.send(SystemParam.get("system_phone"),"上传开卡文件异常");
+        }
 
-
-//    <cityCode>110</cityCode>
-//    <dealerName>华睿周元强1090</dealerName>
-//    <dealerID>C100333555</dealerID>
-//    <workNumber>LYHR_ZYQ1111</workNumber>
-//    <password>123456</password>
-
-//	地市编码	3	如：110代表北京市，参见4.4.5归属地是编码
-//	订单编号	28	发起方平台编码+时间（yyyymmddhhmiss）+4位序号（0000~9999）
-//	电话号码	11
-//	卡号	19	Iccid
-//	代理商工号	30	要求工号中的字母都是大写
-//	套餐编码	7	套餐编码线下提供
-//	客户名称	60
-//	证件类型	2	01：身份证；02：工商营业执照
-//	证件编码	60
-//	通讯地址	200
-//	联系人	60
-//	联系电话（手机号码）	20
-//	8986031754351004498/17003564498
-//	8986031754351004497/17003564497
-//	8986011784020097494/17176877494
-//	8986011784020097424/17176877424
-
-    public void createAgentCardFile(int count, int date_offset) {
-        List<Object[]> list = new ArrayList<>();
-        String order = "1000000009"+Utils.getDate(0, "yyyyMMddHHmmss")+"0001";
-        list.add(new Object[]{"190",order,"17003564498","8986031754351004498","LYHR_ZYQ1141","1370761","zhouyq","01","350782198706203512","29号","zhouyq11","18965902603"});
-        list.add(new Object[]{"190",order,"17003564497","8986031754351004497","LYHR_ZYQ1141","1370761","zhouyq","01","350782198706203512","29号","zhouyq11","18965902603"});
-        list.add(new Object[]{"110",order,"17176877494","8986011784020097494","LYHR_ZYQ1142","1371282","zhouyq","01","350782198706203512","29号","zhouyq11","18965902603"});
-        list.add(new Object[]{"110",order,"17176877424","8986011784020097424","LYHR_ZYQ1142","1371282","zhouyq","01","350782198706203512","29号","zhouyq11","18965902603"});
-        this.createOpenCardFile(list, count, date_offset);
     }
 
-    private void createOpenCardFile(List<Object[]> list, int count, int date_offset) {
+    private void createOpenCardFile(List<Long> snums, List<Object[]> list, int count, int date_offset) {
         File dir = new File(this.getLyRootPath()+"upload/");
         if(!dir.exists()) dir.mkdir();
         String ly_src_sys = SystemParam.get("ly_src_sys");
-        String fileName = ly_src_sys+Utils.getDate(-1-date_offset, "yyyyMMddHHmmss")+StringUtils.leftPad(count+"", 6, "0")+".txt";
+        String fileName = ly_src_sys+Utils.getDate(0-date_offset, "yyyyMMddHHmmss")+StringUtils.leftPad(count+"", 6, "0")+".txt";
         File file = new File(dir.getPath()+File.separator+fileName);
         if(file.exists()) file.delete();
         createFile(list, file.getPath());
-        this.uploadFileToSftp("upload", "upload", fileName, 0);
+        int ucount = this.batchUpdateSlz(snums);
+        if(snums.size() != ucount) throw new ServiceException(String.valueOf("需上传号码与更新号码不一致"));
+        Result result = this.uploadFileToSftp("upload", "upload", fileName, 0);
+        if(result.getCode() != Result.OK) throw new ServiceException(String.valueOf(result.getData()));
+
+    }
+
+    private int batchUpdateSlz(List<Long> snums) {
+        int ucount = 0;
+        int start = 0;
+        int len = snums.size();
+        int maxCapacity = 1000;
+        while(start < len){
+            List<Object[]> list = new ArrayList<>();
+            int end = start + maxCapacity;
+            end = end > len ? len : end;
+            int count = numMapper.batchUpdateSlz(snums.subList(start, end));
+            ucount = ucount + count;
+            start = end;
+        }
+        return ucount;
+    }
+
+    public static void main(String[] args) {
+        List t = new ArrayList();
+        t.add("a");t.add("b");t.add("c");t.add("d");;t.add("e");
+        int start = 0;
+        int len = t.size();
+        int maxCapacity = 2;
+        while(start < len){
+            List<Object[]> list = new ArrayList<>();
+            int end = start + maxCapacity;
+            end = end > len ? len : end;
+            List bb = t.subList(start, end);
+            System.out.println(bb.size()+ "***"+ bb.get(0)+"--***"+bb.get(bb.size()-1));
+            start = end;
+        }
     }
 
     @Scheduled(cron = "0 0 6 * * ?")
@@ -208,7 +241,8 @@ public class LyCrmService {
         if(file.exists()) file.delete();
         List<Object[]> list = null;//lyCrmDao.queryActiveIccid();
         createFile(list, file.getPath());
-        this.uploadFileToSftp("iccid_hr2boss", "iccid_hr2boss", fileName, 0);
+        Result result = this.uploadFileToSftp("iccid_hr2boss", "iccid_hr2boss", fileName, 0);
+        if(result.getCode() != Result.OK) throw new ServiceException(String.valueOf(result.getData()));
     }
 
     private void praseLyPhoneData(int date_offset) {
@@ -286,13 +320,13 @@ public class LyCrmService {
         }
     }
 
-    private void uploadFileToSftp(String localPath, String ftpPath, String fileName, int up_count){
+    private Result uploadFileToSftp(String localPath, String ftpPath, String fileName, int up_count){
         log.info("进入上传文件方法");
         try {
             File file = new File(this.getLyRootPath()+localPath+File.separator+fileName);
             if(!file.exists()) {
-                log.info("今天的日志还未生成");
-                throw new ServiceException(fileName);
+                log.info("["+fileName+"]还未生成");
+                return new Result(Result.ERROR, "["+fileName+"]还未生成");
             }
             log.info("查到到文件["+file+"]");
             boolean isup = false;
@@ -306,13 +340,14 @@ public class LyCrmService {
                     log.error("", e1);
                 }
                 if(up_count == 0) {
-                    this.uploadFileToSftp(localPath, ftpPath, fileName, 1);
+                    return this.uploadFileToSftp(localPath, ftpPath, fileName, 1);
                 }
             }
-            if(!isup) throw new ServiceException("上传["+fileName+"]失败");
+            if(!isup) return new Result(Result.ERROR, "上传["+fileName+"]失败");
+            return new Result(Result.OK, "上传["+fileName+"]成功");
         } catch (Exception e) {
             log.error("上传文件异常", e);
-            throw new ServiceException("上传["+fileName+"]失败");
+            return new Result(Result.ERROR, "上传["+fileName+"]失败");
         }
     }
 

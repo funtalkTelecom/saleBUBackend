@@ -82,7 +82,7 @@ public class OrderService extends BaseService {
         }
 
         if("3".equals(goodsType)) {//普靓
-            if(nums != null && nums.size() > 0) numMapper.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
+            if(nums != null && nums.size() > 0) this.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
             order.setStatus(4);//待配卡
             orderMapper.updateByPrimaryKey(order);
             return new Result(Result.OK, "订单下未找到需要发货的产品");
@@ -102,7 +102,7 @@ public class OrderService extends BaseService {
         if(result.getCode() != Result.OK) return result;
         StorageInterfaceResponse storageInterfaceResponse = StorageInterfaceResponse.create(String.valueOf(result.getData()), SystemParam.get("key"));
         if("00000".equals(storageInterfaceResponse.getCode())) {
-            if(nums != null && nums.size() > 0) numMapper.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
+            if(nums != null && nums.size() > 0) this.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
             order.setStatus(3);//待配货
             order.setNoticeShipmentDate(new Date());
             orderMapper.updateByPrimaryKey(order);
@@ -110,6 +110,22 @@ public class OrderService extends BaseService {
             return new Result(Result.ERROR, "发货失败["+storageInterfaceResponse.getDesc()+"]");
         }
         return new Result(Result.OK, "发货成功");
+    }
+
+    private int batchUpdateDpk(Long consumer, String consumerName, List<Map> nums) {
+        int ucount = 0;
+        int start = 0;
+        int len = nums.size();
+        int maxCapacity = 1000;
+        while(start < len){
+            List<Object[]> list = new ArrayList<>();
+            int end = start + maxCapacity;
+            end = end > len ? len : end;
+            int count = numMapper.batchUpdateDpk(consumer, consumerName, nums.subList(start, end));
+            ucount = ucount + count;
+            start = end;
+        }
+        return ucount;
     }
 
     /**
