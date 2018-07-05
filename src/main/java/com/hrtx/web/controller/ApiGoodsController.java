@@ -76,7 +76,7 @@ public class ApiGoodsController extends BaseReturn{
     @Powers(PowerConsts.NOLOGINPOWER)
     public Map goodsKindeditorContent(@PathVariable("gId") String gId){
         Goods goods = new Goods();
-        Map<String, Object> map = null;
+        Map<String, Object> map = new HashMap<String, Object>();
         try {
             goods.setgId(Long.parseLong(gId));
             map = new HashMap<String, Object>();
