@@ -124,13 +124,13 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-xs-2 control-label">营业执照</label>
+						<label class="col-xs-2">营业执照</label>
 						<div class="col-xs-10">
 							<a id="adtradingImg" data-lightbox="tradingImg"><img id="tradingImg" style="max-width: 80px;max-height: 80px;"></a>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-xs-2 control-label">是否通过</label>
+						<label class="col-xs-2 ">是否通过</label>
 						<div class="col-xs-10">
 							<select name="status" class="status">
 								<option value="-1">请选择</option>
@@ -140,7 +140,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-xs-2 control-label">审核备注</label>
+						<label class="col-xs-2 ">审核备注</label>
 						<div class="col-xs-10">
 							<textarea name="checkRemark"></textarea>
 						</div>
