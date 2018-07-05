@@ -71,7 +71,7 @@ public class OrderController extends BaseReturn{
 	@RequestMapping("/order-bindCard")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_BINDCARD})
 	public Result payBindCard(Order order, HttpServletRequest request){
-		return orderService.payBindCard(order, request);
+		return orderService.bindCard(order, request);
 	}
 
 	@RequestMapping("/item-list")

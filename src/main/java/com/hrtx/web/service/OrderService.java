@@ -4,6 +4,7 @@ import com.github.abel533.entity.Example;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hrtx.config.advice.ServiceException;
 import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
@@ -343,14 +344,13 @@ public class OrderService extends BaseService {
         }
     }
 
-    public Result payBindCard(Order order, org.apache.catalina.servlet4preview.http.HttpServletRequest request) {
+    public Result bindCard(Order order, org.apache.catalina.servlet4preview.http.HttpServletRequest request) {
         if("4".equals(order.getStatus()) && "2".equals(order.getSkuGoodsType())) return new Result(Result.ERROR, "待配卡的普号禁止管理员绑卡");
         Result result = numService.blindNum(order.getOrderId());
-        if(result.getCode()==200){
-            return new Result(Result.OK, "绑卡成功");
-        }else{
-            return new Result(Result.ERROR, "绑卡失败\n" + result.getData());
-        }
+        if(result.getCode() != Result.OK) return new Result(Result.ERROR, "绑卡失败\n" + result.getData());
+        result = this.updateDqx(order.getOrderId());
+        if(result.getCode()!=Result.OK) throw new ServiceException("绑卡失败\n" + result.getData());
+        return new Result(Result.OK, "绑卡成功");
     }
 }
 
