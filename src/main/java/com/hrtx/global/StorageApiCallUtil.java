@@ -12,7 +12,7 @@ public class StorageApiCallUtil {
 	private static Logger log = LoggerFactory.getLogger(StorageApiCallUtil.class);
 
 	public static Result storageApiCall(Map param, String act_type){
-		Result res = new Result(Result.ERROR, "调用接口异常");
+		Result res =null;// new Result(Result.ERROR, "调用接口异常");
 		String merid = SystemParam.get("merid");
 		String key = SystemParam.get("key");
 		String serial = Utils.randomNoByDateTime();
