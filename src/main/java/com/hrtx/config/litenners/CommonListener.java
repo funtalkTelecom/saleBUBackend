@@ -6,6 +6,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import com.hrtx.global.ContextUtils;
+import com.hrtx.global.Messager;
 import com.hrtx.global.SystemParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ public class CommonListener implements ServletContextListener {
 		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
 		ContextUtils.setContext(ctx);
 		SystemParam.load();
+		Messager.init();
 		log.info("进行了 权限表检查+++++++++++++++++++++++++++++++++++++++++++++++");
 	}
 

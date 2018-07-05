@@ -51,7 +51,7 @@
 
     <select id="queryDslNum" resultType="java.util.HashMap">
         select n.id, c.third_id, n.num_resource, n.iccid, m.meal_id  from tb_num n, tb_third_city c, tb_meal m where n.city_id = c.city_id and c.third = 'ly' and n.meal_mid = m.mid
-		and n.seller_id = 10 and n.`status` = 5
+		and n.seller_id = 10 and n.`status` = 5 limit 100000
     </select>
 
 </mapper>
