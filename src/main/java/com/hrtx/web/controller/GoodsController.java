@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,8 +58,13 @@ public class GoodsController extends BaseReturn{
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("code", Result.OK);
 		map.put("data", goodsService.findGoodsById(goods.getgId()));
-        map.put("kindeditor", Utils.kindeditorReader(goods.getgId() + ".txt", SystemParam.get("kindedtiorDir")));
-        map.put("goodsPics", fileService.findFilesByRefid(goods.getgId().toString()));
+		try {
+			map.put("kindeditor", Utils.kindeditorReader(goods.getgId() + ".txt", SystemParam.get("kindedtiorDir")));
+		} catch (IOException e) {
+			e.printStackTrace();
+			map.put("kindeditor", "读取文件信息失败:未找到相应文件");
+		}
+		map.put("goodsPics", fileService.findFilesByRefid(goods.getgId().toString()));
 		return map;
 	}
 

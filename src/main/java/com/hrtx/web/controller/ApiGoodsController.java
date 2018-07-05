@@ -18,6 +18,7 @@ import com.hrtx.web.pojo.File;
 import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.pojo.Sku;
 import com.hrtx.web.service.ApiGoodsService;
+import com.hrtx.web.service.GoodsService;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +39,8 @@ public class ApiGoodsController extends BaseReturn{
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private ApiGoodsService apiGoodsService;
+	@Autowired
+	private GoodsService goodsService;
 
 	/**
 	 * 在售商品列表
@@ -66,4 +70,27 @@ public class ApiGoodsController extends BaseReturn{
 	public Result goodsDetail(@PathVariable("id") String id, HttpServletRequest request){
 		return apiGoodsService.goodsDetail(id, request);
 	}
+
+    @RequestMapping("/goods-info/{gId}")
+    @ResponseBody
+    @Powers(PowerConsts.NOLOGINPOWER)
+    public Map goodsKindeditorContent(@PathVariable("gId") String gId){
+        Goods goods = new Goods();
+        Map<String, Object> map = null;
+        try {
+            goods.setgId(Long.parseLong(gId));
+            map = new HashMap<String, Object>();
+            map.put("code", Result.OK);
+            map.put("data", goodsService.getKindeditorContent(goods));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            map.put("code", Result.ERROR);
+            map.put("data", "请传入合法的ID");
+        } catch (IOException e) {
+            e.printStackTrace();
+            map.put("code", Result.ERROR);
+            map.put("data", "读取文件信息失败:未找到相应文件");
+        }
+        return map;
+    }
 }

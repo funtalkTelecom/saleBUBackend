@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.System;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -520,5 +521,9 @@ public class GoodsService {
     public boolean checkGnameIsExist(Goods goods) {
 	    int n = goodsMapper.checkGnameIsExist(goods);
 	    return n>0?true:false;
+    }
+
+    public String getKindeditorContent(Goods goods) throws IOException {
+	    return Utils.kindeditorReader(goods.getgId() + ".txt", SystemParam.get("kindedtiorDir"));
     }
 }

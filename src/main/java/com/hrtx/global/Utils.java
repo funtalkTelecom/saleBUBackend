@@ -443,19 +443,14 @@ public class Utils {
 		return b;
 	}
 
-	public static String kindeditorReader(final String fileName, final String filePath) {
+	public static String kindeditorReader(final String fileName, final String filePath) throws IOException {
 		String content;
 		StringBuffer result = new StringBuffer();
 
-		try {
-			FileReader fr = new FileReader(filePath + fileName);
-			BufferedReader br = new BufferedReader(fr);
-			while ((content = br.readLine())!=null){
-				result.append(content);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			result.insert(0,"<<><>>"+e.getMessage().toString());
+		FileReader fr = new FileReader(filePath + fileName);
+		BufferedReader br = new BufferedReader(fr);
+		while ((content = br.readLine())!=null){
+			result.append(content);
 		}
 
 		return result.toString();
