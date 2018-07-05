@@ -629,6 +629,7 @@ $(function() {
             allowImageUpload : true,
             allowFlashUpload : true,
             uploadJson : "/kindeditorUploadFile",
+            imageMaxSize : 2*1024*1024,
             afterBlur: function () { editor.sync(); },
             items : [
                 'source', '|', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
