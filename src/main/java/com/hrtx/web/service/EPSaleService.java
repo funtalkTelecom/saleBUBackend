@@ -467,7 +467,7 @@ public class EPSaleService {
 			epSaleMapper.insertBatch(list);
 		}
 
-		//图片保存
+		//图片保存1
 		Result result = null;
 		String picSeqs = request.getParameter("picSeqs")==null?"":request.getParameter("picSeqs");
 		String delPicSeqs = request.getParameter("delPicSeqs")==null?"":request.getParameter("delPicSeqs");
