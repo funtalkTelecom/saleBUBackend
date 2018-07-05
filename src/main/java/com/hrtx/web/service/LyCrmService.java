@@ -143,7 +143,7 @@ public class LyCrmService {
             List<Map> nums = numMapper.queryDslNum();
             int start = 0;
             int len = nums.size();
-            int maxCapacity = 100000000;
+            int maxCapacity = 1000000;
             List<Long> snums = new ArrayList<>();
             while(start < len){
                 List<Object[]> list = new ArrayList<>();
@@ -163,15 +163,17 @@ public class LyCrmService {
         }catch (ServiceException e) {
             log.error(e.getMessage(), e);
             Messager.send(SystemParam.get("system_phone"),"上传开卡文件异常("+e.getMessage()+")");
+            throw e;
         }catch (Exception e) {
             log.error(e.getMessage(), e);
             Messager.send(SystemParam.get("system_phone"),"上传开卡文件异常");
+            throw e;
         }
 
     }
 
     private void createOpenCardFile(List<Long> snums, List<Object[]> list, int count, int date_offset) {
-        File dir = new File(this.getLyRootPath()+"upload/");
+        File dir = new File(this.getLyRootPath()+"upload"+File.separator);
         if(!dir.exists()) dir.mkdir();
         String ly_src_sys = SystemParam.get("ly_src_sys");
         String fileName = ly_src_sys+Utils.getDate(0-date_offset, "yyyyMMddHHmmss")+StringUtils.leftPad(count+"", 6, "0")+".txt";
@@ -199,6 +201,32 @@ public class LyCrmService {
             start = end;
         }
         return ucount;
+    }
+
+    @Scheduled(cron = "0 0 7 * * ?")
+    public void praseOpenCardFileResult() {
+        praseOpenCardFileResult(0);
+    }
+
+    public void praseOpenCardFileResult(int date_offset) {
+        String ly_src_sys = SystemParam.get("ly_src_sys");
+        String fileName = ly_src_sys+Utils.getDate(-1-date_offset, "yyyyMMddHHmmss")+StringUtils.leftPad("1", 6, "0")+".txt.ok";
+        this.downloadFileToSftp("download", "download", fileName);
+        File dir = new File(this.getLyRootPath()+"download"+File.separator);
+        List<String> datas = this.readFile(dir.getPath()+File.separator+fileName);
+
+        if(datas != null) {
+            log.info("解析到乐语代理商数据["+datas.size()+"]条");
+            for (int j = 0, len = datas.size(); j < len; j++) {
+                String line = datas.get(j)+"|00";;
+                String[] row = line.split("\\|");
+                if(row.length<10){
+                    log.info("第["+j+"]行数据字段不足，异常");
+                    continue;
+                }
+            }
+        }
+
     }
 
     public static void main(String[] args) {
@@ -234,7 +262,7 @@ public class LyCrmService {
     }
 
     public void uploadLyIccidData(int date_offset) {
-        File dir = new File(this.getLyRootPath()+"iccid_hr2boss/");
+        File dir = new File(this.getLyRootPath()+"iccid_hr2boss"+File.separator);
         if(!dir.exists()) dir.mkdir();
         String fileName = Utils.getDate(-1-date_offset, "yyyyMMdd")+".txt";
         File file = new File(dir.getPath()+File.separator+fileName);
@@ -248,7 +276,7 @@ public class LyCrmService {
     private void praseLyPhoneData(int date_offset) {
         String fileName = Utils.getDate(-1-date_offset, "yyyyMMdd")+".txt";
         this.downloadFileToSftp("phone_boss2hr", "phone_boss2hr", fileName);
-        File dir = new File(this.getLyRootPath()+"phone_boss2hr/");
+        File dir = new File(this.getLyRootPath()+"phone_boss2hr"+File.separator);
         String tFileName = dir.getPath()+File.separator+fileName;
         List<String> datas = this.readFile(tFileName);
         numBaseMapper.delete(null);
@@ -278,7 +306,7 @@ public class LyCrmService {
     public void praseLyCorpData(int date_offset) {
         String fileName = Utils.getDate(-1-date_offset, "yyyyMMdd")+".txt";
         this.downloadFileToSftp("channel_boss2hr", "channel_boss2hr", fileName);
-        File dir = new File(this.getLyRootPath()+"channel_boss2hr/");
+        File dir = new File(this.getLyRootPath()+"channel_boss2hr"+File.separator);
         List<String> datas = this.readFile(dir.getPath()+File.separator+fileName);
 //        lyCrmDao.deleteLyCorp();
         if(datas != null) {
@@ -331,7 +359,7 @@ public class LyCrmService {
             log.info("查到到文件["+file+"]");
             boolean isup = false;
             try {
-                isup = FtpUtils.upload(file, "/hr/"+ftpPath+"/"+fileName, this.getFtp());//SFTPUtil.upload("/"+type+"/upload",file);
+                isup = FtpUtils.upload(file, File.separator+"hr"+File.separator+ftpPath+File.separator+fileName, this.getFtp());//SFTPUtil.upload("/"+type+"/upload",file);
             } catch (Exception e) {
                 log.error("上传异常",e);
                 try {
@@ -357,7 +385,7 @@ public class LyCrmService {
         File dir = new File(path);
         if(!dir.exists()) dir.mkdir();
         try {
-            FtpUtils.download(new File(path+fileName), "/hr/"+ftpPath+"/"+fileName, this.getFtp());
+            FtpUtils.download(new File(path+fileName), File.separator+"hr"+File.separator+ftpPath+File.separator+fileName, this.getFtp());
         } catch (Exception e) {
             log.error("下载文件["+fileName+"]异常", e);
             throw new ServiceException("下载文件["+fileName+"]异常");
