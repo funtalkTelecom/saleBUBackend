@@ -31,7 +31,20 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
      * 批量更新为待配卡状态
      * @param nums
      */
-    void batchUpdateDpk(@Param("buyerId") Long buyerId, @Param("buyer") String buyer, @Param("list") List<Map> nums);
+    int batchUpdateDpk(@Param("buyerId") Long buyerId, @Param("buyer") String buyer, @Param("list") List<Map> nums);
 
     Page<Object> queryPageNumList(Num   num, @Param("consumerId") Long consumerId, @Param("status") String status);
+
+    /**
+     * 查找所有待受理号码
+     * @return
+     */
+    List<Map> queryDslNum();
+
+    /**
+     * 批量更新为受理中
+     * @param snums
+     * @return
+     */
+    int batchUpdateSlz(@Param("list") List<Long> snums);
 }
