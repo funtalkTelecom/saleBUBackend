@@ -65,5 +65,5 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     ///////////////////////////////////
     List<Map> queryNumEndTime(@Param("num_id") Long num_id);
-    List<Map> updateNumDelayed(@Param("num_id") Long num_id,@Param("loop_time") Integer loop_time);
+    void updateNumDelayed(@Param("num_id") Long num_id,@Param("loop_time") Integer loop_time);
 }

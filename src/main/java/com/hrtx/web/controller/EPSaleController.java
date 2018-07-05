@@ -268,12 +268,13 @@ public class EPSaleController extends BaseReturn{
 						}
 
 					}
+					epSaleService.epsaleDelayed(auction.getNumId());
 					//**************当前出价记录是处于（结束时间-轮询时间）与结束时间 之间************************************************
-					if(epSaleService.isLoopTime(addDate,loopTime,auction.getNumId())) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
+				/*	if(epSaleService.isLoopTime(addDate,loopTime,auction.getNumId())) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
 					{
 						//***************************则延长结束时间= 结束时间+loopTime*********************
 						epSaleService.numLoopEdit(auction.getNumId(),loopTime);
-					}
+					}*/
 					//出价后的最近10次出价记录
 					List<Map> goodsAuctionListAfter=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
 					//String goodsAuctionListStr="";
@@ -522,6 +523,9 @@ public class EPSaleController extends BaseReturn{
 		return map;
 	}
 
+	/*
+	   通过竟拍活动id获取竟拍活动信息
+	 */
 	@RequestMapping("/epSale/epSale-info")
 	@ResponseBody
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_QUEYR})
@@ -545,6 +549,9 @@ public class EPSaleController extends BaseReturn{
 		return map;
 	}
 
+	/*
+	   竟拍活动信息修改
+	 */
 	@PostMapping("/epSale/epSale-edit")
 	@ResponseBody
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_EDIT})
@@ -552,6 +559,9 @@ public class EPSaleController extends BaseReturn{
             returnResult(epSaleService.epSaleEdit(epSale,request, files));
 	}
 
+	/*
+       竟拍活动信息删除
+    */
 	@RequestMapping("/epSale/epSale-delete")
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_DELETE})
 	public void epSaleDelete(EPSale epSale){

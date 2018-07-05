@@ -239,11 +239,12 @@ public class AuctionDepositService {
 						//****************保证金支付成功*****当前出价记录状态：2成功*******************
 						auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 						auctionMapper.auctionEditStatusById(auction);
-						if(epSaleService.isLoopTime(auction.getConfirmDate(),loopTime,numId)) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
+						epSaleService.epsaleDelayed(numId);
+						/*if(epSaleService.isLoopTime(auction.getConfirmDate(),loopTime,numId)) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
 						{
 							//***************************则延长结束时间= 结束时间+loopTime*********************
 							epSaleService.numLoopEdit(numId,loopTime);
-						}
+						}*/
 						//****************保证金支付成功*******当前出价记录状态：2成功*****************
 					}
 					//2、出现同价的成功出价记录，则当前出价记录状态：3失败
@@ -278,12 +279,13 @@ public class AuctionDepositService {
 					//****************保证金支付成功*****当前出价记录状态：2成功*******************
 					auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 					auctionMapper.auctionEditStatusById(auction);
+					epSaleService.epsaleDelayed(numId);
 					//****************保证金支付成功*******当前出价记录状态：2成功*****************
-					if(epSaleService.isLoopTime(auction.getConfirmDate(),loopTime,numId)) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
+				/*	if(epSaleService.isLoopTime(auction.getConfirmDate(),loopTime,numId)) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
 					{
 						//***************************则延长结束时间= 结束时间+loopTime*********************
 						epSaleService.numLoopEdit(numId,loopTime);
-					}
+					}*/
 				}
 		}else
 		{
