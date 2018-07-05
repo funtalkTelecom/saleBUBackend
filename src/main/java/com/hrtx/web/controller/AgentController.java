@@ -65,7 +65,7 @@ public class AgentController {
 		if(listly.size()>0){
 			map = (Map) listly.get(0);
 			map.put("isAgent","true");
-			map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +map.get("trading_img").toString());
+            map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +map.get("trading_img").toString());
 		}else {
 			List list = agentService.findAgentListByaddConsumerId(consumerId);
 			if(list.size()==0){
@@ -73,7 +73,7 @@ public class AgentController {
 			}else {
 				map = (Map) list.get(0);
 				map.put("isAgent","true");
-				map.put("tradingImgUrl", "");
+                map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +map.get("trading_img").toString());
 			}
 		}
 
