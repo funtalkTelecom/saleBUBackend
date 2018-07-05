@@ -98,6 +98,12 @@ public class EPSaleService {
 		return list;
 	}
 
+	/*
+	  该活动是否有对应上架的商品
+	 */
+	public List<Map> findIsSaleListByEPSaleId(Long ePSaleId) {
+		return  epSaleMapper.findEPSaleGoodsListByEPSaleId2(ePSaleId);
+	}
     public List<Map> findEPSaleGoodsListByEPSaleId(Long ePSaleId) {
 	    //获取竟拍活动ePSaleId的商品列表信息，图片限商品首图
         List<Map> list=epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);

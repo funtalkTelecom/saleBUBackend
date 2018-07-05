@@ -7,8 +7,10 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.web.mapper.IccidMapper;
 import com.hrtx.web.mapper.NumMapper;
+import com.hrtx.web.mapper.OrderMapper;
 import com.hrtx.web.pojo.Iccid;
 import com.hrtx.web.pojo.Num;
+import com.hrtx.web.pojo.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ public class BoundService {
 	private NumMapper numMapper;
 	@Autowired
 	private IccidMapper iccidMapper;
+	@Autowired
+	private OrderMapper orderMapper;
 
 	public Num findNumById(Long Id) {
 		return numMapper.selectByPrimaryKey(Id);
@@ -34,6 +38,11 @@ public class BoundService {
 		Iccid iccid=new Iccid();
 		iccid.setIccid(iccidStr);
 		return iccidMapper.selectOne(iccid);
+	}
+
+	public  void orderSign(Order order)
+	{
+		orderMapper.signByOrderid(order);
 	}
 
 	public void bindNum(Num num) {

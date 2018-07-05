@@ -229,6 +229,18 @@
         and tb_goods.g_active= #{ePSaleId}
     </select>
 
+    <select id="findEPSaleGoodsListByEPSaleId2" resultType="java.util.HashMap">
+    select
+    concat(tb_num.id,'')as numId
+    from
+    tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+    inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+    left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
+    where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+    and tb_num.status in (2)
+    and tb_goods.g_active= #{ePSaleId}
+   </select>
+
     <select id="findEPSaleGoodsImgByNumIdAndGId" resultType="java.util.HashMap">
     select
     case when tb_file_info.file_name is null then ''

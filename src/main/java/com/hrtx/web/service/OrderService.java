@@ -368,5 +368,6 @@ public class OrderService extends BaseService {
         if(result.getCode()!=Result.OK) throw new ServiceException("绑卡失败\n" + result.getData());
         return new Result(Result.OK, "绑卡成功");
     }
+
 }
 

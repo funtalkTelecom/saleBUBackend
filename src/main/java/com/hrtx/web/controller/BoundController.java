@@ -7,6 +7,8 @@ import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.Iccid;
 import com.hrtx.web.pojo.Meal;
 import com.hrtx.web.pojo.Num;
+import com.hrtx.web.pojo.Order;
+import com.hrtx.web.service.ApiOrderService;
 import com.hrtx.web.service.BoundService;
 import com.hrtx.web.service.MealService;
 import org.slf4j.Logger;
@@ -15,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 //@RequestMapping("/api")
@@ -25,6 +30,8 @@ public class BoundController extends BaseReturn{
 	private MealService MealService;
 	@Autowired
 	private BoundService boundService;
+    @Autowired
+    ApiOrderService apiOrderService;
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 
@@ -43,11 +50,22 @@ public class BoundController extends BaseReturn{
         Long iccidConsumerId=0L;//用户Id  iccid记录
         String iccidStatus="";//状态 iccid记录
 		Long mealMid=0L;//mdelMid 套餐记录
-
+        int orderStatus=0;//订单状态
+        Long orderId=0L;//订单Id
+        Order order=new Order();//签收订单
 		numId=num.getId();
         iccidStr=num.getIccid();
 		mealMid=num.getMealMid();
-
+		//sku商品类型=3 普号
+        List<Map> orderList=apiOrderService.findOrderListByNumId(numId);
+        if(orderList!=null&&orderList.size()>0)
+        {
+            orderStatus=Integer.valueOf(orderList.get(0).get("orderStatus").toString());
+            orderId=Long.valueOf(orderList.get(0).get("orderId").toString());
+        }else
+        {
+            returnResult(new Result(Result.ERROR,"号码对应的订单记录为空，请核对！"));
+        }
 		Num number=boundService.findNumById(numId);
         Iccid iccid=boundService.findIccidByIccid(iccidStr);
         Meal meal =MealService.findMealById(mealMid);
@@ -61,6 +79,11 @@ public class BoundController extends BaseReturn{
         iccidConsumerId=iccid.getConsumerId();
         iccidStatus=iccid.getDealStatus();
         iccidStr=iccid.getIccid();
+        if(orderStatus!=4)//4待配卡；5待签收(仓储物流已取件)；6完成
+        {
+            isEdit=false;
+            returnResult(new Result(Result.ERROR,"请待配卡的号码对应的订单应处于待配卡状态进行绑定，请核对！"));
+        }
         if(!(numBuyerId.toString().equals(iccidConsumerId.toString())))//是否同一用户
         {
             isEdit=false;
@@ -83,6 +106,11 @@ public class BoundController extends BaseReturn{
         }
         if(isEdit)
         {
+            order.setOrderId(orderId);
+            order.setStatus(6);
+            order.setSignDate(new Date());//签收时间
+            order.setSignType(2);//签收方式1用户自动签收2系统
+            boundService.orderSign(order);//4待配卡,6完成
             num.setIccidId(iccid.getId());
             num.setIccid(iccidStr);
             num.setStatus(5);//4待配卡(已付款 针对2C或电销无需购买卡时、代理商买号而未指定白卡时)、5待受理(代理商已提交或仓库已发货，待提交乐语BOSS)

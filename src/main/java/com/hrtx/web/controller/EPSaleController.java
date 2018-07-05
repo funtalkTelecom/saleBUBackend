@@ -530,9 +530,16 @@ public class EPSaleController extends BaseReturn{
 		//Object list=cityService.queryByPidList(0);
 /*		deliveryAddress.setId(new Long(5000));*/
 		epSale=epSaleService.finEPSaleById(epSale.getId());
+		int isSale=0;//是否有上架的商品
+		List<Map> isSaleList=epSaleService.findIsSaleListByEPSaleId(epSale.getId());
+		if(isSaleList!=null&&isSaleList.size()>0)
+		{
+			isSale=1;
+		}
 		map.put("code", Result.OK);
 		map.put("data", epSale);
 		map.put("epSalePics", fileService.findFilesByRefid(epSale.getId().toString()));
+		map.put("isSale", String.valueOf(isSale));
 		request.setAttribute("bean", epSale);
 		//request.setAttribute("province", list);
 		return map;

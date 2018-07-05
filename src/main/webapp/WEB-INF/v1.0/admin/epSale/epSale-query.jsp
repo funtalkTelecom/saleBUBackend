@@ -8,8 +8,10 @@
 		<script type="text/javascript" src="<%=basePath %>admin/js/epSale-query.js"></script>
 		<link rel="stylesheet" href="<%=basePath %>project/js/kindeditor/themes/default/default.css" type="text/css">
 		<script type="text/javascript" src="<%=basePath %>project/js/kindeditor/kindeditor-all.js"></script>
+        <%--<<script type="text/javascript" src="<%=basePath %>project/js/sockjs.min.js"></script>
+        <script type="text/javascript" src="<%=basePath %>project/js/stomp.js"></script>--%>
 	</head>
-	<body class="no-skin">
+	<body class="no-skin" onload="disconnect()">
 		<!-- #section:basics/navbar.layout -->
 		<div id="navbar" class="navbar navbar-default">
 			<jsp:include page="../common/top.jsp"></jsp:include>
@@ -34,7 +36,7 @@
 						</ul><!-- /.breadcrumb -->
 						<!-- /section:basics/content.searchbox -->
 					</div>
-					
+
 					<div class="page-content">
 						<div class="row">
 							<div class="col-xs-12">
@@ -63,13 +65,24 @@
 								</div>
 							</div>
 						</div>
-						
+
 						<div class="row">
 							<div class="col-xs-12">
 							</div>
 						</div>
 					</div>
 				</div>
+                <!-- test   websocket  hidden  start-->
+				<div id="websocket" class="hidden">
+					<input id="text" type="text"/>
+					<button onclick="send()">发送消息</button>
+					<hr/>
+					<button onclick="openWebSocket()">开启WebSocket连接</button>
+					<button onclick="closeWebSocket()">关闭WebSocket连接</button>
+					<hr/>
+					<div id="message"></div>
+				</div>
+                <!-- test   websocket  hidden  end-->
 			</div><!-- /.main-content -->
 
 			<div class="footer">
@@ -159,6 +172,56 @@
             var basePath = "<%=basePath %>";
             var p_edit = <%=SessionUtil.hasPower(PowerConsts.EPSALEMOUDULE_COMMON_EDIT)%>;
             var p_delete= <%=SessionUtil.hasPower(PowerConsts.EPSALEMOUDULE_COMMON_DELETE)%>;
+
+            //**************************websocket**************start****************
+           /***
+            var websocket = null;
+            //判断当前浏览器是否支持WebSocket
+            if ('WebSocket' in window) {
+                websocket = new WebSocket("ws://localhost:8091/websocket/989303317700030649/1013001752720441344");
+            }
+            else {
+                alert('当前浏览器 Not support websocket')
+            }
+            websocket.onopen= function () {
+                setMessageInnerHTML('开启WebSocket连接');
+            }
+
+            //连接发生错误的回调方法
+            websocket.onerror = function () {
+                setMessageInnerHTML("WebSocket连接发生错误");
+            };
+
+            //接收到消息的回调方法
+            websocket.onmessage = function (event) {
+                setMessageInnerHTML(event.data);
+            }
+
+            //将消息显示在网页上
+            function setMessageInnerHTML(innerHTML) {
+                document.getElementById('message').innerHTML += innerHTML + '<br/>';
+            }
+
+            //开启WebSocket连接
+            function openWebSocket() {
+                websocket.onopen= function () {
+                    setMessageInnerHTML('开启WebSocket连接');
+                }
+            }
+
+            //关闭WebSocket连接
+            function closeWebSocket() {
+                websocket.close();
+                setMessageInnerHTML('关闭WebSocket连接');
+            }
+
+            //发送消息
+            function send() {
+                var message = document.getElementById('text').value;
+                websocket.send(message);
+            }
+           ****/
+            //**************************websocket**************end****************
 		</script>
 	</body>
 </html>

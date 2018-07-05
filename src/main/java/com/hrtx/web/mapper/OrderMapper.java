@@ -19,6 +19,8 @@ public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
 
     List<Map> findOrderSignList();
 
+    List<Map> findOrderListByNumIdAndConsumerId(@Param("numId") Long numId,@Param("consumerId") Long consumerId);
+
     Order findOrderInfo(@Param("orderid") Long id);
 
     Page<Object> getOrderByConsumer(@Param("order") Order order, @Param("st") String st);
