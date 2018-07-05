@@ -501,6 +501,15 @@
             and a.consumer_id not in (#{consumer_id})
         </if>
     </select>
-
+    <!--查询号码的时间-->
+    <select id="queryNumEndTime" resultType="java.util.HashMap">
+        select g.g_id,s.sku_id,n.id num_id,n.end_time,TIMESTAMPDIFF(SECOND,now(),n.end_time)  `time_status`,g.g_loop_time,(g.g_loop_time) `loop_time`
+        from tb_goods g left join tb_sku s on g.g_id=s.g_id left join tb_num n on n.sku_id=s.sku_id
+        where g.g_is_sale=1 and g.g_is_auc=1 and n.id=#{num_id}
+    </select>
+    <!--延时号码竞拍时间-->
+    <update id="updateNumDelayed">
+         update tb_num n set n.end_time=date_add(n.end_time, interval #{loop_time} minute) where n.id=#{num_id}
+    </update>
 
 </mapper>

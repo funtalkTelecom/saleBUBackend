@@ -62,4 +62,8 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
     List<Map> queryActiveAuction(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
     List<Map> countAuctions(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
     List<Map> queryNeedReturn(@Param("num_id") Long num_id,@Param("g_id") Long g_id,@Param("consumer_id") Long consumer_id);
+
+    ///////////////////////////////////
+    List<Map> queryNumEndTime(@Param("num_id") Long num_id);
+    List<Map> updateNumDelayed(@Param("num_id") Long num_id,@Param("loop_time") Integer loop_time);
 }

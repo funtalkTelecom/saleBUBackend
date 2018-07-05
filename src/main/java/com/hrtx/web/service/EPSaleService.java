@@ -41,6 +41,7 @@ public class EPSaleService {
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private FundOrderService fundOrderService;
 	@Autowired private ApiOrderService apiOrderService;
+	@Autowired private EPSaleService epSaleService;
 	public Result pageEPSale(EPSale epSale) {
 		PageHelper.startPage(epSale.getPageNum(),epSale.getLimit());
 		Page<Object> ob=this.epSaleMapper.queryPageList(epSale);
@@ -162,18 +163,36 @@ public class EPSaleService {
 		return epSale;
 	}
 
+	public Result epsaleDelayed(Long num_id) {
+		List<Map> list=this.epSaleMapper.queryNumEndTime(num_id);
+		log.info(String.format("检测并更新号码[%s]延时时间,计划更新条数[%s]",num_id,list.size()));
+		if(list.isEmpty())return new Result(Result.ERROR,"暂无可出来号码书");
+		for (Map map:list) {
+			Integer time_status=NumberUtils.toInt(String.valueOf(map.get("time_status")),0);
+			Integer loop_time=NumberUtils.toInt(String.valueOf(map.get("loop_time")),0);
+			Long q_num_id=NumberUtils.toLong(String.valueOf(map.get("num_id")),0l);
+			log.info(String.format("结束时间距离当前时间[%s]s,延时周期[%s]min",time_status,loop_time));
+			if(time_status>=0&& time_status<=loop_time*60){
+				this.epSaleMapper.updateNumDelayed(q_num_id,loop_time);
+			}
+		}
+		return new Result(Result.OK,"更新成功");
+	}
+
     @Scheduled(fixedRate=1000)
-    public void newEpsaleOrder() {
+    public void epsaleOrder() {
 		if(!StringUtils.equals(auction_timer,"true"))return;
 	    this.epSaleMapper.freezeOneRecord();
 	    try {
-			this.payEpsaleOrder();
+			epSaleService.payEpsaleOrder();
 		}catch (Exception e){
 	    	log.error("生成竞拍订单&退还保证金异常",e);
 		}
 
     }
-
+	public Result newCreateOrder(Map mapOrder) {
+		return apiOrderService.createOrder(null,mapOrder);
+	}
 	public void payEpsaleOrder() {
 		/**
 		 * 1、取出所有竞拍的上架单的时间到期未生成订单的号码
@@ -214,7 +233,7 @@ public class EPSaleService {
 					mapOrder.put("addrid",0);//竟拍成功addrid
 					mapOrder.put("price",price);//竟拍成功price
                     log.info("准备生成订单："+mapOrder);
-					Result result=apiOrderService.createOrder(null,mapOrder);
+					Result result=epSaleService.newCreateOrder(mapOrder);
 					if(result.getCode()!=200){
 						log.error(String.format("竟拍结束;出价成功转订单失败;竟拍号[%s]",num_resource));
 						Messager.send(SystemParam.get("system_phone"),"竟拍结束;出价成功转订单失败;竟拍号:"+num_resource);
@@ -246,9 +265,6 @@ public class EPSaleService {
 				}
 			}
 		}
-
-
-
 	}
 
    /*
