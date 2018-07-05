@@ -101,25 +101,25 @@
 				<input id="addConsumerId" name="addConsumerId" type="hidden">
 				<div class="modal-body">
 					<div class="form-group">
-						<label class="col-xs-2 control-label">公司名称</label>
+						<label class="col-xs-2">公司名称</label>
 						<div class="col-xs-10">
 							<span class="scomm"></span>
 						</div>
 					</div>
 					<div class="form-group">
 
-						<label class="col-xs-2 control-label">法人</label>
-						<div class="col-xs-4">
+						<label class="col-xs-2">法人</label>
+						<div class="col-xs-3">
 							<span class="person"></span>
 						</div>
-						<label class="col-xs-2 control-label">电话</label>
-						<div class="col-xs-4">
+						<label class="col-xs-2 ">电话</label>
+						<div class="col-xs-3">
 							<span class="phone"></span>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-xs-2 control-label">注册地址</label>
-						<div class="col-xs-10">
+						<label class="col-xs-2">注册地址</label>
+						<div class="col-xs-8">
 							<span class="address"></span>
 						</div>
 					</div>
@@ -170,7 +170,7 @@
 			<form role="form" class="form-horizontal">
 				<div class="modal-body">
 					<div class="form-group">
-						<label  class="col-xs-2 col-sm-2 ">公司名称:</label>
+						<label  class="col-xs-2 ">公司名称:</label>
 						<div class="col-xs-10 ">
 							<span class="scomm text-left"></span>
 						</div>
