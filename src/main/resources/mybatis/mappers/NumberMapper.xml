@@ -245,13 +245,13 @@
             </if>
             a.status=1
             where
-            a.sku_id = #{number.skuId} and a.status = 2
+            a.sku_id = #{number.skuId} and a.status in (1,2)
         </if>
         <if test="number.status==2">
             a.sku_id=#{number.skuId},
             a.status=2
             where
-            a.num_resource = #{number.numResource}
+            a.num_resource = #{number.numResource} and a.status in (1,2)
         </if>
     </update>
 
