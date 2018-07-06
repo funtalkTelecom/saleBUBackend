@@ -253,6 +253,15 @@ public class OrderService extends BaseService {
             Map map = auctionDepositService.findAuctionDepositListByOrderId(orderId);
             double deposit = NumberUtils.toDouble(ObjectUtils.toString(map.get("deposit")));
             int amt = ((Double)Arith.mul(Arith.sub(order.getTotal(), deposit), 100)).intValue();
+            if(amt<=0) {
+                Result result = this.payOrderSuccess(orderId);
+                if(result.getCode() == Result.OK) {
+                    result = this.payDeliverOrder(orderId);
+                    return new Result(Result.OK, CommonMap.create("paySuccess", true).getData());
+                }else {
+                    return result;
+                }
+            }
             return fundOrderService.payPinganWxxOrder(amt, "["+SystemParam.get("system_name")+"]"+num+"号码尾款", orderId+"");
         }
         if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_3.getStringKey())) {//线下
