@@ -42,6 +42,7 @@ $(function() {
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
                         $operate.find(".update").click(function () {
+                            isDelAllSku = false;
                             //获取仓库商品类型下拉框
                             $.ajax({
                                 type: "POST",
@@ -335,13 +336,18 @@ $(function() {
 	}
 	var selectedProperty = "";
     var preProNum = 0;
+    var isDelAllSku = false;
 	function checkboxClick(obj){
 	    //商品下架中,重新选属性,要把现有列表的skuid放到delSku里面,后台才能删除sku
         var dsku="";
         $("#skuResult tr.sku_row").each(function(){
             dsku += $(this).find("input[name=skuId]").val() + ",";
         });
-        if(!$("#delSkus").val()) $("#delSkus").val(dsku);
+        console.log(isDelAllSku);
+        if(!isDelAllSku) {
+            $("#delSkus").val($("#delSkus").val()+dsku);
+            isDelAllSku = true;
+        }
 
         selectedProperty = "";
         $("input[type=checkbox]:checked").each(function(){

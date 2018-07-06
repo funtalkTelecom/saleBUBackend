@@ -102,7 +102,7 @@ public class GoodsService {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return new Result(Result.ERROR, "第"+(i+1)+"行2B价格为空");
                     }else{
-                        String pattern = "[1-9]\\d*.\\d*|0.\\d*[1-9]\\d*";
+                        String pattern = "[1-9]\\d*.?\\d*|0.\\d*[1-9]\\d*";
                         Pattern r = Pattern.compile(pattern);
                         Matcher m = r.matcher(price);
                         if(!m.matches()) return new Result(Result.ERROR, "第" + (i + 1) + "行2B价格格式错误,请输入两位正小数");
@@ -141,9 +141,9 @@ public class GoodsService {
                         skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
     //                    sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
     //                    sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
-                        String[] okSkuNum = skuSaleNum.split("★")[0].split("\\r?\\n");
+                        String[] okSkuNum = skuSaleNum.split("★").length==0?skuSaleNum.split("★"):skuSaleNum.split("★")[0].split("\\r?\\n");
                         int okCount = okSkuNum.length;
-                        if (StringUtils.isBlank(okSkuNum[0]) && okSkuNum.length == 1) okCount = 0;
+                        if (okSkuNum.length !=0 && StringUtils.isBlank(okSkuNum[0]) && okSkuNum.length == 1) okCount = 0;
                         //有错误号码
                         if (skuSaleNum.split("★").length > 1) {
                             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
