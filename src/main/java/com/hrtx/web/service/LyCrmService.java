@@ -1,17 +1,14 @@
 package com.hrtx.web.service;
 
+import com.github.abel533.entity.Example;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
 import com.hrtx.global.FtpUtils;
 import com.hrtx.global.Messager;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
-import com.hrtx.web.mapper.NumBaseMapper;
-import com.hrtx.web.mapper.NumMapper;
-import com.hrtx.web.mapper.SequenceMapper;
-import com.hrtx.web.pojo.Num;
-import com.hrtx.web.pojo.NumBase;
-import com.hrtx.web.pojo.Sequence;
+import com.hrtx.web.mapper.*;
+import com.hrtx.web.pojo.*;
 import com.hrtx.webservice.crmsps.CrmSpsServiceLocator;
 import com.hrtx.webservice.crmsps.CrmSpsServicePortType;
 import org.apache.commons.io.FileUtils;
@@ -28,6 +25,7 @@ import sun.net.ftp.FtpProtocolException;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.System;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -70,6 +68,9 @@ public class LyCrmService {
     @Autowired private NumMapper numMapper;
     @Autowired private NumBaseMapper numBaseMapper;
     @Autowired private SequenceMapper sequenceMapper;
+    @Autowired private DictMapper dictMapper;
+    @Autowired private DictService dictService;
+    @Autowired private IccidMapper iccidMapper;
 
     /**
      * 获取服务
@@ -133,8 +134,12 @@ public class LyCrmService {
         return result;
     }
 
+    /**
+     * 上传开卡文件
+     */
     @Scheduled(cron = "0 0 23 * * ?")
     public void createAgentCardFile() {
+        log.info("开始执行上传开卡文件定时器");
         try {
             int date_offset = 0;
             int count = 1;
@@ -176,18 +181,21 @@ public class LyCrmService {
         File dir = new File(this.getLyRootPath()+"upload"+File.separator);
         if(!dir.exists()) dir.mkdir();
         String ly_src_sys = SystemParam.get("ly_src_sys");
-        String fileName = ly_src_sys+Utils.getDate(0-date_offset, "yyyyMMddHHmmss")+StringUtils.leftPad(count+"", 6, "0")+".txt";
+        String fileName = ly_src_sys+Utils.getDate(-1-date_offset, "yyyyMMddHHmmss")+StringUtils.leftPad(count+"", 6, "0")+".txt";
         File file = new File(dir.getPath()+File.separator+fileName);
         if(file.exists()) file.delete();
         createFile(list, file.getPath());
-        int ucount = this.batchUpdateSlz(snums);
+        Dict dict = new Dict(null, Utils.getDate(0-date_offset, "yyyyMMdd")+"-"+count, "opend_card_file_name", fileName, 0, "上传的开卡文件名", "", 0);
+        dict.setId(dict.getGeneralId());
+        dictMapper.insert(dict);
+        int ucount = this.batchUpdateSlz(fileName, snums);
         if(snums.size() != ucount) throw new ServiceException(String.valueOf("需上传号码与更新号码不一致"));
         Result result = this.uploadFileToSftp("upload", "upload", fileName, 0);
         if(result.getCode() != Result.OK) throw new ServiceException(String.valueOf(result.getData()));
 
     }
 
-    private int batchUpdateSlz(List<Long> snums) {
+    private int batchUpdateSlz(String fileName, List<Long> snums) {
         int ucount = 0;
         int start = 0;
         int len = snums.size();
@@ -196,37 +204,58 @@ public class LyCrmService {
             List<Object[]> list = new ArrayList<>();
             int end = start + maxCapacity;
             end = end > len ? len : end;
-            int count = numMapper.batchUpdateSlz(snums.subList(start, end));
+            int count = numMapper.batchUpdateSlz(fileName, snums.subList(start, end));
             ucount = ucount + count;
             start = end;
         }
         return ucount;
     }
 
+    /**
+     * 解析开卡结果
+     */
     @Scheduled(cron = "0 0 7 * * ?")
     public void praseOpenCardFileResult() {
-        praseOpenCardFileResult(0);
-    }
-
-    public void praseOpenCardFileResult(int date_offset) {
-        String ly_src_sys = SystemParam.get("ly_src_sys");
-        String fileName = ly_src_sys+Utils.getDate(-1-date_offset, "yyyyMMddHHmmss")+StringUtils.leftPad("1", 6, "0")+".txt.ok";
-        this.downloadFileToSftp("download", "download", fileName);
-        File dir = new File(this.getLyRootPath()+"download"+File.separator);
-        List<String> datas = this.readFile(dir.getPath()+File.separator+fileName);
-
-        if(datas != null) {
-            log.info("解析到乐语代理商数据["+datas.size()+"]条");
-            for (int j = 0, len = datas.size(); j < len; j++) {
-                String line = datas.get(j)+"|00";;
-                String[] row = line.split("\\|");
-                if(row.length<10){
-                    log.info("第["+j+"]行数据字段不足，异常");
-                    continue;
+        log.info("开始执行解析开卡结果定时器");
+        List<Map> list = dictService.findDictByGroup("opend_card_file_name");
+        for (Map map:list) {
+            String yFileName = String.valueOf(map.get("key_value"));
+            String fileName = yFileName+".ok";
+            log.info("开始解析["+fileName+"]结果");
+            try {
+                this.downloadFileToSftp("download", "download", fileName);
+                File dir = new File(this.getLyRootPath()+"download"+File.separator);
+                List<String> datas = this.readFile(dir.getPath()+File.separator+fileName);
+                if(datas != null) {
+                    log.info("解析到数据["+datas.size()+"]条");
+                    for (int j = 0, len = datas.size(); j < len; j++) {
+                        String line = datas.get(j)+"|00";;
+                        String[] row = line.split("\\|");
+                        if(row.length<9){
+                            log.info("第["+j+"]行数据字段不足，异常");
+                            continue;
+                        }
+                        int status = NumberUtils.toInt(row[6]);
+                        Num num = new Num();
+                        num.setStatus(status == 3 ? 6 : 7);
+                        num.setSlReason(row[7]);
+                        Example example = new Example(Num.class);
+                        example.createCriteria().andEqualTo("numResource",row[2]).andEqualTo("iccid", row[3]).andEqualTo("status", 9);
+                        numMapper.updateByExample(num, example);
+                    }
                 }
+                Dict dict = new Dict();
+                dict.setIsDel(1);
+                Example example = new Example(Dict.class);
+                example.createCriteria().andEqualTo("keyValue",yFileName).andEqualTo("isDel", 0);
+                dictMapper.updateByExample(dict, example);
+            }catch (ServiceException e) {
+                log.error("解析["+fileName+"]结果异常，原因["+e.getMessage()+"]", e);
+            }catch (Exception e) {
+                log.error("解析["+fileName+"]结果异常, 未知异常", e);
             }
-        }
 
+        }
     }
 
     public static void main(String[] args) {
@@ -245,8 +274,11 @@ public class LyCrmService {
         }
     }
 
+    /**
+     * 下载号码资源
+     */
     @Scheduled(cron = "0 0 6 * * ?")
-    public void praseLyData() {//String type, int dateOffset
+    public void praseLyPhoneData() {//String type, int dateOffset
 //        if("ly_corp".equals(type)) this.praseLyCorpData(dateOffset);
 //        if("ly_phone".equals(type))
         try {
@@ -261,14 +293,32 @@ public class LyCrmService {
 //        if("ly_iccid".equals(type)) this.uploadLyIccidData(dateOffset);
     }
 
+    /**
+     * 上传iccid资源
+     */
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void uploadLyIccidData() {
+        try {
+            this.uploadLyIccidData(0);
+        }catch (ServiceException e) {
+            log.error(e.getMessage(), e);
+            Messager.send(SystemParam.get("system_phone"),"上传iccid资源数据异常("+e.getMessage()+")");
+        }catch (Exception e) {
+            log.error(e.getMessage(), e);
+            Messager.send(SystemParam.get("system_phone"),"上传iccid资源数据异常");
+        }
+    }
+
     public void uploadLyIccidData(int date_offset) {
         File dir = new File(this.getLyRootPath()+"iccid_hr2boss"+File.separator);
         if(!dir.exists()) dir.mkdir();
         String fileName = Utils.getDate(-1-date_offset, "yyyyMMdd")+".txt";
         File file = new File(dir.getPath()+File.separator+fileName);
         if(file.exists()) file.delete();
-        List<Object[]> list = null;//lyCrmDao.queryActiveIccid();
-        createFile(list, file.getPath());
+        Iccid iccid = new Iccid();
+        iccid.setStockStatus(1);
+        List<Iccid> list = iccidMapper.select(iccid);
+        createIccidFile(list, file.getPath());
         Result result = this.uploadFileToSftp("iccid_hr2boss", "iccid_hr2boss", fileName, 0);
         if(result.getCode() != Result.OK) throw new ServiceException(String.valueOf(result.getData()));
     }
@@ -324,6 +374,19 @@ public class LyCrmService {
 
     }
 
+    private void createIccidFile(List<Iccid> list, String pathName) {
+        log.info("准备工作验证通过，开始生成iccid上传文件");
+        try {
+            List<String> lines = new ArrayList<String>();
+            for(Iccid iccid : list){
+                lines.add(iccid.getIccid());
+            }
+            FileUtils.writeLines(new File(pathName), "gbk", lines);
+        } catch (Exception e) {
+            log.error("", e);
+            throw new ServiceException("生成文件["+pathName+"]异常");
+        }
+    }
     private void createFile(List<Object[]> list, String pathName) {
         log.info("准备工作验证通过，开始生成上传文件");
         try {
@@ -359,7 +422,7 @@ public class LyCrmService {
             log.info("查到到文件["+file+"]");
             boolean isup = false;
             try {
-                isup = FtpUtils.upload(file, File.separator+"hr"+File.separator+ftpPath+File.separator+fileName, this.getFtp());//SFTPUtil.upload("/"+type+"/upload",file);
+                isup = FtpUtils.upload(file, "/hr/"+ftpPath+"/"+fileName, this.getFtp());//SFTPUtil.upload("/"+type+"/upload",file);
             } catch (Exception e) {
                 log.error("上传异常",e);
                 try {
@@ -385,7 +448,7 @@ public class LyCrmService {
         File dir = new File(path);
         if(!dir.exists()) dir.mkdir();
         try {
-            FtpUtils.download(new File(path+fileName), File.separator+"hr"+File.separator+ftpPath+File.separator+fileName, this.getFtp());
+            FtpUtils.download(new File(path+fileName), "/hr/"+ftpPath+"/"+fileName, this.getFtp());
         } catch (Exception e) {
             log.error("下载文件["+fileName+"]异常", e);
             throw new ServiceException("下载文件["+fileName+"]异常");

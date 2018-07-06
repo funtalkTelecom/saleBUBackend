@@ -42,12 +42,19 @@ public class UserService {
 	@Autowired private CorporationService corporationService;
 	@Autowired private IccidMapper iccidMapper;
 
-	public void test1() {
-		System.out.println("test1 begain--------------------");
-		userMapper.test1();
-		System.out.println("test1 end--------------------");
+	public void test1(int i) {
+		User u = new User(((Integer)i).longValue());
+		userMapper.insert(u);
+//		if(i==16) throw  new ServiceException("test");
 	}
 	public void test() {
+		User u = new User(10l);
+		userMapper.insert(u);
+		try{
+			userService.paytest();
+		} catch (Exception e) {
+			System.out.println(e.getMessage()+"----------捕捉异常");
+		}
 //	    Example example = new Example(FundOrder.class);
 //	    example.createCriteria();
 //	    List<User> u = userMapper.selectByExample(new Example(User.class).createCriteria().andEqualTo("id", 1));
@@ -60,51 +67,34 @@ public class UserService {
 //        allImeis.add(CommonMap.create("iccids",imeis).put("itemId", "111111").getData());
 //        allImeis.add(CommonMap.create("iccids",Arrays.asList(new String[]{"C1234","D1234"})).put("itemId", "222222").getData());
 //        System.out.println(iccidMapper.batchInsertTemp(allImeis, 1111111l));
-        User u = new User(10l);
-        u.setLoginName("111");
-        userMapper.insert(u);
-		User u1 = new User(11l);
-		u1.setLoginName("111");
-		userMapper.insert(u1);
-		System.out.println("aaaaaaaaaaaaaaaa");
-//	    try{
-//	        userService.paytest();
-//        }catch (Exception e) {
-//	        e.printStackTrace();
-//        }
-//		User u = new User(10l);
-//		userMapper.insert(u);
-//		Example example = new Example(User.class);
-//		List list = new ArrayList();
-//		for (int i = 0; i<2000; i++) {
-//			list.add("周元强");
-//		}
-//		example.createCriteria().andIn("name", list);
-//		List<User> users = userMapper.selectByExample(example);
-//        System.out.println(users.size()+"----------------------------");
-//		userService.paytest("b","b");
-//		if(1==1) throw new ServiceException("手动异常");
-//		List<User> list=this.userMapper.select(null);
-//		for (User user : list) {
-//			System.out.println("----"+user.getName());
-//		}
+//		User u1 = new User(11l);
+//		u1.setLoginName("111");
+//		userMapper.insert(u1);
+//		System.out.println("aaaaaaaaaaaaaaaa");
 	}
 
-    public void newtest() {
-        for (int i = 0; i<3; i++) {
-            User u = new User(((Integer)(i+3)).longValue());
-		    userMapper.insert(u);
-		    if(i == 2) throw  new ServiceException("test");
-		}
+    public void newtest(int i) {
+//		User u = new User(((Integer)i).longValue());
+//		userMapper.insert(u);
+		userService.test1(i);
+//        for (int i = 0; i<3; i++) {
+//            User u = new User(((Integer)(i+3)).longValue());
+//		    userMapper.insert(u);
+//		    if(i == 2) throw  new ServiceException("test");
+//		}
     }
 
     public void paytest() {
 //		User u = new User(11l);
 //		userMapper.insert(u);
 //		if(1==1) throw new ServiceException("手动异常");
-        User u = new User(9l);
-        userMapper.insert(u);
-        if(true) throw  new ServiceException("test");
+		for (int i = 15; i <17 ; i++) {
+			User u = new User(((Integer)(i+10)).longValue());
+			userMapper.insert(u);
+			userService.newtest(i);
+			if(i == 15) throw new ServiceException("test");
+		}
+//        if(true) throw  new ServiceException("test");
 //        user.setCorpId(10l);
 //        userMapper.updateByPrimaryKey(user);
 //        user.setLoginName("eee");
