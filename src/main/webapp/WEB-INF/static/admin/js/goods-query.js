@@ -680,14 +680,17 @@ $(function() {
             if($("#gIsSale").val()=="1"){
                 $("#gActive").prop("disabled", true);
                 $("#skuResult textarea").prop("disabled", true);
+            }else{
+                $("#gActive").prop("disabled", false);
+                $("#skuResult textarea").prop("disabled", false);
             }
         }else{
             isAucContent.hide();
             gActive.hide();
             $('#gStartTimePicker').prop("disabled", false);
             $('#gEndTimePicker').prop("disabled", false);
+            $("#gActive").prop("disabled", false);
             $("#skuResult textarea").prop("disabled", false);
-            $("#gActive").prop("disabled", true);
             // $('#gStartTime').bind('click',function() {
             //     WdatePicker({
             //         maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',
