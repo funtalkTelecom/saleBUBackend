@@ -186,12 +186,15 @@ $(function() {
 
     $('#goodsInfo').on('show.bs.modal', function (e) {
         gIsAucOnClick();
-        var autoheight=editor.edit.doc.body.scrollHeight;
-        editor.edit.setHeight(autoheight);
     });
 
-    $('#goodsInfo').on('shown.bs.modal', function (e) {
-        alert("sdf");
+    //解决编辑器弹出层文本框不能输入的问题
+    $('#goodsInfo').off('shown.bs.modal').on('shown.bs.modal', function (e) {
+        $(document).off('focusin.modal');
+
+        $('.chosen-select').chosen({allow_single_deselect:true, search_contains:true});
+        var autoheight=editor.edit.doc.body.scrollHeight;
+        editor.edit.setHeight(autoheight);
     });
 
     var soption = {
@@ -280,8 +283,12 @@ $(function() {
                 alert("提交成功");
             }
         };
+        //提交前把需要传到后台的disabled去掉
+        $("[disabledNeedSubmit]").prop("disabled", false);
         // 将options传给ajaxForm
         $('#goodsInfo form').ajaxSubmit(options);
+        //提交结束之后还原disabled
+        $("[disabledNeedSubmit]").prop("disabled", true);
     });
 
 	function getSkuJson(){
@@ -647,13 +654,6 @@ $(function() {
         });
     });
 
-    //解决编辑器弹出层文本框不能输入的问题
-    $('#goodsInfo').off('shown.bs.modal').on('shown.bs.modal', function (e) {
-        $(document).off('focusin.modal');
-
-        $('.chosen-select').chosen({allow_single_deselect:true, search_contains:true});
-    });
-
     //轮询时间下拉框
     option = {
         url:"",
@@ -683,7 +683,9 @@ $(function() {
             $('#gEndTimePicker').prop("disabled", true);
             if($("#gIsSale").val()=="1"){
                 $("#gActive").prop("disabled", true);
+                $("#gActive").attr("disabledNeedSubmit", "");
                 $("#skuResult textarea").prop("disabled", true);
+                $("#skuResult textarea").attr("disabledNeedSubmit", "");
             }else{
                 $("#gActive").prop("disabled", false);
                 $("#skuResult textarea").prop("disabled", false);
