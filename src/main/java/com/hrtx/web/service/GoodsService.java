@@ -62,6 +62,10 @@ public class GoodsService {
             List<Goods> list = new ArrayList<Goods>();
             String isSale = goods.getgIsSale();
             if (goods.getgId() != null && goods.getgId() > 0) {
+                //上架中的竞拍商品只允许修改个别字段
+                if("1".equals(goods.getgIsAuc()) && "1".equals(isSale)){
+
+                }
                 goodsMapper.goodsEdit(goods);
                 goods = goodsMapper.findGoodsInfo(goods.getgId());
             } else {
