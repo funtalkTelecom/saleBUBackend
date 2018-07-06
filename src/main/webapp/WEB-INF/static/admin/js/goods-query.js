@@ -36,8 +36,8 @@ $(function() {
 							if(record.gIsSale=="1")
 							    node.push('<a class="btn btn-success btn-xs unsale" href="javascript:void(0);">下架</a>');
                         }
-						if(p_delete) {
-							node.push('<a class="btn btn-success btn-xs delete" href="javascript:void(0);">删除</a>');
+						if(p_delete && record.gIsSale!="1") {
+							node.push('<a class="btn btn-danger btn-xs delete" href="javascript:void(0);">删除</a>');
                         }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
@@ -186,7 +186,33 @@ $(function() {
 
     $('#goodsInfo').on('show.bs.modal', function (e) {
         gIsAucOnClick();
+        //上架中的竞拍禁止修改
+        if($("#gIsSale").val()=="1" && $("input[name=gIsAuc]:checked").val()=="1"){
+            $("#gActive").prop("disabled", true);
+            $("#gActive").attr("disabledNeedSubmit", "");
+
+            $("#skuResult input,select,textarea").prop("disabled", true);
+            $("#skuResult input,select,textarea").attr("disabledNeedSubmit", "");
+
+            $("#gLoopTime").prop("disabled", true);
+            $("#gLoopTime").attr("disabledNeedSubmit", "");
+
+            $("input[name=gStartNum]").prop("disabled", true);
+            $("input[name=gStartNum]").attr("disabledNeedSubmit", "");
+
+            $("input[name=gDeposit]").prop("disabled", true);
+            $("input[name=gDeposit]").attr("disabledNeedSubmit", "");
+
+            $("input[name=gPriceUp]").prop("disabled", true);
+            $("input[name=gPriceUp]").attr("disabledNeedSubmit", "");
+
+            $("input[name=gIsAuc]").prop("disabled", true);
+            $("input[name=gIsAuc]").attr("disabledNeedSubmit", "");
+        }else{
+            $("[disabledNeedSubmit]").prop("disabled", false);
+        }
     });
+
 
     //解决编辑器弹出层文本框不能输入的问题
     $('#goodsInfo').off('shown.bs.modal').on('shown.bs.modal', function (e) {
@@ -681,22 +707,11 @@ $(function() {
             gActive.show();
             $('#gStartTimePicker').prop("disabled", true);
             $('#gEndTimePicker').prop("disabled", true);
-            if($("#gIsSale").val()=="1"){
-                $("#gActive").prop("disabled", true);
-                $("#gActive").attr("disabledNeedSubmit", "");
-                $("#skuResult textarea").prop("disabled", true);
-                $("#skuResult textarea").attr("disabledNeedSubmit", "");
-            }else{
-                $("#gActive").prop("disabled", false);
-                $("#skuResult textarea").prop("disabled", false);
-            }
         }else{
             isAucContent.hide();
             gActive.hide();
             $('#gStartTimePicker').prop("disabled", false);
             $('#gEndTimePicker').prop("disabled", false);
-            $("#gActive").prop("disabled", false);
-            $("#skuResult textarea").prop("disabled", false);
             // $('#gStartTime').bind('click',function() {
             //     WdatePicker({
             //         maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',
