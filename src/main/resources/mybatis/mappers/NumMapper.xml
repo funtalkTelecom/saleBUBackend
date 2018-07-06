@@ -27,7 +27,7 @@
         )
     </update>
     <update id="batchUpdateSlz">
-        update tb_num n set n.`status` = 9 where n.id in (
+        update tb_num n set n.`status` = 9, n.upload_file_name=#{fileName} where n.id in (
         <foreach collection ="list" item="item" separator =",">
             #{item}
         </foreach >

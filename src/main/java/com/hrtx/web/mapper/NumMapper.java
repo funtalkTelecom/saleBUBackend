@@ -46,5 +46,5 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
      * @param snums
      * @return
      */
-    int batchUpdateSlz(@Param("list") List<Long> snums);
+    int batchUpdateSlz(@Param("fileName") String fileName, @Param("list") List<Long> snums);
 }
