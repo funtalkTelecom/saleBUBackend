@@ -117,6 +117,8 @@ $(function() {
                                                     $("#skuResult textarea").each(function (i, e) {
                                                         $(this).val($(this).attr("textareaValue"));
                                                     });
+
+                                                    $('#goodsInfo').modal('show');
                                                 }else{
                                                     $("button.btn-success").attr("disabled", "disabled");
                                                     alert("sku加载异常,请重新打开!");
@@ -124,14 +126,6 @@ $(function() {
                                             }, "json");
                                             //获取sku列表end
 
-                                            $('#goodsInfo').modal('show');
-
-                                            //获取高度,然后设置
-                                            setTimeout(function () {
-                                                gIsAucOnClick();
-                                                var autoheight=editor.edit.doc.body.scrollHeight;
-                                                editor.edit.setHeight(autoheight);
-                                            }, 500);
                                         }, "json");
                                     }else{
                                         repoGoods = "";
@@ -189,6 +183,16 @@ $(function() {
 	window.reload = function(){
 		dataList.reload();
 	}
+
+    $('#goodsInfo').on('show.bs.modal', function (e) {
+        gIsAucOnClick();
+        var autoheight=editor.edit.doc.body.scrollHeight;
+        editor.edit.setHeight(autoheight);
+    });
+
+    $('#goodsInfo').on('shown.bs.modal', function (e) {
+        alert("sdf");
+    });
 
     var soption = {
         url:"",
