@@ -81,8 +81,6 @@ $(function() {
                                             }
                                             onCheck(null, "cityTree");
 
-                                            gIsAucOnClick();
-
                                             //获取sku列表
                                             $.post("sku/sku-list-gid", {gId: v}, function (data) {
                                                 if (data.code == "200"){
@@ -130,6 +128,7 @@ $(function() {
 
                                             //获取高度,然后设置
                                             setTimeout(function () {
+                                                gIsAucOnClick();
                                                 var autoheight=editor.edit.doc.body.scrollHeight;
                                                 editor.edit.setHeight(autoheight);
                                             }, 500);
@@ -678,11 +677,17 @@ $(function() {
             gActive.show();
             $('#gStartTimePicker').prop("disabled", true);
             $('#gEndTimePicker').prop("disabled", true);
+            if($("#gIsSale").val()=="1"){
+                $("#gActive").prop("disabled", true);
+                $("#skuResult textarea").prop("disabled", true);
+            }
         }else{
             isAucContent.hide();
             gActive.hide();
             $('#gStartTimePicker').prop("disabled", false);
             $('#gEndTimePicker').prop("disabled", false);
+            $("#skuResult textarea").prop("disabled", false);
+            $("#gActive").prop("disabled", true);
             // $('#gStartTime').bind('click',function() {
             //     WdatePicker({
             //         maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',

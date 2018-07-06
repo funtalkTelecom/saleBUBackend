@@ -210,11 +210,9 @@ public class GoodsService {
                             }
                             numberMapper.updateStatus(okNumber, false);
                         }
+                    }else {//是白卡就把该skuid下的所有号码状态改成1,清空tb_num的sku_id
+                        checkSkuSaleNum("", sku, true, "".equals(tskuId) ? sku.getSkuId() : Long.parseLong(tskuId));
                     }
-                    if(StringUtils.isBlank(skuSaleNum)){
-                        checkSkuSaleNum(skuSaleNum, sku, true, "".equals(tskuId) ? sku.getSkuId() : Long.parseLong(tskuId));
-                    }
-
 
 //                    sku.setSkuId(sku.getGeneralId());
                     sku.setSkuSaleNum(skuSaleNum.split("★")[0].split("\n")[0]);
