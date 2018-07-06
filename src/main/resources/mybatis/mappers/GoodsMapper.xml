@@ -280,6 +280,11 @@
     </update>
 
     <select id="checkGnameIsExist" resultType="java.lang.Integer">
-        select count(1) as num from tb_goods a where a.g_id != #{gId} and a.g_name = #{gName}
+        select count(1) as num from tb_goods a where 1=1
+        <if test="gId != null and gId != ''">
+          and a.g_id != #{gId}
+        </if>
+        and a.g_name = #{gName}
+        and SYSDATE() between a.g_start_time and a.g_end_time
     </select>
 </mapper>

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
-    void updateStatus(Number number);
+    void updateStatus(@Param("number") Number number, @Param("isClearSkuid") boolean isClearSkuid);
 
     int checkNumberIsOk(Number number);
 

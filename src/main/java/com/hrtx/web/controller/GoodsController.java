@@ -87,7 +87,9 @@ public class GoodsController extends BaseReturn{
 		}
 		if(goods.getgStartTime()==null) return (new Result(Result.ERROR, "有效期开始时间不能为空"));
 		if(goods.getgEndTime()==null) return (new Result(Result.ERROR, "有效期结束时间不能为空"));
-		if(goodsService.checkGnameIsExist(goods)) return (new Result(Result.ERROR, "商品名称已存在"));
+		if("1".equals(goods.getgIsAuc())) {
+			if(goodsService.checkGnameIsExist(goods)) return (new Result(Result.ERROR, "商品名称已存在"));
+		}
 
         return (goodsService.goodsEdit(goods, request, files));
 	}
