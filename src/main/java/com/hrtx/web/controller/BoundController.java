@@ -11,11 +11,12 @@ import com.hrtx.web.pojo.Order;
 import com.hrtx.web.service.ApiOrderService;
 import com.hrtx.web.service.BoundService;
 import com.hrtx.web.service.MealService;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import org.apache.commons.lang.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
@@ -60,8 +61,8 @@ public class BoundController extends BaseReturn{
         List<Map> orderList=apiOrderService.findOrderListByNumId(numId);
         if(orderList!=null&&orderList.size()>0)
         {
-            orderStatus=Integer.valueOf(orderList.get(0).get("orderStatus").toString());
-            orderId=Long.valueOf(orderList.get(0).get("orderId").toString());
+            orderStatus= NumberUtils.toInt(String.valueOf(orderList.get(0).get("orderStatus")),0) ;
+            orderId=NumberUtils.toLong(String.valueOf(orderList.get(0).get("orderId")),0L);
         }else
         {
             returnResult(new Result(Result.ERROR,"号码对应的订单记录为空，请核对！"));
@@ -70,21 +71,33 @@ public class BoundController extends BaseReturn{
         Iccid iccid=boundService.findIccidByIccid(iccidStr);
         Meal meal =MealService.findMealById(mealMid);
         if(number==null) returnResult(new Result(Result.ERROR,"号码记录为空，请核对！"));
-        if(iccid==null) returnResult(new Result(Result.ERROR,"iccid记录为空，请核对！"));
+        if(iccid==null) returnResult(new Result(Result.ERROR,"你所填写的iccid不存在，请重新填写！"));
         if(meal==null) returnResult(new Result(Result.ERROR,"套餐记录为空，请核对！"));
-        numBuyerId=number.getBuyerId();
-        numSectionNo=number.getSectionNo();
-        numStatus=number.getStatus();
-        iccidSectionNo=iccid.getSections();
-        iccidConsumerId=iccid.getConsumerId();
-        iccidStatus=iccid.getDealStatus();
-        iccidStr=iccid.getIccid();
+        numBuyerId=NumberUtils.toLong(String.valueOf(number.getBuyerId()),0L);
+        if(StringUtils.isNotBlank(number.getSectionNo()))
+        {
+            numSectionNo=number.getSectionNo();
+        }
+        numStatus=NumberUtils.toInt(String.valueOf(number.getStatus()),0);
+        if(StringUtils.isNotBlank(iccid.getSections()))
+        {
+            iccidSectionNo=iccid.getSections();
+        }
+        iccidConsumerId=NumberUtils.toLong(String.valueOf(iccid.getConsumerId()),0L);
+        if(StringUtils.isNotBlank(iccid.getDealStatus()))
+        {
+            iccidStatus=iccid.getDealStatus();
+        }
+        if(StringUtils.isNotBlank(iccid.getIccid()))
+        {
+            iccidStr=iccid.getIccid();
+        }
         if(orderStatus!=4)//4待配卡；5待签收(仓储物流已取件)；6完成
         {
             isEdit=false;
-            returnResult(new Result(Result.ERROR,"请待配卡的号码对应的订单应处于待配卡状态进行绑定，请核对！"));
+            returnResult(new Result(Result.ERROR,"你所绑的号码对应的订单状态不是待配卡状态，请核对！"));
         }
-        if(!(numBuyerId.toString().equals(iccidConsumerId.toString())))//是否同一用户
+        if(!(String.valueOf(numBuyerId).equals(String.valueOf(iccidConsumerId))))//是否同一用户
         {
             isEdit=false;
             returnResult(new Result(Result.ERROR,"该号码与iccid属于不同的用户，请核对！"));
@@ -92,12 +105,17 @@ public class BoundController extends BaseReturn{
         if(!(numSectionNo.trim().equals(iccidSectionNo.trim())))//是否同一号段
         {
             isEdit=false;
-            returnResult(new Result(Result.ERROR,"该号码号段与iccid号段不一致，请核对！"));
+            returnResult(new Result(Result.ERROR,"该号码所属号段与所填iccid的号段不一致，请重新填定！"));
         }
         if(numStatus!=4)
         {
             isEdit=false;
             returnResult(new Result(Result.ERROR,"请待配卡的号码进行绑定，请核对！"));
+        }
+        if(iccidStatus.equals("2"))//受理状态(1待绑定 2已绑定
+        {
+            isEdit=false;
+            returnResult(new Result(Result.ERROR,"你所填写的iccid已被绑定，请重新填写！"));
         }
         if(!iccidStatus.equals("1"))//受理状态(1待绑定
         {

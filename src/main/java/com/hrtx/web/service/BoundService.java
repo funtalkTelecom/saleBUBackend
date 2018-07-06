@@ -54,7 +54,7 @@ public class BoundService {
 	}
 
 	/*
-	  status4 未绑定 5,6,7已绑定
+	  status4 未绑定 5,6,7,9已绑定
 	 */
 	public Result numBoundList(String status, HttpServletRequest request){
 		Num num=new Num();
@@ -71,7 +71,7 @@ public class BoundService {
 				statusStr="4";
 			}else if(status.equals("1"))
 			{
-				statusStr="5,6,7";
+				statusStr="5,6,7,9";
 			}
 			//模拟登陆
 //			Consumer u = new Consumer();

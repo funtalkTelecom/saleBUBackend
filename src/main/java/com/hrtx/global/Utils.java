@@ -1,5 +1,15 @@
 package com.hrtx.global;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import sun.misc.BASE64Encoder;
+
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -9,18 +19,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import sun.misc.BASE64Encoder;
-
-import javax.servlet.http.HttpServletResponse;
+import java.util.regex.Pattern;
 
 public class Utils {
 	private static Logger log = LoggerFactory.getLogger(Utils.class);
@@ -327,6 +326,33 @@ public class Utils {
 			exception.printStackTrace();
 		}
 		return 0;
+	}
+
+	/**
+	 * 判断非负数的整数或者携带一位或者两位的小数
+	 *
+	 * @function:
+	 * @param obj
+	 * @return boolean
+	 * @exception
+	 * @author:
+	 * @since  1.0.0
+	 */
+	public static boolean judgeTwoDecimal(Object obj){
+		boolean flag = false;
+		try {
+			if(obj != null){
+				String source = obj.toString();
+				// 判断是否是整数或者是携带一位或者两位的小数
+				Pattern pattern = Pattern.compile("^[+]?([0-9]+(.[0-9]{1,2})?)$");
+				if(pattern.matcher(source).matches()){
+					flag = true;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return flag;
 	}
 
 	/**
