@@ -233,23 +233,25 @@
 
     <update id="updateStatus">
         update tb_num a set
-        <if test="startTime!=null">
-            a.start_time = #{startTime},
+        <if test="number.startTime!=null">
+            a.start_time = #{number.startTime},
         </if>
-        <if test="endTime!=null">
-            a.end_time = #{endTime},
+        <if test="number.endTime!=null">
+            a.end_time = #{number.endTime},
         </if>
-        <if test="status==1">
-            a.status=1,
-            a.sku_id=null
+        <if test="number.status==1">
+            <if test="isClearSkuid">
+              a.sku_id=null,
+            </if>
+            a.status=1
             where
-            a.sku_id = #{skuId} and a.status = 2
+            a.sku_id = #{number.skuId} and a.status = 2
         </if>
-        <if test="status==2">
-            a.sku_id=#{skuId},
+        <if test="number.status==2">
+            a.sku_id=#{number.skuId},
             a.status=2
             where
-            a.num_resource = #{numResource}
+            a.num_resource = #{number.numResource}
         </if>
     </update>
 

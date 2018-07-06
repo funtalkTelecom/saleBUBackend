@@ -141,7 +141,10 @@ public class GoodsService {
                         skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
     //                    sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
     //                    sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
-                        String[] okSkuNum = skuSaleNum.split("★").length==0?skuSaleNum.split("★"):skuSaleNum.split("★")[0].split("\\r?\\n");
+                        String[] okSkuNum = new String[] {};
+                        if(skuSaleNum.indexOf("★")!=0){
+                            okSkuNum = skuSaleNum.split("★")[0].split("\\r?\\n");
+                        }
                         int okCount = okSkuNum.length;
                         if (okSkuNum.length !=0 && StringUtils.isBlank(okSkuNum[0]) && okSkuNum.length == 1) okCount = 0;
                         //有错误号码
@@ -205,7 +208,7 @@ public class GoodsService {
                                 okNumber.setStartTime(goods.getgStartTime());
                                 okNumber.setEndTime(goods.getgEndTime());
                             }
-                            numberMapper.updateStatus(okNumber);
+                            numberMapper.updateStatus(okNumber, false);
                         }
                     }
                     if(StringUtils.isBlank(skuSaleNum)){
@@ -402,7 +405,7 @@ public class GoodsService {
         Number number = new Number();
         number.setSkuId(skuid);
         number.setStatus(1);
-        numberMapper.updateStatus(number);
+        numberMapper.updateStatus(number, true);
 
 	    String[] skuSaleNumbs = skuSaleNum.split("\\r?\\n");
 	    if(skuSaleNumbs!=null && skuSaleNumbs.length>0){
@@ -492,7 +495,7 @@ public class GoodsService {
                             Number number = new Number();
                             number.setSkuId(s.getSkuId());
                             number.setStatus(1);
-                            numberMapper.updateStatus(number);
+                            numberMapper.updateStatus(number, false);
                         }
                     }
                 }
