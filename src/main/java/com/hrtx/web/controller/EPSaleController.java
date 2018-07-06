@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-
+import com.hrtx.global.Utils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.text.DecimalFormat;
@@ -163,6 +163,7 @@ public class EPSaleController extends BaseReturn{
 		boolean isDeposit=false;//是否支付保证金
 		Long auctionDepositId=0L;//保证金Id
 		DecimalFormat df=new DecimalFormat("######0.00");
+        DecimalFormat df2=new DecimalFormat("######0");
 		if(goodsAuctionCount>0)//最近10次数出价记录
 		{
 			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
@@ -179,7 +180,14 @@ public class EPSaleController extends BaseReturn{
 		}
 		if(subPrice>0)
 		{
-			subPrice=Double.valueOf(df.format(subPrice));
+			subPrice=Double.valueOf(df.format(subPrice));//保留两位小数
+			if(Utils.judgeTwoDecimal(subPrice)||Utils.judgeTwoDecimal(priceUp))//若含小数点，转整数进行求%
+            {
+                subPrice=subPrice*100;
+                subPrice=Double.valueOf(df.format(subPrice));//去小数
+                priceUp=priceUp*100;
+                priceUp=Double.valueOf(df.format(priceUp));//去小数
+            }
 			if((goodsAuctionCount>0)&&(subPrice%priceUp>0)) {//比较前后次出价差是===>否按每次加价的倍数,若是第一次出价记录则不要进行比较
 				if(goodsAuctionCount>0)
 				{

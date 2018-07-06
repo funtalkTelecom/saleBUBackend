@@ -110,7 +110,9 @@
 	  else tb_auction.order_id end
 	  as orderId,
 	  tb_num.end_time as endTime,
-	  tb_order.status as orderStatus
+	  case when  tb_order.status is null then ''
+	   else tb_order.status end
+	   as orderStatus
 	  from tb_auction
 	  inner join tb_consumer on tb_consumer.id=tb_auction.consumer_id
 	  inner join tb_num on tb_num.id=tb_auction.num_id
