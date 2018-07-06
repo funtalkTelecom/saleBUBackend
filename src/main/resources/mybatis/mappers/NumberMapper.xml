@@ -240,7 +240,8 @@
             a.end_time = #{endTime},
         </if>
         <if test="status==1">
-            a.status=1
+            a.status=1,
+            a.sku_id=null
             where
             a.sku_id = #{skuId} and a.status = 2
         </if>

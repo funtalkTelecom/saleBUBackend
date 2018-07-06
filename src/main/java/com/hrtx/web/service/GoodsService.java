@@ -208,6 +208,10 @@ public class GoodsService {
                             numberMapper.updateStatus(okNumber);
                         }
                     }
+                    if(StringUtils.isBlank(skuSaleNum)){
+                        checkSkuSaleNum(skuSaleNum, sku, true, "".equals(tskuId) ? sku.getSkuId() : Long.parseLong(tskuId));
+                    }
+
 
 //                    sku.setSkuId(sku.getGeneralId());
                     sku.setSkuSaleNum(skuSaleNum.split("★")[0].split("\n")[0]);
@@ -401,7 +405,7 @@ public class GoodsService {
         numberMapper.updateStatus(number);
 
 	    String[] skuSaleNumbs = skuSaleNum.split("\\r?\\n");
-	    if(skuSaleNumbs!=null && skuSaleNumbs.length>0 && !"".equals(skuSaleNumbs[0])){
+	    if(skuSaleNumbs!=null && skuSaleNumbs.length>0){
             skuSaleNum = "";
             for (int i = 0; i < skuSaleNumbs.length; i++) {
                 if(StringUtils.isBlank(skuSaleNumbs[i])) continue;
