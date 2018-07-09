@@ -53,10 +53,14 @@ public class WebSocketServer {
     @OnOpen
     public void onOpen(Session session,EndpointConfig config) {
         this.session =session;
+        // 得到httpSession
       //  HttpSession httpSession= (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        log.info("config:{}", config.getUserProperties().get("name"));
+        log.info("session:{}", config.getUserProperties().get("sessionid"));
         webSocketSet.add(this);     //加入set中
         addOnlineCount();           //在线数加1
         System.out.println("有新连接加入！当前在线人数为" + getOnlineCount());
+        log.info("【websocket消息】有新的连接, 总数:{}", webSocketSet.size());
     }
 
     /**
