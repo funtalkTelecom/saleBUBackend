@@ -99,7 +99,7 @@ public class ApiOrderService {
 	/*
 	 订单 已发货待签收>7天
 	 */
-	@Scheduled(fixedRate=3000)
+	@Scheduled(fixedRate=300000000)
 	public void signOrderSystem() {
 		List<Map> list=this.orderMapper.findOrderSignList();
 		if(list.isEmpty()){
