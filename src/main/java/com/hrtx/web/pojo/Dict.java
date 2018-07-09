@@ -17,7 +17,7 @@ public class Dict extends BasePojo implements java.io.Serializable {
     private String keyValue;
     private int isDel;
     private String note;
-    private String pid;
+    private Long pid;
     private int seq;
 
     public Dict() {
@@ -28,7 +28,7 @@ public class Dict extends BasePojo implements java.io.Serializable {
         this.keyGroup = keyGroup;
     }
 
-    public Dict(Long id, String keyId, String keyGroup, String keyValue, int isDel, String note, String pid, int seq) {
+    public Dict(Long id, String keyId, String keyGroup, String keyValue, int isDel, String note, Long pid, int seq) {
         this.id = id;
         this.keyId = keyId;
         this.keyGroup = keyGroup;
@@ -87,11 +87,11 @@ public class Dict extends BasePojo implements java.io.Serializable {
         this.note = note;
     }
 
-    public String getPid() {
+    public Long getPid() {
         return pid;
     }
 
-    public void setPid(String pid) {
+    public void setPid(Long pid) {
         this.pid = pid;
     }
 

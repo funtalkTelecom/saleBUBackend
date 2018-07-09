@@ -185,7 +185,7 @@ public class LyCrmService {
         File file = new File(dir.getPath()+File.separator+fileName);
         if(file.exists()) file.delete();
         createFile(list, file.getPath());
-        Dict dict = new Dict(null, Utils.getDate(0-date_offset, "yyyyMMdd")+"-"+count, "opend_card_file_name", fileName, 0, "上传的开卡文件名", "", 0);
+        Dict dict = new Dict(null, Utils.getDate(0-date_offset, "yyyyMMdd")+"-"+count, "opend_card_file_name", fileName, 0, "上传的开卡文件名", 0l, 0);
         dict.setId(dict.getGeneralId());
         dictMapper.insert(dict);
         int ucount = this.batchUpdateSlz(fileName, snums);
