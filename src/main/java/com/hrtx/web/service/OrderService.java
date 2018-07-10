@@ -20,9 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.System;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class OrderService extends BaseService {
@@ -37,6 +39,7 @@ public class OrderService extends BaseService {
     @Autowired private GoodsMapper goodsMapper;
     @Autowired private AuctionDepositService auctionDepositService;
     @Autowired private NumService numService;
+    @Autowired private MealMapper mealMapper;
 
     //订单业务类型 //1白卡 2普号 3普靓  4超靓
     private String[] goodsTypes = new String[]{"1","2","3","4"};
@@ -215,11 +218,15 @@ public class OrderService extends BaseService {
      * @param order
      */
     @NoRepeat
-    public Result payBalance(Order order) {
+    public Result payBalance(Order order, Long mealId) {
         Long addresId = order.getAddressId();
         String payMenthod = order.getPayMenthodId();
         Long orderId = order.getOrderId();
         if(!ArrayUtils.contains(Constants.getKeyObject("PAY_MENTHOD_TYPE"), payMenthod)) return new Result(Result.ERROR, "支付方式不存在");
+        Meal meal = new Meal();
+        meal.setMid(mealId);
+        meal = mealMapper.selectByPrimaryKey(meal);
+        if(meal == null) return new Result(Result.ERROR, "所选套餐不存在");
         order = orderMapper.selectByPrimaryKey(order.getOrderId());
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
@@ -236,6 +243,7 @@ public class OrderService extends BaseService {
 //        City city =fundOrders.get(0);
         City city = cityMapper.selectByPrimaryKey(districtId);
         if(city == null) return new Result(Result.ERROR, "所选地址区县不存在");
+        orderItemMapper.updateMeal(orderId, mealId);
         order.setPayMenthodId(payMenthod);
         order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payMenthod));
         order.setAddressId(addresId);
