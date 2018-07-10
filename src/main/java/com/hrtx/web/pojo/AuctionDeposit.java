@@ -15,15 +15,19 @@ public class AuctionDeposit extends BasePojo implements java.io.Serializable {
     @Id
 	@JsonSerialize(using = ToStringSerializer.class)
     private Long id;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long skuId;//	tb_sku.id  二级属性关联到一级商品保证金;号码三级
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long numId;//	号码编码
     private String num;//	号码  来自 tb_num.num_resource
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long gId;//商品编码tb_goods.id
     private double amt;//	金额
     private int status;//	状态  1初始；2已支付；3已退款
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date addDate;//	创建时间
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long  consumerId;//	用户id  来自tb_consumer.id
     private String addIp;//	用户ip
     private String paySnn;//	支付流水
