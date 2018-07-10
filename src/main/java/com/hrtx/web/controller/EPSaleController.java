@@ -465,12 +465,12 @@ public class EPSaleController extends BaseReturn{
 			//Long numId=NumberUtils.toLong(String.valueOf(goodsMap.get("numId")));
 			List<File> fileList = new ArrayList<File>();
 			List<Map> imgList= new ArrayList<Map>();
-			Map<String, Object> imgMap= new HashMap<String, Object>();
 			//图片集
 			fileList = fileService.findFilesByRefid(gId);
 			//fileList = fileService.findFilesByRefid("1003545391213314048");
 			if (fileList != null && fileList.size() > 0) {
 				for (File file : fileList) {
+					Map<String, Object> imgMap= new HashMap<String, Object>();
 					String gImgUrl=SystemParam.get("domain-full") + "get-img/goodsPics/" +gId+"/"+ file.getFileName();
 					imgMap.put("seq",file.getSeq());
 					imgMap.put("gImg",gImgUrl);
