@@ -38,9 +38,9 @@ public class FundOrderController extends BaseReturn{
 
     @PostMapping("/pay-balance")
     @Powers({PowerConsts.NOPOWER})
-    public Result payBalance(@Validated(value = {Groups.FundOrderPayOrder.class}) Order order, BindingResult result){
+    public Result payBalance(@Validated(value = {Groups.FundOrderPayOrder.class}) Order order, BindingResult result, Long mealId){
         if(result.hasErrors()) return new Result(Result.ERROR, this.getErrors(result.getFieldErrors()));
-        return orderService.payBalance(order);
+        return orderService.payBalance(order, mealId);
     }
 
 	@PostMapping("/add-fund-order")
