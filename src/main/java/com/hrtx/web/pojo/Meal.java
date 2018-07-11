@@ -19,6 +19,7 @@ public class Meal extends BasePojo implements java.io.Serializable {
 	private String mealName;
 	private String mealDesc;
     private Long saleCity;
+    @Transient
     private String saleCityName;
 	private String saleType;
 	private Long createBy;
