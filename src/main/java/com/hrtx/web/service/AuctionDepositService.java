@@ -14,12 +14,16 @@ import com.hrtx.web.pojo.Auction;
 import com.hrtx.web.pojo.AuctionDeposit;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.Goods;
+import com.hrtx.web.websocket.WebSocketServer;
+import net.sf.json.JSONArray;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -95,6 +99,15 @@ public class AuctionDepositService {
 		}
 		map.put("deposit",deposit);
 		return   map;
+	}
+
+	/*
+	  通过NumId、StatusA、GId的返回对应的保证金列表
+	 */
+	public List<Map>  findAuctionDepositListByNumIdAndStatusAndGId(AuctionDeposit auctionDeposit)
+	{
+		List<Map> auctionDepositList=auctionDepositMapper.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
+		return auctionDepositList;
 	}
 
 	/*
@@ -253,7 +266,6 @@ public class AuctionDepositService {
 						//auction  状态：3失败
 						auction.setStatus(3);
 						//****************保证金支付成功*****当前出价记录状态：3失败*******************
-
 						auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 						auctionMapper.auctionEditStatusById(auction);
 						//****************保证金支付成功*******当前出价记录状态：3失败*****************
@@ -287,10 +299,44 @@ public class AuctionDepositService {
 						epSaleService.numLoopEdit(numId,loopTime);
 					}*/
 				}
+				Map goodsAuctionMap=new HashMap();
+				int priceCount=0;//出价次数
+				//出价后的最近10次出价记录
+				List<Map> goodsAuctionListAfter=auctionMapper.findAuctionListByNumIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getgId());
+				//出价次数
+				List<Map> epSaleGoodsAuctionPriceInfo=auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(auctionDeposit.getNumId()),Long.valueOf(auctionDeposit.getgId()));
+				if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
+					priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
+				}
+				if(goodsAuctionListAfter!=null&&goodsAuctionListAfter.size()>0)
+				{
+					goodsAuctionMap.put("goodsAuctionList",goodsAuctionListAfter);
+					goodsAuctionMap.put("priceCount",priceCount);
+					goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
+					//goodsAuctionListStr="goodsAuctionList:"+goodsAuctionListAfter;
+				}else
+				{
+					goodsAuctionMap.put("goodsAuctionList","");
+					goodsAuctionMap.put("priceCount","");
+					goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
+					//goodsAuctionListStr="goodsAuctionList:"+"";
+				}
+				goodsAuctionMap.put("idDeposit","1");
+				//******************************出价后的向所有WebSocket客户端广播信息
+				String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
+				try {
+					WebSocketServer.sendInfo(msg);
+					log.info("广播信息{}"+msg);
+					log.info("保证金支付成功，广播信息,最近10次出价记录，状态：2支付成功保证金列表");
+				}catch (IOException e)
+				{
+					log.info("保证金支付成功，广播信息异常{}",e.getMessage());
+				}
 		}else
 		{
 			auctionDeposit.setStatus(1);
 			auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
+			log.info("保证金支付失败");
 		}
 
 		/*if(status)

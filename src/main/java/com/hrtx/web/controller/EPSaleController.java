@@ -6,6 +6,8 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.service.*;
+import com.hrtx.web.websocket.WebSocketServer;
+import net.sf.json.JSONArray;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import com.hrtx.global.Utils;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -112,6 +115,7 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	private static Object cjLock = new Object();
+
 	/*
 	   竟拍商品出价
 	   *限 每次gId与numId组合
@@ -305,7 +309,17 @@ public class EPSaleController extends BaseReturn{
 						//goodsAuctionListStr="goodsAuctionList:"+"";
 					}
 					goodsAuctionMap.put("idDeposit","1");
-					returnResult(new Result(200, goodsAuctionMap));
+
+					//******************************出价后的向所有WebSocket客户端广播信息
+					String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
+					try {
+						WebSocketServer.sendInfo(msg);
+						log.info("出价成功，广播信息,最近10次出价记录，状态：2支付成功保证金列表");
+					}catch (IOException e)
+					{
+						log.info("出价成功，广播信息异常{}",e.getMessage());
+					}
+					//returnResult(new Result(200, goodsAuctionMap));
 
 				}else //当前用户保证金未支付成功    预先生成出价记录 状态：1初始     保证金记录状态：1 初始
 				{

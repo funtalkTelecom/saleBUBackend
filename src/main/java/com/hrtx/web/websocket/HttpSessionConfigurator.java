@@ -40,6 +40,7 @@ public class HttpSessionConfigurator extends ServerEndpointConfig.Configurator{
         sec.getUserProperties().put("name", "小强");
         super.modifyHandshake(sec, request, response);
     }
+
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {
         //这个对象说一下，貌似只有服务器是tomcat的时候才需要配置,具体我没有研究

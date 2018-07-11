@@ -30,7 +30,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Component
 //@WebListener
 public class WebSocketServer {
-    public final org.slf4j.Logger log = LoggerFactory.getLogger(WebSocketServer.class);
+    public static  final org.slf4j.Logger log = LoggerFactory.getLogger(WebSocketServer.class);
     @Autowired private AuctionMapper auctionMapper;
     @Autowired private AuctionDepositMapper auctionDepositMapper;
     @Autowired private AuctionDepositService auctionDepositService;
@@ -152,6 +152,20 @@ public class WebSocketServer {
                 item.sendMessage(msg);
             } catch (IOException e) {
                 e.printStackTrace();
+                continue;
+            }
+        }
+    }
+
+    /**
+     * 群发自定义消息
+     * */
+    public static void sendInfo(String message) throws IOException {
+        log.info("sdfsdfsdfsdf");
+        for (WebSocketServer item : webSocketSet) {
+            try {
+                item.sendMessage(message);
+            } catch (IOException e) {
                 continue;
             }
         }
