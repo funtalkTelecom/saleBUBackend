@@ -248,7 +248,7 @@ public class EPSaleService {
 			//if(true) throw  new RuntimeException("测试。。。。。。。。。。。。。。。。。");
 			List<Map> needReturn=epSaleMapper.queryNeedReturn(num_id,g_id,success_consumer_id);//success_consumer_id为空时查询该号码所有出价结果
 			if(needReturn.isEmpty()){
-				log.info(String.format("竞拍单[%s]无可退保证金",num_resource));return;
+				log.info(String.format("竞拍单[%s]无可退保证金",num_resource));continue;
 			}
 			for (Map map_return: needReturn) {
 				String id=String.valueOf(map_return.get("id"));
