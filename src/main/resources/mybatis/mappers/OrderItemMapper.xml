@@ -125,6 +125,6 @@
         select n.id, n.`status` from tb_order_item oi, tb_num n where oi.num_id = n.id and oi.order_id = #{orderId}
     </select>
     <update id="updateMeal">
-        update tb_order_item oi set oi.meal_id = #{mealId} and oi.order_id = #{orderId}
+        update tb_order_item oi set oi.meal_id = #{mealId} where oi.order_id = #{orderId}
     </update>
 </mapper>
