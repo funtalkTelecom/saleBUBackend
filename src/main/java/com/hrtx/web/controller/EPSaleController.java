@@ -292,6 +292,12 @@ public class EPSaleController extends BaseReturn{
 					//String goodsAuctionListStr="";
 					Map goodsAuctionMap=new HashMap();
 					List<Map> epSaleGoodsAuctionPriceInfo=auctionService.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
+                    //对应的状态：2支付成功保证金列表
+                    AuctionDeposit auctionDeposit=new AuctionDeposit();
+                    auctionDeposit.setStatus(2);
+                    auctionDeposit.setgId(auction.getgId());
+                    auctionDeposit.setNumId(auction.getNumId());
+                    List<Map> auctionDepositList=auctionDepositService.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
 					if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
 						priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
 					}
@@ -308,7 +314,14 @@ public class EPSaleController extends BaseReturn{
 						goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
 						//goodsAuctionListStr="goodsAuctionList:"+"";
 					}
-					goodsAuctionMap.put("idDeposit","1");
+                    if(auctionDepositList!=null&&auctionDepositList.size()>0)
+                    {
+                        goodsAuctionMap.put("goodsAuctionDepositList",auctionDepositList);
+                    }else
+                    {
+                        goodsAuctionMap.put("goodsAuctionDepositList","");
+                    }
+					//goodsAuctionMap.put("idDeposit","1");
 
 					//******************************出价后的向所有WebSocket客户端广播信息
 					String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
@@ -320,6 +333,7 @@ public class EPSaleController extends BaseReturn{
 						log.info("出价成功，广播信息异常{}",e.getMessage());
 					}
 					//returnResult(new Result(200, goodsAuctionMap));
+                    returnResult(new Result(200, ""));
 
 				}else //当前用户保证金未支付成功    预先生成出价记录 状态：1初始     保证金记录状态：1 初始
 				{

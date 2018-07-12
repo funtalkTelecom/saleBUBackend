@@ -305,6 +305,10 @@ public class AuctionDepositService {
 				List<Map> goodsAuctionListAfter=auctionMapper.findAuctionListByNumIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getgId());
 				//出价次数
 				List<Map> epSaleGoodsAuctionPriceInfo=auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(auctionDeposit.getNumId()),Long.valueOf(auctionDeposit.getgId()));
+				auctionDeposit.setStatus(2);
+				//对应的状态：2支付成功保证金列表
+				auctionDeposit.setStatus(2);
+				List<Map> auctionDepositLisAftet=auctionDepositMapper.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
 				if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
 					priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
 				}
@@ -321,7 +325,13 @@ public class AuctionDepositService {
 					goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
 					//goodsAuctionListStr="goodsAuctionList:"+"";
 				}
-				goodsAuctionMap.put("idDeposit","1");
+				if(auctionDepositList!=null&&auctionDepositList.size()>0)
+				{
+					goodsAuctionMap.put("goodsAuctionDepositList",auctionDepositList);
+				}else
+				{
+					goodsAuctionMap.put("goodsAuctionDepositList","");
+				}
 				//******************************出价后的向所有WebSocket客户端广播信息
 				String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
 				try {
