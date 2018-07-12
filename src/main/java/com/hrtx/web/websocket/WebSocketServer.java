@@ -17,9 +17,8 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -38,39 +37,63 @@ public class WebSocketServer {
     private static int onlineCount = 0;
 
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
-    private static CopyOnWriteArraySet<WebSocketServer> webSocketSet = new CopyOnWriteArraySet<WebSocketServer>();
+    private static ConcurrentHashMap<String,WebSocketServer> webSocketSet = new ConcurrentHashMap<String,WebSocketServer>();
 
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
 
     //当前会话的httpsession
     private HttpSession httpSession;
+
     /**
      * 连接建立成功调用的方法
      *
      * @param session 可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
     @OnOpen
-    public void onOpen(Session session,EndpointConfig config) {
+    public void onOpen(Session session,EndpointConfig config,@PathParam("numId") String numId,@PathParam("gId") String gId) {
         this.session =session;
         // 得到httpSession
       //  HttpSession httpSession= (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
-        log.info("config:{}", config.getUserProperties().get("name"));
-        log.info("session:{}", config.getUserProperties().get("sessionid"));
-        webSocketSet.add(this);     //加入set中
+       // log.info("config:{}", config.getUserProperties().get("name"));
+       // log.info("session:{}", config.getUserProperties().get("sessionid"));
+        String keyId=numId+"_"+gId;
+        webSocketSet.put(keyId,this);     //加入set中
         addOnlineCount();           //在线数加1
-        System.out.println("有新连接加入！当前在线人数为" + getOnlineCount());
-        log.info("【websocket消息】有新的连接, 总数:{}", webSocketSet.size());
+        System.out.println("有新连接加入！当前在线人数为" + getOnlineCount()+"*********** numId_gid:"+keyId);
+        log.info("有新连接加入！当前在线人数为" + getOnlineCount()+"*********** numId_gid:"+keyId+";当前session_id:"+this.session.getId());
+        log.info("【websocket消息】有新的连接, 总数:", webSocketSet.size());
     }
 
     /**
      * 连接关闭调用的方法
      */
     @OnClose
-    public void onClose() {
-        webSocketSet.remove(this);  //从set中删除
+    public void onClose(@PathParam("numId") String numId,@PathParam("gId") String gId) {
+        String keyId="";
+        String sessionId="";
+        if(webSocketSet.containsValue(this))
+        {
+            Iterator<String> keys=webSocketSet.keySet().iterator();
+            while (keys.hasNext())
+            {
+                keyId=keys.next();
+                if(webSocketSet.get(keyId)==this)
+                {
+                    sessionId=webSocketSet.get(keyId).session.getId();
+                    webSocketSet.remove(keyId,this); //从set中删除
+                }
+            }
+        }
+        this.session=null;
+       /* try {
+            session.close();
+        }catch (IOException e)
+        {
+            e.printStackTrace();
+        }*/
         subOnlineCount();           //在线数减1
-        System.out.println("有一连接关闭！当前在线人数为" + getOnlineCount());
+        System.out.println("有一连接关闭！当前在线人数为" + getOnlineCount()+"*********** numId_gid:{)"+keyId+";当前session_id:"+sessionId);
     }
 
     /**
@@ -80,8 +103,9 @@ public class WebSocketServer {
      * @param session 可选的参数
      */
     @OnMessage
-    public void onMessage(@PathParam("numId") String numId,@PathParam("gId") String gId,String message, Session session) {
+    public void onMessage(String message,@PathParam("numId") String numId,@PathParam("gId") String gId, Session session) {
         String msg="";
+        String keyId=numId+"_"+gId;
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, Object> mapData= new HashMap<String, Object>();
         int priceCount=0;//出价次数
@@ -146,10 +170,26 @@ public class WebSocketServer {
         }
 
         System.out.println(msg);
-        //群发消息
+       /* //群发消息
         for (WebSocketServer item : webSocketSet) {
             try {
                 item.sendMessage(msg);
+            } catch (IOException e) {
+                e.printStackTrace();
+                continue;
+            }
+        }*/
+
+        // 群发消息
+        Set<String> keys=webSocketSet.keySet();
+        for(String key :keys)
+        {
+            try {
+                if(keyId.equals(key))//限当前的keyId的session
+                {
+                    webSocketSet.get(key).sendMessage(msg);
+                    log.info("信息广播:numId_gId:"+key+";"+msg);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 continue;
@@ -160,15 +200,30 @@ public class WebSocketServer {
     /**
      * 群发自定义消息
      * */
-    public static void sendInfo(String message) throws IOException {
-        log.info("sdfsdfsdfsdf");
-        for (WebSocketServer item : webSocketSet) {
+    public static void sendInfo(String message,@PathParam("numId") String numId,@PathParam("gId") String gId) throws IOException {
+        String keyId=numId+"_"+gId;
+        log.info("********************************");
+        log.info("信息广播开始:numId_gId:"+keyId+"");
+        log.info("********************************");
+        Set<String> keyIds=webSocketSet.keySet();
+        // 群发消息
+        Set<String> keys=webSocketSet.keySet();
+        for(String key :keys)
+        {
             try {
-                item.sendMessage(message);
+                if(keyId.equals(key))
+                {
+                    webSocketSet.get(key).sendMessage(message);//限当前的keyId的session
+                    log.info("信息广播:numId_gId:"+keyId+";"+message+";当前session_id:"+webSocketSet.get(key).session.getId());
+                }
             } catch (IOException e) {
+                e.printStackTrace();
                 continue;
             }
         }
+        log.info("********************************");
+        log.info("信息广播结束:numId_gId:"+keyId+"");
+        log.info("********************************");
     }
 
     /**

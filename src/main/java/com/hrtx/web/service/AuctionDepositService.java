@@ -335,12 +335,12 @@ public class AuctionDepositService {
 				//******************************出价后的向所有WebSocket客户端广播信息
 				String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
 				try {
-					WebSocketServer.sendInfo(msg);
-					log.info("广播信息{}"+msg);
+					WebSocketServer.sendInfo(msg,String.valueOf(auctionDeposit.getNumId()),String.valueOf(auctionDeposit.getgId()));
+					log.info("广播信息"+msg);
 					log.info("保证金支付成功，广播信息,最近10次出价记录，状态：2支付成功保证金列表");
 				}catch (IOException e)
 				{
-					log.info("保证金支付成功，广播信息异常{}",e.getMessage());
+					log.info("保证金支付成功，广播信息异常",e.getMessage());
 				}
 		}else
 		{
