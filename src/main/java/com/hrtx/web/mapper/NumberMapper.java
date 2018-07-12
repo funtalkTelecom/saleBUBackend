@@ -30,4 +30,6 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
     Map getNumInfoByNum(@Param("num") String num);
 
     Page<Object> queryPageList(Number number, @Param("param") Map param);
+
+    void updateDelStatus(@Param("delSku") Long delSku);
 }

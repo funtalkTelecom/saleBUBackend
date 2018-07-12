@@ -328,6 +328,9 @@ public class GoodsService {
                                         }
                                     }
                                 }
+                                // by zdh 20180712
+                                //更新删除的tb_num 状态
+                                numberMapper.updateDelStatus(s.getSkuId());
                             }
                         }
                     }
