@@ -327,7 +327,10 @@ public class EPSaleController extends BaseReturn{
 					String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
 					try {
 						WebSocketServer.sendInfo(msg);
+                        log.info("出价成功************************************************8");
 						log.info("出价成功，广播信息,最近10次出价记录，状态：2支付成功保证金列表");
+                        log.info(msg);
+                        log.info("出价成功************************************************8");
 					}catch (IOException e)
 					{
 						log.info("出价成功，广播信息异常{}",e.getMessage());
