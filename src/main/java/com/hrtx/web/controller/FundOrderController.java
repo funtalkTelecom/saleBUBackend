@@ -43,13 +43,6 @@ public class FundOrderController extends BaseReturn{
         return orderService.payBalance(order, mealId);
     }
 
-	@PostMapping("/add-fund-order")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result payOrder(@Validated(value = {Groups.FundOrderPayOrder.class}) FundOrder fundOrder, BindingResult result){
-        if(result.hasErrors()) return new Result(Result.ERROR, this.getErrors(result.getFieldErrors()));
-		return fundOrderService.payPinganWxxOrder(fundOrder.getAmt(), fundOrder.getOrderName(), fundOrder.getSourceId());
-	}
-
 	@RequestMapping("/pingan-pay-result")
 	@Powers({PowerConsts.NOLOGINPOWER})
 	public void payResult(HttpServletRequest request){
@@ -59,17 +52,4 @@ public class FundOrderController extends BaseReturn{
             renderHtml("notify_success");
         }
 	}
-
-    @PostMapping("/refund-fund-order")
-    @Powers({PowerConsts.NOLOGINPOWER})
-    public Result refundOrder(FundOrder fundOrder){
-        return fundOrderService.payOrderRefund(fundOrder.getSourceId(), fundOrder.getRemark());
-    }
-
-    @RequestMapping("/test-no-repate")
-    @Powers({PowerConsts.NOLOGINPOWER})
-//    @NoRepeat
-    public void testNoRepate(String a, String b){
-        returnResult(fundOrderService.test(a, 1, new User()));
-    }
 }
