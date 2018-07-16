@@ -232,10 +232,11 @@ public class WebSocketServer {
     /**
      * 群发自定义消息
      * */
-    public static void sendInfo(String message,@PathParam("numId") String numId,@PathParam("gId") String gId) throws IOException {
+    public static void sendInfo(@PathParam("numId") String numId,@PathParam("gId") String gId) throws IOException {
         String keyId=numId+"_"+gId;
+        String msg=auctionAfterInfo(Long.valueOf(numId),Long.valueOf(gId));
         // 群发消息
-        if(webSocketSet.size()>0)
+        if(webSocketSet.size()>0&&msg.trim().length()>0)
         {
             wsSet=webSocketSet.get(keyId);//socket_Set
             if(wsSet!=null&&wsSet.size()>0)
@@ -246,11 +247,14 @@ public class WebSocketServer {
                 for (WebSocketServer item :wsSet)//socket_Set
                 {
                     try {
-                        item.sendMessage(message);
+                        item.sendMessage(msg);
+                        log.info("出价成功、保证金支付成功，广播信息【最近10次出价的记录，状态=2支付成功的保证金列表】");
+                        log.info(msg);
                         log.info("信息广播:numId_gId_sessionId:"+keyId+"_"+item.session.getId());
-                        log.info("信息广播:信息msg:"+message);
+                        log.info("信息广播:信息msg:"+msg);
                     }catch (IOException e) {
                         e.printStackTrace();
+                        log.info(String.format("出价成功、保证金支付成功，广播信息异常【[%s]",e.getMessage())+"】");
                         continue;
                     }
                 }
@@ -259,6 +263,53 @@ public class WebSocketServer {
                 log.info("***********************************************");
             }
         }
+    }
+
+    /*
+	  出价成功后或保证金支付成功后
+	  返回广播信息
+	 */
+    public static String auctionAfterInfo(Long numId,Long gId) {
+        AuctionMapper auctionMapper2=(AuctionMapper) ContextUtils.getContext().getBean("auctionMapper");
+        AuctionDepositMapper auctionDepositMapper2=(AuctionDepositMapper) ContextUtils.getContext().getBean("auctionDepositMapper");
+        Map goodsAuctionMap=new HashMap();
+        int priceCount=0;//出价次数
+        //出价后的最近10次出价记录
+        List<Map> goodsAuctionListAfter=auctionMapper2.findAuctionListByNumIdAndGId(numId,gId);
+        //出价次数
+        List<Map> epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByNumIdAndGId(numId,gId);
+        //对应的状态：2支付成功保证金列表
+        AuctionDeposit auctionDeposit=new AuctionDeposit();
+        auctionDeposit.setStatus(2);
+        auctionDeposit.setNumId(numId);
+        auctionDeposit.setgId(gId);
+        List<Map> auctionDepositLisAftet=auctionDepositMapper2.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
+        if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
+            priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
+        }
+        if(goodsAuctionListAfter!=null&&goodsAuctionListAfter.size()>0)
+        {
+            goodsAuctionMap.put("goodsAuctionList",goodsAuctionListAfter);
+            goodsAuctionMap.put("priceCount",priceCount);
+            goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
+            //goodsAuctionListStr="goodsAuctionList:"+goodsAuctionListAfter;
+        }else
+        {
+            goodsAuctionMap.put("goodsAuctionList","");
+            goodsAuctionMap.put("priceCount","");
+            goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
+            //goodsAuctionListStr="goodsAuctionList:"+"";
+        }
+        if(auctionDepositLisAftet!=null&&auctionDepositLisAftet.size()>0)
+        {
+            goodsAuctionMap.put("goodsAuctionDepositList",auctionDepositLisAftet);
+        }else
+        {
+            goodsAuctionMap.put("goodsAuctionDepositList","");
+        }
+        //******************************出价后的向所有WebSocket客户端广播信息
+        String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
+        return  msg;
     }
 
     /**

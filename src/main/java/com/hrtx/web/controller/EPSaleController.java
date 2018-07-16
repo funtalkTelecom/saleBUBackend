@@ -7,7 +7,6 @@ import com.hrtx.global.*;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.service.*;
 import com.hrtx.web.websocket.WebSocketServer;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -287,7 +286,9 @@ public class EPSaleController extends BaseReturn{
 						//***************************则延长结束时间= 结束时间+loopTime*********************
 						epSaleService.numLoopEdit(auction.getNumId(),loopTime);
 					}*/
-					//出价后的最近10次出价记录
+				    /*
+                    this.epSaleService.AuctionAfterInfo(auction.getNumId(),auction.getgId());
+                    //出价后的最近10次出价记录
 					List<Map> goodsAuctionListAfter=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
 					//String goodsAuctionListStr="";
 					Map goodsAuctionMap=new HashMap();
@@ -325,15 +326,15 @@ public class EPSaleController extends BaseReturn{
 
 					//******************************出价后的向所有WebSocket客户端广播信息
 					String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
+					*/
+                    //String msg=this.epSaleService.AuctionAfterInfo(auction.getNumId(),auction.getgId());
 					try {
-						WebSocketServer.sendInfo(msg,String.valueOf(auction.getNumId()),String.valueOf(auction.getgId()));
-                        log.info("出价成功************************************************8");
-						log.info("出价成功，广播信息,最近10次出价记录，状态：2支付成功保证金列表");
-                        log.info(msg);
-                        log.info("出价成功************************************************8");
+						log.info("出价成功************广播信息*************************************");
+						WebSocketServer.sendInfo(String.valueOf(auction.getNumId()),String.valueOf(auction.getgId()));
+                        log.info("出价成功*************广播信息************************************");
 					}catch (IOException e)
 					{
-						log.info("出价成功，广播信息异常{}",e.getMessage());
+						log.info(String.format("出价成功，广播信息异常【[%s]",e.getMessage())+"】");
 					}
 					//returnResult(new Result(200, goodsAuctionMap));
                     returnResult(new Result(200, ""));

@@ -299,13 +299,12 @@ public class AuctionDepositService {
 						epSaleService.numLoopEdit(numId,loopTime);
 					}*/
 				}
-				Map goodsAuctionMap=new HashMap();
+				/*Map goodsAuctionMap=new HashMap();
 				int priceCount=0;//出价次数
 				//出价后的最近10次出价记录
 				List<Map> goodsAuctionListAfter=auctionMapper.findAuctionListByNumIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getgId());
 				//出价次数
 				List<Map> epSaleGoodsAuctionPriceInfo=auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(auctionDeposit.getNumId()),Long.valueOf(auctionDeposit.getgId()));
-				auctionDeposit.setStatus(2);
 				//对应的状态：2支付成功保证金列表
 				auctionDeposit.setStatus(2);
 				List<Map> auctionDepositLisAftet=auctionDepositMapper.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
@@ -325,22 +324,24 @@ public class AuctionDepositService {
 					goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
 					//goodsAuctionListStr="goodsAuctionList:"+"";
 				}
-				if(auctionDepositList!=null&&auctionDepositList.size()>0)
+				if(auctionDepositLisAftet!=null&&auctionDepositLisAftet.size()>0)
 				{
-					goodsAuctionMap.put("goodsAuctionDepositList",auctionDepositList);
+					goodsAuctionMap.put("goodsAuctionDepositList",auctionDepositLisAftet);
 				}else
 				{
 					goodsAuctionMap.put("goodsAuctionDepositList","");
-				}
+				}*/
 				//******************************出价后的向所有WebSocket客户端广播信息
-				String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
+				//String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
 				try {
-					WebSocketServer.sendInfo(msg,String.valueOf(auctionDeposit.getNumId()),String.valueOf(auctionDeposit.getgId()));
-					log.info("广播信息"+msg);
-					log.info("保证金支付成功，广播信息,最近10次出价记录，状态：2支付成功保证金列表");
+					log.info("出价成功**************广播信息***********************************");
+					WebSocketServer.sendInfo(String.valueOf(auctionDeposit.getNumId()),String.valueOf(auctionDeposit.getgId()));
+					log.info("出价成功**************广播信息***********************************");
+					//log.info("广播信息"+msg);
+					//log.info("保证金支付成功，广播信息,最近10次出价记录，状态：2支付成功保证金列表");
 				}catch (IOException e)
 				{
-					log.info("保证金支付成功，广播信息异常",e.getMessage());
+					log.info(String.format("出价成功，广播信息异常【[%s]",e.getMessage())+"】");
 				}
 		}else
 		{

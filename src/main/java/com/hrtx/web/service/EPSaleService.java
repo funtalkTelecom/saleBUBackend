@@ -8,6 +8,7 @@ import com.hrtx.global.*;
 import com.hrtx.web.controller.BaseReturn;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
+import com.hrtx.web.websocket.WebSocketServer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -19,9 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
-import java.lang.System;
 
 @Service
 public class EPSaleService {
@@ -237,6 +238,16 @@ public class EPSaleService {
 					if(result.getCode()!=200){
 						log.error(String.format("竟拍结束;出价成功转订单失败;竟拍号[%s]",num_resource));
 						Messager.send(SystemParam.get("system_phone"),"竟拍结束;出价成功转订单失败;竟拍号:"+num_resource);
+					}else
+					{
+						try {
+							log.info("出价成功************广播信息*************************************");
+							WebSocketServer.sendInfo(String.valueOf(num_id),String.valueOf(g_id));
+							log.info("出价成功*************广播信息************************************");
+						}catch (IOException e)
+						{
+							log.info(String.format("出价成功，广播信息异常【[%s]",e.getMessage())+"】");
+						}
 					}
 				}
 			}else{//人数不足  流拍
