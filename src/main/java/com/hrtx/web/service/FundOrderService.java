@@ -339,6 +339,21 @@ public class FundOrderService extends BaseService {
         return new Result(Result.OK, amt);
     }
 
+    /**
+     * 查询订单的支付信息
+     * @param sourceId 订单号
+     * @return result code == 200 已支付 其它 未支付 data= 1线上支付  2线下支付
+     */
+    public Result queryPayOrderInfo(String sourceId) {
+        Example example = new Example(FundOrder.class);
+        example.createCriteria().andEqualTo("busi", FundOrder.BUSI_TYPE_PAYORDER).andEqualTo("status", 3).andEqualTo("sourceId", sourceId);
+        List<FundOrder> list = fundOrderMapper.selectByExample(example);
+        if(list.size() <= 0) return new Result(Result.ERROR, "未支付");
+        FundOrder fundOrder = list.get(0);
+        if(FundOrder.THIRD_PAY_OFFLINE.equals(fundOrder.getThird())) return new Result(Result.OK, 2);
+        return new Result(Result.OK, 1);
+    }
+
     @NoRepeat
     public Result test(String a, Integer b, User u) {
         try {
