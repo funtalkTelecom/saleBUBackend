@@ -1,7 +1,7 @@
 ;$(function(){
 	/* 初始化角色列表数据 */
 	var roleList = new $.DSTable({
-		"url" : '/list-role',
+		"url" : 'list-role',
 		"ct" : "#result",
 		"cm" : [{
 			"header" : "角色名",
@@ -20,7 +20,7 @@
 	});
 	roleList.load();
 	var userList = new $.DSTable({
-		"url" : '/list-user',
+		"url" : 'list-user',
 		"ct" : "#userresult",
 		"cm" : [{
 			"header" : "登录帐号",
