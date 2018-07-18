@@ -25,7 +25,7 @@ $.post("dict-to-map", {group: "orderStatus"},function(data){
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
-		"url" : '/order/order-list',
+		"url" : 'order/order-list',
 		"ct" : "#result",
 		"cm" : [{
                     "header" : "编号",
@@ -200,7 +200,7 @@ $(function() {
 		}
 	});
     itemList = new $.DSTable({
-        "url" : '/order/item-list',
+        "url" : 'order/item-list',
         "ct" : "#itemResult",
         "cm" : [{
             "header" : "商品属性",

@@ -15,7 +15,7 @@ $.post("dict-to-map", {group: "num_tags"},function(data){
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
-		"url" : '/number/number-list',
+		"url" : 'number/number-list',
 		"ct" : "#result",
 		"cm" : [{
 					"header" : "地市名称",

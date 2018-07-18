@@ -6,7 +6,7 @@ $.post("dict-to-map", {group: "gIsAuc"},function(data){
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
-		"url" : '/goods/goods-list',
+		"url" : 'goods/goods-list',
 		"ct" : "#result",
 		"cm" : [{
                     "header" : "商品名称",

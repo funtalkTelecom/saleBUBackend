@@ -2,7 +2,7 @@ var dataList = null;
 $(function() {
 	/* 初始化竟拍活动管理列表数据 */
 	dataList = new $.DSTable({
-		"url" : '/epSale/epSale-list',
+		"url" : 'epSale/epSale-list',
 		"ct" : "#result",
 		"cm" : [{
             "header" : "编号",

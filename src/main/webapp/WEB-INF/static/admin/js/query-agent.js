@@ -2,7 +2,7 @@ var dataList = null;
 $(function() {
     /* 初始化入库单列表数据 */
     dataList = new $.DSTable({
-        "url" : '/agent/list-agent',
+        "url" : 'agent/list-agent',
         "ct" : "#result",
         "cm" : [{
             "header" : "企业名称",

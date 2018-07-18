@@ -2,7 +2,7 @@ var dataList = null;
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
-		"url" : '/dict/dict-list',
+		"url" : 'dict/dict-list',
 		"ct" : "#result",
 		"cm" : [{
 					"header" : "key_id",
