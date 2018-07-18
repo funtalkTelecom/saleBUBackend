@@ -50,7 +50,7 @@ $(function() {
                 }
                 $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
                 $operate.find(".update").click(function () {
-                    $.post("/find-agent-by-id",{id:v},function(data){
+                    $.post("find-agent-by-id",{id:v},function(data){
                         var _data=data.data;
                         $(".scomm").html(_data.commpayName);
                         $(".person").html(_data.person);
@@ -65,7 +65,7 @@ $(function() {
                     },"json");
                 })
                 $operate.find(".deltails").click(function () {
-                    $.post("/find-agent-by-id",{id:v},function(data){
+                    $.post("find-agent-by-id",{id:v},function(data){
                         var _data=data.data;
                         $(".scomm").html(_data.commpayName);
                         $(".person").html(_data.person);

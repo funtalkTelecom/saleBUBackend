@@ -37,7 +37,7 @@
 
                                     <div class="space-6"></div>
 
-                                    <form action="/login" method="post" id="loginForm">
+                                    <form action="login" method="post" id="loginForm">
                                         <fieldset>
                                             <div id="errormsg">${errormsg}</div>
                                             <label class="block clearfix">

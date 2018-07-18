@@ -49,7 +49,7 @@
 	function loadStorageAllocate(id,name){
 		$("#tree").treeview({
 		"showcheck" : true,
-		"url" : "/permission-tree-node",
+		"url" : "permission-tree-node",
 		"cbiconpath" : "project/css/checktree/images/icons/",
 		"theme": "bbit-tree-no-lines",
 		"data" : [{
@@ -89,7 +89,7 @@
 				"property" : $("#property").val(),
 				"permissionIds" : selected.join(",")
 			};
-			$.getJSON("/update-permission",param,function(data){
+			$.getJSON("update-permission",param,function(data){
 				$("#submit").attr("disabled",false);
 				$("#sendTip").hide();
 				alert("授权成功");
@@ -108,7 +108,7 @@
 		}
 		$(this).attr("disabled",true);
 		$.ajax({
-			url : "/add-role",
+			url : "add-role",
 			data : {
 				"t" : new Date().getTime(),
 				"name":$.trim($("#name").val())

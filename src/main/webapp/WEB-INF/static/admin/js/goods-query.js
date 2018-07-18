@@ -670,7 +670,7 @@ $(function() {
             allowPreviewEmoticons : false,
             allowImageUpload : true,
             allowFlashUpload : true,
-            uploadJson : "/kindeditorUploadFile",
+            uploadJson : "kindeditorUploadFile",
             imageMaxSize : 2*1024*1024,
             afterBlur: function () { editor.sync(); },
             items : [
