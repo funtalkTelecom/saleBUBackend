@@ -1,3 +1,4 @@
+/*
 package com.hrtx.config;
 
 import org.springframework.cache.annotation.EnableCaching;
@@ -12,3 +13,4 @@ public class SessionInitializer extends AbstractHttpSessionApplicationInitialize
       super(RedisConfig.class);
   }
 }
+*/
