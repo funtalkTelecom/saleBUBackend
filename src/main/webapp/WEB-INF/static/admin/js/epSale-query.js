@@ -44,8 +44,7 @@ $(function() {
                 $operate.find(".update").click(function () {
                     $.post("epSale/epSale-info", {id: v}, function (data) {
                         var _data = data.data;
-                        var isSale=data.isSale=="1"?true:false;
-
+                        var isSale=data.isSale=="1"?true:false;//是否有上架的商品
                         $("#startTimePicker").val(_data.startTime);
                         $("#startTimePicker").attr("disabled",isSale);
                         $("#endTimePicker").val(_data.endTime);
@@ -56,6 +55,13 @@ $(function() {
                         $("#lastPayTimePicker").val(_data.lastPayTime);
                         $("#lastPayTimePicker").attr("disabled",isSale);
                         initEPSalePics(data.epSalePics);
+                        if(data.epSalePics.length>0)
+                        {
+                            $("#delImgI").attr("class","raty-cancel cancel-off-png");
+                        }else
+                        {
+                            $("#delImgI").attr("class","");
+                        }
                         editor.html(_data.epRule);
                         formInit($("#epSaleInfo form"), _data);
                         $('#epSaleInfo').modal('show');
@@ -114,6 +120,7 @@ $(function() {
         var lastPayTime=$("#lastPayTime").val();
         var epRule=$("textarea[name='epRule']").val();
         var file=$("#file").val();
+        var imgSrc=$("#epSaleImg")[0].src;
        if(title=="")
        {
            alert("标题不能为空!")
@@ -139,11 +146,17 @@ $(function() {
             alert("竟拍规则不能为空!")
             return false;
         }
+        var delImgClass=$("#delImgI").attr("class");
         if(file=="")
         {
-            alert("图片不能为空!")
-            return false;
+           // if(imgSrc==""||imgSrc.indexOf("undefined")>0)
+            if(delImgClass=="")
+            {
+                alert("图片不能为空!")
+                return false;
+            }
         }
+
         //editor.sync();
         // 准备好Options对象
         var options = {
@@ -196,6 +209,7 @@ $(function() {
         citySelect($("#fdistrict"),$(this).val());
     });
 
+
     /**
      * 图片上传
      * */
@@ -225,7 +239,7 @@ $(function() {
             }
             html+='<input style="float:left" type="file" name="file" id="file" seq="'+(i+1)+'" onchange="fileChange('+(i+1)+')">';
             html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;"><i  id="delImgI" title="删除图片" class="'+imgClass+'" data-alt="x"></i></div>';
-            html+='<img style="width:150px;'+style+'" src="'+basePath+'get-img/epSalePics/'+refid+'/'+filename+'">';
+            html+='<img id="epSaleImg" style="width:150px;'+style+'" src="'+basePath+'get-img/epSalePics/'+refid+'/'+filename+'">';
 
             html+='</div>';
 

@@ -57,7 +57,7 @@ public class BoundController extends BaseReturn{
 		numId=num.getId();
         iccidStr=num.getIccid();
 		mealMid=num.getMealMid();
-		//sku商品类型=3 普号
+		//sku商品类型=3 普靓
         List<Map> orderList=apiOrderService.findOrderListByNumId(numId);
         if(orderList!=null&&orderList.size()>0)
         {
@@ -144,6 +144,7 @@ public class BoundController extends BaseReturn{
     /**
      * 号码列表
      * 查询当前用户
+     * status:0 未绑定限 sku商品类型=3 普靓
      */
     @GetMapping("/api/numBoundList/{status}")
     @Powers(PowerConsts.NOPOWER)

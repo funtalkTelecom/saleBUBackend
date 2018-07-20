@@ -86,8 +86,17 @@ public class BoundService {
 			num.setLimit(limit);
 			num.setStart(limit*(pageNum-1));
 			PageHelper.startPage(pageNum,limit);
-			Page<Object> ob=this.numMapper.queryPageNumList(num,apiSessionUtil.getConsumer().getId(),statusStr);
-			pm = new PageInfo<Object>(ob);
+			if(status.equals("0"))
+			{
+				statusStr="4";
+				Page<Object> ob=this.numMapper.queryPageNumList2(num,apiSessionUtil.getConsumer().getId(),statusStr);
+				pm = new PageInfo<Object>(ob);
+			}else if(status.equals("1"))
+			{
+				statusStr="5,6,7,9";
+				Page<Object> ob=this.numMapper.queryPageNumList(num,apiSessionUtil.getConsumer().getId(),statusStr);
+				pm = new PageInfo<Object>(ob);
+			}
 			result = new Result(Result.OK, pm);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
