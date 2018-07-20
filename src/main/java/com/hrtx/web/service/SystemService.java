@@ -20,6 +20,8 @@ public class SystemService {
 	
 	@Autowired
 	private SystemMapper systemMapper;
+	@Autowired
+	private SystemParam systemParam;
 
 	public Result pageSystem(System system) {
 		PageHelper.startPage(system.getPageNum(),system.getLimit());
@@ -64,7 +66,7 @@ public class SystemService {
 
 	public Result systemAudit(System system) {
 		systemMapper.systemAudit(system);
-		SystemParam.load();
+		systemParam.load1();
 		return new Result(Result.OK, "审核成功");
 	}
 

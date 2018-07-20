@@ -377,7 +377,7 @@ public class OrderService extends BaseService {
         }
     }
 
-    public Result bindCard(Order order, org.apache.catalina.servlet4preview.http.HttpServletRequest request) {
+    public Result bindCard(Order order/*, org.apache.catalina.servlet4preview.http.HttpServletRequest request*/) {
         if("4".equals(order.getStatus()) && "2".equals(order.getSkuGoodsType())) return new Result(Result.ERROR, "待配卡的普号禁止管理员绑卡");
         Result result = numService.blindNum(order.getOrderId());
         if(result.getCode() != Result.OK) return new Result(Result.ERROR, "绑卡失败\n" + result.getData());

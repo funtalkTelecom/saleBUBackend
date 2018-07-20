@@ -6,27 +6,22 @@ import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
-import com.hrtx.web.pojo.FundOrder;
-import com.hrtx.web.pojo.Groups;
 import com.hrtx.web.pojo.Order;
 import com.hrtx.web.pojo.OrderItem;
 import com.hrtx.web.service.AuctionDepositService;
 import com.hrtx.web.service.NumService;
 import com.hrtx.web.service.OrderItemService;
 import com.hrtx.web.service.OrderService;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +66,7 @@ public class OrderController extends BaseReturn{
 	@RequestMapping("/order-bindCard")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_BINDCARD})
 	public Result payBindCard(Order order, HttpServletRequest request){
-		return orderService.bindCard(order, request);
+		return orderService.bindCard(order/*, request*/);
 	}
 
 	@RequestMapping("/item-list")
