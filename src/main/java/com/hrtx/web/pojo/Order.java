@@ -66,6 +66,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     private String conment;//摘要
     private int isDel;//
     private String skuGoodsType;
+    private String reason;
 
     public Order() {
     }
@@ -359,5 +360,13 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public void setSkuGoodsType(String skuGoodsType) {
         this.skuGoodsType = skuGoodsType;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

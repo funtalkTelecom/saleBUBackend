@@ -38,7 +38,9 @@
     <select id="findOrderInfo" resultType="Order">
         select
         <include refid="col_list"/>
-        from tb_order a where a.order_id = #{orderid};
+        from tb_order a
+        where a.is_del=0
+        and  a.order_id = #{orderid};
     </select>
     <resultMap id="orderList" type="java.util.HashMap">
         <result property="order_id" column="orderId" javaType="java.lang.String"></result>
@@ -126,7 +128,7 @@
         <include refid="col_list"/>
         from tb_order a
         left join (select max(order_id) as order_id, max(goods_id) as g_id from tb_order_item group by order_id) b
-        on a.order_id = b.order_id
+        on a.order_id = b.order_id and a.is_del= 0
         left join tb_file_info c on c.ref_id = b.g_id
         left join tb_goods d on d.g_id = b.g_id
         where c.seq = 1
@@ -260,4 +262,27 @@
         a.status= #{status}
         where  a.order_id = #{orderId}
     </update>
+
+    <update id="CancelOrderStatus">
+        update tb_order a
+        set a.status= #{status}
+
+            ,a.reason =#{reason}
+        where  a.order_id = #{orderId}
+    </update>
+
+    <select id="getOrderItmeList" resultType="java.util.HashMap">
+        select m.item_id item_id,m.order_id order_id,m.goods_id goods_id,m.sku_id sku_id,
+        m.num_id num_id,m.num num,m.quantity quantity,m.price price,m.total total,m.is_shipment is_shipment,
+        o.sku_goods_type sku_goods_type,o.order_type order_type
+        from tb_order_item m ,tb_order o where m.order_id = o.order_id and o.is_del=0
+        and m.is_shipment=#{isShipment}
+        and m.order_id = #{orderId}
+    </select>
+    <select id="getOrderItmeCount" resultType="java.util.HashMap">
+        select m.sku_id sku_id,m.goods_id goods_id,sum(m.quantity) quantity from tb_order_item m ,tb_order o where m.order_id = o.order_id and o.is_del=0
+        and m.is_shipment= #{isShipment}
+        and m.order_id = #{orderId}
+        GROUP BY m.sku_id,m.goods_id
+    </select>
 </mapper>

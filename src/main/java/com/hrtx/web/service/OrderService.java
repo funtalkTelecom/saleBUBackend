@@ -40,6 +40,7 @@ public class OrderService extends BaseService {
     @Autowired private AuctionDepositService auctionDepositService;
     @Autowired private NumService numService;
     @Autowired private MealMapper mealMapper;
+    @Autowired private ApiOrderService apiOrderService;
 
     //订单业务类型 //1白卡 2普号 3普靓  4超靓
     private String[] goodsTypes = new String[]{"1","2","3","4"};
@@ -384,6 +385,40 @@ public class OrderService extends BaseService {
         result = this.updateDqx(order.getOrderId());
         if(result.getCode()!=Result.OK) throw new ServiceException("绑卡失败\n" + result.getData());
         return new Result(Result.OK, "绑卡成功");
+    }
+
+    public Result OrderCallbackStatus(StorageInterfaceRequest storageInterfaceRequest){
+        Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
+        long orderId = NumberUtils.toLong(ObjectUtils.toString(platrequest.get("order_id")));
+        int cancel_res = NumberUtils.toInt(ObjectUtils.toString(platrequest.get("cancel_res")));
+        String reson = ObjectUtils.toString(platrequest.get("reson"));
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order == null) return new Result(Result.ERROR, "订单不存在");
+        if(order.getStatus() != 11) return new Result(Result.ERROR, "非待仓库撤销状态的订单");
+        if(cancel_res==1) {
+            //确认取消
+            Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
+            if(ispay.getCode()==200){
+                //已支付
+                if(ispay.getData().equals("1")){//线上支付
+                    apiOrderService.CancelOrderStatus(orderId,12,""); //退款中
+                    Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reson);
+                    if(payR.getCode()==200){  //退款成功
+                        apiOrderService.orderType(orderId);
+                    }else { //退款失败
+                        apiOrderService.CancelOrderStatus(orderId,13,""); //退款失败
+                    }
+                }else {//线下支付
+                    apiOrderService.CancelOrderStatus(orderId,14,""); //待财务退款
+                }
+            }else {//未支付
+                //上架涉及的表，数量，状态
+                apiOrderService.orderType(orderId);
+            }
+        }else if (cancel_res==2){//撤销取消,还原订单状态
+            apiOrderService.CancelOrderStatus(orderId,3,reson);
+        }
+        return new Result(Result.OK, "取消成功");
     }
 
 }
