@@ -25,7 +25,7 @@ public class SpringbootApplication extends SpringBootServletInitializer {
     public static void main(String[] args) {
         System.out.println("====================内置tomcat启动中=====================");
         System.out.println("====================为了在部署到tomcat时确保一致的效果，取消内置tomcat启动方式 zjc 2018.7.18=====================");
-    	SpringApplication.run(SpringbootApplication.class, args);
+//    	SpringApplication.run(SpringbootApplication.class, args);
     }
 
 }
