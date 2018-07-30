@@ -201,128 +201,122 @@ public class ApiOrderService {
 					if (numcount == -1) return new Result(Result.ERROR, "数量不能为空");
 					if (user.getIsAgent() != 2) return new Result(Result.ERROR, "您不是一级代理商,无法提交");
 					//冻结号码
-					if (!LockUtils.tryLock(skuid)) return new Result(Result.ERROR, "请稍后再试!");
-					try {
-						//获取sku列表
-						log.info("获取sku信息");
-						List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
-						if(skulist==null || skulist.size()<=0) return new Result(Result.ERROR, "未找到相关商品,请刷新后再试");
-						for (int i = 0; i < skulist.size(); i++) {
-							OrderItem orderItem = new OrderItem();
-							Map sku = (Map) skulist.get(i);
-							List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
+					//获取sku列表
+					log.info("获取sku信息");
+					List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
+					if(skulist==null || skulist.size()<=0) return new Result(Result.ERROR, "未找到相关商品,请刷新后再试");
+					for (int i = 0; i < skulist.size(); i++) {
+						OrderItem orderItem = new OrderItem();
+						Map sku = (Map) skulist.get(i);
+						List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 
-							orderItem.setItemId(orderItem.getGeneralId());
-							orderItem.setOrderId(order.getOrderId());
+						orderItem.setItemId(orderItem.getGeneralId());
+						orderItem.setOrderId(order.getOrderId());
 
-							//获取商品
-							log.info("获取商品信息");
-							goods = goodsMapper.findGoodsInfoBySkuid(skuid);
-							log.info("验证一级代理商");
-							if(user.getIsAgent() != 2){
-								return new Result(Result.ERROR, "您不是一级代理商,无法提交普通靓号订单");
-							}
-							//判断商品地市和代理商地市
-							log.info("判断商品地市和代理商地市");
-							if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
-								return new Result(Result.ERROR, "不属于您的地市,无法操作");
-							}
-							skuGoodsType = String.valueOf(sku.get("skuGoodsType"));
-							//卡体item
-							orderItem.setGoodsId(goods.getgId());
-							orderItem.setSkuId(Long.parseLong(skuid));
-							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+						//获取商品
+						log.info("获取商品信息");
+						goods = goodsMapper.findGoodsInfoBySkuid(skuid);
+						log.info("验证一级代理商");
+						if(user.getIsAgent() != 2){
+							return new Result(Result.ERROR, "您不是一级代理商,无法提交普通靓号订单");
+						}
+						//判断商品地市和代理商地市
+						log.info("判断商品地市和代理商地市");
+						if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
+							return new Result(Result.ERROR, "不属于您的地市,无法操作");
+						}
+						skuGoodsType = String.valueOf(sku.get("skuGoodsType"));
+						//卡体item
+						orderItem.setGoodsId(goods.getgId());
+						orderItem.setSkuId(Long.parseLong(skuid));
+						orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
 //                                orderItem.setNumId(Long.parseLong(numid));
 //                                orderItem.setNum(String.valueOf( number.get("numResource"));
-							orderItem.setIsShipment(1);//都需要发货
-							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
-							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
-							orderItem.setShipmentApi("egt");
-							orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
-							orderItem.setQuantity(numcount);
-							double twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
-							orderItem.setPrice(twobPrice);
-							orderItem.setTotal(twobPrice * numcount);
+						orderItem.setIsShipment(1);//都需要发货
+						orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+						orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
+						orderItem.setShipmentApi("egt");
+						orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+						orderItem.setQuantity(numcount);
+						double twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
+						orderItem.setPrice(twobPrice);
+						orderItem.setTotal(twobPrice * numcount);
 //                                orderItem.setMealId(Long.parseLong(mealid));
-							sub_total += orderItem.getTotal();
+						sub_total += orderItem.getTotal();
 
-							pOrderItem = orderItem;
-							orderItems.add(orderItem);
-							//修改sku数量
-							Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
-							nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-numcount);
-							skuMapper.updateSkuNum(nowSku);
+						pOrderItem = orderItem;
+						orderItems.add(orderItem);
+						//修改sku数量
+						Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
+						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-numcount);
+						skuMapper.updateSkuNum(nowSku);
 
-							log.info("冻结号码,添加号码item");
-							//是普号,根据数量冻结号码,添加号码item
-							if("2".equals(sku.get("skuGoodsType"))){
-								//获取可冻结的号码,判断库存是否充足
-								nlist = numberMapper.getListBySkuidAndStatus(skuid, "'2'", numcount);
-								if(nlist.size()!=numcount){//获取的数量和购买不等
-									return new Result(Result.ERROR, "库存不足,请重试");
-								}
-								//冻结号码,往orderItem写数据
-								freezeNumByIds(nlist, "3");
-								for (com.hrtx.web.pojo.Number n : nlist) {
-									orderItem = new OrderItem();
-									orderItem.setpItemId(pOrderItem.getItemId());
+						log.info("冻结号码,添加号码item");
+						//是普号,根据数量冻结号码,添加号码item
+						if("2".equals(sku.get("skuGoodsType"))){
+							//获取可冻结的号码,判断库存是否充足
+							nlist = numberMapper.getListBySkuidAndStatus(skuid, "'2'", numcount);
+							if(nlist.size()!=numcount){//获取的数量和购买不等
+								return new Result(Result.ERROR, "库存不足,请重试");
+							}
+							//冻结号码,往orderItem写数据
+							freezeNumByIds(nlist, "3");
+							for (com.hrtx.web.pojo.Number n : nlist) {
+								orderItem = new OrderItem();
+								orderItem.setpItemId(pOrderItem.getItemId());
 
-									orderItem.setItemId(orderItem.getGeneralId());
-									orderItem.setOrderId(order.getOrderId());
+								orderItem.setItemId(orderItem.getGeneralId());
+								orderItem.setOrderId(order.getOrderId());
 
-									orderItem.setGoodsId(goods.getgId());
-									orderItem.setSkuId(Long.parseLong(skuid));
-									orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
-									orderItem.setNumId(n.getId());
-									orderItem.setNum(n.getNumResource());
-									orderItem.setIsShipment(0);//号码item无需发货
-									orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
-									orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
-									orderItem.setShipmentApi("egt");
-									orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
-									orderItem.setQuantity(1);
-									twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
-									orderItem.setPrice(0);
-									orderItem.setTotal(0);
+								orderItem.setGoodsId(goods.getgId());
+								orderItem.setSkuId(Long.parseLong(skuid));
+								orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+								orderItem.setNumId(n.getId());
+								orderItem.setNum(n.getNumResource());
+								orderItem.setIsShipment(0);//号码item无需发货
+								orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+								orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
+								orderItem.setShipmentApi("egt");
+								orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+								orderItem.setQuantity(1);
+								twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
+								orderItem.setPrice(0);
+								orderItem.setTotal(0);
 //                                orderItem.setMealId(Long.parseLong(mealid));
-									sub_total += orderItem.getTotal();
+								sub_total += orderItem.getTotal();
 
-									orderItems.add(orderItem);
-								}
+								orderItems.add(orderItem);
 							}
 						}
-						log.info("设置订单信息");
-						//设置订单
-						order.setSkuGoodsType(skuGoodsType);
-						order.setConsumer(user.getId());
-						order.setConsumerName(user.getName());
-						order.setStatus(1);//设置成待付款
-						order.setReqUserAgent(request.getHeader("user-agent"));
-						order.setReqIp(SessionUtil.getUserIp());
-						order.setAddDate(new Date());
-						order.setOrderType(1);
-
-						log.info("设置收货信息");
-						//获取收货地址信息
-						DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
-						order.setAddressId(deliveryAddress.getId());
-						order.setPersonName(deliveryAddress.getPersonName());
-						order.setPersonTel(deliveryAddress.getPersonTel());
-						order.setAddress(deliveryAddress.getAddress());
-
-						log.info("计算金额");
-						order.setCommission(commission);
-						order.setShippingTotal(shipping_total);
-						order.setSubTotal(sub_total);
-						//子项小计打折之后减去运费
-						total = sub_total * commission - shipping_total;
-						order.setTotal(total);
-
-						orderList.add(order);
-					} finally {
-						LockUtils.unLock(skuid);
 					}
+					log.info("设置订单信息");
+					//设置订单
+					order.setSkuGoodsType(skuGoodsType);
+					order.setConsumer(user.getId());
+					order.setConsumerName(user.getName());
+					order.setStatus(1);//设置成待付款
+					order.setReqUserAgent(request.getHeader("user-agent"));
+					order.setReqIp(SessionUtil.getUserIp());
+					order.setAddDate(new Date());
+					order.setOrderType(1);
 
+					log.info("设置收货信息");
+					//获取收货地址信息
+					DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
+					order.setAddressId(deliveryAddress.getId());
+					order.setPersonName(deliveryAddress.getPersonName());
+					order.setPersonTel(deliveryAddress.getPersonTel());
+					order.setAddress(deliveryAddress.getAddress());
+
+					log.info("计算金额");
+					order.setCommission(commission);
+					order.setShippingTotal(shipping_total);
+					order.setSubTotal(sub_total);
+					//子项小计打折之后减去运费
+					total = sub_total * commission - shipping_total;
+					order.setTotal(total);
+
+					orderList.add(order);
 				} catch (Exception e) {
 					e.printStackTrace();
 					//清除已生成的订单
@@ -357,138 +351,133 @@ public class ApiOrderService {
 					//获取号码
 					number = numberMapper.getNumInfoById(numid);
 					//冻结号码
-					if (!LockUtils.tryLock(numid)) return new Result(Result.ERROR, "请稍后再试!");
-					try {
-						log.info("验证号码是否可下单");
-						//验证号码是否可下单,2:销售中
-						if (number == null || !"2".equals(String.valueOf(number.get("status"))))
-							return new Result(Result.ERROR, "号码已被购买!");
-						log.info("冻结号码");
-						freezeNum(numid, "3");
-						log.info("获取sku信息");
-						//获取sku列表
-						List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
-						if(skulist==null || skulist.size()<=0) return new Result(Result.ERROR, "未找到相关商品,请刷新后再试");
-						for (int i = 0; i < skulist.size(); i++) {
-							OrderItem orderItem = new OrderItem();
-							Map sku = (Map) skulist.get(i);
+					log.info("验证号码是否可下单");
+					//验证号码是否可下单,2:销售中
+					if (number == null || !"2".equals(String.valueOf(number.get("status"))))
+						return new Result(Result.ERROR, "号码已被购买!");
+					log.info("冻结号码");
+					freezeNum(numid, "3");
+					log.info("获取sku信息");
+					//获取sku列表
+					List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
+					if(skulist==null || skulist.size()<=0) return new Result(Result.ERROR, "未找到相关商品,请刷新后再试");
+					for (int i = 0; i < skulist.size(); i++) {
+						OrderItem orderItem = new OrderItem();
+						Map sku = (Map) skulist.get(i);
 
-							log.info("获取商品信息");
-							//获取商品
-							goods = goodsMapper.findGoodsInfoBySkuid(skuid);
-							//普通靓号,需要一级代理商
-							if("3".equals(sku.get("skuGoodsType"))){
-								log.info("普通靓号,验证一级代理商");
-								if(user.getIsAgent() != 2){
-									freezeNum(numid, String.valueOf(number.get("status")));
-									return new Result(Result.ERROR, "您不是一级代理商,无法提交普通靓号订单");
-								}
-								log.info("判断商品地市和代理商地市");
-								//判断商品地市和代理商地市
-
-								if(!StringUtils.equals(number.get("cityId")+"",user.getAgentCity()+"")) {
-									freezeNum(numid, String.valueOf(number.get("status")));
-									return new Result(Result.ERROR, "不属于您的地市,无法操作");
-								}
-								/*if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
-									freezeNum(numid, String.valueOf(number.get("status")));
-									return new Result(Result.ERROR, "不属于您的地市,无法操作");
-								}*/
+						log.info("获取商品信息");
+						//获取商品
+						goods = goodsMapper.findGoodsInfoBySkuid(skuid);
+						//普通靓号,需要一级代理商
+						if("3".equals(sku.get("skuGoodsType"))){
+							log.info("普通靓号,验证一级代理商");
+							if(user.getIsAgent() != 2){
+								freezeNum(numid, String.valueOf(number.get("status")));
+								return new Result(Result.ERROR, "您不是一级代理商,无法提交普通靓号订单");
 							}
-							List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
+							log.info("判断商品地市和代理商地市");
+							//判断商品地市和代理商地市
 
-
-							int num = 1;
-							double twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
-							//修改sku数量
-							Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
-							nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
-							skuMapper.updateSkuNum(nowSku);
-							//超级靓号添加卡的item
-							if("4".equals(sku.get("skuGoodsType"))){
-								log.info("超级靓号添加卡体item");
-								orderItem = new OrderItem();
-								orderItem.setItemId(orderItem.getGeneralId());
-								orderItem.setOrderId(order.getOrderId());
-
-								orderItem.setGoodsId(goods.getgId());
-								orderItem.setSkuId(Long.parseLong(skuid));
-								orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
-								orderItem.setNumId(Long.parseLong(numid));
-								orderItem.setNum(String.valueOf( number.get("numResource")));
-								orderItem.setIsShipment(1);//卡体发货
-								orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
-								orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
-								orderItem.setShipmentApi("egt");
-								orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
-								orderItem.setQuantity(num);
-								orderItem.setPrice(twobPrice);
-								orderItem.setTotal(twobPrice * num);
-								if(!StringUtils.isBlank(mealid)) orderItem.setMealId(Long.parseLong(mealid));
-								sub_total += orderItem.getTotal();
-
-								pOrderItem = orderItem;
-								orderItems.add(orderItem);
+							if(!StringUtils.equals(number.get("cityId")+"",user.getAgentCity()+"")) {
+								freezeNum(numid, String.valueOf(number.get("status")));
+								return new Result(Result.ERROR, "不属于您的地市,无法操作");
 							}
+							/*if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
+								freezeNum(numid, String.valueOf(number.get("status")));
+								return new Result(Result.ERROR, "不属于您的地市,无法操作");
+							}*/
+						}
+						List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 
-							skuGoodsType = String.valueOf(sku.get("skuGoodsType"));
-							log.info("添加号码item");
-							//号码item
+
+						int num = 1;
+						double twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
+						//修改sku数量
+						Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
+						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
+						skuMapper.updateSkuNum(nowSku);
+						//超级靓号添加卡的item
+						if("4".equals(sku.get("skuGoodsType"))){
+							log.info("超级靓号添加卡体item");
 							orderItem = new OrderItem();
-							orderItem.setpItemId(pOrderItem.getItemId());
 							orderItem.setItemId(orderItem.getGeneralId());
 							orderItem.setOrderId(order.getOrderId());
+
 							orderItem.setGoodsId(goods.getgId());
 							orderItem.setSkuId(Long.parseLong(skuid));
 							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
 							orderItem.setNumId(Long.parseLong(numid));
 							orderItem.setNum(String.valueOf( number.get("numResource")));
-							orderItem.setIsShipment(0);//普通靓号不发货
+							orderItem.setIsShipment(1);//卡体发货
 							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
 							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
 							orderItem.setShipmentApi("egt");
 							orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
-							num = 1;
 							orderItem.setQuantity(num);
-							twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
 							orderItem.setPrice(twobPrice);
 							orderItem.setTotal(twobPrice * num);
 							if(!StringUtils.isBlank(mealid)) orderItem.setMealId(Long.parseLong(mealid));
 							sub_total += orderItem.getTotal();
 
+							pOrderItem = orderItem;
 							orderItems.add(orderItem);
 						}
 
-						log.info("设置订单信息");
-						//设置订单
-						order.setSkuGoodsType(skuGoodsType);
-						order.setConsumer(user.getId());
-						order.setConsumerName(user.getName());
-						order.setStatus(1);//设置成待付款
-						order.setReqUserAgent(request.getHeader("user-agent"));
-						order.setReqIp(SessionUtil.getUserIp());
-						order.setAddDate(new Date());
-						order.setOrderType(2);
-						if (addrid == null) order.setAddressId(null);
-						else {
-							//获取收货地址信息
-							DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
-							order.setAddressId(deliveryAddress.getId());
-							order.setPersonName(deliveryAddress.getPersonName());
-							order.setPersonTel(deliveryAddress.getPersonTel());
-							order.setAddress(deliveryAddress.getAddress());
-						}
-						order.setCommission(commission);
-						order.setShippingTotal(shipping_total);
-						order.setSubTotal(sub_total);
-						//子项小计打折之后减去运费
-						total = sub_total * commission - shipping_total;
-						order.setTotal(total);
+						skuGoodsType = String.valueOf(sku.get("skuGoodsType"));
+						log.info("添加号码item");
+						//号码item
+						orderItem = new OrderItem();
+						orderItem.setpItemId(pOrderItem.getItemId());
+						orderItem.setItemId(orderItem.getGeneralId());
+						orderItem.setOrderId(order.getOrderId());
+						orderItem.setGoodsId(goods.getgId());
+						orderItem.setSkuId(Long.parseLong(skuid));
+						orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+						orderItem.setNumId(Long.parseLong(numid));
+						orderItem.setNum(String.valueOf( number.get("numResource")));
+						orderItem.setIsShipment(0);//普通靓号不发货
+						orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+						orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
+						orderItem.setShipmentApi("egt");
+						orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+						num = 1;
+						orderItem.setQuantity(num);
+						twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
+						orderItem.setPrice(twobPrice);
+						orderItem.setTotal(twobPrice * num);
+						if(!StringUtils.isBlank(mealid)) orderItem.setMealId(Long.parseLong(mealid));
+						sub_total += orderItem.getTotal();
 
-						orderList.add(order);
-					} finally {
-						LockUtils.unLock(numid);
+						orderItems.add(orderItem);
 					}
+
+					log.info("设置订单信息");
+					//设置订单
+					order.setSkuGoodsType(skuGoodsType);
+					order.setConsumer(user.getId());
+					order.setConsumerName(user.getName());
+					order.setStatus(1);//设置成待付款
+					order.setReqUserAgent(request.getHeader("user-agent"));
+					order.setReqIp(SessionUtil.getUserIp());
+					order.setAddDate(new Date());
+					order.setOrderType(2);
+					if (addrid == null) order.setAddressId(null);
+					else {
+						//获取收货地址信息
+						DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
+						order.setAddressId(deliveryAddress.getId());
+						order.setPersonName(deliveryAddress.getPersonName());
+						order.setPersonTel(deliveryAddress.getPersonTel());
+						order.setAddress(deliveryAddress.getAddress());
+					}
+					order.setCommission(commission);
+					order.setShippingTotal(shipping_total);
+					order.setSubTotal(sub_total);
+					//子项小计打折之后减去运费
+					total = sub_total * commission - shipping_total;
+					order.setTotal(total);
+
+					orderList.add(order);
 				} catch (Exception e) {
 					e.printStackTrace();
 					//清除已生成的订单
@@ -528,120 +517,114 @@ public class ApiOrderService {
 					//获取号码
 					number = numberMapper.getNumInfoById(numid);
 					//冻结号码
-					if (!LockUtils.tryLock(numid)) return new Result(Result.ERROR, "请稍后再试!");
-					try {
-						log.info("验证号码是否可下单");
-						//验证号码是否可下单,2:销售中
-						if (number == null || !"2".equals(String.valueOf(number.get("status"))))
-							return new Result(Result.ERROR, "号码已被购买!");
-						log.info("冻结号码");
-						freezeNum(numid, "3");
-						log.info("获取sku信息");
-						//获取sku列表
-						List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
-						if(skulist==null || skulist.size()<=0) return new Result(Result.ERROR, "未找到相关商品,请刷新后再试");
-						for (int i = 0; i < skulist.size(); i++) {
-							OrderItem orderItem = new OrderItem();
-							Map sku = (Map) skulist.get(i);
+					log.info("验证号码是否可下单");
+					//验证号码是否可下单,2:销售中
+					if (number == null || !"2".equals(String.valueOf(number.get("status"))))
+						return new Result(Result.ERROR, "号码已被购买!");
+					log.info("冻结号码");
+					freezeNum(numid, "3");
+					log.info("获取sku信息");
+					//获取sku列表
+					List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
+					if(skulist==null || skulist.size()<=0) return new Result(Result.ERROR, "未找到相关商品,请刷新后再试");
+					for (int i = 0; i < skulist.size(); i++) {
+						OrderItem orderItem = new OrderItem();
+						Map sku = (Map) skulist.get(i);
 
-							log.info("获取商品信息");
-							//获取商品
-							goods = goodsMapper.findGoodsInfoBySkuid(skuid);
-							List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
+						log.info("获取商品信息");
+						//获取商品
+						goods = goodsMapper.findGoodsInfoBySkuid(skuid);
+						List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 
-							skuGoodsType = String.valueOf(sku.get("skuGoodsType"));
+						skuGoodsType = String.valueOf(sku.get("skuGoodsType"));
 
-							int num = 1;
-							double twobPrice = Double.parseDouble(price);
-							//修改sku数量
-							Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
-							nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
-							skuMapper.updateSkuNum(nowSku);
-							log.info("添加卡体item");
-							//添加卡的item
-							orderItem = new OrderItem();
-							orderItem.setItemId(orderItem.getGeneralId());
-							orderItem.setOrderId(order.getOrderId());
+						int num = 1;
+						double twobPrice = Double.parseDouble(price);
+						//修改sku数量
+						Sku nowSku = skuMapper.getSkuBySkuid(Long.parseLong(String.valueOf( sku.get("skuId"))));
+						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
+						skuMapper.updateSkuNum(nowSku);
+						log.info("添加卡体item");
+						//添加卡的item
+						orderItem = new OrderItem();
+						orderItem.setItemId(orderItem.getGeneralId());
+						orderItem.setOrderId(order.getOrderId());
 
-							orderItem.setGoodsId(goods.getgId());
-							orderItem.setSkuId(Long.parseLong(skuid));
-							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
-							orderItem.setNumId(Long.parseLong(numid));
-							orderItem.setNum(String.valueOf( number.get("numResource")));
-							orderItem.setIsShipment(1);//卡体发货
-							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
-							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
-							orderItem.setShipmentApi("egt");
-							orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
-							num = 1;
-							orderItem.setQuantity(num);
-							twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
-							orderItem.setPrice(twobPrice);
-							orderItem.setTotal(twobPrice * num);
-							sub_total += orderItem.getTotal();
+						orderItem.setGoodsId(goods.getgId());
+						orderItem.setSkuId(Long.parseLong(skuid));
+						orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+						orderItem.setNumId(Long.parseLong(numid));
+						orderItem.setNum(String.valueOf( number.get("numResource")));
+						orderItem.setIsShipment(1);//卡体发货
+						orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+						orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
+						orderItem.setShipmentApi("egt");
+						orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+						num = 1;
+						orderItem.setQuantity(num);
+						twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
+						orderItem.setPrice(twobPrice);
+						orderItem.setTotal(twobPrice * num);
+						sub_total += orderItem.getTotal();
 
-							pOrderItem=orderItem;
-							orderItems.add(orderItem);
+						pOrderItem=orderItem;
+						orderItems.add(orderItem);
 
-							log.info("添加号码item");
-							//号码item
-							orderItem = new OrderItem();
-							orderItem.setItemId(orderItem.getGeneralId());
-							orderItem.setpItemId(pOrderItem.getItemId());
-							orderItem.setOrderId(order.getOrderId());
-							orderItem.setGoodsId(goods.getgId());
-							orderItem.setSkuId(Long.parseLong(skuid));
-							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
-							orderItem.setNumId(Long.parseLong(numid));
-							orderItem.setNum(String.valueOf( number.get("numResource")));
-							orderItem.setIsShipment(0);
-							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
-							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
-							orderItem.setShipmentApi("egt");
-							orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
-							num = 1;
-							orderItem.setQuantity(num);
-							twobPrice = Double.parseDouble(price);
-							orderItem.setPrice(twobPrice);
-							orderItem.setTotal(twobPrice * num);
-							sub_total += orderItem.getTotal();
+						log.info("添加号码item");
+						//号码item
+						orderItem = new OrderItem();
+						orderItem.setItemId(orderItem.getGeneralId());
+						orderItem.setpItemId(pOrderItem.getItemId());
+						orderItem.setOrderId(order.getOrderId());
+						orderItem.setGoodsId(goods.getgId());
+						orderItem.setSkuId(Long.parseLong(skuid));
+						orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
+						orderItem.setNumId(Long.parseLong(numid));
+						orderItem.setNum(String.valueOf( number.get("numResource")));
+						orderItem.setIsShipment(0);
+						orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
+						orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
+						orderItem.setShipmentApi("egt");
+						orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+						num = 1;
+						orderItem.setQuantity(num);
+						twobPrice = Double.parseDouble(price);
+						orderItem.setPrice(twobPrice);
+						orderItem.setTotal(twobPrice * num);
+						sub_total += orderItem.getTotal();
 
-							orderItems.add(orderItem);
-						}
-
-						log.info("设置订单信息");
-						//设置订单
-						order.setSkuGoodsType(skuGoodsType);
-						order.setConsumer(user.getId());
-						order.setConsumerName(user.getName());
-						order.setStatus(1);//设置成待付款
-						//order.setReqUserAgent(request.getHeader("user-agent"));
-						order.setReqIp(SessionUtil.getUserIp());
-						order.setAddDate(new Date());
-						order.setOrderType(3);
-						if (addrid == null) order.setAddressId(null);
-						else {
-							//获取收货地址信息
-							DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
-							if(deliveryAddress!=null)
-							{
-								order.setAddressId(deliveryAddress.getId());
-								order.setPersonName(deliveryAddress.getPersonName());
-								order.setPersonTel(deliveryAddress.getPersonTel());
-								order.setAddress(deliveryAddress.getAddress());
-							}
-						}
-						order.setCommission(commission);
-						order.setShippingTotal(shipping_total);
-						order.setSubTotal(sub_total);
-						//子项小计打折之后减去运费
-						total = sub_total * commission - shipping_total;
-						order.setTotal(total);
-						orderList.add(order);
-
-					} finally {
-						LockUtils.unLock(numid);
+						orderItems.add(orderItem);
 					}
+
+					log.info("设置订单信息");
+					//设置订单
+					order.setSkuGoodsType(skuGoodsType);
+					order.setConsumer(user.getId());
+					order.setConsumerName(user.getName());
+					order.setStatus(1);//设置成待付款
+					//order.setReqUserAgent(request.getHeader("user-agent"));
+					order.setReqIp(SessionUtil.getUserIp());
+					order.setAddDate(new Date());
+					order.setOrderType(3);
+					if (addrid == null) order.setAddressId(null);
+					else {
+						//获取收货地址信息
+						DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
+						if(deliveryAddress!=null)
+						{
+							order.setAddressId(deliveryAddress.getId());
+							order.setPersonName(deliveryAddress.getPersonName());
+							order.setPersonTel(deliveryAddress.getPersonTel());
+							order.setAddress(deliveryAddress.getAddress());
+						}
+					}
+					order.setCommission(commission);
+					order.setShippingTotal(shipping_total);
+					order.setSubTotal(sub_total);
+					//子项小计打折之后减去运费
+					total = sub_total * commission - shipping_total;
+					order.setTotal(total);
+					orderList.add(order);
 				} catch (Exception e) {
 					e.printStackTrace();
 					//清除已生成的订单
