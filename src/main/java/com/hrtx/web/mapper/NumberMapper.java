@@ -32,4 +32,6 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
     Page<Object> queryPageList(Number number, @Param("param") Map param);
 
     void updateDelStatus(@Param("delSku") Long delSku);
+
+    Page<Object> queryPageByNumList(@Param("num") String num);
 }
