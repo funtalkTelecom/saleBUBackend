@@ -146,7 +146,7 @@ public class FundOrderService extends BaseService {
                 if(FundOrder.THIRD_PAY_YZFFQ.equals(third)) {
                     thirdPayService.setThirdPayStrategy(YzfPayStrategy.getInstance());
                     PayResponse payResponse =thirdPayService.payOrder(new PayRequest(amt, payee, payer, contractno, contractno, null, orderName,
-                            "YZF", amt, remark, SystemParam.get("domain-full")+"/yzffq-pay-result-jump", SystemParam.get("domain-full")+"/yzffq-pay-result"));
+                            "YZF", amt, remark, SystemParam.get("domain-full")+"/api/yzffq-pay-result-jump", SystemParam.get("domain-full")+"/api/yzffq-pay-result"));
                     if(payResponse.getResCode() == Result.OK) {
                         JSONObject json1=(JSONObject) payResponse.getData();
                         Map _map = new HashMap();
