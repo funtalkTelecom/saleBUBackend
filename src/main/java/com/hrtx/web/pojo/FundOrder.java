@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 public class FundOrder extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     public static String THIRD_PAY_PINGANAPP = "PINGANAPP";
+    public static String THIRD_PAY_YZFFQ = "YZFFQ";
     public static String THIRD_PAY_OFFLINE = "OFFLINE";
 
     public static String BUSI_TYPE_PAYORDER = "PAYORDER";

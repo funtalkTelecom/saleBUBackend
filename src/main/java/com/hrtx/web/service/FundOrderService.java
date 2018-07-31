@@ -6,7 +6,11 @@ import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.global.pinganUtils.TLinx2Util;
+import com.hrtx.global.pinganUtils.YzffqUtil;
+import com.hrtx.web.dto.PayRequest;
+import com.hrtx.web.dto.PayResponse;
 import com.hrtx.web.mapper.*;
+import com.hrtx.web.pay.YzfPayStrategy;
 import com.hrtx.web.pojo.*;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.math.NumberUtils;
@@ -23,6 +27,7 @@ public class FundOrderService extends BaseService {
 	@Autowired private FundDetailMapper fundDetailMapper;
 	@Autowired private ConsumerLogMapper consumerLogMapper;
 	@Autowired private PinganService pinganService;
+	@Autowired private ThirdPayService thirdPayService;
 	@Autowired private OrderService orderService;
 	@Autowired private AuctionDepositService auctionDepositService;
 	@Autowired private ApiSessionUtil apiSessionUtil;
@@ -70,6 +75,21 @@ public class FundOrderService extends BaseService {
     }
 
     /**
+     * 平台订单支付（已支付分期支付方式）
+     * @param amt 支付金额(分)
+     * @param orderName 订单描述
+     * @param sourceId  订单号
+     * @return
+     */
+    @NoRepeat
+    public Result payYzffqOrder(int amt, String orderName, String sourceId) {
+        Result result = this.getPayer(2);
+//        Result result = new Result(Result.OK, "o1F3M4sVzb7FUkxpgzGBinJWpnQA");
+        if(result.getCode() != Result.OK) return result;
+        return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, "", String.valueOf(result.getData()), orderName, FundOrder.THIRD_PAY_YZFFQ, sourceId, "");
+    }
+
+    /**
      *
      * @param busiType 业务类型
      * @param amt  付款金额(分)
@@ -101,7 +121,7 @@ public class FundOrderService extends BaseService {
             fundDetail.setId(fundDetail.getGeneralId());
             fundDetailMapper.insert(fundDetail);
 
-            String notify_url = SystemParam.get("pay_call_back_url");
+            String notify_url = SystemParam.get("domain-full")+"/pingan-pay-result";
             String sub_appid = SystemParam.get("wxx_appid");
             Result result = null;
             try {
@@ -121,6 +141,19 @@ public class FundOrderService extends BaseService {
                         _map.put("package",json1.getString("package"));
                         _map.put("paySign",json1.getString("paySign"));
                         return result = new Result(Result.OK, _map);
+                    }
+                }
+                if(FundOrder.THIRD_PAY_YZFFQ.equals(third)) {
+                    thirdPayService.setThirdPayStrategy(YzfPayStrategy.getInstance());
+                    PayResponse payResponse =thirdPayService.payOrder(new PayRequest(amt, payee, payer, contractno, contractno, null, orderName,
+                            "YZF", amt, remark, SystemParam.get("domain-full")+"/yzffq-pay-result-jump", SystemParam.get("domain-full")+"/yzffq-pay-result"));
+                    if(payResponse.getResCode() == Result.OK) {
+                        JSONObject json1=(JSONObject) payResponse.getData();
+                        Map _map = new HashMap();
+                        _map.put("trade_qrcode",json1.getString("trade_qrcode"));
+                        return result = new Result(Result.OK, _map);
+                    }else {
+                        return result = new Result(payResponse.getResCode(), payResponse.getResDesc());
                     }
                 }
                 if(FundOrder.THIRD_PAY_OFFLINE.equals(third)) {
@@ -175,7 +208,33 @@ public class FundOrderService extends BaseService {
         }
         int status = NumberUtils.toInt(params.get("status"));
         if(!ArrayUtils.contains(new int[]{1,4}, status)) return  new Result(Result.ERROR, "参数异常");
+        if(status == 1) status = 3; //支付成功
+        if(status == 4) status = 4; //支付失败（支付订单fundOrder 已取消）
         String out_no = params.get("out_no");
+        this.updatePayCallback(out_no, status);
+        return new Result(Result.OK, "success");
+    }
+
+    /**
+     * 更新回调结果
+     * @param params
+     * @return
+     */
+    public Result yzffqPayResult(Map<String,String> params) {
+        log.info("接受到回掉参数："+params);
+        if(!YzffqUtil.verifySign(params)) {
+            return new Result(Result.ERROR, "验签失败");
+        }
+        int status = NumberUtils.toInt(params.get("status"));
+        if(!ArrayUtils.contains(new int[]{1,4}, status)) return  new Result(Result.ERROR, "参数异常");
+        if(status == 1) status = 3; //支付成功
+        if(status == 4) status = 4; //支付失败（支付订单fundOrder 已取消）
+        String out_no = params.get("out_no");
+        this.updatePayCallback(out_no, status);
+        return new Result(Result.OK, "success");
+    }
+
+    private Result updatePayCallback(String out_no, Integer status) {
         FundDetail fundDetail = new FundDetail();
         fundDetail.setSerial(out_no);
         fundDetail.setActType(FundDetail.ORDER_ACT_TYPE_ADD);
@@ -192,21 +251,20 @@ public class FundOrderService extends BaseService {
         fundOrder = fundOrderMapper.selectByPrimaryKey(fundOrder);
         if(fundOrder == null) throw new ServiceException("未找到订单");
 
-        if(status == 1)  fundOrder.setStatus(3);//已支付
-        if(status == 4) fundOrder.setStatus(4);//已取消
+        fundOrder.setStatus(status);
 
         example = new Example(FundOrder.class);
         example.createCriteria().andEqualTo("id",fundOrder.getId()).andIn("status", Arrays.<Object>asList(new Integer[]{1,2}));
         count = fundOrderMapper.updateByExample(fundOrder, example);
         if(count != 1) throw new ServiceException("该状态订单不接受回调");
-
+//        String payTime = params.get("pay_time");
         String busiType = fundOrder.getBusi();
         Long orderId = NumberUtils.toLong(fundOrder.getSourceId());
-        String payTime = params.get("pay_time");
+        Result result = null;
         if(FundOrder.BUSI_TYPE_PAYORDER.equals(busiType)) {// 订单支付完成回调
-            if(status == 1) {//支付成功
+            if(status == 3) {//支付成功
                 try {
-                    Result result = orderService.payOrderSuccess(orderId);
+                    result = orderService.payOrderSuccess(orderId);
                     if(result.getCode() == Result.OK) {
                         result = orderService.payDeliverOrder(orderId);
                     }
@@ -217,12 +275,12 @@ public class FundOrderService extends BaseService {
         }
         if(FundOrder.BUSI_TYPE_PAYDEPOSIT.equals(busiType)) {//保证金支付完成 回调
             try{
-                auctionDepositService.newAuctionDepositPay(orderId, status == 1 ? true : false, payTime);
+                auctionDepositService.newAuctionDepositPay(orderId, status == 3 ? true : false, Utils.getDate(0,"yyyyMMddHHmmss"));//payTime
             }catch (Exception e) {
                 log.error("支付完成更新保证金回调信息异常", e);
             }
         }
-        return new Result(Result.OK, "success");
+        return result;
     }
 
     /**

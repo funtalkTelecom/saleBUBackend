@@ -18,6 +18,7 @@ public enum Constants {
     PAY_MENTHOD_TYPE_1("1", "微信支付", "PAY_MENTHOD_TYPE"),
 //    PAY_MENTHOD_TYPE_2("2", "支付宝支付", "PAY_MENTHOD_TYPE"),
     PAY_MENTHOD_TYPE_3("3", "线下支付", "PAY_MENTHOD_TYPE"),
+    PAY_MENTHOD_TYPE_4("4", "分期付款", "PAY_MENTHOD_TYPE"),
 
     ;
 
