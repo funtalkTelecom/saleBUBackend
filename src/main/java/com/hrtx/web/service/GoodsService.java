@@ -97,6 +97,7 @@ public class GoodsService {
                 List<SkuProperty> skuPropertyList = new ArrayList<SkuProperty>();
                 List<Sku> skuList = new ArrayList<Sku>();
                 String skuSaleNum = "";
+                Set<String> set = new HashSet<String>();
                 for(int i=0; i<skuPropertyJsonArr.size(); i++){
                     //sku表操作
                     sku = new Sku();
@@ -145,8 +146,15 @@ public class GoodsService {
                     //白卡不验证号码
                     if(!"1".equals(sku.getSkuGoodsType())) {
                         String repeatNum = getRepeatNum(skuSaleNum);
-
                         if(repeatNum!=null && repeatNum.length()>0) return new Result(Result.ERROR, "以下号码重复\n"+repeatNum);
+
+                        String[] nums = skuSaleNum.split("\n");
+                        for (String a :nums){
+                            if(set.contains(a)){
+                                return new Result(Result.ERROR, "该上架商品存在重复号码\n"+a);
+                            }
+                            set.add(a);
+                        }
                         skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
     //                    sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
     //                    sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
