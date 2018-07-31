@@ -25,4 +25,10 @@ public interface GoodsMapper extends Mapper<Goods>,BaseMapper<Goods>{
     Page<Object> queryPageSkuListApi(Goods goods, @Param("gSaleCity") String split);
 
     int checkGnameIsExist(Goods goods);
+
+    /***
+     * 查询过期的上架商品
+     * @return
+     */
+    List<Goods> findGoodsIsSale();
 }
