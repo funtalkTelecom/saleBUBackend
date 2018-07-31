@@ -15,7 +15,10 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +34,8 @@ import java.util.regex.Pattern;
 
 @Service
 public class GoodsService {
-	
+
+    public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private GoodsMapper goodsMapper;
 	@Autowired
@@ -141,6 +145,7 @@ public class GoodsService {
                     //白卡不验证号码
                     if(!"1".equals(sku.getSkuGoodsType())) {
                         String repeatNum = getRepeatNum(skuSaleNum);
+
                         if(repeatNum!=null && repeatNum.length()>0) return new Result(Result.ERROR, "以下号码重复\n"+repeatNum);
                         skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
     //                    sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
@@ -537,5 +542,28 @@ public class GoodsService {
 
     public String getKindeditorContent(Goods goods) throws IOException {
 	    return Utils.kindeditorReader(goods.getgId() + ".txt", SystemParam.get("kindedtiorDir"));
+    }
+
+    /***
+     * 判断是否过期的上架商品
+     */
+    @Scheduled(fixedRate=3000)
+    public void goodsTimer(){
+        if(!"true".equals(SystemParam.get("goods_timer"))) return;
+        log.info("开始执行判断商品是否过期定时器");
+        List<Goods> list = goodsMapper.findGoodsIsSale();
+        if(list.size()==0){
+            log.info(String.format("暂无过期的上架商品"));return;
+        }else {
+            for(Goods g : list){
+                try {
+                    log.info("下架商品GoodsID:"+g.getgId());
+                    this.goodsUnsale(g,null);
+                }catch (Exception e) {
+                    log.error("未知异常", e);
+                }
+            }
+        }
+
     }
 }
