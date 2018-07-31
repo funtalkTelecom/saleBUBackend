@@ -329,6 +329,12 @@ public class FundOrderService extends BaseService {
                 if(FundOrder.THIRD_PAY_PINGANAPP.equals(fundOrder.getThird())) {
                     result = pinganService.payRefund(outNo, contractno, fundOrder.getOrderName()+"退款", fundOrder.getAmt(), remark);
                 }
+                if(FundOrder.THIRD_PAY_YZFFQ.equals(fundOrder.getThird())) {
+                    thirdPayService.setThirdPayStrategy(YzfPayStrategy.getInstance());
+                    PayResponse payResponse = thirdPayService.payRefund(new PayRequest(fundOrder.getAmt(), "", "", contractno, contractno, outNo, "",
+                            "YZF", 0, fundOrder.getOrderName()+"退款", "", ""));
+                    result = new Result(payResponse.getResCode(), payResponse.getResDesc());
+                }
                 if(result == null) result = new Result(Result.ERROR,"第三方支付接口不存在");
                 return result;
             } catch (Exception e) {

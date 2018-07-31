@@ -199,10 +199,10 @@ public class OrderService extends BaseService {
         order.setPayMenthodId(payType);
         order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payType));
         orderMapper.updateByPrimaryKey(order);
-        if(Constants.PAY_MENTHOD_TYPE_1.equals(payType)) {
+        if(Constants.PAY_MENTHOD_TYPE_1.getStringKey().equals(payType)) {
             return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
         }
-        if(Constants.PAY_MENTHOD_TYPE_4.equals(payType)) {
+        if(Constants.PAY_MENTHOD_TYPE_4.getStringKey().equals(payType)) {
             return fundOrderService.payYzffqOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
         }
         return new Result(Result.OK, "success");
