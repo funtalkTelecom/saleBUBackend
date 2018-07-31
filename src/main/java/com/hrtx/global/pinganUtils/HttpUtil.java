@@ -149,12 +149,12 @@ public class HttpUtil {
 		try {
 			urls = new URL(url);
 			uc = (HttpURLConnection) urls.openConnection();
-//			if(!StringUtils.equals(SystemParam.get("http-proxy-falg"),"true")){
-//				Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.7.1",58080));
-//				uc = (HttpURLConnection) urls.openConnection(proxy);
-//			}else{
-//				uc = (HttpURLConnection) urls.openConnection();
-//			}
+			if(StringUtils.equals(SystemParam.get("http-proxy-falg"),"true")){
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.7.1",58080));
+				uc = (HttpURLConnection) urls.openConnection(proxy);
+			}else{
+				uc = (HttpURLConnection) urls.openConnection();
+			}
 			uc.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
 			uc.setDoOutput(true);
 			uc.setDoInput(true);
