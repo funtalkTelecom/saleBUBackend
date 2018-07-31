@@ -6,7 +6,7 @@
 <script type="text/javascript">
     wx.miniProgram.getEnv(function(res) {
         if(res.miniprogram) {
-            wx.miniProgram.navigateTo({url: '/pages/my-order/index'})
+            wx.miniProgram.redirectTo({url: '/pages/temp/index?sourceId=${sourceId}'})
         }
     })
 </script>
