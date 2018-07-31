@@ -121,7 +121,7 @@ public class FundOrderService extends BaseService {
             fundDetail.setId(fundDetail.getGeneralId());
             fundDetailMapper.insert(fundDetail);
 
-            String notify_url = SystemParam.get("domain-full")+"/pingan-pay-result";
+            String notify_url = SystemParam.get("domain-full")+"/api/pingan-pay-result";
             String sub_appid = SystemParam.get("wxx_appid");
             Result result = null;
             try {
