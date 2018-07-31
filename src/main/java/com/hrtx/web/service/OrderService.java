@@ -191,14 +191,21 @@ public class OrderService extends BaseService {
      * @return
      */
     @NoRepeat
-    public Result payOrder(Long orderId) {
+    public Result payOrder(Long orderId, String payType) {
+        if(!ArrayUtils.contains(Constants.getKeyObject("PAY_MENTHOD_TYPE"), payType)) return new Result(Result.ERROR, "支付方式不存在");
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getStatus() !=1 || order.getIsDel() != 0) return new Result(Result.ERROR, "订单状态异常");
-        order.setPayMenthodId(Constants.PAY_MENTHOD_TYPE_1.getStringKey());
-        order.setPayMenthod(Constants.PAY_MENTHOD_TYPE_1.getValue());
+        order.setPayMenthodId(payType);
+        order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payType));
         orderMapper.updateByPrimaryKey(order);
-        return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
+        if(Constants.PAY_MENTHOD_TYPE_1.equals(payType)) {
+            return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
+        }
+        if(Constants.PAY_MENTHOD_TYPE_4.equals(payType)) {
+            return fundOrderService.payYzffqOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
+        }
+        return new Result(Result.OK, "success");
     }
 
     /**
@@ -236,11 +243,6 @@ public class OrderService extends BaseService {
         if(list.isEmpty()) return new Result(Result.ERROR, "地址不存在");
         Map addressmap=list.get(0);
         int districtId= NumberUtils.toInt(String.valueOf(addressmap.get("districtId")));
-//        Example example = new Example(City.class);
-//        example.createCriteria().andEqualTo("id", NumberUtils.toInt(districtId));
-//        List<City> fundOrders = cityMapper.selectByExample(example);
-//        if(fundOrders.isEmpty()) return new Result(Result.ERROR, "地址不存在");
-//        City city =fundOrders.get(0);
         City city = cityMapper.selectByPrimaryKey(districtId);
         if(city == null) return new Result(Result.ERROR, "所选地址区县不存在");
         orderItemMapper.updateMeal(orderId, mealId);
@@ -251,7 +253,10 @@ public class OrderService extends BaseService {
         order.setPersonName( String.valueOf(addressmap.get("personName")));
         order.setPersonTel(String.valueOf(addressmap.get("personTel")));
         orderMapper.updateByPrimaryKey(order);
-        if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_1.getStringKey())) {//微信支付
+        if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_3.getStringKey())) {//线下
+//            return this.payOrderSuccess(orderId);
+            return new Result(Result.OK, "success");
+        }else {
             Example example = new Example(OrderItem.class);
             example.createCriteria().andEqualTo("orderId", orderId).andEqualTo("isShipment", 0);
             List<OrderItem> items = orderItemMapper.selectByExample(example);
@@ -270,13 +275,15 @@ public class OrderService extends BaseService {
                     return result;
                 }
             }
-            return fundOrderService.payPinganWxxOrder(amt, "["+SystemParam.get("system_name")+"]"+num+"号码尾款", orderId+"");
+
+            if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_1.getStringKey())) {//微信支付
+                return fundOrderService.payPinganWxxOrder(amt, "["+SystemParam.get("system_name")+"]"+num+"号码尾款", orderId+"");
+            }
+            if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_4.getStringKey())) {//分期付款
+                return fundOrderService.payYzffqOrder(amt, "["+SystemParam.get("system_name")+"]"+num+"号码尾款", orderId+"");
+            }
+            return new Result(Result.ERROR, "未找到支付方式");
         }
-        if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_3.getStringKey())) {//线下
-//            return this.payOrderSuccess(orderId);
-            return new Result(Result.OK, "success");
-        }
-        return new Result(Result.ERROR, "未找到支付方式");
     }
 
 

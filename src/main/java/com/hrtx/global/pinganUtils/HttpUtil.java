@@ -5,16 +5,17 @@
  */
 package com.hrtx.global.pinganUtils;
 
+import com.hrtx.global.SystemParam;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLDecoder;
+import java.net.*;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -148,6 +149,12 @@ public class HttpUtil {
 		try {
 			urls = new URL(url);
 			uc = (HttpURLConnection) urls.openConnection();
+//			if(!StringUtils.equals(SystemParam.get("http-proxy-falg"),"true")){
+//				Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.7.1",58080));
+//				uc = (HttpURLConnection) urls.openConnection(proxy);
+//			}else{
+//				uc = (HttpURLConnection) urls.openConnection();
+//			}
 			uc.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
 			uc.setDoOutput(true);
 			uc.setDoInput(true);
@@ -172,7 +179,7 @@ public class HttpUtil {
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
-			return URLDecoder.decode("\"errcode\": 99999, \"msg\": \"未知异常\", \"timestamp\": 1494483084, \"data\": \"\",\"sign\": \"\"");
+			return URLDecoder.decode("{\"errcode\": 99999, \"msg\": \"未知异常\", \"timestamp\": 1494483084, \"data\": \"\",\"sign\": \"\"}");
 		} finally {
 			if (uc != null) {
 				uc.disconnect();
