@@ -908,26 +908,9 @@ public class ApiOrderService {
 		example.createCriteria().andEqualTo("consumer",consumerId).andEqualTo("orderId", orderId);
 		List<Order> orders=orderMapper.selectByExample(example);
 		if(orders.size()==0) return new Result(Result.ERROR, "该订单不存在");
-		log.info("调用仓储取消订单接口前封装参数");
-		Map param = new HashMap();
-		String callbackUrl =SystemParam.get("domain-full")+"/api/cancel-order-callback";
-		param.put("order_id",orderId);
-		param.put("callback_url",callbackUrl);
-		param.put("reason",reason);
 
-		log.info("调用仓储接口");
-		Result res = StorageApiCallUtil.storageApiCall(param, "HK0005");
-		Map maps =  MapJsonUtils.parseJSON2Map(res.getData().toString());
-		String code = maps.get("code").toString();
-		String desc =maps.get("desc").toString();
-		if("10000".equals(code)){
-			log.info("业务受理成功,等待回调");
-			log.info("更新订单状态为11:待仓库撤销");
-			int status =11;
-			CancelOrderStatus(orderId,status,reason);
-
-		}else if ("00000".equals(code)){
-			log.info("成功");
+		Order order = orderMapper.findOrderInfo(Long.parseLong(orderIds));
+		if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
 			log.info("更新订单状态为7:已取消");
 			int status =7;
 			CancelOrderStatus(orderId,status,reason);
@@ -948,7 +931,49 @@ public class ApiOrderService {
 				//上架涉及的表，数量，状态
 				orderType(orderId);
 			}
-		}//其他视为失败，不做任何操作动作
+		}else {
+			log.info("调用仓储取消订单接口前封装参数");
+			Map param = new HashMap();
+			String callbackUrl =SystemParam.get("domain-full")+"/api/cancel-order-callback";
+			param.put("order_id",orderId);
+			param.put("callback_url",callbackUrl);
+			param.put("reason",reason);
+
+			log.info("调用仓储接口");
+			Result res = StorageApiCallUtil.storageApiCall(param, "HK0005");
+			Map maps =  MapJsonUtils.parseJSON2Map(res.getData().toString());
+			String code = maps.get("code").toString();
+			String desc =maps.get("desc").toString();
+			if("10000".equals(code)){
+				log.info("业务受理成功,等待回调");
+				log.info("更新订单状态为11:待仓库撤销");
+				int status =11;
+				CancelOrderStatus(orderId,status,reason);
+
+			}else if ("00000".equals(code)){
+				log.info("成功");
+				log.info("更新订单状态为7:已取消");
+				int status =7;
+				CancelOrderStatus(orderId,status,reason);
+				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
+				if(ispay.getCode()==200){  //已支付
+					if(ispay.getData().equals("1")){//线上支付
+						CancelOrderStatus(orderId,12,""); //退款中
+						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
+						if(payR.getCode()==200){  //退款成功
+							orderType(orderId);
+						}else { //退款失败
+							CancelOrderStatus(orderId,13,""); //退款失败
+						}
+					}else {//线下支付
+						CancelOrderStatus(orderId,14,""); //待财务退款
+					}
+				}else {//未支付
+					//上架涉及的表，数量，状态
+					orderType(orderId);
+				}
+			}//其他视为失败，不做任何操作动作
+		}
 		return new Result(Result.OK, "取消成功");
 	}
 
@@ -1020,22 +1045,24 @@ public class ApiOrderService {
 					Map param = new HashMap();
 					//获取目前sku信息
 					Sku nowSku = skuMapper.getSkuBySkuid(skuId);
-					param.put("supply_id", nowSku.getSkuId());//供货单编码(sku_id)
-					Result res;
-					//再冻结新库存
-					param.put("type", "1");//处理类型1上架；2下架
-					param.put("quantity", quantity);//数量
-					param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
-					if(!"0".equals(param.get("quantity").toString())) {
-						res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-						if(res.getCode()!=200){
-							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-							return new Result(Result.ERROR, "库存验证失败");
-						}else {
-							StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-							if (!"00000".equals(sir.getCode())) {
+					if(!nowSku.getSkuGoodsType().equals("3")){
+						param.put("supply_id", nowSku.getSkuId());//供货单编码(sku_id)
+						Result res;
+						//再冻结新库存
+						param.put("type", "1");//处理类型1上架；2下架
+						param.put("quantity", quantity);//数量
+						param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
+						if(!"0".equals(param.get("quantity").toString())) {
+							res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+							if(res.getCode()!=200){
 								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-								return new Result(Result.ERROR, "冻结库存失败\n"+sir.getDesc());
+								return new Result(Result.ERROR, "库存验证失败");
+							}else {
+								StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+								if (!"00000".equals(sir.getCode())) {
+									TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+									return new Result(Result.ERROR, "冻结库存失败\n"+sir.getDesc());
+								}
 							}
 						}
 					}
