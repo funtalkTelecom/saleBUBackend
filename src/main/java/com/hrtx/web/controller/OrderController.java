@@ -131,4 +131,32 @@ public class OrderController extends BaseReturn{
 		}
 	}
 
+	/***
+	 * 取消订单回调地址
+	 * @return
+	 */
+	@RequestMapping("/cancel-order-callback")
+	@Powers({PowerConsts.NOLOGINPOWER})
+	public String CancelOrderCallback(HttpServletRequest request) {
+		try {
+			String param = this.getParamBody(request);
+			log.info("接收到发货回调参数["+param+"]");
+			StorageInterfaceRequest storageInterfaceRequest = StorageInterfaceRequest.create(param, SystemParam.get("key"));
+			//接收仓库回调，取消订单操作
+			Result result = orderService.OrderCallbackStatus(storageInterfaceRequest);
+			if (result.getCode() == 200) {
+				renderHtml("取消订单成功");
+			} else {
+				renderHtml("取消订单失败");
+			}
+			return null;
+		}catch (ServiceException e) {
+			log.error(e.getMessage(), e);
+			return renderHtml(e.getMessage());
+		}catch (Exception e){
+			log.error("未知异常", e);
+			return renderHtml("error");
+		}
+	}
+
 }

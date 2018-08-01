@@ -67,6 +67,7 @@ public class FundOrderController extends BaseReturn{
 	@RequestMapping("/yzffq-pay-result-jump")
 	@Powers({PowerConsts.NOLOGINPOWER})
 	public ModelAndView yzffqPayResultJump(HttpServletRequest request){
+        request.setAttribute("sourceId", request.getParameter("source_id"));
         return new ModelAndView("admin/yzffq-jump");
 	}
 }

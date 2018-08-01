@@ -257,7 +257,11 @@
     </update>
 
     <update id="freezeNum">
-        update tb_num a set a.status = #{status} where a.id = #{id}
+        update tb_num a set a.status = #{status}
+        <if test="isUpdateSukid">
+            ,a.sku_id =null
+        </if>
+         where a.id = #{id}
     </update>
 
     <update id="freezeNumByIds">

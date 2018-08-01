@@ -3,6 +3,7 @@ package com.hrtx.web.pay;
 import com.hrtx.dto.Result;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.pinganUtils.TLinxAESCoder;
+import com.hrtx.global.pinganUtils.TLinxSHA1;
 import com.hrtx.global.pinganUtils.YzffqUtil;
 import com.hrtx.web.dto.PayRequest;
 import com.hrtx.web.dto.PayResponse;
@@ -129,14 +130,12 @@ public class YzfPayStrategy implements ThirdPayStrategy {
 			return new PayResponse(Result.ERROR,"加密失败", null, JSONObject.fromObject(datamap).toString(), "", "json", PAYCANCEL, "YZF");
 		}
 
-		//签名方式
-		postmap.put("sign_type", "RSA");
-
-		/**
-		 * 2 请求参数签名 按A~z排序，串联成字符串，先进行RSA签名
-		 */
+		//		postmap.put("sign_type", "RSA");
 //		YzffqUtil.handleSignRSA(postmap, this.getPrivateKey());
-        YzffqUtil.handleSign(postmap);
+		/**
+		 * 2 请求参数签名 按A~z排序，串联成字符串，先进行sha1加密(小写)，再进行md5加密(小写)，得到签名
+		 */
+		YzffqUtil.handleSign(postmap);
 
 		/**
 		 * 3 请求、响应
@@ -169,7 +168,7 @@ public class YzfPayStrategy implements ThirdPayStrategy {
 		datamap.put("refund_ord_name", "");
 		datamap.put("refund_amount", payRequest.getAmt()+"");
 		datamap.put("remark", payRequest.getRemark());
-		datamap.put("shop_pass", "123456");
+		datamap.put("shop_pass", TLinxSHA1.SHA1("123456"));
 
 //		this.saveDateReq(datamap, PinganRefund.class);
 		/**
@@ -181,12 +180,13 @@ public class YzfPayStrategy implements ThirdPayStrategy {
 			log.error("AES加密失败",e);
 			return new PayResponse(Result.ERROR,"加密失败", null, JSONObject.fromObject(datamap).toString(), "", "json", PAYREFUND, "YZF");
 		}
-		postmap.put("sign_type", "RSA");
-		/**
-		 * 2 请求参数签名 按A~z排序，串联成字符串，进行RSA签名
-		 */
+
+//		postmap.put("sign_type", "RSA");
 //		YzffqUtil.handleSignRSA(postmap, this.getPrivateKey());
-        YzffqUtil.handleSign(postmap);
+		/**
+		 * 2 请求参数签名 按A~z排序，串联成字符串，先进行sha1加密(小写)，再进行md5加密(小写)，得到签名
+		 */
+		YzffqUtil.handleSign(postmap);
 
 		/**
 		 * 3 请求、响应

@@ -255,19 +255,9 @@
 <!-- /.main-container -->
 
 <script src="<%=basePath %>project/js/md5.js"></script>
-<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
-
 
 <!-- inline scripts related to this page -->
 <script type="text/javascript">
-    console.log(11);
-    $(function(){
-        // wx.miniProgram.navigateTo({url: '/path/to/page'})
-        // wx.miniProgram.postMessage({ data: 'foo' })
-        // wx.miniProgram.postMessage({ data: {foo: 'bar'} })
-        console.log(12);
-        wx.miniProgram.getEnv(function(res) { console.log(res.miniprogram) // true })
-    })
     jQuery(function ($) {
         $(document).on('click', '.toolbar a[data-target]', function (e) {
             e.preventDefault();

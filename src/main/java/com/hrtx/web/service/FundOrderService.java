@@ -83,8 +83,8 @@ public class FundOrderService extends BaseService {
      */
     @NoRepeat
     public Result payYzffqOrder(int amt, String orderName, String sourceId) {
-        Result result = this.getPayer(2);
-//        Result result = new Result(Result.OK, "o1F3M4sVzb7FUkxpgzGBinJWpnQA");
+//        Result result = this.getPayer(2);
+        Result result = new Result(Result.OK, "o1F3M4sVzb7FUkxpgzGBinJWpnQA");
         if(result.getCode() != Result.OK) return result;
         return payAddOrder(FundOrder.BUSI_TYPE_PAYORDER, amt, "", String.valueOf(result.getData()), orderName, FundOrder.THIRD_PAY_YZFFQ, sourceId, "");
     }
@@ -146,7 +146,7 @@ public class FundOrderService extends BaseService {
                 if(FundOrder.THIRD_PAY_YZFFQ.equals(third)) {
                     thirdPayService.setThirdPayStrategy(YzfPayStrategy.getInstance());
                     PayResponse payResponse =thirdPayService.payOrder(new PayRequest(amt, payee, payer, contractno, contractno, null, orderName,
-                            "YZF", amt, remark, SystemParam.get("domain-full")+"/api/yzffq-pay-result-jump", SystemParam.get("domain-full")+"/api/yzffq-pay-result"));
+                            "YZF", amt, remark, SystemParam.get("domain-full")+"/api/yzffq-pay-result-jump?source_id="+sourceId, SystemParam.get("domain-full")+"/api/yzffq-pay-result"));
                     if(payResponse.getResCode() == Result.OK) {
                         JSONObject json1=(JSONObject) payResponse.getData();
                         Map _map = new HashMap();
@@ -333,7 +333,11 @@ public class FundOrderService extends BaseService {
                     thirdPayService.setThirdPayStrategy(YzfPayStrategy.getInstance());
                     PayResponse payResponse = thirdPayService.payRefund(new PayRequest(fundOrder.getAmt(), "", "", contractno, contractno, outNo, "",
                             "YZF", 0, fundOrder.getOrderName()+"退款", "", ""));
-                    result = new Result(payResponse.getResCode(), payResponse.getResDesc());
+                    if(payResponse.getResCode() == Result.OK) {
+                        result = new Result(payResponse.getResCode(), payResponse.getData());
+                    }else {
+                        result = new Result(payResponse.getResCode(), payResponse.getResDesc());
+                    }
                 }
                 if(result == null) result = new Result(Result.ERROR,"第三方支付接口不存在");
                 return result;
