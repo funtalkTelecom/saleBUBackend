@@ -459,21 +459,24 @@ public class GoodsService {
         try {
             for(Sku s : skuList){
                 Map param = new HashMap();
-                param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
-                param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
-                param.put("type", "2");//处理类型1上架；2下架
-                param.put("quantity", s.getSkuNum());//数量
-                if(s.getSkuNum()!=0 && "1".equals(goods.getgIsSale())) {
-                    res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                    if (200 != (res.getCode())) {
-                        return new Result(Result.ERROR, "库存验证失败");
-                    } else {
-                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                        if (!"00000".equals(sir.getCode())) {
-                            return new Result(Result.ERROR, "库存验证失败\n" + sir.getDesc());
+                if(!s.getSkuGoodsType().equals("3")){
+                    param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
+                    param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                    param.put("type", "2");//处理类型1上架；2下架
+                    param.put("quantity", s.getSkuNum());//数量
+                    if(s.getSkuNum()!=0 && "1".equals(goods.getgIsSale())) {
+                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                        if (200 != (res.getCode())) {
+                            return new Result(Result.ERROR, "库存验证失败");
+                        } else {
+                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                            if (!"00000".equals(sir.getCode())) {
+                                return new Result(Result.ERROR, "库存验证失败\n" + sir.getDesc());
+                            }
                         }
                     }
                 }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -499,24 +502,26 @@ public class GoodsService {
             List<Sku> skuList = skuMapper.findSkuInfo(goods.getgId());
             for(Sku s : skuList){
                 Map param = new HashMap();
-                param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
-                param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
-                param.put("type", "2");//处理类型1上架；2下架
-                param.put("quantity", s.getSkuNum());//数量
-                if(s.getSkuNum()!=0) {
-                    res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                    if (200 != (res.getCode())) {
-                        return new Result(Result.ERROR, "库存验证失败");
-                    } else {
-                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                        if (!"00000".equals(sir.getCode())) {
+                if(!s.getSkuGoodsType().equals("3")){
+                    param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
+                    param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                    param.put("type", "2");//处理类型1上架；2下架
+                    param.put("quantity", s.getSkuNum());//数量
+                    if(s.getSkuNum()!=0) {
+                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                        if (200 != (res.getCode())) {
                             return new Result(Result.ERROR, "库存验证失败");
-                        }else{
-                            //成功之后吧上架的号码状态还原成1
-                            Number number = new Number();
-                            number.setSkuId(s.getSkuId());
-                            number.setStatus(1);
-                            numberMapper.updateStatus(number, false);
+                        } else {
+                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                            if (!"00000".equals(sir.getCode())) {
+                                return new Result(Result.ERROR, "库存验证失败");
+                            }else{
+                                //成功之后吧上架的号码状态还原成1
+                                Number number = new Number();
+                                number.setSkuId(s.getSkuId());
+                                number.setStatus(1);
+                                numberMapper.updateStatus(number, false);
+                            }
                         }
                     }
                 }
