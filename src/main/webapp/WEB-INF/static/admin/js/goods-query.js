@@ -6,7 +6,7 @@ $.post("dict-to-map", {group: "gIsAuc"},function(data){
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
-		"url" : '/goods/goods-list',
+		"url" : 'goods/goods-list',
 		"ct" : "#result",
 		"cm" : [{
                     "header" : "商品名称",
@@ -670,7 +670,7 @@ $(function() {
             allowPreviewEmoticons : false,
             allowImageUpload : true,
             allowFlashUpload : true,
-            uploadJson : "/kindeditorUploadFile",
+            uploadJson : "kindeditorUploadFile",
             imageMaxSize : 2*1024*1024,
             afterBlur: function () { editor.sync(); },
             items : [

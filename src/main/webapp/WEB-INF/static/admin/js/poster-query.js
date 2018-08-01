@@ -2,7 +2,7 @@ var dataList = null;
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
-		"url" : '/poster/poster-list',
+		"url" : 'poster/poster-list',
 		"ct" : "#result",
 		"cm" : [{
                     "header" : "标题",

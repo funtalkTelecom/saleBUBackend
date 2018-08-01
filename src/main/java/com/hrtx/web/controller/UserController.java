@@ -37,7 +37,7 @@ public class UserController {
     public ModelAndView loginIndex(HttpServletRequest request) {
         return new ModelAndView("admin/login");
     }
-    
+
     @RequestMapping("/login")
     @Powers({PowerConsts.NOLOGINPOWER})
     public ModelAndView login(User user, HttpServletRequest request, HttpServletResponse response) throws IOException, NoSuchAlgorithmException{

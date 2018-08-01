@@ -19,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -32,8 +33,8 @@ public class FundOrderController extends BaseReturn{
 
     @PostMapping("/pay-order")
     @Powers({PowerConsts.NOPOWER})
-    public Result payOrder(String orderId){
-        return orderService.payOrder(NumberUtils.toLong(orderId));
+    public Result payOrder(String orderId, String payMenthodId){
+        return orderService.payOrder(NumberUtils.toLong(orderId), payMenthodId);
     }
 
     @PostMapping("/pay-balance")
@@ -51,5 +52,22 @@ public class FundOrderController extends BaseReturn{
         if(result.getCode() == Result.OK) {
             renderHtml("notify_success");
         }
+	}
+
+	@RequestMapping("/yzffq-pay-result")
+	@Powers({PowerConsts.NOLOGINPOWER})
+	public void yzffqPayResult(HttpServletRequest request){
+		Map<String,String> params = this.getParamMap(request);
+        Result result = fundOrderService.yzffqPayResult(params);
+        if(result.getCode() == Result.OK) {
+            renderHtml("notify_success");
+        }
+	}
+
+	@RequestMapping("/yzffq-pay-result-jump")
+	@Powers({PowerConsts.NOLOGINPOWER})
+	public ModelAndView yzffqPayResultJump(HttpServletRequest request){
+        request.setAttribute("sourceId", request.getParameter("source_id"));
+        return new ModelAndView("admin/yzffq-jump");
 	}
 }

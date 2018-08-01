@@ -164,6 +164,10 @@ public class EPSaleController extends BaseReturn{
 		Long auctionDepositId=0L;//保证金Id
 		DecimalFormat df=new DecimalFormat("######0.00");
         DecimalFormat df2=new DecimalFormat("######0");
+        if(Utils.formatFloatNumber(auction.getPrice()).length()>10)//整数7位.小数2位
+		{
+			returnResult(new Result(606, "当前加价额度不能超过9位"));
+		}
 		if(goodsAuctionCount>0)//最近10次数出价记录
 		{
 			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录

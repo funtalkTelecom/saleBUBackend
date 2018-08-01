@@ -508,7 +508,8 @@ public class EPSaleService {
 					f.setFileId(f.getGeneralId());
 					f.setFileGroup("epSalePics");
 					//String kk=SystemParam.get("epSalePics");
-					result = BaseReturn.uploadFile(SystemParam.get("epSalePics")+epSale.getId()+"\\", "jpg,png,gif", file, false, false);
+					//result = BaseReturn.uploadFile(SystemParam.get("epSalePics")+epSale.getId()+"\\", "jpg,png,gif", file, false, false);
+					result = BaseReturn.uploadFile(SystemParam.get("epSalePics")+epSale.getId()+java.io.File.separator, "jpg,png,gif", file, false, false);
 					f.setFileName(((Map)result.getData()).get("sourceServerFileName").toString());
 					f.setRefId(epSale.getId());
 					f.setSeq(Integer.parseInt(picSeqs.replaceAll("\"","").split(",")[i]));

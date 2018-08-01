@@ -289,7 +289,7 @@ public class HttpsUtil {
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			return URLDecoder.decode("\"errcode\": 99999, \"msg\": \"未知异常\", \"timestamp\": 1494483084, \"data\": \"\",\"sign\": \"\"");
+			return URLDecoder.decode("{\"errcode\": 99999, \"msg\": \"未知异常\", \"timestamp\": 1494483084, \"data\": \"\",\"sign\": \"\"}");
 		} finally {
 			if (uc != null) {
 				uc.disconnect();

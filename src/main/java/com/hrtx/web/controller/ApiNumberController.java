@@ -54,4 +54,18 @@ public class ApiNumberController extends BaseReturn{
 	public Result numberInfo(@PathVariable("id") String id, HttpServletRequest request){
 		return apiNumberService.numberInfo(id, request);
 	}
+
+
+	/**
+	 * 根据号码模糊查询获取号码列表
+	 * @param number
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/fand-number")
+	@Powers(PowerConsts.NOLOGINPOWER)
+	@ResponseBody
+	public Result numberListByNum(Number number, HttpServletRequest request){
+		return apiNumberService.numberListByNum(number, request);
+	}
 }

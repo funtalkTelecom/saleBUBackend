@@ -160,4 +160,41 @@ public class ApiNumberService {
 		numResource.insert(8, ",");
 		return numResource.toString().split(",");
 	}
+
+
+
+	/**
+	 * 根据tags获取号码
+	 * @param number
+	 * @param request
+	 * @return
+	 */
+	public Result numberListByNum(Number number, HttpServletRequest request){
+		PageInfo<Object> pm = null;
+		try {
+			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+			number.setStart(limit*(pageNum-1));
+			number.setLimit(limit);
+			String num = request.getParameter("num")==null?"": request.getParameter("num");
+
+			PageHelper.startPage(number.getPageNum(),number.getLimit());
+			Page<Object> ob=this.numberMapper.queryPageByNumList(num);
+			if(ob!=null && ob.size()>0){
+				//处理号码,生成号码块字段(numBlock)
+				for (int i = 0; i < ob.size(); i++) {
+					Map obj= (Map) ob.get(i);
+					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
+				}
+			}
+			pm = new PageInfo<Object>(ob);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			pm = new PageInfo<Object>(null);
+			return new Result(Result.ERROR, pm);
+		}
+
+		return new Result(Result.OK, pm);
+	}
+
 }

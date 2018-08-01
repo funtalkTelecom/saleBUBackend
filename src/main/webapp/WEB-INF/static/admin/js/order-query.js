@@ -25,7 +25,7 @@ $.post("dict-to-map", {group: "orderStatus"},function(data){
 $(function() {
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
-		"url" : '/order/order-list',
+		"url" : 'order/order-list',
 		"ct" : "#result",
 		"cm" : [{
                     "header" : "编号",
@@ -36,6 +36,12 @@ $(function() {
                 }*/,{
                     "header" : "用户名称",
                     "dataIndex" : "consumerName"
+                },{
+                    "header" : "类型",
+                    "dataIndex" : "skuGoodsType",
+                    "renderer":function(v) {
+                        return skuGoodsTypes[v];
+                    }
                 },{
                     "header" : "状态",
                     "dataIndex" : "status",//1待付款；2已付款待推送（已付款尚未推送到仓储期）；3待配货(仓储系统已收到)；4待签收(仓储物流已取件)；5完成
@@ -135,7 +141,8 @@ $(function() {
 							node.push('<a class="btn btn-success btn-xs payDeliver" href="javascript:void(0);">发货</a>');
                         }
                         //普号进入“待配卡”状态，应该不允许管理员绑定
-						if(p_bindCard && record.status=="4" && record.skuGoodsType!="2") {
+                        var bk_gtypes = ['1','2','4'];
+						if(p_bindCard && record.status=="4" && $.inArray(record.skuGoodsType,bk_gtypes) != -1) {
 							node.push('<a class="btn btn-success btn-xs bindCard" href="javascript:void(0);">绑卡</a>');
                         }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
@@ -200,7 +207,7 @@ $(function() {
 		}
 	});
     itemList = new $.DSTable({
-        "url" : '/order/item-list',
+        "url" : 'order/item-list',
         "ct" : "#itemResult",
         "cm" : [{
             "header" : "商品属性",

@@ -6,13 +6,16 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ExcelUtil;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.pojo.Number;
 import com.hrtx.web.pojo.User;
 import com.hrtx.web.service.DictService;
+import com.hrtx.web.service.LyCrmService;
 import com.hrtx.web.service.NumberService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,8 @@ public class NumberController extends BaseReturn{
 	private DictService dictService;
 	@Autowired
 	private NumberService numberService;
+	@Autowired
+	private LyCrmService lyCrmService;
 
 	@RequestMapping("/number-query")
 	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_QUEYR})
@@ -162,4 +167,17 @@ public class NumberController extends BaseReturn{
 		}
 		return map;
 	}
+
+	@RequestMapping("/ftp-test")
+	@Powers({PowerConsts.NOPOWER})
+	public String ftpTest(HttpServletRequest request){
+		if(!SessionUtil.hasPower(PowerConsts.SYSTEMMOUULE_USERLIST_ALL)) return renderHtml("没有权限");
+		String type = request.getParameter("type");
+		if("kk_upload".equals(type)) lyCrmService.createAgentCardFile();
+		if("kk_download".equals(type)) lyCrmService.praseOpenCardFileResult();
+		if("iccid_upload".equals(type)) lyCrmService.uploadLyIccidData();
+		if("num_download".equals(type)) lyCrmService.praseLyPhoneData();
+		return renderHtml("执行完成");
+	}
+
 }

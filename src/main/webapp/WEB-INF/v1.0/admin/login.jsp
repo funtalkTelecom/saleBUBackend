@@ -37,7 +37,7 @@
 
                                     <div class="space-6"></div>
 
-                                    <form action="/login" method="post" id="loginForm">
+                                    <form action="login" method="post" id="loginForm">
                                         <fieldset>
                                             <div id="errormsg">${errormsg}</div>
                                             <label class="block clearfix">
@@ -255,6 +255,7 @@
 <!-- /.main-container -->
 
 <script src="<%=basePath %>project/js/md5.js"></script>
+
 <!-- inline scripts related to this page -->
 <script type="text/javascript">
     jQuery(function ($) {

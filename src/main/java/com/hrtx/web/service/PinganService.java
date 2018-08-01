@@ -100,7 +100,7 @@ public class PinganService {
 		//return new Result("B0008",respObject.getString("msg"),null);
 		if (!TLinx2Util.verifySign(respObject)) {
 			log.info("=====验签失败=====");
-			return new Result(Result.PARAM,"验签失败");
+			return new Result(Result.WARN,"验签失败");
 //			return new Result("B0007","验签失败",null);
 		}
 		log.info("验签成功");
@@ -115,7 +115,7 @@ public class PinganService {
 //			return new Result("00000","验签成功",respObject);
 		} catch (Exception e) {
 			log.error("AES解密失败",e);
-			return new Result(Result.ERROR,"解密失败");
+			return new Result(Result.WARN,"解密失败");
 //			return new Result("B0007","解密失败",null);
 		}
 	}
@@ -154,7 +154,7 @@ public class PinganService {
 			rspStr = TLinx2Util.handlePost(postmap, this.PAYCANCEL);
 		} catch (Exception e) {
 			log.error("请求接口失败",e);
-			return new Result(Result.ERROR,"请求失败");
+			return new Result(Result.WARN,"请求失败");
 //			return new Result("B0007","请求失败",null);
 		}
 		/**
@@ -194,7 +194,7 @@ public class PinganService {
 			TLinx2Util.handleEncrypt(datamap, postmap);
 		} catch (Exception e) {
 			log.error("AES加密失败",e);
-			return new Result(Result.PARAM,"加密失败");
+			return new Result(Result.ERROR,"加密失败");
 //			return new Result("B0008","加密失败",null);
 		}
 		postmap.put("sign_type", "RSA");
@@ -211,7 +211,7 @@ public class PinganService {
 			rspStr = TLinx2Util.handlePost(postmap, this.PAYREFUND);
 		} catch (Exception e) {
 			log.error("请求接口失败",e);
-			return new Result(Result.ERROR,"请求失败");
+			return new Result(Result.WARN,"请求失败");
 //			return new Result("B0007","请求失败",null);
 		}
 		/**
@@ -258,7 +258,7 @@ public class PinganService {
 			BeanUtils.setProperty(bean,"id",new PinganOrder().getGeneralId());
 		} catch (Exception e) {
 			log.error("对象无法实例化",e);
-			return new Result(Result.PARAM,"无法实例化对象，保存失败");
+			return new Result(Result.WARN,"无法实例化对象，保存失败");
 		}
 		Iterator<String> iterator=datamap.keySet().iterator();
 		while (iterator.hasNext()) {
@@ -352,7 +352,7 @@ public class PinganService {
 			TLinx2Util.handleEncrypt(datamap, postmap);
 		} catch (Exception e) {
 			log.error("AES加密失败",e);
-			return new Result(Result.PARAM,"加密失败");
+			return new Result(Result.ERROR,"加密失败");
 		}
 
 		/**
@@ -403,7 +403,7 @@ public class PinganService {
 			TLinx2Util.handleEncrypt(datamap, postmap);
 		} catch (Exception e) {
 			log.error("AES加密失败",e);
-			return new Result(Result.PARAM,"加密失败");
+			return new Result(Result.ERROR,"加密失败");
 		}
 
 		/**
@@ -443,7 +443,7 @@ public class PinganService {
 			TLinx2Util.handleEncrypt(datamap, postmap);
 		} catch (Exception e) {
 			log.error("AES加密失败",e);
-			return new Result(Result.PARAM,"加密失败");
+			return new Result(Result.ERROR,"加密失败");
 		}
 
 		/**
@@ -484,7 +484,7 @@ public class PinganService {
 			TLinx2Util.handleEncrypt(datamap, postmap);
 		} catch (Exception e) {
 			log.error("AES加密失败",e);
-			return new Result(Result.PARAM,"加密失败");
+			return new Result(Result.ERROR,"加密失败");
 		}
 
 		/**
@@ -525,7 +525,7 @@ public class PinganService {
 			TLinx2Util.handleEncrypt(datamap, postmap);
 		} catch (Exception e) {
 			log.error("AES加密失败",e);
-			return new Result(Result.PARAM,"加密失败");
+			return new Result(Result.ERROR,"加密失败");
 		}
 
 		/**
@@ -572,7 +572,7 @@ public class PinganService {
 			TLinx2Util.handleEncrypt(datamap, postmap);
 		} catch (Exception e) {
 			log.error("AES加密失败",e);
-			return new Result(Result.PARAM,"加密失败");
+			return new Result(Result.ERROR,"加密失败");
 		}
 
 		/**

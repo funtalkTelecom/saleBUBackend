@@ -107,6 +107,7 @@
         <result column="low_consume" property="lowConsume"></result>
         <result column="net_type" property="netType"></result>
         <result column="tele_type" property="teleType"></result>
+        <result column="num" property="num"></result>
     </resultMap>
     <select id="queryPageListApi" resultMap="saleNumber">
         select
@@ -274,4 +275,32 @@
     <update id ="updateDelStatus" >
         update tb_num m set m.status=1,m.sku_id=null  where m.sku_id=#{delSku}
     </update>
+
+    <select id="queryPageByNumList" resultMap="saleNumber">
+        select
+        a.id,
+        a.city_id,
+        a.city_name,
+        a.num_resource,
+        b.sku_id,
+        b.sku_tob_price,
+        b.sku_toc_price,
+        (select GROUP_CONCAT(`value`) from tb_num_rule where num_id = a.id GROUP BY num_id) as tags,
+        a.num_level,
+        a.with4,
+        a.low_consume,
+        a.net_type,
+        if(a.tele_type is null,'',a.tele_type) as tele_type
+        from tb_num a
+        left join tb_sku b on b.sku_id = a.sku_id
+        left join tb_goods c on c.g_id = b.g_id
+        where c.g_is_auc = 0
+        <if test="num!=null and num!=''">
+            and a.num_resource like "%"#{num}"%"
+        </if>
+        and a.status in ('2')
+        and b.sku_goods_type = '4'
+        and c.g_is_sale = '1'
+        and SYSDATE() between c.g_start_time and c.g_end_time
+    </select>
 </mapper>
