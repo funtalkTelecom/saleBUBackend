@@ -58,6 +58,7 @@ public class ApiOrderService {
 	{
 		return  orderMapper.findOrderListByNumIdAndConsumerId(numId,this.apiSessionUtil.getConsumer().getId());
 	}
+
 	public Result signOrder(Order order,HttpServletRequest request)
 	{
 		Long orderId=0L;
@@ -104,6 +105,8 @@ public class ApiOrderService {
 	 */
 	@Scheduled(fixedRate=3000)
 	public void signOrderSystem() {
+		if(!"true".equals(SystemParam.get("exe_timer"))) return;
+		log.info("开始执行.....已发货待签收的订单>7天时,系统自动签收......定时器");
 		List<Map> list=this.orderMapper.findOrderSignList();
 		if(list.isEmpty()){
 			log.info(String.format("暂无已发货未签收的订单"));return;
