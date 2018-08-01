@@ -81,7 +81,7 @@ public class ApiOrderController extends BaseReturn{
         return apiOrderService.getOrderAndItemsByOrderId(request, id);
     }
 
-    @PostMapping("/cancel-order")
+    @GetMapping("/cancel-order")
 //  @Powers(PowerConsts.NOPOWER)
     @Powers(PowerConsts.NOLOGINPOWER)
     public Result CancelOrder(@RequestParam("orderId") String orderId,@RequestParam("reason") String reason){

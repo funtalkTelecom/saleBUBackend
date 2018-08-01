@@ -360,7 +360,7 @@ public class ApiOrderService {
 					if (number == null || !"2".equals(String.valueOf(number.get("status"))))
 						return new Result(Result.ERROR, "号码已被购买!");
 					log.info("冻结号码");
-					freezeNum(numid, "3");
+					freezeNum(numid, "3",false);
 					log.info("获取sku信息");
 					//获取sku列表
 					List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
@@ -376,14 +376,14 @@ public class ApiOrderService {
 						if("3".equals(sku.get("skuGoodsType"))){
 							log.info("普通靓号,验证一级代理商");
 							if(user.getIsAgent() != 2){
-								freezeNum(numid, String.valueOf(number.get("status")));
+								freezeNum(numid, String.valueOf(number.get("status")),false);
 								return new Result(Result.ERROR, "您不是一级代理商,无法提交普通靓号订单");
 							}
 							log.info("判断商品地市和代理商地市");
 							//判断商品地市和代理商地市
 
 							if(!StringUtils.equals(number.get("cityId")+"",user.getAgentCity()+"")) {
-								freezeNum(numid, String.valueOf(number.get("status")));
+								freezeNum(numid, String.valueOf(number.get("status")),false);
 								return new Result(Result.ERROR, "不属于您的地市,无法操作");
 							}
 							/*if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
@@ -487,7 +487,7 @@ public class ApiOrderService {
 					//清除已生成的订单
 					deleteOrder(orderList);
 					//解冻号码,把冻结之前的状态还原
-					freezeNum(numid, String.valueOf(number.get("status")));
+					freezeNum(numid, String.valueOf(number.get("status")),false);
 					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new Result(Result.ERROR, "获取数据异常");
 				}
@@ -526,7 +526,7 @@ public class ApiOrderService {
 					if (number == null || !"2".equals(String.valueOf(number.get("status"))))
 						return new Result(Result.ERROR, "号码已被购买!");
 					log.info("冻结号码");
-					freezeNum(numid, "3");
+					freezeNum(numid, "3",false);
 					log.info("获取sku信息");
 					//获取sku列表
 					List skulist = skuMapper.getSkuListBySkuids("'" + skuid.replaceAll(",", "','") + "'");
@@ -634,7 +634,7 @@ public class ApiOrderService {
 					//清除已生成的订单
 					deleteOrder(orderList);
 					//解冻号码,把冻结之前的状态还原
-					freezeNum(numid, String.valueOf(number.get("status")));
+					freezeNum(numid, String.valueOf(number.get("status")),false);
 					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new Result(Result.ERROR, "获取数据异常");
 				}
@@ -705,7 +705,7 @@ public class ApiOrderService {
 			e.printStackTrace();
 			//解冻号码
 			for (OrderItem i : orderItems) {
-				freezeNum(i.getNumId().toString(), "2");
+				freezeNum(i.getNumId().toString(), "2",false);
 			}
 			//清除已生成的订单
 			deleteOrder(orderList);
@@ -899,10 +899,10 @@ public class ApiOrderService {
 	}
 
 	public Result CancelOrderAllCase(String orderIds,String reason){
-//		Consumer consumer= this.apiSessionUtil.getConsumer();
-//		long userid = consumer.getId();
-		String a = "1014426510456520704";
-		long consumerId = Long.valueOf(a);
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		long consumerId = consumer.getId();
+//		String a = "1014426510456520704";
+//		long consumerId = Long.valueOf(a);
 		Example example = new Example(Order.class);
 		Long orderId =Long.parseLong(orderIds);
 		example.createCriteria().andEqualTo("consumer",consumerId).andEqualTo("orderId", orderId);
