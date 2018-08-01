@@ -242,7 +242,7 @@ public class GoodsService {
                     //获取目前sku信息
                     Sku nowSku = skuMapper.getSkuBySkuid(sku.getSkuId());
                     Result res;
-                    if(!nowSku.getSkuGoodsType().equals("3")){
+                    if(!sku.getSkuGoodsType().equals("3")){
                         if(goods.getGeneralId()!=goods.getgId() && "1".equals(isSale)) {
                             //先解冻现有库存
                             param.put("type", "2");//处理类型1上架；2下架
