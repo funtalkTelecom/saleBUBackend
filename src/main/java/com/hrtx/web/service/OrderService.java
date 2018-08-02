@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.System;
 import java.text.ParseException;
 import java.util.*;
 
@@ -37,6 +36,8 @@ public class OrderService extends BaseService {
     @Autowired private GoodsMapper goodsMapper;
     @Autowired private AuctionDepositService auctionDepositService;
     @Autowired private NumService numService;
+    @Autowired private MealMapper mealMapper;
+    @Autowired private ApiOrderService apiOrderService;
 
     //订单业务类型 //1白卡 2普号 3普靓  4超靓
     private String[] goodsTypes = new String[]{"1","2","3","4"};
@@ -140,6 +141,7 @@ public class OrderService extends BaseService {
         if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
         order.setPayDate(new Date());
         order.setStatus(2);
+        order.setPayMenthod("线下支付");
         orderMapper.updateByPrimaryKey(order);
         return new Result(Result.OK, "success");
     }
@@ -188,14 +190,21 @@ public class OrderService extends BaseService {
      * @return
      */
     @NoRepeat
-    public Result payOrder(Long orderId) {
+    public Result payOrder(Long orderId, String payType) {
+        if(!ArrayUtils.contains(Constants.getKeyObject("PAY_MENTHOD_TYPE"), payType)) return new Result(Result.ERROR, "支付方式不存在");
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getStatus() !=1 || order.getIsDel() != 0) return new Result(Result.ERROR, "订单状态异常");
-        order.setPayMenthodId(Constants.PAY_MENTHOD_TYPE_1.getStringKey());
-        order.setPayMenthod(Constants.PAY_MENTHOD_TYPE_1.getValue());
+        order.setPayMenthodId(payType);
+        order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payType));
         orderMapper.updateByPrimaryKey(order);
-        return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
+        if(Constants.PAY_MENTHOD_TYPE_1.getStringKey().equals(payType)) {
+            return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
+        }
+        if(Constants.PAY_MENTHOD_TYPE_4.getStringKey().equals(payType)) {
+            return fundOrderService.payYzffqOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
+        }
+        return new Result(Result.OK, "success");
     }
 
     /**
@@ -215,11 +224,15 @@ public class OrderService extends BaseService {
      * @param order
      */
     @NoRepeat
-    public Result payBalance(Order order) {
+    public Result payBalance(Order order, Long mealId) {
         Long addresId = order.getAddressId();
         String payMenthod = order.getPayMenthodId();
         Long orderId = order.getOrderId();
         if(!ArrayUtils.contains(Constants.getKeyObject("PAY_MENTHOD_TYPE"), payMenthod)) return new Result(Result.ERROR, "支付方式不存在");
+        Meal meal = new Meal();
+        meal.setMid(mealId);
+        meal = mealMapper.selectByPrimaryKey(meal);
+        if(meal == null) return new Result(Result.ERROR, "所选套餐不存在");
         order = orderMapper.selectByPrimaryKey(order.getOrderId());
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
@@ -229,13 +242,9 @@ public class OrderService extends BaseService {
         if(list.isEmpty()) return new Result(Result.ERROR, "地址不存在");
         Map addressmap=list.get(0);
         int districtId= NumberUtils.toInt(String.valueOf(addressmap.get("districtId")));
-//        Example example = new Example(City.class);
-//        example.createCriteria().andEqualTo("id", NumberUtils.toInt(districtId));
-//        List<City> fundOrders = cityMapper.selectByExample(example);
-//        if(fundOrders.isEmpty()) return new Result(Result.ERROR, "地址不存在");
-//        City city =fundOrders.get(0);
         City city = cityMapper.selectByPrimaryKey(districtId);
         if(city == null) return new Result(Result.ERROR, "所选地址区县不存在");
+        orderItemMapper.updateMeal(orderId, mealId);
         order.setPayMenthodId(payMenthod);
         order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payMenthod));
         order.setAddressId(addresId);
@@ -243,7 +252,10 @@ public class OrderService extends BaseService {
         order.setPersonName( String.valueOf(addressmap.get("personName")));
         order.setPersonTel(String.valueOf(addressmap.get("personTel")));
         orderMapper.updateByPrimaryKey(order);
-        if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_1.getStringKey())) {//微信支付
+        if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_3.getStringKey())) {//线下
+//            return this.payOrderSuccess(orderId);
+            return new Result(Result.OK, "success");
+        }else {
             Example example = new Example(OrderItem.class);
             example.createCriteria().andEqualTo("orderId", orderId).andEqualTo("isShipment", 0);
             List<OrderItem> items = orderItemMapper.selectByExample(example);
@@ -262,13 +274,15 @@ public class OrderService extends BaseService {
                     return result;
                 }
             }
-            return fundOrderService.payPinganWxxOrder(amt, "["+SystemParam.get("system_name")+"]"+num+"号码尾款", orderId+"");
+
+            if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_1.getStringKey())) {//微信支付
+                return fundOrderService.payPinganWxxOrder(amt, "["+SystemParam.get("system_name")+"]"+num+"号码尾款", orderId+"");
+            }
+            if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_4.getStringKey())) {//分期付款
+                return fundOrderService.payYzffqOrder(amt, "["+SystemParam.get("system_name")+"]"+num+"号码尾款", orderId+"");
+            }
+            return new Result(Result.ERROR, "未找到支付方式");
         }
-        if(payMenthod.equals(Constants.PAY_MENTHOD_TYPE_3.getStringKey())) {//线下
-//            return this.payOrderSuccess(orderId);
-            return new Result(Result.OK, "success");
-        }
-        return new Result(Result.ERROR, "未找到支付方式");
     }
 
 
@@ -369,7 +383,7 @@ public class OrderService extends BaseService {
         }
     }
 
-    public Result bindCard(Order order, org.apache.catalina.servlet4preview.http.HttpServletRequest request) {
+    public Result bindCard(Order order/*, org.apache.catalina.servlet4preview.http.HttpServletRequest request*/) {
         if("4".equals(order.getStatus()) && "2".equals(order.getSkuGoodsType())) return new Result(Result.ERROR, "待配卡的普号禁止管理员绑卡");
         Result result = numService.blindNum(order.getOrderId());
         if(result.getCode() != Result.OK) return new Result(Result.ERROR, "绑卡失败\n" + result.getData());
@@ -378,5 +392,53 @@ public class OrderService extends BaseService {
         return new Result(Result.OK, "绑卡成功");
     }
 
+    public Result OrderCallbackStatus(StorageInterfaceRequest storageInterfaceRequest){
+        Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
+        long orderId = NumberUtils.toLong(ObjectUtils.toString(platrequest.get("order_id")));
+        int cancel_res = NumberUtils.toInt(ObjectUtils.toString(platrequest.get("cancel_res")));
+        String reson = ObjectUtils.toString(platrequest.get("reson"));
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order == null) return new Result(Result.ERROR, "订单不存在");
+        if(order.getStatus() != 11) return new Result(Result.ERROR, "非待仓库撤销状态的订单");
+        if(cancel_res==1) {
+            //确认取消
+            Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
+            if(ispay.getCode()==200){
+                //已支付
+                if(ispay.getData().equals("1")){//线上支付
+                    apiOrderService.CancelOrderStatus(orderId,12,""); //退款中
+                    Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reson);
+                    if(payR.getCode()==200){  //退款成功
+                        apiOrderService.orderType(orderId);
+                    }else { //退款失败
+                        apiOrderService.CancelOrderStatus(orderId,13,""); //退款失败
+                    }
+                }else {//线下支付
+                    apiOrderService.CancelOrderStatus(orderId,14,""); //待财务退款
+                }
+            }else {//未支付
+                //上架涉及的表，数量，状态
+                apiOrderService.orderType(orderId);
+            }
+        }else if (cancel_res==2){//撤销取消,还原订单状态
+            apiOrderService.CancelOrderStatus(orderId,3,reson);
+        }
+        return new Result(Result.OK, "取消成功");
+    }
+
+
+    public Result findFundOrderAmt(Order order, HttpServletRequest request)
+    {
+        Result result = fundOrderService.queryPayAmt(String.valueOf(order.getOrderId()));
+        //已支付金额(分)
+        double aamt=0.00;
+        if(result.getCode()==200){
+//            aamt = Double.valueOf(String.valueOf(result.getData())) ;
+            aamt = (Double)Arith.add(Double.valueOf(String.valueOf(result.getData()))/100, 0.0) ;
+        }else{
+            return new Result(Result.ERROR, "查询已支付金额失败");
+        }
+        return new Result(Result.OK,aamt);
+    }
 }
 

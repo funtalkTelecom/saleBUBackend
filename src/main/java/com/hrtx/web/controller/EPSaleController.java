@@ -167,6 +167,10 @@ public class EPSaleController extends BaseReturn{
 		Long auctionDepositId=0L;//保证金Id
 		DecimalFormat df=new DecimalFormat("######0.00");
         DecimalFormat df2=new DecimalFormat("######0");
+        if(Utils.formatFloatNumber(auction.getPrice()).length()>10)//整数7位.小数2位
+		{
+			returnResult(new Result(606, "当前加价额度不能超过9位"));
+		}
 		if(goodsAuctionCount>0)//最近10次数出价记录
 		{
 			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
@@ -497,12 +501,12 @@ public class EPSaleController extends BaseReturn{
 			//Long numId=NumberUtils.toLong(String.valueOf(goodsMap.get("numId")));
 			List<File> fileList = new ArrayList<File>();
 			List<Map> imgList= new ArrayList<Map>();
-			Map<String, Object> imgMap= new HashMap<String, Object>();
 			//图片集
 			fileList = fileService.findFilesByRefid(gId);
 			//fileList = fileService.findFilesByRefid("1003545391213314048");
 			if (fileList != null && fileList.size() > 0) {
 				for (File file : fileList) {
+					Map<String, Object> imgMap= new HashMap<String, Object>();
 					String gImgUrl=SystemParam.get("domain-full") + "get-img/goodsPics/" +gId+"/"+ file.getFileName();
 					imgMap.put("seq",file.getSeq());
 					imgMap.put("gImg",gImgUrl);

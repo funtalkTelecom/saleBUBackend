@@ -139,6 +139,7 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 23 * * ?")
     public void createAgentCardFile() {
+        if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行上传开卡文件定时器");
         try {
             int date_offset = 0;
@@ -185,7 +186,7 @@ public class LyCrmService {
         File file = new File(dir.getPath()+File.separator+fileName);
         if(file.exists()) file.delete();
         createFile(list, file.getPath());
-        Dict dict = new Dict(null, Utils.getDate(0-date_offset, "yyyyMMdd")+"-"+count, "opend_card_file_name", fileName, 0, "上传的开卡文件名", "", 0);
+        Dict dict = new Dict(null, Utils.getDate(0-date_offset, "yyyyMMdd")+"-"+count, "opend_card_file_name", fileName, 0, "上传的开卡文件名", 0l, 0);
         dict.setId(dict.getGeneralId());
         dictMapper.insert(dict);
         int ucount = this.batchUpdateSlz(fileName, snums);
@@ -216,10 +217,11 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 7 * * ?")
     public void praseOpenCardFileResult() {
+        if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行解析开卡结果定时器");
         List<Map> list = dictService.findDictByGroup("opend_card_file_name");
         for (Map map:list) {
-            String yFileName = String.valueOf(map.get("key_value"));
+            String yFileName = String.valueOf(map.get("keyValue"));
             String fileName = yFileName+".ok";
             log.info("开始解析["+fileName+"]结果");
             try {
@@ -241,14 +243,14 @@ public class LyCrmService {
                         num.setSlReason(row[7]);
                         Example example = new Example(Num.class);
                         example.createCriteria().andEqualTo("numResource",row[2]).andEqualTo("iccid", row[3]).andEqualTo("status", 9);
-                        numMapper.updateByExample(num, example);
+                        numMapper.updateByExampleSelective(num, example);
                     }
                 }
                 Dict dict = new Dict();
                 dict.setIsDel(1);
                 Example example = new Example(Dict.class);
                 example.createCriteria().andEqualTo("keyValue",yFileName).andEqualTo("isDel", 0);
-                dictMapper.updateByExample(dict, example);
+                dictMapper.updateByExampleSelective(dict, example);
             }catch (ServiceException e) {
                 log.error("解析["+fileName+"]结果异常，原因["+e.getMessage()+"]", e);
             }catch (Exception e) {
@@ -279,8 +281,10 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 6 * * ?")
     public void praseLyPhoneData() {//String type, int dateOffset
+        if(!"true".equals(SystemParam.get("exe_timer"))) return;
 //        if("ly_corp".equals(type)) this.praseLyCorpData(dateOffset);
 //        if("ly_phone".equals(type))
+        log.info("开始执行号码资源下载定时器");
         try {
             this.praseLyPhoneData(0);
         }catch (ServiceException e) {
@@ -298,6 +302,8 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 2 * * ?")
     public void uploadLyIccidData() {
+        if(!"true".equals(SystemParam.get("exe_timer"))) return;
+        log.info("开始执行上传iccid定时器");
         try {
             this.uploadLyIccidData(0);
         }catch (ServiceException e) {

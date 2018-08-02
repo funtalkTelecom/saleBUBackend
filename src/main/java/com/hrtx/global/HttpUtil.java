@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -225,5 +226,82 @@ public class HttpUtil {
 			e.printStackTrace();
 		}
 		return jsonObject;
+	}
+
+	/**
+	 * 从输入流中获取字节数组
+	 * @param inputStream
+	 * @return
+	 * @throws IOException
+	 */
+	public static  byte[] readInputStream(InputStream inputStream) throws IOException {
+		byte[] buffer = new byte[1024];
+		int len = 0;
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		while((len = inputStream.read(buffer)) != -1) {
+			bos.write(buffer, 0, len);
+		}
+		bos.close();
+		return bos.toByteArray();
+	}
+
+	/**
+	 *
+	 * @param url
+	 * @param params
+	 * @param charet
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	public static void getQrcode(String url, String params, String charet,HttpServletResponse response)throws IOException{
+		if (null == charet || "".equals(charet)) {
+			charet = "UTF-8";
+		}
+		URL urls;
+		HttpURLConnection uc = null;
+		OutputStream os = null;
+		DataOutputStream out = null;
+		try {
+			urls = new URL(url);
+			uc = (HttpURLConnection) urls.openConnection();
+			if(StringUtils.equals(SystemParam.get("http-proxy-falg"),"true")){
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.7.1",58080));
+				uc = (HttpsURLConnection) urls.openConnection(proxy);
+			}else{
+				uc = (HttpsURLConnection) urls.openConnection();
+			}
+			uc.setRequestMethod("POST");
+			uc.setDoOutput(true);
+			uc.setDoInput(true);
+			uc.setUseCaches(false);
+			uc.setRequestProperty("Content-Type", "application/json");
+			uc.connect();
+			out = new DataOutputStream(uc.getOutputStream());
+			out.write(params.getBytes(charet));
+			out.flush();
+			byte[] buffer = readInputStream(uc.getInputStream());
+			os = new BufferedOutputStream(response.getOutputStream());
+			response.setContentType("image/jpeg");
+			os.write(buffer);
+		}finally {
+			if(out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					log.error("", e);
+				}
+			}
+			if(os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					log.error("", e);
+				}
+			}
+			if (uc != null) {
+				uc.disconnect();
+			}
+		}
 	}
 }

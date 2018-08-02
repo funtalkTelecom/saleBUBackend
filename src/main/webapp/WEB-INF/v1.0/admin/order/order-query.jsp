@@ -50,6 +50,20 @@
 											<label class="control-label">订单编号</label>
 											<input type="text" class="form-control" style="width:170px;" name="orderId">
 										</div>
+										<div class="form-group">
+											<label class="control-label">收货人</label>
+											<input type="text" class="form-control" style="width:100px;" name="personName">
+										</div>
+										<div class="form-group">
+											<label class="control-label">号码</label>
+											<input type="text" class="form-control" style="width:130px;" name="num">
+										</div>
+										<div class="form-group">
+											<label class="control-label">时间</label>
+											<input type="text" class="form-control" id="startTime" name="startTime" value="" readonly/>
+											-
+											<input type="text" class="form-control" id="endTime" name="endTime" value="" readonly/>
+										</div>
 										<div class="form-group" style="">
 											<label class="control-label">状态</label>
 											<select class="form-control" name="qstatus" id="qstatus">
@@ -248,7 +262,7 @@
 							<div class="form-group">
 								<label class="col-xs-2 control-label">应收</label>
 								<div class="col-xs-3">
-									<input type="text" class="form-control" name="receivable" id="receivable">
+									<input type="text" class="form-control" name="receivable" id="receivable" disabled="disabled">
 								</div>
 								<label class="col-xs-2 control-label">实收</label>
 								<div class="col-xs-3">

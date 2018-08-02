@@ -1,11 +1,12 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@page import="com.hrtx.global.SessionUtil,com.hrtx.global.PowerConsts" %>
+<%Long now = System.currentTimeMillis();%>
 <!DOCTYPE html>
 	<head>
 		<title>商品管理</title>
 		<%@ include file="../common/basecss.jsp" %>
 		<%--<script type="text/javascript" src="<%=basePath %>query-meal.js"></script>--%>
-		<script type="text/javascript" src="<%=basePath %>admin/js/goods-query.js"></script>
+		<script type="text/javascript" src="<%=basePath %>admin/js/goods-query.js?<%=now%>"></script>
 
 		<link rel="stylesheet" href="<%=basePath %>project/js/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
 		<link rel="stylesheet" href="<%=basePath %>project/js/kindeditor/themes/default/default.css" type="text/css">

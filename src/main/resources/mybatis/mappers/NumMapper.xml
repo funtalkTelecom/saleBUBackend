@@ -49,6 +49,24 @@
     and  n.status in ( #{status})
     </select>
 
+    <select id="queryPageNumList2" resultType="java.util.HashMap">
+    select
+    concat(n.id,'')as id,
+    n.num_resource num,
+    n.city_name as cityName,
+    n.low_consume as lowConsume,
+    n.net_type as netType,
+    n.iccid,
+    meal.meal_name as mealName
+    from tb_num n
+    left join tb_order_item oi on n.id=oi.num_id
+    left join tb_order o on o.order_id=oi.order_id
+    left join tb_meal meal on meal.mid=n.meal_mid
+    where o.status=4 and o.sku_goods_type=3
+    and  n.buyer_id=#{consumerId}
+    and  n.status in ( #{status})
+   </select>
+
     <select id="queryDslNum" resultType="java.util.HashMap">
         select n.id, c.third_id, n.num_resource, n.iccid, m.meal_id  from tb_num n, tb_third_city c, tb_meal m where n.city_id = c.city_id and c.third = 'ly' and n.meal_mid = m.mid
 		and n.seller_id = 10 and n.`status` = 5 limit 100000

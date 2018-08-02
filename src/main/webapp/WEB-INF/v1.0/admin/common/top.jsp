@@ -112,7 +112,7 @@
 								</li>
 								<li class="divider"></li>
 								<li>
-									<a href="/login-out"><i class="ace-icon fa fa-power-off"></i>Logout</a>
+									<a href="login-out"><i class="ace-icon fa fa-power-off"></i>Logout</a>
 								</li>
 							</ul>
 						</li>

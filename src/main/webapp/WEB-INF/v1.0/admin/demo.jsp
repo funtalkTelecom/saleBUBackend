@@ -72,7 +72,7 @@
 		      "processing": true,
 		      "serverSide": true,//打开后台分页
 		      "ajax": {
-		           "url": "/page-demo",
+		           "url": "page-demo",
 		           "type": "POST"
 		           ,
 		           "data": function ( d ) {

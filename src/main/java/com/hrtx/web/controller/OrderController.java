@@ -6,27 +6,22 @@ import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
-import com.hrtx.web.pojo.FundOrder;
-import com.hrtx.web.pojo.Groups;
 import com.hrtx.web.pojo.Order;
 import com.hrtx.web.pojo.OrderItem;
 import com.hrtx.web.service.AuctionDepositService;
 import com.hrtx.web.service.NumService;
 import com.hrtx.web.service.OrderItemService;
 import com.hrtx.web.service.OrderService;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +57,12 @@ public class OrderController extends BaseReturn{
 		return orderService.payReceipt(order, request);
 	}
 
+	@RequestMapping("/order-yPayAmt")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
+	public Result yPayAmt(Order order, HttpServletRequest request){
+		return orderService.findFundOrderAmt(order, request);
+	}
+
 	@RequestMapping("/order-payDeliver")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
 	public Result payDeliver(Order order, HttpServletRequest request){
@@ -71,7 +72,7 @@ public class OrderController extends BaseReturn{
 	@RequestMapping("/order-bindCard")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_BINDCARD})
 	public Result payBindCard(Order order, HttpServletRequest request){
-		return orderService.bindCard(order, request);
+		return orderService.bindCard(order/*, request*/);
 	}
 
 	@RequestMapping("/item-list")
@@ -133,6 +134,34 @@ public class OrderController extends BaseReturn{
 			long err_no=System.currentTimeMillis();
 			log.error("系统未知异常"+err_no, e);
 			return renderHtml("系统未知异常"+err_no);
+		}
+	}
+
+	/***
+	 * 取消订单回调地址
+	 * @return
+	 */
+	@RequestMapping("/cancel-order-callback")
+	@Powers({PowerConsts.NOLOGINPOWER})
+	public String CancelOrderCallback(HttpServletRequest request) {
+		try {
+			String param = this.getParamBody(request);
+			log.info("接收到发货回调参数["+param+"]");
+			StorageInterfaceRequest storageInterfaceRequest = StorageInterfaceRequest.create(param, SystemParam.get("key"));
+			//接收仓库回调，取消订单操作
+			Result result = orderService.OrderCallbackStatus(storageInterfaceRequest);
+			if (result.getCode() == 200) {
+				renderHtml("取消订单成功");
+			} else {
+				renderHtml("取消订单失败");
+			}
+			return null;
+		}catch (ServiceException e) {
+			log.error(e.getMessage(), e);
+			return renderHtml(e.getMessage());
+		}catch (Exception e){
+			log.error("未知异常", e);
+			return renderHtml("error");
 		}
 	}
 

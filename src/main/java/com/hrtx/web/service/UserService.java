@@ -48,13 +48,13 @@ public class UserService {
 //		if(i==16) throw  new ServiceException("test");
 	}
 	public void test() {
-		User u = new User(10l);
+		User u = new User(100l);
 		userMapper.insert(u);
-		try{
-			userService.paytest();
-		} catch (Exception e) {
-			System.out.println(e.getMessage()+"----------捕捉异常");
-		}
+//		try{
+//			userService.paytest();
+//		} catch (Exception e) {
+//			System.out.println(e.getMessage()+"----------捕捉异常");
+//		}
 //	    Example example = new Example(FundOrder.class);
 //	    example.createCriteria();
 //	    List<User> u = userMapper.selectByExample(new Example(User.class).createCriteria().andEqualTo("id", 1));

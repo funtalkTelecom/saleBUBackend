@@ -17,7 +17,7 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
 
     Map getNumInfoById(@Param("id") String id);
 
-    void freezeNum(@Param("id") String numid, @Param("status") String status);
+    void freezeNum(@Param("id") String numid, @Param("status") String status,@Param("isUpdateSukid") boolean isUpdateSukid);
 
     List<Number> getListBySkuid(@Param("skuid")String skuid);
 
@@ -30,4 +30,8 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
     Map getNumInfoByNum(@Param("num") String num);
 
     Page<Object> queryPageList(Number number, @Param("param") Map param);
+
+    void updateDelStatus(@Param("delSku") Long delSku);
+
+    Page<Object> queryPageByNumList(@Param("num") String num);
 }

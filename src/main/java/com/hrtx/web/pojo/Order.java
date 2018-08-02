@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -66,6 +67,14 @@ public class Order extends BasePojo implements java.io.Serializable {
     private String conment;//摘要
     private int isDel;//
     private String skuGoodsType;
+    private String reason;
+
+    @Transient
+    private String num;
+    @Transient
+    private String startTime;
+    @Transient
+    private String endTime;
 
     public Order() {
     }
@@ -359,5 +368,37 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public void setSkuGoodsType(String skuGoodsType) {
         this.skuGoodsType = skuGoodsType;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getNum() {
+        return num;
+    }
+
+    public void setNum(String num) {
+        this.num = num;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 }

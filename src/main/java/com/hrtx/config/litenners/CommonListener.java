@@ -1,10 +1,5 @@
 package com.hrtx.config.litenners;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-
 import com.hrtx.global.ContextUtils;
 import com.hrtx.global.Messager;
 import com.hrtx.global.SystemParam;
@@ -13,27 +8,37 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hrtx.web.service.PermissionService;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-@WebListener
-public class CommonListener implements ServletContextListener {
+import javax.servlet.ServletContext;
+
+//@WebListener
+@Component
+public class CommonListener implements ApplicationRunner {
 
 	private Logger log = LoggerFactory.getLogger(CommonListener.class);
-	
 	@Autowired PermissionService permissionService;
-	
-	public void contextInitialized(ServletContextEvent event) {
-		permissionService.checkOrInsertPermission();
-		ServletContext context = event.getServletContext();
-		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
-		ContextUtils.setContext(ctx);
-		SystemParam.load();
-		Messager.init();
-		log.info("进行了 权限表检查+++++++++++++++++++++++++++++++++++++++++++++++");
-	}
+	@Autowired SystemParam	systemParam;
+	@Autowired private ServletContext servletContext;
 
-	public void contextDestroyed(ServletContextEvent event) {
+
+	@Override
+	public void run(ApplicationArguments var1) throws Exception{
+		log.info("进行了 权限表检查+++++++++++++++++++++++++++++++++++++++++++++++");
+		permissionService.checkOrInsertPermission();
+		log.info("系统配置初始化+++++++++++++++++++++++++++++++++++++++++++++++");
+		systemParam.load1();
+		log.info("短信组件初始化+++++++++++++++++++++++++++++++++++++++++++++++");
+		Messager.init();
+
+		log.info("ContextUtils组件初始化+++++++++++++++++++++++++++++++++++++++++++++++");
+		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+		ContextUtils.setContext(ctx);
+
 	}
 
 }

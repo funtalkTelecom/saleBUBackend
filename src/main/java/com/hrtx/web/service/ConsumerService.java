@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -123,4 +124,52 @@ public class ConsumerService extends BaseService {
 		consumer = consumerMapper.selectOne(consumer);
 		return  consumer;
 	}
+    public Result getAccess_token() {
+        String appid = SystemParam.get("AppID");
+        String appsecret = SystemParam.get("AppSecret");
+        String tokenUrl = "https://api.weixin.qq.com/cgi-bin/token";
+        String tokenParams = "grant_type=client_credential&appid=" + appid + "&secret=" + appsecret;
+        String access_token = null;//发送请求
+        try {
+            String data = HttpUtil.get(tokenUrl, tokenParams);
+            if (StringUtils.isEmpty(data)) return new Result(Result.ERROR, "请求错误");
+            JSONObject json = JSONObject.fromObject(data);
+            if (!json.containsKey("access_token")) return new Result(Result.ERROR, "微信返回结果错误");
+            access_token = String.valueOf(json.get("access_token"));//用户的唯一标识（openid）
+            return new Result(Result.OK, access_token);
+        } catch (Exception e) {
+            log.error("获取access_token失败", e);
+        }
+
+        return new Result(Result.ERROR, "无法获取access_token");
+    }
+
+    public Result getQrcode(String access_token, String scene, String page,String width,String auto_color,String line_color,String is_hyaline,HttpServletResponse response) {
+        String requestUrl = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + access_token;
+        JSONObject json = new JSONObject();
+        if(!StringUtils.isBlank(scene)){
+            json.put("scene", scene);
+        }
+        if(!StringUtils.isBlank(page)){
+            json.put("page", page);
+        }
+        if(!StringUtils.isBlank(width)){
+            json.put("width", width);
+        }
+        if(!StringUtils.isBlank(line_color)){
+            json.put("line_color", JSONObject.fromObject(line_color));
+        }
+        if(!StringUtils.isBlank(auto_color)){
+            json.put("auto_color", new Boolean(auto_color));
+        }
+        if(!StringUtils.isBlank(is_hyaline)){
+            json.put("is_hyaline", new Boolean(is_hyaline));
+        }
+        try {
+            HttpUtil.getQrcode(requestUrl, json.toString(), null,response);
+            return new Result(Result.OK,"success");
+        }catch (Exception e){
+            return new Result(Result.ERROR,"二维码生成失败");
+        }
+    }
 }

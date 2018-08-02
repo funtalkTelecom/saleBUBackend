@@ -23,7 +23,7 @@ public final class SystemParam {
 	/**
 	 * 加载配置文件
 	 * @return
-	 */
+
 	public final static void load() {
 		params.clear();
 		try {
@@ -36,7 +36,7 @@ public final class SystemParam {
 			log.error("",e);
 		}
 	}
-
+	 */
 	public final void load1() {
 		params.clear();
 		try {

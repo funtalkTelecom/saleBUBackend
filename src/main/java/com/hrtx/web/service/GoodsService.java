@@ -15,7 +15,10 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +34,8 @@ import java.util.regex.Pattern;
 
 @Service
 public class GoodsService {
-	
+
+    public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private GoodsMapper goodsMapper;
 	@Autowired
@@ -62,6 +66,10 @@ public class GoodsService {
             List<Goods> list = new ArrayList<Goods>();
             String isSale = goods.getgIsSale();
             if (goods.getgId() != null && goods.getgId() > 0) {
+                //上架中的竞拍商品只允许修改个别字段
+                if("1".equals(goods.getgIsAuc()) && "1".equals(isSale)){
+
+                }
                 goodsMapper.goodsEdit(goods);
                 goods = goodsMapper.findGoodsInfo(goods.getgId());
             } else {
@@ -89,6 +97,7 @@ public class GoodsService {
                 List<SkuProperty> skuPropertyList = new ArrayList<SkuProperty>();
                 List<Sku> skuList = new ArrayList<Sku>();
                 String skuSaleNum = "";
+                Set<String> set = new HashSet<String>();
                 for(int i=0; i<skuPropertyJsonArr.size(); i++){
                     //sku表操作
                     sku = new Sku();
@@ -138,6 +147,14 @@ public class GoodsService {
                     if(!"1".equals(sku.getSkuGoodsType())) {
                         String repeatNum = getRepeatNum(skuSaleNum);
                         if(repeatNum!=null && repeatNum.length()>0) return new Result(Result.ERROR, "以下号码重复\n"+repeatNum);
+
+                        String[] nums = skuSaleNum.split("\n");
+                        for (String a :nums){
+                            if(set.contains(a)){
+                                return new Result(Result.ERROR, "该上架商品存在重复号码\n"+a);
+                            }
+                            set.add(a);
+                        }
                         skuSaleNum = checkSkuSaleNum(skuSaleNum, sku, false, "".equals(tskuId)?sku.getSkuId():Long.parseLong(tskuId));
     //                    sku.setSkuRepoGoods(((JSONObject) obj.get("skuRepoGoods")).get("value")==null||((JSONObject) obj.get("skuRepoGoods")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoods")).get("value"));
     //                    sku.setSkuRepoGoodsName(((JSONObject) obj.get("skuRepoGoodsName")).get("value")==null||((JSONObject) obj.get("skuRepoGoodsName")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuRepoGoodsName")).get("value"));
@@ -225,11 +242,30 @@ public class GoodsService {
                     //获取目前sku信息
                     Sku nowSku = skuMapper.getSkuBySkuid(sku.getSkuId());
                     Result res;
-                    if(goods.getGeneralId()!=goods.getgId() && "1".equals(isSale)) {
-                        //先解冻现有库存
-                        param.put("type", "2");//处理类型1上架；2下架
-                        param.put("quantity", nowSku == null ? 0 : nowSku.getSkuNum());//数量
-                        param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                    if(!sku.getSkuGoodsType().equals("3")){
+                        if(goods.getGeneralId()!=goods.getgId() && "1".equals(isSale)) {
+                            //先解冻现有库存
+                            param.put("type", "2");//处理类型1上架；2下架
+                            param.put("quantity", nowSku == null ? 0 : nowSku.getSkuNum());//数量
+                            param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                            if(!"0".equals(param.get("quantity").toString())) {
+                                res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                                if (200 != (res.getCode())) {
+                                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                                    return new Result(Result.ERROR, "第"+(i+1)+"行,库存验证失败");
+                                } else {
+                                    StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                                    if (!"00000".equals(sir.getCode())) {
+                                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                                        return new Result(Result.ERROR, "第"+(i+1)+"行,解冻库存失败\n"+sir.getDesc());
+                                    }
+                                }
+                            }
+                        }
+                        //再冻结新库存
+                        param.put("type", "1");//处理类型1上架；2下架
+                        param.put("quantity", sku.getSkuNum());//数量
+                        param.put("companystock_id", sku.getSkuRepoGoods());//库存编码(skuRepoGoods)
                         if(!"0".equals(param.get("quantity").toString())) {
                             res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                             if (200 != (res.getCode())) {
@@ -239,29 +275,11 @@ public class GoodsService {
                                 StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                                 if (!"00000".equals(sir.getCode())) {
                                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                    return new Result(Result.ERROR, "第"+(i+1)+"行,解冻库存失败\n"+sir.getDesc());
+                                    return new Result(Result.ERROR, "第"+(i+1)+"行,冻结库存失败\n"+sir.getDesc());
                                 }
                             }
                         }
                     }
-                    //再冻结新库存
-                    param.put("type", "1");//处理类型1上架；2下架
-                    param.put("quantity", sku.getSkuNum());//数量
-                    param.put("companystock_id", sku.getSkuRepoGoods());//库存编码(skuRepoGoods)
-                    if(!"0".equals(param.get("quantity").toString())) {
-                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                        if (200 != (res.getCode())) {
-                            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                            return new Result(Result.ERROR, "第"+(i+1)+"行,库存验证失败");
-                        } else {
-                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                            if (!"00000".equals(sir.getCode())) {
-                                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                return new Result(Result.ERROR, "第"+(i+1)+"行,冻结库存失败\n"+sir.getDesc());
-                            }
-                        }
-                    }
-
                     //sku属性表操作end
                     //判断是否存在,存在就update,否则加到list中insert
                     if(!"".equals(tskuId)&&skuMapper.getSkuBySkuid(Long.parseLong(tskuId))!=null) {
@@ -302,28 +320,33 @@ public class GoodsService {
                                 //获取目前sku信息
                                 Sku s = skuMapper.getSkuBySkuid(Long.parseLong(delSku));
                                 if (s != null) {
-                                    //调用仓储接口
-                                    Map param = new HashMap();
-                                    param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
-                                    Result res;
-                                    //解冻现有库存
-                                    param.put("type", "2");//处理类型1上架；2下架
-                                    param.put("quantity", s == null ? 0 : s.getSkuNum());//数量
-                                    param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
-                                    if (!"0".equals(param.get("quantity").toString())) {
-                                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                                        if (200 != (res.getCode())) {
-                                            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                            return new Result(Result.ERROR, "解冻库存失败");
-                                        } else {
-                                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                                            if (!"00000".equals(sir.getCode())) {
+                                    if(!s.getSkuGoodsType().equals("3")){
+                                        //调用仓储接口
+                                        Map param = new HashMap();
+                                        param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
+                                        Result res;
+                                        //解冻现有库存
+                                        param.put("type", "2");//处理类型1上架；2下架
+                                        param.put("quantity", s == null ? 0 : s.getSkuNum());//数量
+                                        param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                                        if (!"0".equals(param.get("quantity").toString())) {
+                                            res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                                            if (200 != (res.getCode())) {
                                                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                                return new Result(Result.ERROR, "解冻库存失败\n" + sir.getDesc());
+                                                return new Result(Result.ERROR, "解冻库存失败");
+                                            } else {
+                                                StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                                                if (!"00000".equals(sir.getCode())) {
+                                                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                                                    return new Result(Result.ERROR, "解冻库存失败\n" + sir.getDesc());
+                                                }
                                             }
                                         }
                                     }
                                 }
+                                // by zdh 20180712
+                                //更新删除的tb_num 状态
+                                numberMapper.updateDelStatus(s.getSkuId());
                             }
                         }
                     }
@@ -355,7 +378,7 @@ public class GoodsService {
                         File f = new File();
                         f.setFileId(f.getGeneralId());
                         f.setFileGroup("goodsPic");
-                        result = BaseReturn.uploadFile(SystemParam.get("goodsPics")+goods.getgId()+"\\", "jpg,png,gif", file, false, false);
+                        result = BaseReturn.uploadFile(SystemParam.get("goodsPics")+goods.getgId()+java.io.File.separator, "jpg,png,gif", file, false, false);
                         f.setFileName(((Map)result.getData()).get("sourceServerFileName").toString());
                         f.setRefId(goods.getgId());
                         f.setSeq(Integer.parseInt(picSeqs.replaceAll("\"","").split(",")[i]));
@@ -436,21 +459,24 @@ public class GoodsService {
         try {
             for(Sku s : skuList){
                 Map param = new HashMap();
-                param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
-                param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
-                param.put("type", "2");//处理类型1上架；2下架
-                param.put("quantity", s.getSkuNum());//数量
-                if(s.getSkuNum()!=0 && "1".equals(goods.getgIsSale())) {
-                    res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                    if (200 != (res.getCode())) {
-                        return new Result(Result.ERROR, "库存验证失败");
-                    } else {
-                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                        if (!"00000".equals(sir.getCode())) {
-                            return new Result(Result.ERROR, "库存验证失败\n" + sir.getDesc());
+                if(!s.getSkuGoodsType().equals("3")){
+                    param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
+                    param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                    param.put("type", "2");//处理类型1上架；2下架
+                    param.put("quantity", s.getSkuNum());//数量
+                    if(s.getSkuNum()!=0 && "1".equals(goods.getgIsSale())) {
+                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                        if (200 != (res.getCode())) {
+                            return new Result(Result.ERROR, "库存验证失败");
+                        } else {
+                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                            if (!"00000".equals(sir.getCode())) {
+                                return new Result(Result.ERROR, "库存验证失败\n" + sir.getDesc());
+                            }
                         }
                     }
                 }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -470,30 +496,36 @@ public class GoodsService {
 	}
 
     public Result goodsUnsale(Goods goods, HttpServletRequest request) {
-
         Result res = new Result(Result.ERROR, "请求异常");
         try {
             List<Sku> skuList = skuMapper.findSkuInfo(goods.getgId());
             for(Sku s : skuList){
                 Map param = new HashMap();
-                param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
-                param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
-                param.put("type", "2");//处理类型1上架；2下架
-                param.put("quantity", s.getSkuNum());//数量
-                if(s.getSkuNum()!=0) {
-                    res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-                    if (200 != (res.getCode())) {
-                        return new Result(Result.ERROR, "库存验证失败");
-                    } else {
-                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                        if (!"00000".equals(sir.getCode())) {
+                if(s.getSkuGoodsType().equals("3")){
+                    Number number = new Number();
+                    number.setSkuId(s.getSkuId());
+                    number.setStatus(1);
+                    numberMapper.updateStatus(number, false);
+                }else {
+                    param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
+                    param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                    param.put("type", "2");//处理类型1上架；2下架
+                    param.put("quantity", s.getSkuNum());//数量
+                    if(s.getSkuNum()!=0) {
+                        res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                        if (200 != (res.getCode())) {
                             return new Result(Result.ERROR, "库存验证失败");
-                        }else{
-                            //成功之后吧上架的号码状态还原成1
-                            Number number = new Number();
-                            number.setSkuId(s.getSkuId());
-                            number.setStatus(1);
-                            numberMapper.updateStatus(number, false);
+                        } else {
+                            StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                            if (!"00000".equals(sir.getCode())) {
+                                return new Result(Result.ERROR, "库存验证失败");
+                            }else{
+                                //成功之后吧上架的号码状态还原成1
+                                Number number = new Number();
+                                number.setSkuId(s.getSkuId());
+                                number.setStatus(1);
+                                numberMapper.updateStatus(number, false);
+                            }
                         }
                     }
                 }
@@ -530,5 +562,28 @@ public class GoodsService {
 
     public String getKindeditorContent(Goods goods) throws IOException {
 	    return Utils.kindeditorReader(goods.getgId() + ".txt", SystemParam.get("kindedtiorDir"));
+    }
+
+    /***
+     * 判断是否过期的上架商品
+     */
+    @Scheduled(fixedRate=3000)
+    public void goodsTimer(){
+        if(!"true".equals(SystemParam.get("goods_timer"))) return;
+        log.info("开始执行判断商品是否过期定时器");
+        List<Goods> list = goodsMapper.findGoodsIsSale();
+        if(list.size()==0){
+            log.info(String.format("暂无过期的上架商品"));return;
+        }else {
+            for(Goods g : list){
+                try {
+                    log.info("下架商品GoodsID:"+g.getgId());
+                    this.goodsUnsale(g,null);
+                }catch (Exception e) {
+                    log.error("未知异常", e);
+                }
+            }
+        }
+
     }
 }
