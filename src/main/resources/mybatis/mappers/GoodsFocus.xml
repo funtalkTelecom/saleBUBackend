@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.GoodsFocusMapper">
+
+	<select id="findGoodsFocusListBydConsumerId" resultType="java.util.HashMap">
+	  select
+	  tb_goods_focus.id,
+	  tb_goods_focus.price,
+	  tb_goods_focus.add_date
+	  from tb_goods_focus
+	  where tb_goods_focus.is_del=0
+      and  tb_goods_focus.consumer_id = #{consumerId}
+    </select>
+
+
+	<select id="finGoodsFocusListByGIdAndNumIdAndConsumerId" resultType="java.util.HashMap">
+      select
+	  tb_goods_focus.id,
+	  tb_goods_focus.price,
+	  tb_goods_focus.add_date
+	  from tb_goods_focus
+	  where tb_goods_focus.is_del=0
+	  and  tb_goods_focus.g_id= #{gId}
+	  and  tb_goods_focus.num_id = #{numId}
+      and  tb_goods_focus.consumer_id = #{consumerId}
+    </select>
+
+	<select id="findGoodsFocusListByConsumerId2" resultType="java.util.HashMap">
+  	 select
+	 tb_goods_focus.id,
+	 tb_goods_focus.num_id as numId,
+	 tb_goods_focus.g_id as gId,
+	 case when tb_file_info.file_name is null then ''
+	 else  concat("get-img","/",tb_file_info.file_group,"s/",tb_file_info.ref_id,"/",tb_file_info.file_name) end as gImg,
+	 tb_goods_focus.g_id as gId,
+	 case when tb_goods_focus.num !='' and  tb_goods_focus.num is not null then tb_goods_focus.num
+	 else tb_goods_focus.g_name  end as gName,
+	 tb_sku.sku_tob_price as currentPrice,
+	 tb_goods_focus.price as focusPrice,
+	 tb_goods_focus.update_date as addDate
+	 from tb_goods_focus
+	 left join tb_file_info on tb_file_info.ref_id=tb_goods_focus.g_id
+	 inner join tb_sku on tb_sku.g_id=tb_goods_focus.g_id
+	 where  tb_file_info.file_group='goodsPic' and tb_file_info.seq=1
+	 and tb_goods_focus.is_del=0
+	 and  tb_goods_focus.consumer_id = #{consumerId}
+	</select>
+
+	<update id="goodsFocusEdit">
+        update tb_goods_focus t set
+         t.sku_id=#{skuId},
+         t.num_id=#{numId} ,
+         t.num=#{num} ,
+         t.g_id=#{gId} ,
+         t.g_name=#{gName} ,
+         t.price=#{price} ,
+         t.update_date=#{updateDate},
+         t.consumer_id=#{consumerId},
+         t.add_ip=#{addIp}
+        where
+        t.is_del=0 and   t.id = #{id}
+    </update>
+
+	<insert id="insertBatch">
+		insert into tb_goods_focus(
+		id,
+		sku_id,
+		num_id,
+		num,
+		g_id,
+		g_name,
+		price,
+		add_date,
+		update_date,
+		consumer_id,
+		add_ip,
+		is_del,
+		remark
+		) values
+		<foreach collection="goodsFocusList" item="GoodsFocus" separator=",">
+			(
+			#{GoodsFocus.id},
+			#{GoodsFocus.skuId},
+			#{GoodsFocus.numId},
+			#{GoodsFocus.num},
+			#{GoodsFocus.gId},
+			#{GoodsFocus.gName},
+			#{GoodsFocus.price},
+			#{GoodsFocus.addDate},
+			#{GoodsFocus.updateDate},
+			#{GoodsFocus.consumerId},
+			#{GoodsFocus.addIp},
+			#{GoodsFocus.isDel},
+			#{GoodsFocus.remark}
+			)
+		</foreach>
+	</insert>
+
+</mapper>

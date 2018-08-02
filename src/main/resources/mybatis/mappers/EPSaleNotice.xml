@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.EPSaleNoticeMapper">
+
+	<select id="findEPSaleNoticeListBydConsumerId" resultType="java.util.HashMap">
+	  select
+	  tb_ep_sale_notice.id,
+	  tb_ep_sale_notice.add_date
+	  from tb_ep_sale_notice
+	  where tb_ep_sale_notice.is_del=0
+      and  tb_ep_sale_notice.consumer_id = #{consumerId}
+    </select>
+
+
+	<select id="findEPSaleNoticeListByEPSaleIdAndConsumerId" resultType="java.util.HashMap">
+    select
+	  tb_ep_sale_notice.id,
+	  tb_ep_sale_notice.add_date
+	  from tb_ep_sale_notice
+	  where tb_ep_sale_notice.is_del=0
+      and  tb_ep_sale_notice.epSale_id = #{epSaleId}
+      and  tb_ep_sale_notice.consumer_id = #{consumerId}
+    </select>
+
+	<select id="findEPSaleNoticeListByGIdAndConsumerId" resultType="java.util.HashMap">
+      select
+	  tb_ep_sale_notice.id,
+	  tb_ep_sale_notice.add_date,
+	  tb_ep_sale_notice.epSale_id as epSaleId,
+	  tb_goods.g_id as gId,
+	  tb_ep_sale_notice.phone
+	  from tb_ep_sale_notice
+	  inner join tb_goods
+	  on tb_goods.g_active=tb_ep_sale_notice.epSale_id
+	  where tb_goods.g_is_auc=1
+	  and tb_goods.g_is_sale=1
+	  and tb_ep_sale_notice.is_del=0
+	  and tb_ep_sale_notice.is_notice=1
+      and  tb_goods.g_id = #{gId}
+       and  tb_ep_sale_notice.consumer_id = #{consumerId}
+    </select>
+
+	<update id="ePSaleNoticeEdit">
+        update tb_ep_sale_notice t set
+         t.epSale_id=#{epSaleId} ,
+         t.phone=#{phone} ,
+         t.update_date=#{updateDate},
+         t.consumer_id=#{consumerId},
+         t.add_ip=#{addIp},
+         t.is_notice=#{isNotice}
+        where
+        t.is_del=0 and   t.id = #{id}
+    </update>
+
+	<insert id="insertBatch">
+		insert into tb_ep_sale_notice(
+		id,
+		epSale_id,
+		phone,
+		add_date,
+		update_date,
+		consumer_id,
+		add_ip,
+		is_notice,
+		is_del,
+		remark
+		) values
+		<foreach collection="ePSaleNoticeList" item="EPSaleNotice" separator=",">
+			(
+			#{EPSaleNotice.id},
+			#{EPSaleNotice.epSaleId},
+			#{EPSaleNotice.phone},
+			#{EPSaleNotice.addDate},
+			#{EPSaleNotice.updateDate},
+			#{EPSaleNotice.consumerId},
+			#{EPSaleNotice.addIp},
+			#{EPSaleNotice.isNotice},
+			#{EPSaleNotice.isDel},
+			#{EPSaleNotice.remark}
+			)
+		</foreach>
+	</insert>
+
+</mapper>
