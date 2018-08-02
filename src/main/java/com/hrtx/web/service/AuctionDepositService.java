@@ -15,8 +15,6 @@ import com.hrtx.web.pojo.AuctionDeposit;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.websocket.WebSocketServer;
-import net.sf.json.JSONArray;
-import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
