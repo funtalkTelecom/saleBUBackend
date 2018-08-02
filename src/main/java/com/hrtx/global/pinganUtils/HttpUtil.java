@@ -148,7 +148,7 @@ public class HttpUtil {
 		BufferedReader in = null;
 		try {
 			urls = new URL(url);
-			uc = (HttpURLConnection) urls.openConnection();
+//			uc = (HttpURLConnection) urls.openConnection();
 			if(StringUtils.equals(SystemParam.get("http-proxy-falg"),"true")){
 				Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.7.1",58080));
 				uc = (HttpURLConnection) urls.openConnection(proxy);

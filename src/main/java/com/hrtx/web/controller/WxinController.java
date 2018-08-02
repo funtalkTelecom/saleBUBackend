@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/api")
 public class WxinController {
@@ -30,5 +32,19 @@ public class WxinController {
 		Result result = this.consumerService.getOpenId(getcode);
 		if(result.getCode()==Result.OK)result= consumerService.isOpenid(String.valueOf(result.getData()));
 		return result;
+	}
+
+	@GetMapping("/getQrcode")
+	@Powers({PowerConsts.NOLOGINPOWER})
+	public void getQrcode(@RequestParam(value="scene",required=false)String scene,
+						  @RequestParam(value="page",required=false)String page,
+						  @RequestParam(value="width",required=false)String width,
+						  @RequestParam(value="auto_color",required=false)String auto_color,
+						  @RequestParam(value="line_color",required=false)String line_color,
+						  @RequestParam(value="is_hyaline",required=false)String is_hyaline,
+						  HttpServletResponse response) {
+		Result result =consumerService.getAccess_token();
+		if(result.getCode()==Result.OK) consumerService.getQrcode(String.valueOf(result.getData()),scene,page,width,auto_color,line_color,is_hyaline,response);
+
 	}
 }
