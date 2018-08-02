@@ -168,10 +168,18 @@ $(function() {
                             //如果是竞拍订单获取保证金
                             if(record.orderType=="3"){
                                 var deposit;
+                                var aamt;
                                 $.post("order/order-deposit", {orderId: v}, function (data) {
                                     deposit = data["deposit"];
                                     $("#receivable").val(Number(record.total)-Number(deposit));
                                     $("#receipts").val(Number(record.total)-Number(deposit));
+                                }, "json");
+                            }else {
+                                $.post("order/order-yPayAmt", {orderId: v}, function (data) {
+                                    aamt = data.data;
+                                    var aa =Number(record.total)-Number(aamt);
+                                    $("#receivable").val(aa.toFixed(2));
+                                    $("#receipts").val(aa.toFixed(2));
                                 }, "json");
                             }
                             $('#receiptInfo').modal('show');
@@ -269,4 +277,35 @@ $(function() {
             alert(data.data);
         },"json");
     });
+
+    $('#startTime').bind('focus',function() {
+        WdatePicker({
+            maxDate : '#F{$dp.$D(\'endTime\',{s:-1})}',
+            dateFmt : 'yyyy-MM-dd',
+            onpicked : function(item) {
+                $(this).change();
+            }
+        });
+    });
+    $('#endTime').bind('focus',function() {
+        WdatePicker({
+            minDate : '#F{$dp.$D(\'startTime\',{s:1})}',
+            dateFmt : 'yyyy-MM-dd',
+            onpicked : function(item) {
+                $(this).change();
+            }
+        });
+    });
+
+    $("#receipts").blur(function(){
+        var $this = $(this);
+        var receipts = window.parseFloat($this.val()) || 0;
+        receipts = receipts.toFixed(2);
+        if(receipts <= 0) {
+            alert("交通费总金额需大于0");
+            $this.val("");
+            return;
+        }
+        $this.val(receipts);
+    })
 });

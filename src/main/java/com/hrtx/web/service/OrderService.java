@@ -21,10 +21,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class OrderService extends BaseService {
@@ -144,6 +141,7 @@ public class OrderService extends BaseService {
         if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
         order.setPayDate(new Date());
         order.setStatus(2);
+        order.setPayMenthod("线下支付");
         orderMapper.updateByPrimaryKey(order);
         return new Result(Result.OK, "success");
     }
@@ -428,5 +426,19 @@ public class OrderService extends BaseService {
         return new Result(Result.OK, "取消成功");
     }
 
+
+    public Result findFundOrderAmt(Order order, HttpServletRequest request)
+    {
+        Result result = fundOrderService.queryPayAmt(String.valueOf(order.getOrderId()));
+        //已支付金额(分)
+        double aamt=0.00;
+        if(result.getCode()==200){
+//            aamt = Double.valueOf(String.valueOf(result.getData())) ;
+            aamt = (Double)Arith.add(Double.valueOf(String.valueOf(result.getData()))/100, 0.0) ;
+        }else{
+            return new Result(Result.ERROR, "查询已支付金额失败");
+        }
+        return new Result(Result.OK,aamt);
+    }
 }
 

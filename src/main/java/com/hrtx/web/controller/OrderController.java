@@ -57,6 +57,12 @@ public class OrderController extends BaseReturn{
 		return orderService.payReceipt(order, request);
 	}
 
+	@RequestMapping("/order-yPayAmt")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
+	public Result yPayAmt(Order order, HttpServletRequest request){
+		return orderService.findFundOrderAmt(order, request);
+	}
+
 	@RequestMapping("/order-payDeliver")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
 	public Result payDeliver(Order order, HttpServletRequest request){
