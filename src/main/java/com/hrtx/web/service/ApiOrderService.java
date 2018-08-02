@@ -103,7 +103,7 @@ public class ApiOrderService {
 	/*
 	 订单 已发货待签收>7天
 	 */
-	@Scheduled(fixedRate=300000000)
+	@Scheduled(fixedRate=3000)
 	public void signOrderSystem() {
 		if(!"true".equals(SystemParam.get("exe_timer"))) return;
 		log.info("开始执行.....已发货待签收的订单>7天时,系统自动签收......定时器");
