@@ -290,7 +290,7 @@
 
     <select id="findGoodsIsSale" resultType="Goods">
         select c.g_id gId,c.g_type2 gType2,c.g_name gName from tb_goods c
-        where c.g_is_sale = '1' and  ( SYSDATE() &lt; c.g_start_time or SYSDATE() &gt; c.g_end_time)
+        where c.g_is_sale = '1' and  SYSDATE() &gt; c.g_start_time and SYSDATE()&gt; c.g_end_time
     </select>
 
 </mapper>
