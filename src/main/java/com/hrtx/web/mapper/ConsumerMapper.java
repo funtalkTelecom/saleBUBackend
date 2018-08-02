@@ -19,4 +19,6 @@ public interface ConsumerMapper extends Mapper<Consumer>,BaseMapper<Consumer>{
     void insertAgentToConsumer(Consumer consumer);
 
     Consumer findConsumerById(@Param("id") Long id);
+
+    void insertPhoneToConsumer(Consumer consumer);
 }
