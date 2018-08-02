@@ -501,7 +501,7 @@ public class GoodsService {
             List<Sku> skuList = skuMapper.findSkuInfo(goods.getgId());
             for(Sku s : skuList){
                 Map param = new HashMap();
-                if(!s.getSkuGoodsType().equals(3)){
+                if(s.getSkuGoodsType().equals(3)){
                     Number number = new Number();
                     number.setSkuId(s.getSkuId());
                     number.setStatus(1);
