@@ -459,7 +459,7 @@ public class GoodsService {
         try {
             for(Sku s : skuList){
                 Map param = new HashMap();
-                if(!s.getSkuGoodsType().equals(3)){
+                if(!s.getSkuGoodsType().equals("3")){
                     param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
                     param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
                     param.put("type", "2");//处理类型1上架；2下架
@@ -501,7 +501,7 @@ public class GoodsService {
             List<Sku> skuList = skuMapper.findSkuInfo(goods.getgId());
             for(Sku s : skuList){
                 Map param = new HashMap();
-                if(s.getSkuGoodsType().equals(3)){
+                if(s.getSkuGoodsType().equals("3")){
                     Number number = new Number();
                     number.setSkuId(s.getSkuId());
                     number.setStatus(1);
