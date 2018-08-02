@@ -18,11 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
+import java.lang.System;
 
 @Service
 public class EPSaleService {
@@ -499,7 +499,9 @@ public class EPSaleService {
 			list.add(epSale);
 			epSaleMapper.insertBatch(list);
 		}
-
+		//富文本信息获取
+		String kindeditorContent = request.getParameter("epRule");
+		Utils.kindeditorWriter(kindeditorContent, epSale.getId()+".txt", SystemParam.get("kindedtiorDir"));
 		//图片保存1
 		Result result = null;
 		String picSeqs = request.getParameter("picSeqs")==null?"":request.getParameter("picSeqs");

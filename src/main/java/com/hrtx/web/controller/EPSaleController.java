@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -45,6 +46,8 @@ public class EPSaleController extends BaseReturn{
 	private FundOrderService fundOrderService;
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
+	@Autowired
+	private EPSaleNoticeService ePSaleNoticeService;
 
 	@RequestMapping("/epSale/epSale-query")
 	@Powers({PowerConsts.EPSALEMOUDULE})
@@ -84,7 +87,6 @@ public class EPSaleController extends BaseReturn{
 		return epSaleService.findEPSaleList2();
 	}
 
-
 	/**
 	 * 查询竟拍活动的商品列表
 	 * 未过期
@@ -98,23 +100,22 @@ public class EPSaleController extends BaseReturn{
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Map> epSaleMap=epSaleService.findEPSaleByEPSaleId(Long.valueOf(ePSaleId));
 		if(epSaleMap.size()>0)
-        {
-            List<Map> goodsList=epSaleService.findEPSaleGoodsListByEPSaleId(Long.valueOf(ePSaleId));
-            if(goodsList.size()>0)
-            {
-                epSaleMap.get(0).put("goodsList",goodsList);
-            }else
-            {
-                epSaleMap.get(0).put("goodsList","");
-            }
-        }
+		{
+			List<Map> goodsList=epSaleService.findEPSaleGoodsListByEPSaleId(Long.valueOf(ePSaleId));
+			if(goodsList.size()>0)
+			{
+				epSaleMap.get(0).put("goodsList",goodsList);
+			}else
+			{
+				epSaleMap.get(0).put("goodsList","");
+			}
+		}
 		map.put("code", Result.OK);
 		map.put("data", epSaleMap);
 		return map;
 	}
 
 	private static Object cjLock = new Object();
-
 	/*
 	   竟拍商品出价
 	   *限 每次gId与numId组合
@@ -127,7 +128,7 @@ public class EPSaleController extends BaseReturn{
 		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息
 		Date endTime=null;//结束时间
 		Date currentTime=new Date();//当前时间
-        int goodsAuctionCount=0;//最近10次数出价记录的次数
+		int goodsAuctionCount=0;//最近10次数出价记录的次数
 		List<Map> numList=epSaleService.findNumById(auction.getNumId());
 		if(numList.size()>0)
 		{
@@ -139,11 +140,13 @@ public class EPSaleController extends BaseReturn{
 			if(currentTime.compareTo(endTime)>0)
 			{
 				returnResult(new Result(500, "竟拍已经结束"));
+				return;
 			}
 		}
 		else
 		{
 			returnResult(new Result(500, "该商品不存在"));
+			return;
 		}
 		double startPrice=0L;
 		Map numMap=epSaleService.findEPSaleNumInfoByNumId(auction.getNumId());
@@ -153,52 +156,60 @@ public class EPSaleController extends BaseReturn{
 		}
 		//最近10次数出价记录
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumIdAndGId3(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
-        goodsAuctionCount=goodsAuctionList.size();
+		goodsAuctionCount=goodsAuctionList.size();
 		int priceCount=0;//出价次数
 		double priceUp=Double.valueOf(goods.getgPriceUp());//每次加价
+		double priceUp2=0.00;//priceUp*100
 		int mulPrices=0;//每次加价倍数
 		int loopTime=Integer.valueOf(goods.getgLoopTime());//轮咨时间分钟
 		double deposit=Double.valueOf(goods.getgDeposit());//保证金
 		double beforePrice=0.00;//前一次出价记录
 		double subPrice=0.00;//当前出价与前一次出价相差
+		BigDecimal subPrice2=null;//subPrice*100
+		BigDecimal priceUp3=null;//priceUp*100
 		Long  autionId=0L;//前一次出价记录Id
 		Long consumerId=0L;//前一次出价记录用户Id
 		boolean isDeposit=false;//是否支付保证金
 		Long auctionDepositId=0L;//保证金Id
 		DecimalFormat df=new DecimalFormat("######0.00");
-        DecimalFormat df2=new DecimalFormat("######0");
-        if(Utils.formatFloatNumber(auction.getPrice()).length()>10)//整数7位.小数2位
+		DecimalFormat df2=new DecimalFormat("######0");
+		if(Utils.formatFloatNumber(auction.getPrice()).length()>10)//整数7位.小数2位
 		{
 			returnResult(new Result(606, "当前加价额度不能超过9位"));
+			return;
 		}
 		if(goodsAuctionCount>0)//最近10次数出价记录
 		{
-			 beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
-			 autionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
-			 consumerId=Long.valueOf(goodsAuctionList.get(0).get("consumerId").toString());//前一次出价记录用户Id
-			 subPrice=auction.getPrice()-beforePrice;
+			beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
+			autionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
+			consumerId=Long.valueOf(goodsAuctionList.get(0).get("consumerId").toString());//前一次出价记录用户Id
+			subPrice=auction.getPrice()-beforePrice;
 		}else
 		{
-			 subPrice=auction.getPrice();
-			 if(startPrice>subPrice)
-			 {
-				 returnResult(new Result(603, "当前加价不符规则;加价不能低于起拍价"+startPrice));
-			 }
+			subPrice=auction.getPrice();
+			if(startPrice>subPrice)
+			{
+				returnResult(new Result(603, "当前加价不符规则;加价不能低于起拍价"+startPrice));
+				return;
+			}
 		}
 		if(subPrice>0)
 		{
 			subPrice=Double.valueOf(df.format(subPrice));//保留两位小数
 			if(Utils.judgeTwoDecimal(subPrice)||Utils.judgeTwoDecimal(priceUp))//若含小数点，转整数进行求%
-            {
-                subPrice=subPrice*100;
-                subPrice=Double.valueOf(df.format(subPrice));//去小数
-                priceUp=priceUp*100;
-                priceUp=Double.valueOf(df.format(priceUp));//去小数
-            }
-			if((goodsAuctionCount>0)&&(subPrice%priceUp>0)) {//比较前后次出价差是===>否按每次加价的倍数,若是第一次出价记录则不要进行比较
+			{
+				subPrice=subPrice*100;
+				subPrice=Double.valueOf(df.format(subPrice));//去小数
+				subPrice2=new BigDecimal(subPrice);//可以过虑科学计数格式
+				priceUp2=priceUp*100;
+				priceUp2=Double.valueOf(df.format(priceUp2));//去小数
+				priceUp3=new BigDecimal(priceUp2);//可以过虑科学计数格式
+			}
+			if((goodsAuctionCount>0)&&(subPrice2.divideAndRemainder(priceUp3)[1].compareTo(BigDecimal.ZERO)>0)) {//比较前后次出价差是===>否按每次加价的倍数%,若是第一次出价记录则不要进行比较
 				if(goodsAuctionCount>0)
 				{
 					returnResult(new Result(602, "当前加价不符规则;加价应按" + priceUp + "的倍数进行加价"));
+					return;
 				}
 			}else
 			{
@@ -241,6 +252,7 @@ public class EPSaleController extends BaseReturn{
 					double newPrice=0.00;
 					Long newAutionId=0L;
 					Long newConsumerId=0L;
+					String goodsNoticePhone="";//短信通知手机号
 					Auction auctonNew=new Auction();
 					synchronized (cjLock) {
 						//出价后的最新10次出价记录
@@ -259,11 +271,13 @@ public class EPSaleController extends BaseReturn{
 								//auction  状态：2成功
 								auction.setStatus(2);
 								auctionService.auctionEdit(auction);//出价记录 状态：2成功
-								//****************短信通信auctonNew****************已落败
-								Consumer consumer=new Consumer();
-								consumer.setId(newConsumerId);
-								consumer=consumerService.getConsumerById(consumer);
-								Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
+								//****************短信通知提醒auctonNew****************已落败
+								List<Map> goodsNoticeList=ePSaleNoticeService.findEPSaleNoticeListByGIdAndConsumerId(auction.getgId(),newConsumerId);
+								if(!goodsNoticeList.isEmpty()&&goodsNoticeList.size()>0)
+								{
+									goodsNoticePhone=String.valueOf(goodsNoticeList.get(0).get("phone").toString());
+									Messager.send(goodsNoticePhone,"你的出价记录低于新的出价记录，已落败");
+								}
 							}//2、出现同价的成功出价记录，则当前出价记录状态：3失败
 							else if(auction.getPrice()==newPrice)//出现同价的成功出价记录
 							{
@@ -274,11 +288,13 @@ public class EPSaleController extends BaseReturn{
 								//auction  状态：4落败
 								auction.setStatus(4);
 								auctionService.auctionEdit(auction);//出价记录 状态：2成功
-								//****************短信通信auctonNew****************已落败
-								Consumer consumer=new Consumer();
-								consumer.setId(this.apiSessionUtil.getConsumer().getId());
-								consumer=consumerService.getConsumerById(consumer);
-								Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
+								//****************短信通知提醒auctonNew****************已落败
+								List<Map> goodsNoticeList=ePSaleNoticeService.findEPSaleNoticeListByGIdAndConsumerId(auction.getgId(),this.apiSessionUtil.getConsumer().getId());
+								if(!goodsNoticeList.isEmpty()&&goodsNoticeList.size()>0)
+								{
+									goodsNoticePhone=String.valueOf(goodsNoticeList.get(0).get("phone").toString());
+									Messager.send(goodsNoticePhone,"你的出价记录低于新的出价记录，已落败");
+								}
 							}
 						}
 
@@ -290,19 +306,11 @@ public class EPSaleController extends BaseReturn{
 						//***************************则延长结束时间= 结束时间+loopTime*********************
 						epSaleService.numLoopEdit(auction.getNumId(),loopTime);
 					}*/
-				    /*
-                    this.epSaleService.AuctionAfterInfo(auction.getNumId(),auction.getgId());
-                    //出价后的最近10次出价记录
+					//出价后的最近10次出价记录
 					List<Map> goodsAuctionListAfter=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
 					//String goodsAuctionListStr="";
 					Map goodsAuctionMap=new HashMap();
 					List<Map> epSaleGoodsAuctionPriceInfo=auctionService.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
-                    //对应的状态：2支付成功保证金列表
-                    AuctionDeposit auctionDeposit=new AuctionDeposit();
-                    auctionDeposit.setStatus(2);
-                    auctionDeposit.setgId(auction.getgId());
-                    auctionDeposit.setNumId(auction.getNumId());
-                    List<Map> auctionDepositList=auctionDepositService.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
 					if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
 						priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
 					}
@@ -319,29 +327,21 @@ public class EPSaleController extends BaseReturn{
 						goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
 						//goodsAuctionListStr="goodsAuctionList:"+"";
 					}
-                    if(auctionDepositList!=null&&auctionDepositList.size()>0)
-                    {
-                        goodsAuctionMap.put("goodsAuctionDepositList",auctionDepositList);
-                    }else
-                    {
-                        goodsAuctionMap.put("goodsAuctionDepositList","");
-                    }
-					//goodsAuctionMap.put("idDeposit","1");
+					goodsAuctionMap.put("idDeposit","1");
+					returnResult(new Result(200, goodsAuctionMap));
 
 					//******************************出价后的向所有WebSocket客户端广播信息
-					String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
-					*/
-                    //String msg=this.epSaleService.AuctionAfterInfo(auction.getNumId(),auction.getgId());
+					//String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
+					//*/
+					//String msg=this.epSaleService.AuctionAfterInfo(auction.getNumId(),auction.getgId());
 					try {
 						log.info("出价成功************广播信息*************************************");
 						WebSocketServer.sendInfo(String.valueOf(auction.getNumId()),String.valueOf(auction.getgId()));
-                        log.info("出价成功*************广播信息************************************");
+						log.info("出价成功*************广播信息************************************");
 					}catch (IOException e)
 					{
 						log.info(String.format("出价成功，广播信息异常【[%s]",e.getMessage())+"】");
 					}
-					//returnResult(new Result(200, goodsAuctionMap));
-                    returnResult(new Result(200, ""));
 
 				}else //当前用户保证金未支付成功    预先生成出价记录 状态：1初始     保证金记录状态：1 初始
 				{
@@ -364,12 +364,13 @@ public class EPSaleController extends BaseReturn{
 						res.setCode(605);//"保证金支付中异常"
 					}
 					//returnResult(new Result(600, "保证金未支付"+res.getData().toString()));
-					 returnResult(res);
+					returnResult(res);
 				}
 			}
 		}else
 		{
 			returnResult(new Result(601, "当前加价不符规则;加价应超过前一次出价"));
+			return;
 		}
 	}
 
@@ -444,8 +445,8 @@ public class EPSaleController extends BaseReturn{
 	@ResponseBody
 	public Map findAuctions(@PathVariable("numId") String numId,@PathVariable("gId") String gId){
 		Map<String, Object> map = new HashMap<String, Object>();
-        Map<String, Object> mapData= new HashMap<String, Object>();
-        int priceCount=0;//出价次数
+		Map<String, Object> mapData= new HashMap<String, Object>();
+		int priceCount=0;//出价次数
 		//最近10次出价记录
 		List<Map> goodsAuctionList=auctionService.findAuctionListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
 		//出价次数
@@ -455,12 +456,12 @@ public class EPSaleController extends BaseReturn{
 		}
 		if(goodsAuctionList!=null&&goodsAuctionList.size()>0)
 		{
-            mapData.put("goodsAuctionList",goodsAuctionList);
+			mapData.put("goodsAuctionList",goodsAuctionList);
 			mapData.put("priceCount",priceCount);
 			mapData.put("serviceTime",java.lang.System.currentTimeMillis());;
 		}else
 		{
-            mapData.put("goodsAuctionList","");
+			mapData.put("goodsAuctionList","");
 			mapData.put("priceCount","");
 			mapData.put("serviceTime",java.lang.System.currentTimeMillis());;
 		}
@@ -517,9 +518,9 @@ public class EPSaleController extends BaseReturn{
 			{
 				goodsList.get(0).put("gImgList","");
 			}
-            //当前价 出价次数
+			//当前价 出价次数
 			List<Map> epSaleGoodsAuctionPriceInfo=auctionService.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
- 			if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0)
+			if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0)
 			{
 				goodsList.get(0).put("priceCount",NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount"))));
 				goodsList.get(0).put("currentPrice",String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("currentPrice")));
@@ -576,7 +577,7 @@ public class EPSaleController extends BaseReturn{
 	public Map epSaleInfo(EPSale epSale, HttpServletRequest request){
 		Map<String, Object> map = new HashMap<String, Object>();
 		//Object list=cityService.queryByPidList(0);
-/*		deliveryAddress.setId(new Long(5000));*/
+		/*		deliveryAddress.setId(new Long(5000));*/
 		epSale=epSaleService.finEPSaleById(epSale.getId());
 		int isSale=0;//是否有上架的商品
 		List<Map> isSaleList=epSaleService.findIsSaleListByEPSaleId(epSale.getId());
@@ -586,6 +587,12 @@ public class EPSaleController extends BaseReturn{
 		}
 		map.put("code", Result.OK);
 		map.put("data", epSale);
+		try {
+			map.put("epRule", Utils.kindeditorReader(epSale.getId()+ ".txt", SystemParam.get("kindedtiorDir")));
+		} catch (IOException e) {
+			e.printStackTrace();
+			map.put("epRule", "读取文件信息失败:未找到相应文件");
+		}
 		map.put("epSalePics", fileService.findFilesByRefid(epSale.getId().toString()));
 		map.put("isSale", String.valueOf(isSale));
 		request.setAttribute("bean", epSale);
@@ -600,7 +607,7 @@ public class EPSaleController extends BaseReturn{
 	@ResponseBody
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_EDIT})
 	public void epSaleEdit(EPSale epSale, @RequestParam(name = "file",required = false) MultipartFile[] files, HttpServletRequest request){
-            returnResult(epSaleService.epSaleEdit(epSale,request, files));
+		returnResult(epSaleService.epSaleEdit(epSale,request, files));
 	}
 
 	/*

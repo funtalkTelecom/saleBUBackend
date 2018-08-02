@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.hrtx.web.mapper.EPSaleNoticeMapper;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
@@ -34,6 +34,7 @@ public class AuctionDepositService {
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
 	@Autowired private AuctionMapper auctionMapper;
 	@Autowired private ConsumerMapper consumerMapper;
+	@Autowired private EPSaleNoticeMapper ePSaleNoticeMapper;
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 	public List<Map> findAuctionDepositSumEPSaleGoodsByNumId(Long numId) {
@@ -216,6 +217,7 @@ public class AuctionDepositService {
 			Long autionId=0L;
 			Long  beforeAutionId=0L;//前一次出价记录Id
 			Long beforeConsumerId=0L;//前一次出价记录用户Id
+			String ePSaleNoticePhone="";//短信通知手机号
 			//auction.status=1记录状态调整
 			Auction auction=new Auction();
 			Auction auctonBef=new Auction();
@@ -241,10 +243,13 @@ public class AuctionDepositService {
 						auctonBef.setId(beforeAutionId);
 						auctonBef.setStatus(4);//前一次出价记录   状态：4 落败
 						auctionMapper.auctionEditStatusById2(auctonBef);//通知用户
-						Consumer beforeConsumer=new Consumer();//前一次出价记录用户
-						beforeConsumer.setId(beforeConsumerId);
-						beforeConsumer = consumerMapper.selectOne(beforeConsumer);
-						Messager.send(beforeConsumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
+						//****************短信通知提醒auctonNew****************已落败
+						List<Map> ePSaleNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByGIdAndConsumerId(gId,beforeConsumerId);
+						if(!ePSaleNoticeList.isEmpty()&&ePSaleNoticeList.size()>0)
+						{
+							ePSaleNoticePhone=String.valueOf(ePSaleNoticeList.get(0).get("phone").toString());
+							Messager.send(ePSaleNoticePhone,"你的出价记录低于新的出价记录，已落败");
+						}
 						//auction  状态：2成功
 						auction.setStatus(2);
 						//****************保证金支付成功*****当前出价记录状态：2成功*******************
@@ -277,10 +282,13 @@ public class AuctionDepositService {
 						auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 						auctionMapper.auctionEditStatusById(auction);
 						//****************保证金支付成功*******当前出价记录状态：4落败*****************
-						Consumer consumer=new Consumer();//当前出价记录用户
-						consumer.setId(consumerId);
-						consumer = consumerMapper.selectOne(consumer);
-						Messager.send(consumer.getPhone(),"你的出价记录低于新的出价记录，已落败");
+						//****************短信通知提醒auctonNew****************已落败
+						List<Map> ePSaleNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByGIdAndConsumerId(gId,consumerId);
+						if(!ePSaleNoticeList.isEmpty()&&ePSaleNoticeList.size()>0)
+						{
+							ePSaleNoticePhone=String.valueOf(ePSaleNoticeList.get(0).get("phone").toString());
+							Messager.send(ePSaleNoticePhone,"你的出价记录低于新的出价记录，已落败");
+						}
 					}
 				}else
 				{
@@ -297,40 +305,6 @@ public class AuctionDepositService {
 						epSaleService.numLoopEdit(numId,loopTime);
 					}*/
 				}
-				/*Map goodsAuctionMap=new HashMap();
-				int priceCount=0;//出价次数
-				//出价后的最近10次出价记录
-				List<Map> goodsAuctionListAfter=auctionMapper.findAuctionListByNumIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getgId());
-				//出价次数
-				List<Map> epSaleGoodsAuctionPriceInfo=auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(auctionDeposit.getNumId()),Long.valueOf(auctionDeposit.getgId()));
-				//对应的状态：2支付成功保证金列表
-				auctionDeposit.setStatus(2);
-				List<Map> auctionDepositLisAftet=auctionDepositMapper.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
-				if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
-					priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
-				}
-				if(goodsAuctionListAfter!=null&&goodsAuctionListAfter.size()>0)
-				{
-					goodsAuctionMap.put("goodsAuctionList",goodsAuctionListAfter);
-					goodsAuctionMap.put("priceCount",priceCount);
-					goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
-					//goodsAuctionListStr="goodsAuctionList:"+goodsAuctionListAfter;
-				}else
-				{
-					goodsAuctionMap.put("goodsAuctionList","");
-					goodsAuctionMap.put("priceCount","");
-					goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
-					//goodsAuctionListStr="goodsAuctionList:"+"";
-				}
-				if(auctionDepositLisAftet!=null&&auctionDepositLisAftet.size()>0)
-				{
-					goodsAuctionMap.put("goodsAuctionDepositList",auctionDepositLisAftet);
-				}else
-				{
-					goodsAuctionMap.put("goodsAuctionDepositList","");
-				}*/
-				//******************************出价后的向所有WebSocket客户端广播信息
-				//String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
 				try {
 					log.info("出价成功**************广播信息***********************************");
 					WebSocketServer.sendInfo(String.valueOf(auctionDeposit.getNumId()),String.valueOf(auctionDeposit.getgId()));
