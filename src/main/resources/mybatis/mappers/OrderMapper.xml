@@ -140,10 +140,28 @@
     <select id="queryPageList" resultType="Order">
         select distinct
         <include refid="col_list"/>
-        from tb_order a
+        from tb_order a left join tb_order_item m on a.order_id = m.order_id
         where 1=1 and a.is_del=0
         <if test="param.orderId!=null and param.orderId!=''">
             and a.order_id = #{param.orderId}
+        </if>
+        <if test="param.personName!=null and param.personName!=''">
+            and a.person_name like "%"#{param.personName}"%"
+        </if>
+        <if test="param.num!=null and param.num!=''">
+            and m.num =#{param.num}
+        </if>
+        <if test="param.personName!=null and param.personName!=''">
+            and a.person_name like "%"#{param.personName}"%"
+        </if>
+        <if test="param.num!=null and param.num!=''">
+            and m.num =#{param.num}
+        </if>
+        <if test="param.startTime!=null and param.startTime!=''">
+            and  str_to_date(a.add_date,'%Y-%m-%d') &gt;= #{param.startTime}
+        </if>
+        <if test="param.endTime!=null and param.endTime!=''">
+            and  str_to_date(a.add_date,'%Y-%m-%d') &lt;= #{param.endTime}
         </if>
         <if test="param.status!=null and param.status!='' and param.status!='-1'">
             and a.status = #{param.status}
@@ -285,4 +303,5 @@
         and m.order_id = #{orderId}
         GROUP BY m.sku_id,m.goods_id
     </select>
+
 </mapper>

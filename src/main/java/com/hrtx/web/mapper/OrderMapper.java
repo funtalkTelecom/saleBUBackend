@@ -45,4 +45,5 @@ public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
     List getOrderItmeCount(@Param("orderId") Long orderId,@Param("isShipment") int isShipment);
 
     /**----------------end---取消订单操作涉及的方法--------------------------**/
+
 }
