@@ -5,11 +5,9 @@ import com.hrtx.global.ContextUtils;
 import com.hrtx.web.mapper.AuctionDepositMapper;
 import com.hrtx.web.mapper.AuctionMapper;
 import com.hrtx.web.pojo.AuctionDeposit;
-import com.hrtx.web.service.AuctionDepositService;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
@@ -29,9 +27,9 @@ import java.util.concurrent.ConcurrentHashMap;
 //@WebListener
 public class WebSocketServer {
     public static  final org.slf4j.Logger log = LoggerFactory.getLogger(WebSocketServer.class);
-    @Autowired private AuctionMapper auctionMapper;
+/*    @Autowired private AuctionMapper auctionMapper;
     @Autowired private AuctionDepositMapper auctionDepositMapper;
-    @Autowired private AuctionDepositService auctionDepositService;
+    @Autowired private AuctionDepositService auctionDepositService;*/
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
     private static int onlineCount = 0;
 
