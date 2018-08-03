@@ -28,7 +28,6 @@ import java.util.*;
 @Service
 public class ApiOrderService {
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
-
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 	@Autowired
