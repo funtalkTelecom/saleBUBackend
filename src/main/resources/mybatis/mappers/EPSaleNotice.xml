@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hrtx.web.mapper.EPSaleNoticeMapper">
 
-	<select id="findEPSaleNoticeListBydConsumerId" resultType="java.util.HashMap">
+	<select id="findEPSaleNoticeListByConsumerId" resultType="java.util.HashMap">
 	  select
 	  tb_ep_sale_notice.id,
 	  tb_ep_sale_notice.add_date
@@ -11,6 +11,31 @@
       and  tb_ep_sale_notice.consumer_id = #{consumerId}
     </select>
 
+	<select id="findEPSaleNoticeListByEPSaleId" resultType="java.util.HashMap">
+	  select
+	  tb_ep_sale_notice.id,
+	  tb_ep_sale_notice.phone
+	  from tb_ep_sale_notice
+	  where tb_ep_sale_notice.is_del=0
+	  and tb_ep_sale_notice.is_notice=1
+      and  tb_ep_sale_notice.epSale_id = #{epSaleId}
+    </select>
+
+	<select id="findStartEPSaleList" resultType="java.util.HashMap">
+	    select
+        ep.id as epSaleId,
+        ep.title
+        from tb_ep_sale ep
+        where ep.is_del=0
+        and ep.id in(
+        select tb_goods.g_active
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1)
+        and   ep.start_time<![CDATA[=]]>now()
+    </select>
 
 	<select id="findEPSaleNoticeListByEPSaleIdAndConsumerId" resultType="java.util.HashMap">
     select

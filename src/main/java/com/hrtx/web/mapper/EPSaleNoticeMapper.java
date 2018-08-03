@@ -8,7 +8,11 @@ import java.util.Map;
 
 public interface EPSaleNoticeMapper extends Mapper<EPSaleNotice>,BaseMapper<EPSaleNotice>{
 
-    List<Map> findEPSaleNoticeListBydConsumerId(@Param("consumerId") Long consumerId);
+    List<Map> findEPSaleNoticeListbyConsumerId(@Param("consumerId") Long consumerId);
+
+    List<Map> findEPSaleNoticeListByEPSaleId(@Param("epSaleId") Long epSaleId);
+
+    List<Map> findStartEPSaleList();
 
     List<Map> findEPSaleNoticeListByEPSaleIdAndConsumerId(@Param("epSaleId") Long epSaleId, @Param("consumerId") Long consumerId);
 
