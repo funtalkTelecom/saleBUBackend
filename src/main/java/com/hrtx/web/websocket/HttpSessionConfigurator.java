@@ -2,8 +2,6 @@ package com.hrtx.web.websocket;
 
 import org.apache.catalina.session.StandardSessionFacade;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.HandshakeResponse;
@@ -41,9 +39,9 @@ public class HttpSessionConfigurator extends ServerEndpointConfig.Configurator{
         super.modifyHandshake(sec, request, response);
     }
 
-    @Bean
+   /* @Bean
     public ServerEndpointExporter serverEndpointExporter() {
         //这个对象说一下，貌似只有服务器是tomcat的时候才需要配置,具体我没有研究
         return new ServerEndpointExporter();
-    }
+    }*/
 }
