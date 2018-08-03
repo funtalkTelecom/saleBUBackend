@@ -141,7 +141,6 @@ public class OrderService extends BaseService {
         if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
         order.setPayDate(new Date());
         order.setStatus(2);
-        order.setPayMenthod("线下支付");
         orderMapper.updateByPrimaryKey(order);
         return new Result(Result.OK, "success");
     }
@@ -337,6 +336,12 @@ public class OrderService extends BaseService {
             if (amt + aamt > receivableInt) return new Result(Result.ERROR, "本次实收金额加已支付金额不能大于应收金额");
         }
         result = fundOrderService.payOffLineOrder(amt, receivableAccount, payAccount, order.getOrderId()+"线下支付", String.valueOf(order.getOrderId()));
+
+        Order parm = orderMapper.selectByPrimaryKey(order.getOrderId());
+        parm.setPayMenthodId("3");
+        parm.setPayMenthod("线下支付");
+        orderMapper.updateByPrimaryKey(parm);
+
         if(result.getCode()==200){
             //竞拍订单判断
             if(order.getOrderType()==3){
