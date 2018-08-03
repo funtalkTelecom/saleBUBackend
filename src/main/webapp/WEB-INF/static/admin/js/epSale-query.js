@@ -1,10 +1,10 @@
 var dataList = null;
 $(function() {
-	/* 初始化竟拍活动管理列表数据 */
-	dataList = new $.DSTable({
-		"url" : 'epSale/epSale-list',
-		"ct" : "#result",
-		"cm" : [{
+    /* 初始化竟拍活动管理列表数据 */
+    dataList = new $.DSTable({
+        "url" : 'epSale/epSale-list',
+        "ct" : "#result",
+        "cm" : [{
             "header" : "编号",
             "dataIndex" : "id"
         },{
@@ -78,28 +78,28 @@ $(function() {
                 return $operate;
             }}
         ],
-		"pm" : {
-			"limit" : 15,
-			"start" : 0
-		},
-		"getParam" : function() {
-			var obj={};
-			$(".query input,.query select").each(function(index,v2){
-				var name=$(v2).attr("name");
-				obj[name]=$(v2).val();
-			});
-			return obj;
-		}
-	});
-	dataList.load();
+        "pm" : {
+            "limit" : 15,
+            "start" : 0
+        },
+        "getParam" : function() {
+            var obj={};
+            $(".query input,.query select").each(function(index,v2){
+                var name=$(v2).attr("name");
+                obj[name]=$(v2).val();
+            });
+            return obj;
+        }
+    });
+    dataList.load();
 
-	$("#query").click(function() {
-		dataList.load();
-	});
-	
-	window.reload = function(){
-		dataList.reload();
-	}
+    $("#query").click(function() {
+        dataList.load();
+    });
+
+    window.reload = function(){
+        dataList.reload();
+    }
 
     //点击弹出添加/修改竟拍活动界面
     $("button[data-target=#epSaleInfo]").bind("click", function () {
@@ -121,11 +121,11 @@ $(function() {
         var epRule=$("textarea[name='epRule']").val();
         var file=$("#file").val();
         var imgSrc=$("#epSaleImg")[0].src;
-       if(title=="")
-       {
-           alert("标题不能为空!")
-           return false;
-       }
+        if(title=="")
+        {
+            alert("标题不能为空!")
+            return false;
+        }
         if(startTime=="")
         {
             alert("开始时间不能为空!")
@@ -149,7 +149,7 @@ $(function() {
         var delImgClass=$("#delImgI").attr("class");
         if(file=="")
         {
-           // if(imgSrc==""||imgSrc.indexOf("undefined")>0)
+            // if(imgSrc==""||imgSrc.indexOf("undefined")>0)
             if(delImgClass=="")
             {
                 alert("图片不能为空!")
@@ -179,13 +179,15 @@ $(function() {
     KindEditor.ready(function(K) {
         editor = K.create('textarea[name="epRule"]', {
             resizeType : 1,
-            allowPreviewEmoticons : false,
-            allowImageUpload : false,
+            allowImageUpload : true,
+            allowFlashUpload : true,
+            uploadJson : "kindeditorUploadFile",
+            imageMaxSize : 2*1024*1024,
             afterBlur: function () { editor.sync(); },
             items : [
-                'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                'source', '|', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
                 'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
-                'insertunorderedlist', '|', 'emoticons', 'link']
+                'insertunorderedlist', '|', 'emoticons', 'link','image']
         });
     });
     //解决编辑器弹出层文本框不能输入的问题
