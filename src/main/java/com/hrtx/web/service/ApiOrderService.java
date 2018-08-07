@@ -214,8 +214,8 @@ public class ApiOrderService {
 						OrderItem orderItem = new OrderItem();
 						Map sku = (Map) skulist.get(i);
 						int a = Integer.parseInt((String.valueOf(sku.get("skuNum"))));
-						if(a==0) return new Result(Result.ERROR, "上架数不足,请重试");
-						if(a < numcount) return new Result(Result.ERROR, "上架数不足,请重试");
+						if(a==0) return new Result(Result.ERROR, "已售罄,请稍微再试");
+						if(a < numcount) return new Result(Result.ERROR, "库存数不足,请重试");
 						List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(skuid));
 
 						orderItem.setItemId(orderItem.getGeneralId());
