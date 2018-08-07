@@ -22,7 +22,7 @@ public class AccountService {
 	@Autowired private AccountMapper accountMapper;
 
 	public Result pageAccount(Account account) {
-		PageHelper.startPage(account.getPageNum(),account.getLimit());
+		PageHelper.startPage(account.startToPageNum(),account.getLimit());
 		Page<Object> ob=this.accountMapper.queryPageList(account);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

@@ -787,12 +787,12 @@ public class ApiOrderService {
 		PageInfo<Object> pm = null;
 		Order order = new Order();
 		try{
-			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
-			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+//			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+//			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
 			int status = request.getParameter("status")==null?0: Integer.parseInt(request.getParameter("status"));
 			String st = "";
-			order.setStart(limit*(pageNum-1));
-			order.setLimit(limit);
+//			order.setStart(limit*(pageNum-1));
+//			order.setLimit(limit);
 			order.setConsumer(consumer.getId());
 			if(status==0){
 				st = "1,2,3,4,5,6";

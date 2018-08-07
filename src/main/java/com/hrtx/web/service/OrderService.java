@@ -48,7 +48,7 @@ public class OrderService extends BaseService {
         User user = SessionUtil.getUser();
         if(user==null) return new Result(Result.ERROR, "未获取到用户");
         Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");
-        PageHelper.startPage(order.getPageNum(),order.getLimit());
+        PageHelper.startPage(order.startToPageNum(),order.getLimit());
         Page<Object> ob=this.orderMapper.queryPageList(order, corporation.getId());
         PageInfo<Object> pm = new PageInfo<Object>(ob);
         return new Result(Result.OK, pm);

@@ -43,7 +43,7 @@ public class EPSaleService {
 	@Autowired private ApiOrderService apiOrderService;
 	@Autowired private EPSaleService epSaleService;
 	public Result pageEPSale(EPSale epSale) {
-		PageHelper.startPage(epSale.getPageNum(),epSale.getLimit());
+		PageHelper.startPage(epSale.startToPageNum(),epSale.getLimit());
 		Page<Object> ob=this.epSaleMapper.queryPageList(epSale);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

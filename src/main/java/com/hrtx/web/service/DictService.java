@@ -20,7 +20,7 @@ public class DictService {
 	private DictMapper dictMapper;
 
 	public Result pageDict(Dict dict) {
-		PageHelper.startPage(dict.getPageNum(),dict.getLimit());
+		PageHelper.startPage(dict.startToPageNum(),dict.getLimit());
 		Page<Object> ob=this.dictMapper.queryPageList(dict);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

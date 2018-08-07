@@ -33,7 +33,7 @@ public class DeliveryAddressService {
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 	public Result pageDeliveryAddress(DeliveryAddress deliveryAddress) {
-		PageHelper.startPage(deliveryAddress.getPageNum(),deliveryAddress.getLimit());
+		PageHelper.startPage(deliveryAddress.startToPageNum(),deliveryAddress.getLimit());
 		Page<Object> ob=this.deliveryAddressMapper.queryPageList(deliveryAddress);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

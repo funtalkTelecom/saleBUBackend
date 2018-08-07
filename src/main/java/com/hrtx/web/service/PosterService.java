@@ -29,7 +29,7 @@ public class PosterService {
 	private PosterMapper posterMapper;
 
 	public Result pagePoster(Poster poster) {
-		PageHelper.startPage(poster.getPageNum(),poster.getLimit());
+		PageHelper.startPage(poster.startToPageNum(),poster.getLimit());
 		Page<Object> ob=this.posterMapper.queryPageList(poster);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

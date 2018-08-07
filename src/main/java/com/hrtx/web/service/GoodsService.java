@@ -44,7 +44,7 @@ public class GoodsService {
     private NumberMapper numberMapper;
 
 	public Result pageGoods(Goods goods) {
-		PageHelper.startPage(goods.getPageNum(),goods.getLimit());
+		PageHelper.startPage(goods.startToPageNum(),goods.getLimit());
 		Page<Object> ob=this.goodsMapper.queryPageList(goods);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

@@ -125,7 +125,7 @@ public class AgentService {
 	}
 
     public Result pageAgent(Agent agent) {
-        PageHelper.startPage(agent.getPageNum(),agent.getLimit());
+        PageHelper.startPage(agent.startToPageNum(),agent.getLimit());
         Page<Object> ob=this.agentMapper.queryPageList(agent);
         PageInfo<Object> pm = new PageInfo<Object>(ob);
         return new Result(Result.OK, pm);

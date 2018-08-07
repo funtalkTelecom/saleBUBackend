@@ -20,7 +20,7 @@ public class CorporationService {
 	private CorporationMapper corporationMapper;
 
 	public Result pageCorporation(Corporation corporation) {
-		PageHelper.startPage(corporation.getPageNum(),corporation.getLimit());
+		PageHelper.startPage(corporation.startToPageNum(),corporation.getLimit());
 		Page<Object> ob=this.corporationMapper.queryPageList(corporation);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

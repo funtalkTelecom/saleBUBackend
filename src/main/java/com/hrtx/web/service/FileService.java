@@ -20,7 +20,7 @@ public class FileService {
 	private FileMapper fileMapper;
 
 	public Result pageFile(File file) {
-		PageHelper.startPage(file.getPageNum(),file.getLimit());
+		PageHelper.startPage(file.startToPageNum(),file.getLimit());
 		Page<Object> ob=this.fileMapper.queryPageList(file);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);
