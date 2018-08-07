@@ -49,7 +49,7 @@ public class EPSaleNoticeService {
     @Scheduled(fixedRate=1000)
     public void startEPSaleListSystemNotice() {
        // if("true".equals("true")) return;
-        //if(!"true".equals(SystemParam.get("exe_timer"))) return;
+        if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行.....竟拍活动开始,系统自动短信提醒......定时器");
         List<Map> list=this.ePSaleNoticeMapper.findStartEPSaleList();//竟拍活动开始
         if(list.isEmpty()){
