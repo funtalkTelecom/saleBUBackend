@@ -26,6 +26,7 @@ import java.util.Map;
 
 @Service
 public class EPSaleNoticeService {
+
     public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired private EPSaleNoticeMapper ePSaleNoticeMapper;
 	@Autowired
