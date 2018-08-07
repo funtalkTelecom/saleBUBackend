@@ -24,7 +24,7 @@ public class SystemService {
 	private SystemParam systemParam;
 
 	public Result pageSystem(System system) {
-		PageHelper.startPage(system.getPageNum(),system.getLimit());
+		PageHelper.startPage(system.startToPageNum(),system.getLimit());
 		Page<Object> ob=this.systemMapper.queryPageList(system);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

@@ -35,9 +35,12 @@ public class BasePojo {
 		return idWorker.nextId();
 	}
 
-	public int getPageNum() {
+	public int startToPageNum() {
 		if(this.limit==0) return 0;
 		return (this.start/this.limit)+1;
+	}
+	public int getPageNum() {
+		return this.pageNum;
 	}
 
 	public void setPageNum(int pageNum) {

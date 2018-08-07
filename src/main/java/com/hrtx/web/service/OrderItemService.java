@@ -20,7 +20,7 @@ public class OrderItemService {
     private OrderItemMapper orderItemMapper;
 
     public Result pageOrderItem(OrderItem orderItem) {
-        PageHelper.startPage(orderItem.getPageNum(),orderItem.getLimit());
+        PageHelper.startPage(orderItem.startToPageNum(),orderItem.getLimit());
         User user = SessionUtil.getUser();
         if(user==null) return new Result(Result.ERROR, "未获取到用户");
         Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");

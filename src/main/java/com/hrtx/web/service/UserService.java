@@ -106,7 +106,7 @@ public class UserService {
 	}
 
 	public Result pageUser(User user) {
-		PageHelper.startPage(user.getStart(),user.getLimit());
+		PageHelper.startPage(user.startToPageNum(),user.getLimit());
 		Page<Object> ob=this.userMapper.queryPageList(user);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

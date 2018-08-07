@@ -20,7 +20,7 @@ public class MealService {
 	@Autowired private MealMapper mealMapper;
 
 	public Result pageMeal(Meal meal) {
-		PageHelper.startPage(meal.getPageNum(),meal.getLimit());
+		PageHelper.startPage(meal.startToPageNum(),meal.getLimit());
 		Page<Object> ob=this.mealMapper.queryPageList(meal);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);

@@ -47,10 +47,10 @@ public class ApiNumberService {
 	public Result numberList(Number number, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
-			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
-			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-			number.setStart(limit*(pageNum-1));
-			number.setLimit(limit);
+//			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+//			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+//			number.setStart(limit*(pageNum-1));
+//			number.setLimit(limit);
 			String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
 			tags = "'"+ tags.replaceAll(",", "','") +"'";
 
@@ -82,10 +82,10 @@ public class ApiNumberService {
 		try {
 			if(consumer==null) return new Result(Result.ERROR, "未获取到用户");
 
-			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
-			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-			number.setStart(limit*(pageNum-1));
-			number.setLimit(limit);
+//			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+//			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+//			number.setStart(limit*(pageNum-1));
+//			number.setLimit(limit);
 
 			String skuGoodsType = request.getParameter("skuGoodsType");
 			if(skuGoodsType==null || "".equals(skuGoodsType)) return new Result(Result.ERROR, "商品类型不能为空");
@@ -172,10 +172,10 @@ public class ApiNumberService {
 	public Result numberListByNum(Number number, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		try {
-			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
-			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-			number.setStart(limit*(pageNum-1));
-			number.setLimit(limit);
+//			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+//			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+//			number.setStart(limit*(pageNum-1));
+//			number.setLimit(limit);
 			String num = request.getParameter("num")==null?"": request.getParameter("num");
 
 			PageHelper.startPage(number.getPageNum(),number.getLimit());
