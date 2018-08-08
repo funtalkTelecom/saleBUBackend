@@ -193,7 +193,8 @@ public class OrderService extends BaseService {
         if(!ArrayUtils.contains(Constants.getKeyObject("PAY_MENTHOD_TYPE"), payType)) return new Result(Result.ERROR, "支付方式不存在");
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
-        if(order.getStatus() !=1 || order.getIsDel() != 0) return new Result(Result.ERROR, "订单状态异常");
+        if(order.getIsDel() != 0) return new Result(Result.ERROR, "订单已删除");
+        if(order.getStatus() !=1 ) return new Result(Result.ERROR, "订单已支付");
         order.setPayMenthodId(payType);
         order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payType));
         orderMapper.updateByPrimaryKey(order);
@@ -234,7 +235,9 @@ public class OrderService extends BaseService {
         if(meal == null) return new Result(Result.ERROR, "所选套餐不存在");
         order = orderMapper.selectByPrimaryKey(order.getOrderId());
         if(order == null) return new Result(Result.ERROR, "订单不存在");
-        if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
+//        if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
+        if(order.getIsDel() != 0) return new Result(Result.ERROR, "订单已删除");
+        if(order.getStatus() !=1 ) return new Result(Result.ERROR, "订单已支付");
 //        DeliveryAddress address = deliveryAddressMapper.selectByPrimaryKey(addresId);
 //        if(address == null) return new Result(Result.ERROR, "地址不存在");
         List<Map> list=this.deliveryAddressMapper.findDeliveryAddressById(addresId);
