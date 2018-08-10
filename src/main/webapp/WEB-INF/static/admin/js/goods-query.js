@@ -922,7 +922,7 @@ function deletePic(obj){
     if($("#delPicSeqs").val().indexOf($(obj).prev().attr("seq"))==-1) $("#delPicSeqs").val($("#delPicSeqs").val()+'"'+$(obj).prev().attr("seq")+'",');
     $(obj).parent().find("img").eq(0).css("visibility","hidden");
 }
-var allowFileType = ".png,.jpg,.gif";
+var allowFileType = ".png,.jpg,.gif,.jepg";
 function fileChange(i){
     var picSeqs = "";
     var fileType;
