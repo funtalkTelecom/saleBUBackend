@@ -125,7 +125,7 @@ public class EPSaleController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public void goodsAuciton(Auction auction, HttpServletRequest request) {
-		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息
+		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息gActive
 		Date endTime=null;//结束时间
 		Date currentTime=new Date();//当前时间
 		int goodsAuctionCount=0;//最近10次数出价记录的次数
@@ -165,6 +165,7 @@ public class EPSaleController extends BaseReturn{
 		double deposit=Double.valueOf(goods.getgDeposit());//保证金
 		double beforePrice=0.00;//前一次出价记录
 		double subPrice=0.00;//当前出价与前一次出价相差
+		Long epSaleId=goods.getgActive();//竞拍活动Id
 		BigDecimal subPrice2=null;//subPrice*100
 		BigDecimal priceUp3=null;//priceUp*100
 		Long  autionId=0L;//前一次出价记录Id
@@ -272,7 +273,7 @@ public class EPSaleController extends BaseReturn{
 								auction.setStatus(2);
 								auctionService.auctionEdit(auction);//出价记录 状态：2成功
 								//****************短信通知提醒auctonNew****************已落败
-								List<Map> goodsNoticeList=ePSaleNoticeService.findEPSaleNoticeListByGIdAndConsumerId(auction.getgId(),newConsumerId);
+								List<Map> goodsNoticeList=ePSaleNoticeService.findEPSaleNoticeListByEPSaleIdAndConsumerId(epSaleId,newConsumerId);
 								if(!goodsNoticeList.isEmpty()&&goodsNoticeList.size()>0)
 								{
 									goodsNoticePhone=String.valueOf(goodsNoticeList.get(0).get("phone").toString());
@@ -289,7 +290,7 @@ public class EPSaleController extends BaseReturn{
 								auction.setStatus(4);
 								auctionService.auctionEdit(auction);//出价记录 状态：2成功
 								//****************短信通知提醒auctonNew****************已落败
-								List<Map> goodsNoticeList=ePSaleNoticeService.findEPSaleNoticeListByGIdAndConsumerId(auction.getgId(),this.apiSessionUtil.getConsumer().getId());
+								List<Map> goodsNoticeList=ePSaleNoticeService.findEPSaleNoticeListByEPSaleIdAndConsumerId(epSaleId,this.apiSessionUtil.getConsumer().getId());
 								if(!goodsNoticeList.isEmpty()&&goodsNoticeList.size()>0)
 								{
 									goodsNoticePhone=String.valueOf(goodsNoticeList.get(0).get("phone").toString());

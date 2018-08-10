@@ -32,13 +32,18 @@ public class GoodsFocusService {
     private NumMapper numMapper;
     @Autowired
     private GoodsMapper goodsMapper;
-    public List<Map> findGoodsFocusListByNumIdAndGId2(Long numId,Long gId)
+
+    /*
+      当前用户对该商品的收藏记录
+     */
+    public List<Map> findGoodsFocusListByNumIdAndGId(Long numId,Long gId)
 	{
-		return goodsFocusMapper.findGoodsFocusListBydConsumerId(apiSessionUtil.getConsumer().getId());
+	    //return goodsFocusMapper.findGoodsFocusListBydConsumerId(apiSessionUtil.getConsumer().getId());
+        return goodsFocusMapper.finGoodsFocusListByGIdAndNumIdAndConsumerId(gId,numId,this.apiSessionUtil.getConsumer().getId());
 	}
 
 	/*
-	 当前用户关注列表
+	 当前用户商品收藏记录列表
 	 */
     public Result findGoodsFocusList()
     {
@@ -84,6 +89,10 @@ public class GoodsFocusService {
         return new Result(Result.OK,list);
     }
 
+    /*
+	  添加商品收藏
+	  GoodsFocus.isDel;//是否收藏  是0否1
+	 */
 	public Result goodsFocusEdit(GoodsFocus goodsFocus, HttpServletRequest request) {
             goodsFocus.setAddIp(SessionUtil.getUserIp());
             goodsFocus.setConsumerId(apiSessionUtil.getConsumer().getId());
@@ -91,12 +100,14 @@ public class GoodsFocusService {
             if (!goodsFocusList.isEmpty()&&goodsFocusList.size()>0) {
                 goodsFocus.setId(Long.valueOf(goodsFocusList.get(0).get("id").toString()));
                 goodsFocus.setUpdateDate(new Date());
+                goodsFocus.setIsDel(1);//取消收藏 否1
                 goodsFocusMapper.goodsFocusEdit(goodsFocus);
             } else {
                 List<GoodsFocus> list = new ArrayList<GoodsFocus>();
                 goodsFocus.setId(goodsFocus.getGeneralId());
                 goodsFocus.setAddDate(new Date());
                 goodsFocus.setUpdateDate(new Date());
+                goodsFocus.setIsDel(0);//添加收藏 是0
                 list.add(goodsFocus);
                 goodsFocusMapper.insertBatch(list);
             }

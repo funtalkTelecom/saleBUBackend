@@ -137,7 +137,7 @@ public class BoundController extends BaseReturn{
             iccidEdit.setId(iccid.getId());
             iccidEdit.setDealStatus("2");//受理状态(1待绑定=》2已绑定)
             boundService.iccidEditStatus(iccidEdit);
-            returnResult(new Result(Result.OK,"该号码绑定成功！"));
+            returnResult(new Result(Result.OK,"号码绑定成功"));
         }
 	}
 

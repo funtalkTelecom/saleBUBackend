@@ -184,6 +184,7 @@ public class AuctionDepositService {
 		Long consumerId=0L;
 		Long numId=0L;
 		Long gId=0L;
+		Long epSaleId=0L;//竞拍活动Id
 		int loopTime=0;//轮咨时间分钟
 		if(auctionDepositList.size()>0)
 		{
@@ -192,6 +193,7 @@ public class AuctionDepositService {
 			gId=Long.valueOf(auctionDepositList.get(0).get("g_id").toString());
 			Goods goods=goodsService.findGoodsById(gId);//上架商品信息
 			loopTime=Integer.valueOf(goods.getgLoopTime());
+			epSaleId=goods.getgActive();
 		}
 		auctionDeposit.setConsumerId(consumerId);
 		auctionDeposit.setNumId(numId);
@@ -244,7 +246,7 @@ public class AuctionDepositService {
 						auctonBef.setStatus(4);//前一次出价记录   状态：4 落败
 						auctionMapper.auctionEditStatusById2(auctonBef);//通知用户
 						//****************短信通知提醒auctonNew****************已落败
-						List<Map> ePSaleNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByGIdAndConsumerId(gId,beforeConsumerId);
+						List<Map> ePSaleNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,beforeConsumerId);
 						if(!ePSaleNoticeList.isEmpty()&&ePSaleNoticeList.size()>0)
 						{
 							ePSaleNoticePhone=String.valueOf(ePSaleNoticeList.get(0).get("phone").toString());
@@ -283,7 +285,7 @@ public class AuctionDepositService {
 						auctionMapper.auctionEditStatusById(auction);
 						//****************保证金支付成功*******当前出价记录状态：4落败*****************
 						//****************短信通知提醒auctonNew****************已落败
-						List<Map> ePSaleNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByGIdAndConsumerId(gId,consumerId);
+						List<Map> ePSaleNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,consumerId);
 						if(!ePSaleNoticeList.isEmpty()&&ePSaleNoticeList.size()>0)
 						{
 							ePSaleNoticePhone=String.valueOf(ePSaleNoticeList.get(0).get("phone").toString());

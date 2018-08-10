@@ -38,11 +38,25 @@
     </select>
 
 	<select id="findEPSaleNoticeListByEPSaleIdAndConsumerId" resultType="java.util.HashMap">
-    select
+      select
 	  tb_ep_sale_notice.id,
-	  tb_ep_sale_notice.add_date
+      tb_ep_sale_notice.update_date as addDate,
+	  tb_ep_sale_notice.phone,
+	  tb_ep_sale_notice.is_notice as isNotice
 	  from tb_ep_sale_notice
 	  where tb_ep_sale_notice.is_del=0
+      and  tb_ep_sale_notice.epSale_id = #{epSaleId}
+      and  tb_ep_sale_notice.consumer_id = #{consumerId}
+    </select>
+
+	<select id="findEPSaleNoticeListByEPSaleIdAndConsumerId2" resultType="java.util.HashMap">
+      select
+	  tb_ep_sale_notice.id,
+      tb_ep_sale_notice.update_date as addDate,
+	  tb_ep_sale_notice.phone
+	  from tb_ep_sale_notice
+	  where tb_ep_sale_notice.is_del=0
+	  and tb_ep_sale_notice.is_notice=1
       and  tb_ep_sale_notice.epSale_id = #{epSaleId}
       and  tb_ep_sale_notice.consumer_id = #{consumerId}
     </select>

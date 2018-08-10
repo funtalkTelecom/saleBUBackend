@@ -5,8 +5,8 @@
 	<select id="findGoodsFocusListBydConsumerId" resultType="java.util.HashMap">
 	  select
 	  tb_goods_focus.id,
-	  tb_goods_focus.price,
-	  tb_goods_focus.add_date
+	  tb_goods_focus.price as focusPrice,
+	  tb_goods_focus.update_date as addDate
 	  from tb_goods_focus
 	  where tb_goods_focus.is_del=0
       and  tb_goods_focus.consumer_id = #{consumerId}
@@ -16,8 +16,8 @@
 	<select id="finGoodsFocusListByGIdAndNumIdAndConsumerId" resultType="java.util.HashMap">
       select
 	  tb_goods_focus.id,
-	  tb_goods_focus.price,
-	  tb_goods_focus.add_date
+	  tb_goods_focus.price as focusPrice,
+	  tb_goods_focus.update_date as addDate
 	  from tb_goods_focus
 	  where tb_goods_focus.is_del=0
 	  and  tb_goods_focus.g_id= #{gId}
@@ -56,7 +56,8 @@
          t.price=#{price} ,
          t.update_date=#{updateDate},
          t.consumer_id=#{consumerId},
-         t.add_ip=#{addIp}
+         t.add_ip=#{addIp},
+         t.is_del=#{isDel}
         where
         t.is_del=0 and   t.id = #{id}
     </update>

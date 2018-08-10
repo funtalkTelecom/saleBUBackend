@@ -1,6 +1,7 @@
 package com.hrtx.web.controller;
 
 import com.hrtx.config.annotation.Powers;
+import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.GoodsFocus;
@@ -8,11 +9,8 @@ import com.hrtx.web.service.GoodsFocusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import com.hrtx.dto.Result;
+import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
@@ -27,7 +25,18 @@ public class GoodsFocusController extends BaseReturn{
 	private static Object cjLock = new Object();
 
 	/*
-	  添加关注
+	  当前用户对应该商品收藏记录
+	 */
+	@GetMapping("/api/goodsFocus/{numId}/{gId}")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public Result findGoodsFocus(@PathVariable("numId") String numId, @PathVariable("gId") String gId) {
+		return new Result(Result.OK,goodsFocusService.findGoodsFocusListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId)));
+	}
+
+	/*
+	  添加商品收藏
+	  GoodsFocus.isDel;//是否收藏  是0否1
 	 */
 	@PostMapping("/api/goodsFocus")
 	@Powers({PowerConsts.NOPOWER})
@@ -36,6 +45,9 @@ public class GoodsFocusController extends BaseReturn{
 		returnResult(goodsFocusService.goodsFocusEdit(goodsFocus, request));
 	}
 
+	/*
+	我的商品收藏列表
+	 */
 	@GetMapping("/api/goodsFocuss")
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody

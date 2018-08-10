@@ -33,7 +33,7 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
     private Long  consumerId;//	用户id  来自tb_consumer.id
     private String addIp;//	用户ip
     private String  remark;//备注
-    private boolean isDel;
+    private Integer isDel;//是否收藏  是0否1
 
 
 
@@ -41,7 +41,7 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
     }
 
     public GoodsFocus(Long id, Long skuId, Long numId, String num, String gName, Long gId, double price, Date addDate, Date updateDate, Long consumerId,
-                      String addIp, String remark, Boolean isDel) {
+                      String addIp, String remark, Integer isDel) {
         this.id = id;
         this.skuId = skuId;
         this.numId = numId;
@@ -146,12 +146,8 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
         this.addIp = addIp;
     }
 
-    public boolean isDel() {
-        return isDel;
-    }
+    public Integer getIsDel() { return isDel; }
 
-    public void setDel(boolean del) {
-        isDel = del;
-    }
+    public void setIsDel(Integer isDel) { this.isDel = isDel; }
 
 }

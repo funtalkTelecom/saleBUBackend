@@ -10,6 +10,7 @@ import com.hrtx.web.mapper.EPSaleNoticeMapper;
 import com.hrtx.web.mapper.GoodsMapper;
 import com.hrtx.web.mapper.NumMapper;
 import com.hrtx.web.pojo.*;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -37,11 +38,11 @@ public class EPSaleNoticeService {
     private GoodsMapper goodsMapper;
     @Autowired
     private ConsumerMapper consumerMapper;
+
     public List<Map> findEPSaleNoticeListBydConsumerId()
 	{
 		return ePSaleNoticeMapper.findEPSaleNoticeListbyConsumerId(apiSessionUtil.getConsumer().getId());
 	}
-
 
     /*
      竟拍活动开始时系统自动提醒定时器
@@ -79,13 +80,6 @@ public class EPSaleNoticeService {
                     log.info(String.format("该竟拍活动开始,无用户须系统自动短信提醒........"));return;
                 }
                 log.info("竟拍活动开始,系统自动短信提醒,竟拍活动Id:"+epSaleId);
-             /*   orderId=Long.valueOf(map.get("orderId").toString());
-                order.setOrderId(orderId);
-                order.setStatus(6);
-                order.setSignDate(new Date());//签收时间
-                order.setSignType(2);//签收方式1用户自动签收2系统
-                orderMapper.signByOrderid(order);*/
-
             }
         }
     }
@@ -140,16 +134,26 @@ public class EPSaleNoticeService {
     /*
       获取consumerId的设置提醒列表
      */
-    public List<Map> findEPSaleNoticeListByGIdAndConsumerId(Long gId,Long consumerId) {
-        return ePSaleNoticeMapper.findEPSaleNoticeListByGIdAndConsumerId(gId,consumerId);
+    public List<Map> findEPSaleNoticeListByEPSaleId(Long epSaleId) {
+        return ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,this.apiSessionUtil.getConsumer().getId());
+    }
+
+    /*
+         获取consumerId对竞拍活动ID的已设置提醒列表
+        */
+    public List<Map> findEPSaleNoticeListByEPSaleIdAndConsumerId(Long epSaleId,Long consumerId) {
+        return ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,consumerId);
     }
 
 	public Result epSaleEdit(EPSaleNotice ePSaleNotice, HttpServletRequest request) {
+            int isNotice=0;//是否设置提醒
             ePSaleNotice.setAddIp(SessionUtil.getUserIp());
             ePSaleNotice.setConsumerId(apiSessionUtil.getConsumer().getId());
             List<Map> ePSaleNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId (ePSaleNotice.getEpSaleId(),this.apiSessionUtil.getConsumer().getId());
             if (!ePSaleNoticeList.isEmpty()&&ePSaleNoticeList.size()>0) {
-                ePSaleNotice.setId(Long.valueOf(ePSaleNoticeList.get(0).get("id").toString()));
+                ePSaleNotice.setId(Long.valueOf(String.valueOf(ePSaleNoticeList.get(0).get("id"))));
+                isNotice=NumberUtils.toInt(ObjectUtils.toString(ePSaleNoticeList.get(0).get("isNotice")));
+                ePSaleNotice.setIsNotice(isNotice==1?0:1);//是否设置提醒
                 ePSaleNotice.setUpdateDate(new Date());
                 ePSaleNoticeMapper.ePSaleNoticeEdit(ePSaleNotice);
             } else {
@@ -157,6 +161,7 @@ public class EPSaleNoticeService {
                 ePSaleNotice.setId(ePSaleNotice.getGeneralId());
                 ePSaleNotice.setAddDate(new Date());
                 ePSaleNotice.setUpdateDate(new Date());
+                ePSaleNotice.setIsNotice(1);//
                 list.add(ePSaleNotice);
                 ePSaleNoticeMapper.insertBatch(list);
                 Consumer consumer=new Consumer();
