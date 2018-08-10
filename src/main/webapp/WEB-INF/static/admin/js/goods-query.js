@@ -928,7 +928,7 @@ function fileChange(i){
     var fileType;
     $("input[type=file]").each(function(){
         if($(this).val()!="") {
-            fileType = $(this).val().substring($(this).val().lastIndexOf("."));
+            fileType = $(this).val().substring($(this).val().lastIndexOf(".")).toLowerCase();
             if(allowFileType.indexOf(fileType)==-1){
                 $(this).val('');
                 alert("请上传"+allowFileType+"格式的图片");
