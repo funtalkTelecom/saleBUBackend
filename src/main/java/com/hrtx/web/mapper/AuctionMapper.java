@@ -58,4 +58,6 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
     void auctionEditStatusById2(Auction auction);
 
     void auctionEditOrderIDByNumId(Auction auction);
+
+    void auctionEditOrderIDByNumIdAndSkuId(Auction auction);
 }

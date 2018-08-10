@@ -327,4 +327,13 @@
 	and num_id=#{numId}
 	</update>
 
+	<update id="auctionEditOrderIDByNumIdAndSkuId">
+	update
+	tb_auction
+	set
+	order_id=#{orderId}
+	where status=2
+	and num_id=#{numId}
+	and sku_id=#{skuId}
+	</update>
 </mapper>
