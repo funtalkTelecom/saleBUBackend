@@ -135,7 +135,8 @@ public class EPSaleNoticeService {
       获取consumerId的设置提醒列表
      */
     public List<Map> findEPSaleNoticeListByEPSaleId(Long epSaleId) {
-        return ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,this.apiSessionUtil.getConsumer().getId());
+        //return ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,this.apiSessionUtil.getConsumer().getId());
+        return ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId(epSaleId,this.apiSessionUtil.getConsumer().getId());
     }
 
     /*
