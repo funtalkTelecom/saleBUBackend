@@ -148,6 +148,7 @@ public class EPSaleNoticeService {
 
 	public Result epSaleEdit(EPSaleNotice ePSaleNotice, HttpServletRequest request) {
             int isNotice=0;//是否设置提醒
+            String noticeStr="";
             ePSaleNotice.setAddIp(SessionUtil.getUserIp());
             ePSaleNotice.setConsumerId(apiSessionUtil.getConsumer().getId());
             List<Map> ePSaleNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId (ePSaleNotice.getEpSaleId(),this.apiSessionUtil.getConsumer().getId());
@@ -155,6 +156,7 @@ public class EPSaleNoticeService {
                 ePSaleNotice.setId(Long.valueOf(String.valueOf(ePSaleNoticeList.get(0).get("id"))));
                 isNotice=NumberUtils.toInt(ObjectUtils.toString(ePSaleNoticeList.get(0).get("isNotice")));
                 ePSaleNotice.setIsNotice(isNotice==1?0:1);//是否设置提醒
+                noticeStr=isNotice==1?"取消提醒成功":"设置提醒成功";
                 ePSaleNotice.setUpdateDate(new Date());
                 ePSaleNoticeMapper.ePSaleNoticeEdit(ePSaleNotice);
             } else {
@@ -162,7 +164,7 @@ public class EPSaleNoticeService {
                 ePSaleNotice.setId(ePSaleNotice.getGeneralId());
                 ePSaleNotice.setAddDate(new Date());
                 ePSaleNotice.setUpdateDate(new Date());
-                ePSaleNotice.setIsNotice(1);//
+                ePSaleNotice.setIsNotice(1);//设置提醒成功
                 list.add(ePSaleNotice);
                 ePSaleNoticeMapper.insertBatch(list);
                 Consumer consumer=new Consumer();
@@ -172,8 +174,9 @@ public class EPSaleNoticeService {
                     consumer.setPhone(ePSaleNotice.getPhone());
                     consumerMapper.insertPhoneToConsumer(consumer);
                 }
+                noticeStr="设置提醒成功";
             }
-			return new Result(Result.OK, "提交成功");
+			return new Result(Result.OK, noticeStr);
 	}
 
 }
