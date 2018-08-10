@@ -4,11 +4,13 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.pojo.Agent;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.service.AgentService;
 import com.hrtx.web.service.ConsumerService;
+import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ public class AgentController {
 	@Autowired
 	AgentService agentService;
 	@Autowired private ApiSessionUtil apiSessionUtil;
+	@Autowired
+	SessionUtil sessionUtil;
     @PostMapping(value = "/api/save-or-update-agent")
     @Powers({PowerConsts.NOPOWER})
 	public Result SaveOrUpdateAgent(@RequestParam(value="id",required=false) Long id,
@@ -65,7 +69,7 @@ public class AgentController {
 		if(listly.size()>0){
 			map = (Map) listly.get(0);
 			map.put("isAgent","true");
-            map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +map.get("trading_img").toString());
+            map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +ObjectUtils.toString(map.get("trading_img")));
 		}else {
 			List list = agentService.findAgentListByaddConsumerId(consumerId);
 			if(list.size()==0){
@@ -73,7 +77,7 @@ public class AgentController {
 			}else {
 				map = (Map) list.get(0);
 				map.put("isAgent","true");
-                map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +map.get("trading_img").toString());
+                map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +ObjectUtils.toString(map.get("trading_img")));
 			}
 		}
 

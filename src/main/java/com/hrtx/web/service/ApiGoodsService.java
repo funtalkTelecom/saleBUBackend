@@ -54,8 +54,8 @@ public class ApiGoodsService {
 		PageInfo<Object> pm = null;
 		Result result = null;
 		try {
-//			goods.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
-//			goods.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
+			goods.setPageNum(request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum")));
+			goods.setLimit(request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit")));
 
 			//模拟登陆
 //			Consumer u = new Consumer();
