@@ -518,6 +518,7 @@ public class ApiOrderService {
 					}
 					action=new Auction();
 					action.setNumId(Long.valueOf(numid));
+					action.setSkuId(Long.valueOf(skuid));
 					if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
 					if (numid == null || "".equals(numid)) return new Result(Result.ERROR, "numid不能为空");
 					//if (addrid == null || "".equals(addrid)) return new Result(Result.ERROR, "addrid不能为空");
@@ -684,7 +685,7 @@ public class ApiOrderService {
 				if (type.equals("3"))//竞拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
 				{
 					action.setOrderId(preOrderId);
-					auctionMapper.auctionEditOrderIDByNumId(action);
+					auctionMapper.auctionEditOrderIDByNumIdAndSkuId(action);
 				}
 			}catch(Exception e){
 			    //写入数据异常,回滚
@@ -717,7 +718,7 @@ public class ApiOrderService {
 			if(type.equals("3"))//竞拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
 			{
 				action.setOrderId(0L);
-				auctionMapper.auctionEditOrderIDByNumId(action);
+				auctionMapper.auctionEditOrderIDByNumIdAndSkuId(action);
 			}
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return new Result(Result.ERROR, "创建订单异常");
