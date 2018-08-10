@@ -45,20 +45,20 @@ public class EPSaleNoticeService {
 	}
 
     /*
-     竟拍活动开始时系统自动提醒定时器
+     竞拍活动开始时系统自动提醒定时器
      */
     @Scheduled(fixedRate=1000)
     public void startEPSaleListSystemNotice() {
        // if("true".equals("true")) return;
         if(!"true".equals(SystemParam.get("exe_timer"))) return;
-        log.info("开始执行.....竟拍活动开始,系统自动短信提醒......定时器");
-        List<Map> list=this.ePSaleNoticeMapper.findStartEPSaleList();//竟拍活动开始
+        log.info("开始执行.....竞拍活动开始,系统自动短信提醒......定时器");
+        List<Map> list=this.ePSaleNoticeMapper.findStartEPSaleList();//竞拍活动开始
         if(list.isEmpty()){
-            log.info(String.format("暂无竟拍活动开始........"));return;
+            log.info(String.format("暂无竞拍活动开始........"));return;
         }
-        Long epSaleId=0L;//竟拍活动id
+        Long epSaleId=0L;//竞拍活动id
         String goodsNoticePhone="";//短信通知手机号
-        String epSaleTitle="";//竟拍活动标题
+        String epSaleTitle="";//竞拍活动标题
         Order order=new Order();
         if(list.size()>0)
         {
@@ -72,14 +72,14 @@ public class EPSaleNoticeService {
                     for(Map map2 :ePSaleNoticeList)
                     {
                         goodsNoticePhone=String.valueOf(map2.get("phone").toString());
-                        Messager.send(goodsNoticePhone,"竟拍活动"+epSaleTitle+"开始");
-                        log.info(String.format("........竟拍活动"+epSaleTitle+"开始;短信提醒,用户:"+goodsNoticePhone));
+                        Messager.send(goodsNoticePhone,"竞拍活动"+epSaleTitle+"开始");
+                        log.info(String.format("........竞拍活动"+epSaleTitle+"开始;短信提醒,用户:"+goodsNoticePhone));
                     }
                 }else
                 {
-                    log.info(String.format("该竟拍活动开始,无用户须系统自动短信提醒........"));return;
+                    log.info(String.format("该竞拍活动开始,无用户须系统自动短信提醒........"));return;
                 }
-                log.info("竟拍活动开始,系统自动短信提醒,竟拍活动Id:"+epSaleId);
+                log.info("竞拍活动开始,系统自动短信提醒,竞拍活动Id:"+epSaleId);
             }
         }
     }

@@ -1,6 +1,6 @@
 var dataList = null;
 $(function() {
-    /* 初始化竟拍活动管理列表数据 */
+    /* 初始化竞拍活动管理列表数据 */
     dataList = new $.DSTable({
         "url" : 'epSale/epSale-list',
         "ct" : "#result",
@@ -11,7 +11,7 @@ $(function() {
             "header" : "标题",
             "dataIndex" : "title"
         }/*,{
-            "header" : "竟拍规则",
+            "header" : "竞拍规则",
             "dataIndex" : "epRule"
         }*/,{
             "header" : "开始时间",
@@ -101,7 +101,7 @@ $(function() {
         dataList.reload();
     }
 
-    //点击弹出添加/修改竟拍活动界面
+    //点击弹出添加/修改竞拍活动界面
     $("button[data-target=#epSaleInfo]").bind("click", function () {
         editor.html('');
         initEPSalePics();
@@ -143,7 +143,7 @@ $(function() {
         }
         if(epRule=="")
         {
-            alert("竟拍规则不能为空!")
+            alert("竞拍规则不能为空!")
             return false;
         }
         var delImgClass=$("#delImgI").attr("class");

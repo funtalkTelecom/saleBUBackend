@@ -62,8 +62,8 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/**
-	 * 查询竟拍活动
-	 * 限关联有上架商品的竟拍活动
+	 * 查询竞拍活动
+	 * 限关联有上架商品的竞拍活动
 	 * @param epSale
 	 * @return
 	 */
@@ -75,8 +75,8 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/**
-	 * 查询竟拍活动
-	 * 供商品上架时选竟拍活动进行调用
+	 * 查询竞拍活动
+	 * 供商品上架时选竞拍活动进行调用
 	 * @param epSale
 	 * @return
 	 */
@@ -88,7 +88,7 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/**
-	 * 查询竟拍活动的商品列表
+	 * 查询竞拍活动的商品列表
 	 * 未过期
 	 * @param
 	 * @return
@@ -117,7 +117,7 @@ public class EPSaleController extends BaseReturn{
 
 	private static Object cjLock = new Object();
 	/*
-	   竟拍商品出价
+	   竞拍商品出价
 	   *限 每次gId与numId组合
 	   *
 	 */
@@ -139,7 +139,7 @@ public class EPSaleController extends BaseReturn{
 			}
 			if(currentTime.compareTo(endTime)>0)
 			{
-				returnResult(new Result(500, "竟拍已经结束"));
+				returnResult(new Result(500, "竞拍已经结束"));
 				return;
 			}
 		}
@@ -381,7 +381,7 @@ public class EPSaleController extends BaseReturn{
 	public Map findAuctionOrders(){
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> mapData= new HashMap<String, Object>();
-		List<Map> auctionOrderList=auctionService.findAuctionOrderList();//竟拍订单
+		List<Map> auctionOrderList=auctionService.findAuctionOrderList();//竞拍订单
 		if(auctionOrderList!=null&&auctionOrderList.size()>0)
 		{
 			mapData.put("auctionOrderList",auctionOrderList);
@@ -435,7 +435,7 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/**
-	 * 查询竟拍活动的商品的最近10条出价记录
+	 * 查询竞拍活动的商品的最近10条出价记录
 	 * 最近出价记录10条
 	 * 详情
 	 * @param
@@ -484,7 +484,7 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/**
-	 * 查询竟拍活动的商品信息
+	 * 查询竞拍活动的商品信息
 	 * 详情
 	 * numId与gId
 	 * @param
@@ -570,7 +570,7 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/*
-	   通过竟拍活动id获取竟拍活动信息
+	   通过竞拍活动id获取竞拍活动信息
 	 */
 	@RequestMapping("/epSale/epSale-info")
 	@ResponseBody
@@ -602,7 +602,7 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/*
-	   竟拍活动信息修改
+	   竞拍活动信息修改
 	 */
 	@PostMapping("/epSale/epSale-edit")
 	@ResponseBody
@@ -612,7 +612,7 @@ public class EPSaleController extends BaseReturn{
 	}
 
 	/*
-       竟拍活动信息删除
+       竞拍活动信息删除
     */
 	@RequestMapping("/epSale/epSale-delete")
 	@Powers({PowerConsts.EPSALEMOUDULE_COMMON_DELETE})

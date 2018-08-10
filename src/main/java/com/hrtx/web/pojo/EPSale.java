@@ -16,7 +16,7 @@ public class EPSale extends BasePojo implements java.io.Serializable {
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
     private String  title ;//标题
-    private String  epRule ;//竟拍规则
+    private String  epRule ;//竞拍规则
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date  startTime;//开始时间

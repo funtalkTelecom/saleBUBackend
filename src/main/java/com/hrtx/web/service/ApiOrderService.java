@@ -644,7 +644,7 @@ public class ApiOrderService {
 					return new Result(Result.ERROR, "获取数据异常");
 				}
 			}
-			if(!type.equals("3"))//竟拍type3,不需要判断商品有效期
+			if(!type.equals("3"))//竞拍type3,不需要判断商品有效期
 			{
 				log.info("判断商品有效期");
 				//判断商品是否在有效期内
@@ -681,7 +681,7 @@ public class ApiOrderService {
 			try{
 				orderMapper.insertBatch(orderList);
 				orderItemMapper.insertBatch(orderItems);
-				if (type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+				if (type.equals("3"))//竞拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
 				{
 					action.setOrderId(preOrderId);
 					auctionMapper.auctionEditOrderIDByNumId(action);
@@ -714,7 +714,7 @@ public class ApiOrderService {
 			}
 			//清除已生成的订单
 			deleteOrder(orderList);
-			if(type.equals("3"))//竟拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+			if(type.equals("3"))//竞拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
 			{
 				action.setOrderId(0L);
 				auctionMapper.auctionEditOrderIDByNumId(action);

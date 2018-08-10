@@ -15,7 +15,7 @@ public class EPSaleNotice extends BasePojo implements java.io.Serializable {
 	@JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long epSaleId;//竟拍活动ID  来自tb_ep_sale.id
+    private Long epSaleId;//竞拍活动ID  来自tb_ep_sale.id
     private String phone;//	短信通知号码
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

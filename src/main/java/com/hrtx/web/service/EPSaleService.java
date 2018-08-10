@@ -52,7 +52,7 @@ public class EPSaleService {
 
 	public Result findEPSaleList() {
 		//List<Map> list=epSaleMapper.findEPSaleList();
-		//竟拍活动结束时间是以该活动的所有Num中最迟结束时间为主
+		//竞拍活动结束时间是以该活动的所有Num中最迟结束时间为主
 		List<Map> list=epSaleMapper.findEPSaleList2();
 		Long epSaleId=0L;
 		int priceCount=0;
@@ -89,7 +89,7 @@ public class EPSaleService {
 	}
 
 	public List<Map> findEPSaleByEPSaleId(Long ePSaleId) {
-		//竟拍活动结束时间是以该活动的所有Num中最迟结束时间为主
+		//竞拍活动结束时间是以该活动的所有Num中最迟结束时间为主
 		List<Map> list=epSaleMapper.findEPSaleByEPSaleId(ePSaleId);
 		for(Map map:list)
 		{
@@ -107,7 +107,7 @@ public class EPSaleService {
 		return  epSaleMapper.findEPSaleGoodsListByEPSaleId2(ePSaleId);
 	}
     public List<Map> findEPSaleGoodsListByEPSaleId(Long ePSaleId) {
-	    //获取竟拍活动ePSaleId的商品列表信息，图片限商品首图
+	    //获取竞拍活动ePSaleId的商品列表信息，图片限商品首图
         List<Map> list=epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
         Long numId=0L;
         Long gId=0L;
@@ -227,17 +227,17 @@ public class EPSaleService {
 					success_consumer_id=NumberUtils.toLong(String.valueOf(mapa.get("consumer_id")));
 					Consumer user=this.consumerMapper.findConsumerById(success_consumer_id);
 					Double price=NumberUtils.toDouble(String.valueOf(mapa.get("price")));
-					mapOrder.put("type","3");//竟拍订单
-					mapOrder.put("user",user);//竟拍成功用户
-					mapOrder.put("skuid",sku_id);//竟拍成功skuId
-					mapOrder.put("numid",num_id);//竟拍成功numId
-					mapOrder.put("addrid",0);//竟拍成功addrid
-					mapOrder.put("price",price);//竟拍成功price
+					mapOrder.put("type","3");//竞拍订单
+					mapOrder.put("user",user);//竞拍成功用户
+					mapOrder.put("skuid",sku_id);//竞拍成功skuId
+					mapOrder.put("numid",num_id);//竞拍成功numId
+					mapOrder.put("addrid",0);//竞拍成功addrid
+					mapOrder.put("price",price);//竞拍成功price
                     log.info("准备生成订单："+mapOrder);
 					Result result=epSaleService.newCreateOrder(mapOrder);
 					if(result.getCode()!=200){
-						log.error(String.format("竟拍结束;出价成功转订单失败;竟拍号[%s]",num_resource));
-						Messager.send(SystemParam.get("system_phone"),"竟拍结束;出价成功转订单失败;竟拍号:"+num_resource);
+						log.error(String.format("竞拍结束;出价成功转订单失败;竞拍号[%s]",num_resource));
+						Messager.send(SystemParam.get("system_phone"),"竞拍结束;出价成功转订单失败;竞拍号:"+num_resource);
 					}else
 					{
 						try {
@@ -268,11 +268,11 @@ public class EPSaleService {
 				Consumer user=this.consumerMapper.findConsumerById(consumer_id);
 				AuctionDeposit auctionDeposit=this.auctionDepositMapper.selectByPrimaryKey(Long.valueOf(id));
 				if(result.getCode()==200){
-					Messager.send(user.getPhone(),"竟拍结束;保证金退还成功，您参与的竞拍号[%s]由于参与人数不足或者出价金额被赶超");
+					Messager.send(user.getPhone(),"竞拍结束;保证金退还成功，您参与的竞拍号[%s]由于参与人数不足或者出价金额被赶超");
 					auctionDeposit.setStatus(3);//status 3 已退款
 					auctionDepositMapper.auctionDepositEdit(auctionDeposit);
 				}else{
-					Messager.send(SystemParam.get("system_phone"),"竟拍结束;保证金退回失败["+num_resource+"]");
+					Messager.send(SystemParam.get("system_phone"),"竞拍结束;保证金退回失败["+num_resource+"]");
 				}
 			}
 		}
@@ -280,7 +280,7 @@ public class EPSaleService {
 
    /*
    *
-   * 竟拍的号码是否结束
+   * 竞拍的号码是否结束
    * "0 0/5 14,18 * * ?" 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发
    *
 	*/
@@ -297,7 +297,7 @@ public class EPSaleService {
 	    String num="";//出价的号码
         double successAutionPrice=0.00;//最后成功出价记录价格
 		int startNum=0;//起拍人数
-		boolean isEPSaleValid=false;//是否竟拍成功
+		boolean isEPSaleValid=false;//是否竞拍成功
 	    boolean isStartNum=false;//起拍人数是否足够
 	    int priceCumsumerCount=0;//出价人数
 	    long successConsumerId=0L;//最后成功出价记录 用户ID
@@ -321,14 +321,14 @@ public class EPSaleService {
 					return ;
 				}
 				//********************************************************************************************************************
-				//***********************************当前时间>=结束时间*******竟拍人数>=起拍人数符合规则******************************
-				List<Map> auctionCustomers=auctionMapper.findCustomersByNumIdAndGId(numId,gId);//竟拍人数
+				//***********************************当前时间>=结束时间*******竞拍人数>=起拍人数符合规则******************************
+				List<Map> auctionCustomers=auctionMapper.findCustomersByNumIdAndGId(numId,gId);//竞拍人数
 
 
 				if(auctionCustomers.size()>0)
 				{
-					priceCumsumerCount=auctionCustomers.size();//竟拍人数
-					if(priceCumsumerCount>=startNum)//竟拍人数>=起拍人数符合规则
+					priceCumsumerCount=auctionCustomers.size();//竞拍人数
+					if(priceCumsumerCount>=startNum)//竞拍人数>=起拍人数符合规则
 					{
 						isStartNum=true;
 						Auction auction =new Auction();
@@ -348,9 +348,9 @@ public class EPSaleService {
 				}
 
 				//********************************************************************************************************************
-				//***********************************有效竟拍转订单********************************************************************
+				//***********************************有效竞拍转订单********************************************************************
 				//isEPSaleValid=true;
-				if(isEPSaleValid)//有效竟拍，最新一条出价转订单，其他用户退回保证金
+				if(isEPSaleValid)//有效竞拍，最新一条出价转订单，其他用户退回保证金
 				{
                     Consumer user=this.consumerMapper.findConsumerById(successConsumerId);
 					List<Map> deliveryAddressDefault=deliveryAddressMapper.findDeliveryAddressDefaultByUserId(successConsumerId);
@@ -359,22 +359,22 @@ public class EPSaleService {
 						addrid=Long.valueOf(deliveryAddressDefault.get(0).get("id").toString());
 					}*/
                     Map mapOrder=new HashMap();
-                    mapOrder.put("type","3");//竟拍订单
-					mapOrder.put("user",user);//竟拍成功用户
-					mapOrder.put("skuid",skuId);//竟拍成功skuId
-					mapOrder.put("numid",numId);//竟拍成功numId
-					mapOrder.put("addrid",addrid);//竟拍成功addrid
-					mapOrder.put("price",successAutionPrice);//竟拍成功price
+                    mapOrder.put("type","3");//竞拍订单
+					mapOrder.put("user",user);//竞拍成功用户
+					mapOrder.put("skuid",skuId);//竞拍成功skuId
+					mapOrder.put("numid",numId);//竞拍成功numId
+					mapOrder.put("addrid",addrid);//竞拍成功addrid
+					mapOrder.put("price",successAutionPrice);//竞拍成功price
 					if(apiOrderService.createOrder(null,mapOrder).getCode()!=200)
 					{
-						//************************通知管理员，竟拍出价成功转订单失败********************//
-						Messager.send(SystemParam.get("system_phone"),"竟拍结束;出价成功转订单失败;竟拍号:"+num);
+						//************************通知管理员，竞拍出价成功转订单失败********************//
+						Messager.send(SystemParam.get("system_phone"),"竞拍结束;出价成功转订单失败;竞拍号:"+num);
 					}
 				}
 
 				//****************************************************************************************************************
                 //******************************保证金退回并通知****************开始***********************************************
-				//****************isEPSaleValid是否竟拍成功***********************************************************************
+				//****************isEPSaleValid是否竞拍成功***********************************************************************
 				//****************是****状态4 落败者 保证金退回并通知**********否****状态4,2 落败者成功者 保证金全部退回并通知****
 				Long consumerId=0L;
 				Long depositId=0L;
@@ -410,13 +410,13 @@ public class EPSaleService {
 									auctionDepositMapper.auctionDepositEdit(auctionDeposit);
 									if(!isStartNum)//起拍人数是否足够
 									{
-										Messager.send(consumerPhone,"竟拍结束;竟拍失败,出价人数少于起拍人类;竟拍号:"+num);
+										Messager.send(consumerPhone,"竞拍结束;竞拍失败,出价人数少于起拍人类;竞拍号:"+num);
 									}
-									Messager.send(consumerPhone,"竟拍结束;你的出价落败,保证金已退回,金额："+depositPrice+"竟拍号:"+num);
+									Messager.send(consumerPhone,"竞拍结束;你的出价落败,保证金已退回,金额："+depositPrice+"竞拍号:"+num);
 								}else
 								{
 									//************************通知管理员，保证金退回失败********************//
-									Messager.send(SystemParam.get("system_phone"),"竟拍结束;保证金退回失败,金额："+depositPrice+"竟拍号:"+num);
+									Messager.send(SystemParam.get("system_phone"),"竞拍结束;保证金退回失败,金额："+depositPrice+"竞拍号:"+num);
 								}
 							}
 						}

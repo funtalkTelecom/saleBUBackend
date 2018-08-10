@@ -2,7 +2,7 @@
 <%@page import="com.hrtx.global.SessionUtil,com.hrtx.global.PowerConsts" %>
 <!DOCTYPE html>
 	<head>
-		<title>竟拍活动管理</title>
+		<title>竞拍活动管理</title>
 		<%@ include file="../common/basecss.jsp" %>
 		<%--<script type="text/javascript" src="<%=basePath %>query-meal.js"></script>--%>
 		<script type="text/javascript" src="<%=basePath %>admin/js/epSale-query.js"></script>
@@ -31,7 +31,7 @@
 					<div class="breadcrumbs" id="breadcrumbs">
 						<ul class="breadcrumb">
 							<li><i class="ace-icon fa fa-home home-icon"></i><a href="#">主页</a></li>
-							<li><a href="javascript:void(0);">竟拍活动管理</a></li>
+							<li><a href="javascript:void(0);">竞拍活动管理</a></li>
 							<li class="active"></li>
 						</ul><!-- /.breadcrumb -->
 						<!-- /section:basics/content.searchbox -->
@@ -104,7 +104,7 @@
 							&times;
 						</button>
 						<h4 class="modal-title">
-							添加/修改竟拍活动
+							添加/修改竞拍活动
 						</h4>
 					</div>
 					<form role="form" class="form-horizontal">
@@ -144,7 +144,7 @@
 								</div>
 							</div>
 						<div class="form-group">
-							<label class="col-xs-2 control-label">竟拍规则</label>
+							<label class="col-xs-2 control-label">竞拍规则</label>
 							<div id="kindeditor" style="overflow: auto;" class="col-xs-10">
 								<textarea  name="epRule" style="width:100%;height:200px;visibility:hidden;"></textarea>
 							</div>
