@@ -379,7 +379,7 @@ public class GoodsService {
                         File f = new File();
                         f.setFileId(f.getGeneralId());
                         f.setFileGroup("goodsPic");
-                        result = BaseReturn.uploadFile(SystemParam.get("goodsPics")+goods.getgId()+java.io.File.separator, "jpg,png,gif", file, false, false);
+                        result = BaseReturn.uploadFile(SystemParam.get("goodsPics")+goods.getgId()+java.io.File.separator, "jpg,png,gif", file, true, false);
                         f.setFileName(((Map)result.getData()).get("sourceServerFileName").toString());
                         f.setRefId(goods.getgId());
                         f.setSeq(Integer.parseInt(picSeqs.replaceAll("\"","").split(",")[i]));

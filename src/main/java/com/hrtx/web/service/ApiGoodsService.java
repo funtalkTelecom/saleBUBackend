@@ -72,7 +72,7 @@ public class ApiGoodsService {
 			if(ob!=null && ob.size()>0){
 				for(int i=0; i<ob.size(); i++){
 					Map g = (Map) ob.get(i);
-					g.put("fileName", SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +g.get("gId")+"/"+ g.get("fileName"));
+					g.put("fileName", SystemParam.get("domain-full") + "get-img"+SystemParam.get("goodsPics") +g.get("gId")+"/"+ g.get("fileName"));
 					//获取sku的属性,追加到名称中
 					List prolist = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(String.valueOf(g.get("skuId"))));
 					if(prolist!=null && prolist.size()>0){
@@ -130,7 +130,7 @@ public class ApiGoodsService {
 			fileList = fileMapper.findFilesByRefid(String.valueOf(goods.getgId()));
 			if (fileList != null && fileList.size() > 0) {
 				for (File file : fileList) {
-					file.setFileName(SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +goods.getgId()+"/"+ file.getFileName());
+					file.setFileName(SystemParam.get("domain-full") + "/get-img"+SystemParam.get("goodsPics") +goods.getgId()+"/1000/"+ file.getFileName());
 				}
 			}
 			returnMap.put("code", Result.OK);
