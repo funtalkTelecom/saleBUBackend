@@ -15,6 +15,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -585,5 +586,78 @@ public class GoodsService {
             }
         }
 
+    }
+
+    public Result ByNumToUnShelve(String num,String skuid){
+        if(num==null || skuid==null) return new Result(Result.ERROR, "参数有误");
+        List list = goodsMapper.findNumStatus(num,skuid);
+        if(list.size() ==0 ) return new Result(Result.ERROR, "该号码不允许操作");
+        if(list.size() >1 ) return new Result(Result.ERROR, "该号码存在多条以上的记录，请核实");
+        Map map = (Map) list.get(0);
+        int isauc = NumberUtils.toInt(String.valueOf(map.get("g_is_auc")));
+        int skuGoodsType =  NumberUtils.toInt(String.valueOf(map.get("sku_goods_type")));
+        String num_id =String.valueOf( map.get("num_id"));  //tb_num.id
+
+        Map param = new HashMap();
+        if(isauc ==1){//竞拍
+            //更新tb_num 表 skuid,start_time,end_time,status
+            goodsMapper.updateNumStatus(num_id,skuid,num);
+            //更新 tb_sku 表 sku_num 数量
+            Long skuids = NumberUtils.toLong(skuid);
+            Sku nowSku = skuMapper.getSkuBySkuid(skuids);
+            nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-1);//修改sku数量
+            skuMapper.updateSkuNum(nowSku);
+            //调用仓储接口
+            param.put("supply_id", skuids);//供货单编码(sku_id)
+            Result res;
+            //再冻结新库存
+            param.put("type", "2");//处理类型1上架；2下架
+            param.put("quantity", 1);//数量
+            param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
+            if(!"0".equals(param.get("quantity").toString())) {
+                res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                if(res.getCode()!=200){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return new Result(Result.ERROR, "库存验证失败");
+                }else {
+                    StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                    if (!"00000".equals(sir.getCode())) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return new Result(Result.ERROR, "冻结库存失败\n"+sir.getDesc());
+                    }
+                }
+            }
+        }else {
+            //更新tb_num 表 skuid,start_time,end_time,status
+            goodsMapper.updateNumStatus(num_id,skuid,num);
+            //更新 tb_sku 表 sku_num 数量
+            Long skuids = NumberUtils.toLong(skuid);
+            Sku nowSku = skuMapper.getSkuBySkuid(skuids);
+            nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-1);//修改sku数量
+            skuMapper.updateSkuNum(nowSku);
+            if(skuGoodsType!=3){  //普靓,不涉及仓库库存
+                //调用仓储接口
+                param.put("supply_id", skuids);//供货单编码(sku_id)
+                Result res;
+                //再冻结新库存
+                param.put("type", "2");//处理类型1上架；2下架
+                param.put("quantity", 1);//数量
+                param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
+                if(!"0".equals(param.get("quantity").toString())) {
+                    res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+                    if(res.getCode()!=200){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return new Result(Result.ERROR, "库存验证失败");
+                    }else {
+                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                        if (!"00000".equals(sir.getCode())) {
+                            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                            return new Result(Result.ERROR, "冻结库存失败\n"+sir.getDesc());
+                        }
+                    }
+                }
+            }
+        }
+        return new Result(Result.OK, "该号码已释放");
     }
 }
