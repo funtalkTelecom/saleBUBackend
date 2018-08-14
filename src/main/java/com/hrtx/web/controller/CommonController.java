@@ -138,6 +138,11 @@ public class CommonController extends BaseReturn{
     public void getImg2(@PathVariable String str, @PathVariable String str1,  @PathVariable String str2, HttpServletResponse response) {
         this.downLoadImg(str+"/"+str1+"/"+str2, response);
     }
+    @RequestMapping("/get-img/{str}/{str1}/{str2/{str3:.+}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public void getImg2(@PathVariable String str, @PathVariable String str1,  @PathVariable String str2,@PathVariable String str3, HttpServletResponse response) {
+        this.downLoadImg(str+"/"+str1+"/"+str2+"/"+str3, response);
+    }
 
     @RequestMapping("/kindeditorUploadFile")
     @Powers({PowerConsts.NOLOGINPOWER})

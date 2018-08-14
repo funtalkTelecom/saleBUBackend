@@ -200,7 +200,7 @@
         </if>
         and SYSDATE() between a.g_start_time and a.g_end_time
         and a.g_is_sale = '1'
-        order by a.g_start_time,a.g_id
+        order by a.g_start_time desc,a.g_id desc
     </select>
 
     <insert id="insertBatch">

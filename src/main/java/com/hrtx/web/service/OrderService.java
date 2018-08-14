@@ -17,6 +17,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -400,6 +401,11 @@ public class OrderService extends BaseService {
         return new Result(Result.OK, "绑卡成功");
     }
 
+    /***
+     * 仓库回调的方法
+     * @param storageInterfaceRequest
+     * @return
+     */
     public Result OrderCallbackStatus(StorageInterfaceRequest storageInterfaceRequest){
         Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
         long orderId = NumberUtils.toLong(ObjectUtils.toString(platrequest.get("order_id")));
@@ -447,6 +453,12 @@ public class OrderService extends BaseService {
             return new Result(Result.ERROR, "查询已支付金额失败");
         }
         return new Result(Result.OK,aamt);
+    }
+
+
+    @Scheduled(fixedRate=3000)
+    public void goodsTimer(){
+
     }
 }
 
