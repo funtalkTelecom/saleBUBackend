@@ -905,6 +905,12 @@ public class ApiOrderService {
 		return addr.toString();
 	}
 
+	/***
+	 * 小程序端取消订单
+	 * @param orderIds
+	 * @param reason
+	 * @return
+	 */
 	public Result CancelOrderAllCase(String orderIds,String reason){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		long consumerId = consumer.getId();
@@ -915,8 +921,11 @@ public class ApiOrderService {
 		example.createCriteria().andEqualTo("consumer",consumerId).andEqualTo("orderId", orderId);
 		List<Order> orders=orderMapper.selectByExample(example);
 		if(orders.size()==0) return new Result(Result.ERROR, "该订单不存在");
-
-		Order order = orderMapper.findOrderInfo(Long.parseLong(orderIds));
+		return this.CancelOrder(orderIds,reason);
+	}
+	public Result CancelOrder(String orderIds,String reason){
+		Long orderId =Long.parseLong(orderIds);
+		Order order = orderMapper.findOrderInfo(orderId);
 		if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
 			log.info("更新订单状态为7:已取消");
 			int status =7;
@@ -983,6 +992,7 @@ public class ApiOrderService {
 		}
 		return new Result(Result.OK, "取消成功");
 	}
+
 
 	/**
 	 * 根据orderId，更新订单状态

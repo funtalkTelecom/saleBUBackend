@@ -304,4 +304,10 @@
         GROUP BY m.sku_id,m.goods_id
     </select>
 
+    <select id="getTwoHoursOrderList" resultType="java.util.HashMap">
+        select  o.order_id orderid,o.order_type,o.sku_goods_type,.o.ADD_DATE from tb_order o where o.is_del=0
+        and o.`status`=1 and o.order_type !=3
+        and TIMESTAMPDIFF(MINUTE,o.add_date, now()) &gt;120
+    </select>
+
 </mapper>

@@ -455,10 +455,28 @@ public class OrderService extends BaseService {
         return new Result(Result.OK,aamt);
     }
 
+    /**
+     * 待付款订单120分钟后，系统自动取消，除竞拍订单
+     */
+    @Scheduled(fixedRate=6000)
+    public void TowHoursCancelOrderStatusTimer(){
+        if(!"true".equals(SystemParam.get("twoHours_timer"))) return;
+        log.info("开始执行2个小时未付款订单期定时器");
+        List list = orderMapper.getTwoHoursOrderList();
+        if(list.size()>0){
+            for(int i=0; i<list.size(); i++){
+                Map map = (Map) list.get(i);
+                String orderid = String.valueOf(map.get("orderid"));
+                String note ="系统取消，原因：2小时未付款";
+                try {
+                    log.info("取消订单号:"+orderid);
+                    apiOrderService.CancelOrder(orderid,note);
+                }catch (Exception e) {
+                    log.error("未知异常", e);
+                }
 
-    @Scheduled(fixedRate=3000)
-    public void goodsTimer(){
-
+            }
+        }
     }
 }
 
