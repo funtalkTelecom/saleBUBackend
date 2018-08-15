@@ -31,7 +31,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Service
-public class UserService {
+public class UserService extends BaseService {
 	
 	@Autowired SessionUtil sessionUtil;
 	@Autowired private UserMapper userMapper;
@@ -41,6 +41,7 @@ public class UserService {
 	@Autowired private UserService userService;
 	@Autowired private CorporationService corporationService;
 	@Autowired private IccidMapper iccidMapper;
+	@Autowired private PermissionService permissionService;
 
 	public void test1(int i) {
 		User u = new User(((Integer)i).longValue());
@@ -174,4 +175,101 @@ public class UserService {
 		return info;
 	}
 
+    public User getUser(Long id) {
+		User u = userMapper.selectByPrimaryKey(id);
+		List<Map> list = userMapper.finRolesByUserId(id);
+		String roles="";
+		for (int i = 0; i <list.size(); i++) {
+			Map map=list.get(i);
+			if(map.get("userid")!=null)roles+=map.get("id")+",";
+		}
+		u.setRoles(roles);
+		return u;
+    }
+
+	public Result saveUser(User user) {
+        String loginName =ObjectUtils.toString(user.getLoginName(), " ");
+        long id = NumberUtils.toLong(String.valueOf(user.getId()));
+        Example example = new Example(User.class);
+        example.createCriteria().andEqualTo("loginName", loginName);
+        List<User> list =  userMapper.selectByExample(example);
+        User u = list.size() == 0 ? null : list.get(0);
+        if(u != null && u.getId() != id && StringUtils.equals(u.getLoginName(),loginName)) return new Result(Result.ERROR,"["+loginName+"]已存在");
+        if(id==0){
+            if(StringUtils.isBlank(user.getLoginName()) || StringUtils.isBlank(user.getName()) || user.getCorpId() == null || user.getCorpId() == 0L || StringUtils.isBlank(user.getPhone())) {
+                return new Result(Result.ERROR,"必填参数未填写");
+            }
+            if(!user.getPhone().matches(RegexConsts.REGEX_MOBILE_COMMON)) return new Result(Result.ERROR,"请填写正确的手机号码");
+            String pwd = Utils.randomNoByDateTime(6);
+            try {
+                user.setPwd(Utils.encodeByMD5(pwd));
+            } catch (Exception e) {
+                log.error("",e);
+                return new Result(Result.ERROR,"加密异常");
+            }
+            user.setId(user.getGeneralId());
+            user.setAddUser(SessionUtil.getUserId());
+            user.setAddDate(new Date());
+            user.setIsDel(0);
+            userMapper.insert(user);
+            id = user.getId();
+            Messager.send(user.getPhone(), "尊敬的用户,系统给您分配的平台账号" + user.getLoginName()+"已生效，密码是："+ pwd + ",感谢您的使用！");
+        }else{//修改
+            if(StringUtils.isBlank(user.getName()) || user.getCorpId() == null || user.getCorpId() == 0L || StringUtils.isBlank(user.getPhone())) {
+                return new Result(Result.ERROR,"必填参数未填写");
+            }
+            if(!user.getPhone().matches(RegexConsts.REGEX_MOBILE_COMMON)) return new Result(Result.ERROR,"请填写正确的手机号码");
+            u = userMapper.selectByPrimaryKey(id);
+            if(u == null) return new Result(Result.ERROR, "用户不存在");
+            u.setName(user.getName());
+            u.setCorpId(user.getCorpId());
+            u.setPhone(user.getPhone());
+            userMapper.updateByPrimaryKeySelective(u);
+        }
+        permissionService.distributeRole(id, user.getRoles());//分配角色
+        return new Result(Result.OK, "提交成功");
+	}
+
+	public Result freezeUser(User user) {
+		int status = NumberUtils.toInt(String.valueOf(user.getStatus()));
+		if(NumberUtils.toLong(String.valueOf(user.getId())) == 0 || (status !=1 && status != 2)) return new Result(Result.ERROR, "参数异常");
+		User updateUser = new User();
+		updateUser.setId(user.getId());
+		updateUser.setStatus(status);
+		int count = userMapper.updateByPrimaryKeySelective(updateUser);
+		if(count != 1) return new Result(Result.ERROR, "提交失败");
+		return new Result(Result.OK, "提交成功");
+	}
+
+    public Result resetPwd(User user) {
+	    user = userMapper.selectByPrimaryKey(user.getId());
+	    if(user == null) return new Result(Result.ERROR, "用户不存在");
+        String pwd = Utils.randomNoByDateTime(6);
+        try {
+            user.setPwd(Utils.encodeByMD5(pwd));
+        } catch (Exception e) {
+            log.error("",e);
+            return new Result(Result.ERROR,"加密异常");
+        }
+        int count = userMapper.updateByPrimaryKeySelective(user);
+        if(count != 1) return new Result(Result.ERROR,"重置失败");
+        Messager.send(user.getPhone(), "尊敬的用户,您分配的平台账号" + user.getLoginName()+"已重置密码，密码是："+ pwd + ",感谢您的使用！");
+        return new Result(Result.OK, "重置成功");
+    }
+
+    public Result updatePwd(String originPwd, String pwd) {
+        User user = userMapper.selectByPrimaryKey(SessionUtil.getUserId());
+        if(user == null) return new Result(Result.ERROR, "用户不存在");
+        try {
+            originPwd = Utils.encodeByMD5(originPwd);
+            if(!originPwd.equals(user.getPwd())) return new Result(Result.ERROR, "原始密码错误");
+            user.setPwd(Utils.encodeByMD5(pwd));
+        } catch (Exception e) {
+            log.error("",e);
+            return new Result(Result.ERROR,"加密异常");
+        }
+        int count = userMapper.updateByPrimaryKeySelective(user);
+        if(count != 1) return new Result(Result.ERROR,"修改密码失败");
+        return new Result(Result.OK, "修改密码成功");
+    }
 }

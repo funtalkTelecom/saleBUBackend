@@ -1,7 +1,7 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 	<head>
-		<title>角色授权 - Ace Admin</title>
+		<title>角色授权 - 靓号优选</title>
 		<%@ include file="../common/basecss.jsp" %>
 		<link rel="stylesheet" href="<%=basePath %>project/css/checktree/tree.css" type="text/css" />
 		<script type="text/javascript" src="<%=basePath %>project/js/jquery.tree.js"></script>
@@ -36,7 +36,7 @@
 					<div class="page-content" id="isMask">
 						<div class="row">
 							<div class="col-xs-12">
-								<h3 class="header smaller lighter blue">jQuery dataTables</h3>
+								<%--<h3 class="header smaller lighter blue">jQuery dataTables</h3>--%>
 								<%--<div class="table-header">
 									Results for "Latest Registered Domains"
 								</div>--%>
