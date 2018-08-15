@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-			<div class="navbar-container" id="navbar-container">
+<%@ page import="com.hrtx.global.SessionUtil" %>
+<div class="navbar-container" id="navbar-container">
 				<!-- #section:basics/sidebar.mobile.toggle -->
 				<button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler" data-target="#sidebar">
 					<span class="sr-only">Toggle sidebar</span>
@@ -16,8 +17,8 @@
 					<!-- #section:basics/navbar.layout.brand -->
 					<a href="#" class="navbar-brand">
 						<small>
-							<i class="fa fa-leaf"></i>
-							Ace Admin
+							<%--<i class="fa fa-leaf"></i>--%>
+							靓号优选
 						</small>
 					</a>
 				</div>
@@ -25,7 +26,7 @@
 				<!-- #section:basics/navbar.dropdown -->
 				<div class="navbar-buttons navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
-						<li class="purple">
+						<%--<li class="purple">
 							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
 								<i class="ace-icon fa fa-bell icon-animated-bell"></i>
 								<span class="badge badge-important">8</span>
@@ -58,7 +59,7 @@
 											</a>
 										</li>
 
-										<li>
+										&lt;%&ndash;<li>
 											<a href="#">
 												<div class="clearfix">
 													<span class="pull-left">
@@ -68,9 +69,9 @@
 													<span class="pull-right badge badge-success">+8</span>
 												</div>
 											</a>
-										</li>
+										</li>&ndash;%&gt;
 
-										<li>
+										&lt;%&ndash;<li>
 											<a href="#">
 												<div class="clearfix">
 													<span class="pull-left">
@@ -80,7 +81,7 @@
 													<span class="pull-right badge badge-info">+11</span>
 												</div>
 											</a>
-										</li>
+										</li>&ndash;%&gt;
 									</ul>
 								</li>
 
@@ -91,28 +92,28 @@
 									</a>
 								</li>
 							</ul>
-						</li>
+						</li>--%>
 
 						<!-- #section:basics/navbar.user_menu -->
 						<li class="light-blue">
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
 								<img class="nav-user-photo" src="admin/img/default-user.png" alt="Jason's Photo" />
 								<span class="user-info">
-									<small>Welcome,</small>Jason
+									<small>Welcome,</small><%=SessionUtil.getUser() == null ? "游客":SessionUtil.getUser().getName()%>
 								</span>
 								<i class="ace-icon fa fa-caret-down"></i>
 							</a>
 
 							<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
-								<li>
+								<%--<li>
 									<a href="#"><i class="ace-icon fa fa-cog"></i>Settings</a>
 								</li>
 								<li>
 									<a href="profile.html"><i class="ace-icon fa fa-user"></i>Profile</a>
 								</li>
-								<li class="divider"></li>
+								<li class="divider"></li>--%>
 								<li>
-									<a href="login-out"><i class="ace-icon fa fa-power-off"></i>Logout</a>
+									<a href="login-out"><i class="ace-icon fa fa-power-off"></i>登出</a>
 								</li>
 							</ul>
 						</li>

@@ -1,5 +1,8 @@
 package com.hrtx.web.pojo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import java.util.Date;
 
 import javax.persistence.Id;
@@ -10,6 +13,7 @@ import javax.persistence.Transient;
 public class User extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 	private String loginName;
 	private String pwd;

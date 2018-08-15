@@ -463,6 +463,14 @@ public class Utils {
 		return str.toString();
 	}
 
+	public static String randomNoByDateTime(int count){
+		StringBuffer str=new StringBuffer(count);
+		for (int i=0;i<count;i++) {
+			str.append(new Random().nextInt(9));
+		}
+		return str.toString();
+	}
+
 	/**
 	 * 3位自增数(超过3位归为归零)
 	 * @return

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Dashboard - Ace Admin</title>
+		<title>空白 - 靓号优选</title>
 		<%@ include file="common/basecss.jsp" %>
 	</head>
 
