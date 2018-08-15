@@ -43,6 +43,7 @@ public class EPSaleService {
 	@Autowired private FundOrderService fundOrderService;
 	@Autowired private ApiOrderService apiOrderService;
 	@Autowired private EPSaleService epSaleService;
+	@Autowired private GoodsService goodsService;
 	public Result pageEPSale(EPSale epSale) {
 		PageHelper.startPage(epSale.startToPageNum(),epSale.getLimit());
 		Page<Object> ob=this.epSaleMapper.queryPageList(epSale);
@@ -191,8 +192,17 @@ public class EPSaleService {
 		}
 
     }
+
+	/**
+	 * 防止实际业务方法回滚导致此处数据回滚
+	 * @param mapOrder
+	 * @return
+	 */
 	public Result newCreateOrder(Map mapOrder) {
 		return apiOrderService.createOrder(null,mapOrder);
+	}
+	public Result newByNumToUnShelve(String num,String skuid) {
+		return this.goodsService.ByNumToUnShelve(num,skuid);
 	}
 	public void payEpsaleOrder() {
 		/**
@@ -255,6 +265,8 @@ public class EPSaleService {
 				/*Number number=numberMapper.selectByPrimaryKey(num_id);
 				number.setStatus(1);
 				this.numberMapper.updateByPrimaryKey(number);*/
+				Result result=epSaleService.newByNumToUnShelve(num_resource,String.valueOf(sku_id));
+				log.info(String.format("人数不足，流拍出来结果[%s][%s]",result.getCode(),String.valueOf(result.getData())));
 			}
 			//if(true) throw  new RuntimeException("测试。。。。。。。。。。。。。。。。。");
 			List<Map> needReturn=epSaleMapper.queryNeedReturn(num_id,g_id,success_consumer_id);//success_consumer_id为空时查询该号码所有出价结果
