@@ -24,4 +24,10 @@ public interface UserMapper extends Mapper<User>,BaseMapper<User>{
     void test();
 
 	void test1();
+
+    List<Map> finRolesByUserId(Long id);
+
+	void deleteRoleByUserId(@Param("userId") Long userId);
+
+	void insertUr(@Param("roleId") Long roleId, @Param("userId") Long userId);
 }

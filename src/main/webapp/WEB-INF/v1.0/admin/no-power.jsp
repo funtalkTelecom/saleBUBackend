@@ -1,7 +1,7 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 	<head>
-		<title>Dashboard - Ace Admin</title>
+		<title>没有权限 - 靓号优选</title>
 		<%@ include file="common/basecss.jsp" %>
 	</head>
 	<body class="no-skin">
@@ -32,10 +32,10 @@
 					<div class="page-content">
 						<div class="row">
 							<div class="col-xs-12">
-								<h3 class="header smaller lighter blue">jQuery dataTables</h3>
+								<%--<h3 class="header smaller lighter blue">jQuery dataTables</h3>
 								<div class="table-header">
 									Results for "Latest Registered Domains"
-								</div>
+								</div>--%>
 								<!-- <div class="table-responsive"> -->
 								<!-- <div class="dataTables_borderWrap"> -->
 								<div>

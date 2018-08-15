@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -213,6 +215,16 @@ public class PermissionService {
 //				roleDao.inserPermission(power);
 				permissionMapper.insert(new Permission(power.getId(), power.getPid(), power.getPowerName(), "", power.getSeq(), power.name(), power.getLeaf(), power.getGrade(), power.getUrl()));
 			}
+		}
+	}
+
+	public void distributeRole(long userId, String roles) {
+		userMapper.deleteRoleByUserId(userId);
+		String[] rolesArray=StringUtils.split(roles ,",");
+		if(rolesArray == null||rolesArray.length==0)return;
+		for(String s :rolesArray){
+			long roleId = NumberUtils.toLong(s.trim());
+			userMapper.insertUr(roleId, userId);
 		}
 	}
 }

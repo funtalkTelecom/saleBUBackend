@@ -21,4 +21,9 @@
         <include refid="col_list"/>
         from tb_corporation a where a.id = #{corpId};
     </select>
+
+    <select id="queryPageList" resultType="Corporation">
+        select t.id id, t.`name` from tb_corporation t where t.is_del = 0 and t.`status` = 1
+    </select>
+
 </mapper>

@@ -7,6 +7,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.github.pagehelper.PageInfo;
+import com.hrtx.web.pojo.Corporation;
+import com.hrtx.web.service.CorporationService;
+import com.hrtx.web.service.PermissionService;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -30,7 +35,9 @@ public class UserController {
 
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	
-	@Autowired UserService userService;
+	@Autowired private UserService userService;
+	@Autowired private PermissionService permissionService;
+	@Autowired private CorporationService corporationService;
 	
     @GetMapping("/login-index")
     @Powers({PowerConsts.NOLOGINPOWER})
@@ -74,15 +81,75 @@ public class UserController {
    
     @RequestMapping("/user/query-user")
     @Powers({PowerConsts.SYSTEMMOUULE_USERLIST_LIST})
-    public ModelAndView queryUser(User user) {
+    public ModelAndView queryUser(User user, HttpServletRequest request) {
+        request.setAttribute("roles",((PageInfo)permissionService.listRole(null).getData()).getList());
+        request.setAttribute("corps", ((PageInfo)corporationService.pageCorporation(new Corporation()).getData()).getList());
         return new ModelAndView("admin/user/query-user");
     }
     
     @RequestMapping("/list-user")
     @Powers({PowerConsts.SYSTEMMOUULE_USERLIST_LIST})
     public Result listUser(User user) {
-//		if(1==1) throw new ServiceException("test");
-
 		return userService.pageUser(user);
     }
+
+	@RequestMapping("edit-user-index")
+	@Powers({PowerConsts.SYSTEMMOUULE_USERLIST_ADD})
+	public Result editUserIndex(User user){
+		return  new Result(Result.OK, userService.getUser(user.getId()));
+	}
+
+	/**
+	 * 添加用户
+	 */
+	@RequestMapping("/add-user")
+	@Powers({PowerConsts.SYSTEMMOUULE_USERLIST_ADD})
+	public Result addUser(User user){
+		user.setStatus(1);//使用中
+		return userService.saveUser(user);
+	}
+
+	/**
+	 * 冻结、解冻用户
+	 * @return
+	 */
+	@RequestMapping("/freeze-user")
+	@Powers({PowerConsts.SYSTEMMOUULE_USERLIST_ADD})
+	public Result freezeUser(User user){
+		return userService.freezeUser(user);
+	}
+
+	/**
+	 * 重置密码
+	 * @return
+	 */
+	@RequestMapping("/reset-pwd")
+	@Powers({PowerConsts.SYSTEMMOUULE_USERLIST_ADD})
+	public Result resetPwd(User user){
+		return userService.resetPwd(user);
+	}
+
+	/**
+	 * 重置密码
+	 * @return
+	 */
+	@RequestMapping("/update-pwd-index")
+	@Powers({PowerConsts.SYSTEMMOUULE_UPDATE_PWD})
+	public ModelAndView updatePwdIndex(User user){
+		return new ModelAndView("admin/user/update-pwd");
+	}
+
+	/**
+	 * 重置密码
+	 * @return
+	 */
+	@RequestMapping("/update-pwd")
+	@Powers({PowerConsts.SYSTEMMOUULE_UPDATE_PWD})
+	public Result updatePwd(HttpServletRequest request){
+	    String pwd = ObjectUtils.toString(request.getParameter("pwd"));
+	    String confrimPwd = request.getParameter("confrimPwd");
+	    if(!pwd.equals(confrimPwd)) return new Result(Result.ERROR, "新密码与确认密码不一致");
+        String originPwd = request.getParameter("originPwd");
+	    return userService.updatePwd(originPwd, pwd);
+	}
 }
