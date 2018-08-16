@@ -130,7 +130,7 @@ public class ApiOrderService {
 	/**
 	 * 根据商品id创建订单
 	 * @param request
-	 * @param type 1:普靓和超靓:skuid, numid, 地址id, 支付方式, 套餐id
+	 * @param 1:普靓和超靓:skuid, numid, 地址id, 支付方式, 套餐id
 	 *             2:白卡和普号:skuid,数量,地址
 	 * @return
 	 */
@@ -923,6 +923,8 @@ public class ApiOrderService {
 		if(orders.size()==0) return new Result(Result.ERROR, "该订单不存在");
 		return this.CancelOrder(orderIds,reason);
 	}
+
+
 	public Result CancelOrder(String orderIds,String reason){
 		Long orderId =Long.parseLong(orderIds);
 		Order order = orderMapper.findOrderInfo(orderId);
@@ -1012,13 +1014,43 @@ public class ApiOrderService {
 			//白卡
 			updateGoogsT(orderId,1);
 		}else if(order.getOrderType()==3 &&  order.getSkuGoodsType().equals("4")){ //竞拍
-			List list = orderMapper.getOrderItmeList(orderId,2);
+			List list = orderMapper.getOrderItmeList(orderId,0);
 			if(list==null || list.size()<=0) return new Result(Result.ERROR, "未找到订单相应的信息");
 			for (int i = 0; i < list.size(); i++) {
 				Map map = (Map) list.get(i);
 				String num_id =String.valueOf( map.get("num_id"));
-				log.info("号码还原销售中");
-				freezeNum(num_id, "1",true);
+				String num =String.valueOf( map.get("num"));
+				Long skuId =Long.parseLong(String.valueOf( map.get("sku_id")));
+				String sku_Id =String.valueOf( map.get("sku_id"));
+				int quantity = Integer.parseInt(String.valueOf(map.get("quantity")));
+				log.info("号码还原在库");
+//				freezeNum(num_id, "1",true);
+				goodsMapper.updateNumStatus(num_id,sku_Id,num);
+				//调用仓储接口
+				Map param = new HashMap();
+				//获取目前sku信息
+				Sku nowSku = skuMapper.getSkuBySkuid(skuId);
+				if(!nowSku.getSkuGoodsType().equals("3")){
+					param.put("supply_id", nowSku.getSkuId());//供货单编码(sku_id)
+					Result res;
+					//再冻结新库存
+					param.put("type", "2");//处理类型1上架；2下架
+					param.put("quantity", quantity);//数量
+					param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
+					if(!"0".equals(param.get("quantity").toString())) {
+						res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+						if(res.getCode()!=200){
+							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+							return new Result(Result.ERROR, "库存验证失败");
+						}else {
+							StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+							if (!"00000".equals(sir.getCode())) {
+								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+								return new Result(Result.ERROR, "冻结库存失败\n"+sir.getDesc());
+							}
+						}
+					}
+				}
 			}
 		}else {
 			//普号，普靓，超靓

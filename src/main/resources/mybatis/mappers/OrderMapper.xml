@@ -309,5 +309,15 @@
         and o.`status`=1 and o.order_type !=3
         and TIMESTAMPDIFF(MINUTE,o.add_date, now()) &gt;120
     </select>
-
+    <select id="getLastTimePayOrderList" resultType="java.util.HashMap">
+        select m.item_id item_id,m.order_id order_id,m.goods_id goods_id,m.sku_id sku_id,
+        m.num_id num_id,m.num num,m.quantity quantity,m.price price,m.total total,m.is_shipment is_shipment,
+        o.sku_goods_type sku_goods_type,o.order_type order_type,e.title,e.last_pay_time,TIMESTAMPDIFF(MINUTE,e.last_pay_time, now())
+        from tb_order_item m ,tb_order o , tb_goods g,tb_ep_sale e
+				where m.order_id = o.order_id
+				and m.goods_id = g.g_id
+				and g.g_active = e.id
+				and o.is_del=0 and m.is_shipment=0 and o.`status`=1 and o.order_type=3
+				and  TIMESTAMPDIFF(MINUTE,e.last_pay_time, now())>0
+    </select>
 </mapper>

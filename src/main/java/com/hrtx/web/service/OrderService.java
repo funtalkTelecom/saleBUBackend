@@ -478,5 +478,29 @@ public class OrderService extends BaseService {
             }
         }
     }
+
+    /***
+     * 系统自动取消竞拍订单
+     */
+    @Scheduled(fixedRate=6000)
+    public void LastPayTimeCancelOrderStatusTimer(){
+        if(!"true".equals(SystemParam.get("lastPay_timer"))) return;
+        log.info("开始执行竞拍订单未付款订单超过最迟付款期定时器");
+        List list = orderMapper.getLastTimePayOrderList();
+        if(list.size()>0){
+            for(int i=0; i<list.size(); i++){
+                Map map = (Map) list.get(i);
+                String orderid = String.valueOf(map.get("order_id"));
+                String note ="系统取消，原因：竞拍订单超过最迟付款时间未付款";
+                try {
+                    log.info("取消订单号:"+orderid);
+                    apiOrderService.CancelOrder(orderid,note);
+                }catch (Exception e) {
+                    log.error("未知异常", e);
+                }
+
+            }
+        }
+    }
 }
 
