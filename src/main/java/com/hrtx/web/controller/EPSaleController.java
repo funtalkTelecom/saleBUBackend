@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -114,6 +115,18 @@ public class EPSaleController extends BaseReturn{
 		return map;
 	}
 
+	/*
+	   竞拍商品出价
+	   *限 每次gId与numId组合
+	   *
+	 */
+	@PostMapping("/api/epSaleGoodsAuciton2")
+	@Powers({PowerConsts.NOPOWER})
+	@ResponseBody
+	public void goodsAuciton(Auction auction, HttpServletRequest request) {
+		epSaleService.goodsAuciton(auction,request);
+	}
+
 	private static Object cjLock = new Object();
 	/*
 	   竞拍商品出价
@@ -123,7 +136,7 @@ public class EPSaleController extends BaseReturn{
 	@PostMapping("/api/epSaleGoodsAuciton")
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
-	public void goodsAuciton(Auction auction, HttpServletRequest request) {
+	public void goodsAuciton2(Auction auction, HttpServletRequest request) {
 		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息gActive
 		Date endTime=null;//结束时间
 		Date currentTime=new Date();//当前时间
@@ -282,7 +295,8 @@ public class EPSaleController extends BaseReturn{
 							else if(auction.getPrice()==newPrice)//出现同价的成功出价记录
 							{
 								//auction  状态：3失败
-								auction.setStatus(3);
+								//auction.setStatus(3);//调整为状态：4落败
+								auction.setStatus(4);//调整为
 								auctionService.auctionEdit(auction);//出价记录 状态：2成功
 							}else {
 								//auction  状态：4落败
@@ -579,11 +593,21 @@ public class EPSaleController extends BaseReturn{
 		//Object list=cityService.queryByPidList(0);
 		/*		deliveryAddress.setId(new Long(5000));*/
 		epSale=epSaleService.finEPSaleById(epSale.getId());
-		int isSale=0;//是否有上架的商品
+		int isSale=0;//是否有上架的商品  注：是否禁用时间选项
+		int erSatus=0;//erSatus 状态 1竟拍前，2竟拍中，3竟拍后
 		List<Map> isSaleList=epSaleService.findIsSaleListByEPSaleId(epSale.getId());
+		List<Map> isERSatusList=epSaleService.findERSatusByEPSaleId(epSale.getId());
 		if(isSaleList!=null&&isSaleList.size()>0)
 		{
-			isSale=1;
+			isSale=1; //注：有上架的商品,禁用时间选项
+		}
+		if(isERSatusList!=null&&isERSatusList.size()>0)
+		{
+			erSatus=NumberUtils.toInt(String.valueOf(isERSatusList.get(0).get("erSatus")));
+			if(erSatus==3)
+			{
+				isSale=1;//注：竟拍活动过期,禁用时间选项
+			}
 		}
 		map.put("code", Result.OK);
 		map.put("data", epSale);

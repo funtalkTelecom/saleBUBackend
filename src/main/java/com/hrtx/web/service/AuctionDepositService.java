@@ -211,8 +211,6 @@ public class AuctionDepositService {
 			auctionDeposit.setPayDate(payDate1);
             //**********************************同步
             //AuctionDeposit.setPaySnn(paySnn);
-
-
 			//****************auction.status=1记录状态的记录状态调整************************
 			double price=0.00;//出价价格
 			double beforePrice=0.00;//前一次出价记录
@@ -223,6 +221,10 @@ public class AuctionDepositService {
 			//auction.status=1记录状态调整
 			Auction auction=new Auction();
 			Auction auctonBef=new Auction();
+			//***********************************
+			//***************************加锁记录
+			//***********************************
+			auctionMapper.freezeOneNum(numId);
 			//auction.status=1记录状态的记录
 			List<Map> auctionList =auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getConsumerId(),auctionDeposit.getgId());
 			if(auctionList.size()>0)
@@ -238,6 +240,7 @@ public class AuctionDepositService {
 					beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
 					beforeAutionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
 					beforeConsumerId=Long.valueOf(goodsAuctionList.get(0).get("consumerId").toString());//前一次出价记录用户Id
+					//auctionMapper.freezeOneNum(numId);//锁行记录
 					//1、大于之前的最近出价记录，则前一次出价记录状态：4 落败,当前出价记录状态：2成功
 					if(price>beforePrice)
 					{
@@ -269,7 +272,8 @@ public class AuctionDepositService {
 					else if(price==beforePrice)//出现同价的成功出价记录
 					{
 						//auction  状态：3失败
-						auction.setStatus(3);
+						//auction.setStatus(3);//调整为状态：4落败
+						auction.setStatus(4);
 						//****************保证金支付成功*****当前出价记录状态：3失败*******************
 						auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 						auctionMapper.auctionEditStatusById(auction);
