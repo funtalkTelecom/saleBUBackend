@@ -60,4 +60,6 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
     void auctionEditOrderIDByNumId(Auction auction);
 
     void auctionEditOrderIDByNumIdAndSkuId(Auction auction);
+
+    List<Map> freezeOneNum(@Param("numId") Long numId);
 }
