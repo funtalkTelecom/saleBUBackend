@@ -36,9 +36,9 @@ $(function() {
 							if(record.gIsSale=="1")
 							    node.push('<a class="btn btn-success btn-xs unsale" href="javascript:void(0);">下架</a>');
                         }
-						if(p_delete && record.gIsSale!="1") {
-							node.push('<a class="btn btn-danger btn-xs delete" href="javascript:void(0);">删除</a>');
-                        }
+                        // if(p_delete && record.gIsSale!="1") {
+							// node.push('<a class="btn btn-danger btn-xs delete" href="javascript:void(0);">删除</a>');
+                        // }
                         $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
 
                         $operate.find(".update").click(function () {
