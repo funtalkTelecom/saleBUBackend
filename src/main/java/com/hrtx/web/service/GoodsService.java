@@ -3,6 +3,7 @@ package com.hrtx.web.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
 import com.hrtx.global.*;
@@ -509,6 +510,7 @@ public class GoodsService {
                 Long skuIds =s.getSkuId();
                 Map map = numMapper.queryNumCountByskuid(skuIds,"2");
                 int counts = NumberUtils.toInt(String.valueOf(map.get("count")));
+
                 if(s.getSkuGoodsType().equals("1")){
                     param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
                     param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
@@ -517,22 +519,22 @@ public class GoodsService {
                     if(s.getSkuNum()!=0) {
                         res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                         if (200 != (res.getCode())) {
-                            return new Result(Result.ERROR, "库存验证失败");
+                            throw new ServiceException("库存验证失败");
                         } else {
                             StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                             if (!"00000".equals(sir.getCode())) {
-                                return new Result(Result.ERROR, "库存验证失败");
+                                throw new ServiceException("库存验证失败");
                             }
                         }
                     }
                 }else if(s.getSkuGoodsType().equals("3")){
-                    if(counts!=s.getSkuNum()) return new Result(Result.ERROR, "上架的号码数量和销售中的号码数量不一致");
+                    if(counts!=s.getSkuNum()) throw new ServiceException("上架的号码数量和销售中的号码数量不一致");
                     Number number = new Number();
                     number.setSkuId(s.getSkuId());
                     number.setStatus(1);
                     numberMapper.updateStatus(number, true);
                 }else {
-                    if(counts!=s.getSkuNum()) return new Result(Result.ERROR, "上架的号码数量和销售中的号码数量不一致");
+                    if(counts!=s.getSkuNum()) throw new ServiceException("上架的号码数量和销售中的号码数量不一致");
                     param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
                     param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
                     param.put("type", "2");//处理类型1上架；2下架
@@ -540,11 +542,11 @@ public class GoodsService {
                     if(s.getSkuNum()!=0) {
                         res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                         if (200 != (res.getCode())) {
-                            return new Result(Result.ERROR, "库存验证失败");
+                            throw new ServiceException("库存验证失败");
                         } else {
                             StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                             if (!"00000".equals(sir.getCode())) {
-                                return new Result(Result.ERROR, "库存验证失败");
+                                throw new ServiceException("库存验证失败");
                             }else{
                                 //成功之后吧上架的号码状态还原成1
                                 Number number = new Number();
@@ -562,7 +564,7 @@ public class GoodsService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new Result(Result.ERROR, "下架库存异常");
+            throw new ServiceException("下架库存异常");
         }
         goodsMapper.goodsUnsale(goods);
         res = new Result(Result.OK, "下架成功");
