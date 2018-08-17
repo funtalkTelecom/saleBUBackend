@@ -55,4 +55,14 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
      * @return
      */
     int batchUpdateSlz(@Param("fileName") String fileName, @Param("list") List<Long> snums);
+
+    /***
+     * 更加skuid，查询数量
+     * @return
+     */
+    Map queryNumCountByskuid(@Param("skuid") long skuid,@Param("status") String status);
+
+
+
+
 }

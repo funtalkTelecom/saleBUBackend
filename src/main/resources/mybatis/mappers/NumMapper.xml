@@ -72,4 +72,10 @@
 		and n.seller_id = 10 and n.`status` = 5 limit 100000
     </select>
 
+    <select id="queryNumCountByskuid" resultType="java.util.HashMap">
+        select count(*) count from tb_num m
+        where m.sku_id=#{skuid}
+        and m.`status`=#{status}
+    </select>
+
 </mapper>

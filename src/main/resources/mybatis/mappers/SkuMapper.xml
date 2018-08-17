@@ -122,4 +122,11 @@
         where a.sku_id = #{skuId}
     </update>
 
+    <select id="findNumStatus" resultType="java.util.HashMap">
+    select s.sku_id,m.sku_id,m.`status` from tb_num m ,tb_sku s
+    where m.sku_id = s.sku_id
+    and  s.g_id= #{gId}
+    and m.`status`!=2
+    </select>
+
 </mapper>

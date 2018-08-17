@@ -100,11 +100,11 @@ public class GoodsController extends BaseReturn{
         returnResult(goodsService.goodsUnsale(goods, request));
 	}
 
-	@RequestMapping("/goods-delete")
-	@Powers({PowerConsts.GOODSMOUDULE_COMMON_DELETE})
-	public void goodsDelete(Goods goods){
-		returnResult(goodsService.goodsDelete(goods));
-	}
+//	@RequestMapping("/goods-delete")
+//	@Powers({PowerConsts.GOODSMOUDULE_COMMON_DELETE})
+//	public void goodsDelete(Goods goods){
+//		returnResult(goodsService.goodsDelete(goods));
+//	}
 
 	@RequestMapping("/goods-repoGoods")
 	@Powers({PowerConsts.GOODSMOUDULE_COMMON_QUEYR})
