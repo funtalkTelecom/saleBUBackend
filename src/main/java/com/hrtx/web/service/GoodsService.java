@@ -500,8 +500,8 @@ public class GoodsService {
 
     public Result goodsUnsale(Goods goods, HttpServletRequest request) {
         Result res = new Result(Result.ERROR, "请求异常");
-        List lista = skuMapper.findNumStatus(goods.getgId());
-        if(lista.size()>0)  return new Result(Result.ERROR, "该上架商品中有部分号码状态不是销售中，不能下架");
+//        List lista = skuMapper.findNumStatus(goods.getgId());
+//        if(lista.size()>0)  return new Result(Result.ERROR, "该上架商品中有部分号码状态不是销售中，不能下架");
         try {
             List<Sku> skuList = skuMapper.findSkuInfo(goods.getgId());
             for(Sku s : skuList){
