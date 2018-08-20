@@ -30,7 +30,21 @@ public class ExceptionHandleAdvice {
 		v.addObject("errormsg",errorInfo);
 		return v;
 	}
-	
+
+	@ExceptionHandler(WarmException.class)
+	public Object warmException(Exception e,HttpServletRequest request,HttpServletResponse response){
+		long err_no=System.currentTimeMillis();
+		String errorInfo = e.getMessage();
+		log.error(errorInfo,e);
+		if(Utils.isAjax(request)){
+			Utils.returnResult(new Result(Result.ERROR, errorInfo));
+			return null;
+		}
+		ModelAndView v=new ModelAndView("admin/error-page");
+		v.addObject("errormsg",errorInfo);
+		return v;
+	}
+
 	@ExceptionHandler(Exception.class)
 //	@InitBinder
 //	@ModelAttribute
