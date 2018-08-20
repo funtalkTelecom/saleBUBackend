@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.advice.ServiceException;
+import com.hrtx.config.advice.WarmException;
 import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
 import com.hrtx.global.*;
@@ -528,13 +529,13 @@ public class GoodsService {
                         }
                     }
                 }else if(s.getSkuGoodsType().equals("3")){
-                    if(counts!=s.getSkuNum()) throw new ServiceException("上架的号码数量和销售中的号码数量不一致");
+                    if(counts!=s.getSkuNum()) throw new WarmException("上架的号码数量和销售中的号码数量不一致");
                     Number number = new Number();
                     number.setSkuId(s.getSkuId());
                     number.setStatus(1);
                     numberMapper.updateStatus(number, true);
                 }else {
-                    if(counts!=s.getSkuNum()) throw new ServiceException("上架的号码数量和销售中的号码数量不一致");
+                    if(counts!=s.getSkuNum()) throw new WarmException("上架的号码数量和销售中的号码数量不一致");
                     param.put("supply_id", s.getSkuId());//供货单编码(sku_id)
                     param.put("companystock_id", s.getSkuRepoGoods());//库存编码(skuRepoGoods)
                     param.put("type", "2");//处理类型1上架；2下架
@@ -562,8 +563,11 @@ public class GoodsService {
                 skuMapper.updateSkuNum(nowSku);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (WarmException e) {
+            throw e;
+        }catch (ServiceException e) {
+            throw e;
+        }catch (Exception e) {
             throw new ServiceException("下架库存异常");
         }
         goodsMapper.goodsUnsale(goods);
