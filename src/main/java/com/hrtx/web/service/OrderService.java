@@ -301,6 +301,21 @@ public class OrderService extends BaseService {
         apiOrderService.orderType(orderId);
         return new Result(Result.OK, "退款成功");
     }
+    public Result reFundLive(Order order, HttpServletRequest request) {
+        Long orderId = order.getOrderId();
+        String reason ="null";
+        Order order1 = orderMapper.selectByPrimaryKey(orderId);
+        if(order1 == null) return new Result(Result.ERROR, "订单不存在");
+        if(order1.getStatus() != 13) return new Result(Result.ERROR, "非退款失败状态的订单");
+        Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
+        if(payR.getCode()==200){  //退款成功
+            apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
+            apiOrderService.orderType(orderId);
+            return new Result(Result.OK, "退款成功");
+        }else { //退款失败
+            return new Result(Result.OK, "退款失败");
+        }
+    }
 
     /**
      * 线下付款
@@ -438,7 +453,7 @@ public class OrderService extends BaseService {
                 //已支付
                 if("1".equals(String.valueOf(ispay.getData()))){//线上支付
                     Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
-                    if(payR.getCode()==200){  //退款成功
+                    if(payR.getCode()==Result.OK){  //退款成功
                         apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
                         apiOrderService.orderType(orderId);
                         return new Result(Result.OK, "取消成功");

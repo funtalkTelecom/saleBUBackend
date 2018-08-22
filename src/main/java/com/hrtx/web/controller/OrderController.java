@@ -73,6 +73,11 @@ public class OrderController extends BaseReturn{
 	public Result reFund(Order order, HttpServletRequest request){
 		return orderService.reFund(order,request);
 	}
+	@RequestMapping("/order-refund-live")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_REFUND_LIVE})
+	public Result reFundLive(Order order, HttpServletRequest request){
+		return orderService.reFundLive(order,request);
+	}
 
 	@RequestMapping("/order-yPayAmt")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})

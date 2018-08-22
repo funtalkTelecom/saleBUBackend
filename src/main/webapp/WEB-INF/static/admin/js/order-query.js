@@ -145,6 +145,9 @@ $(function() {
 						if(p_refund && record.status=="14") {
 							node.push('<a class="btn btn-success btn-xs refund" href="javascript:void(0);">退款</a>');
                         }
+						if(p_refund_live && record.status=="13") {
+							node.push('<a class="btn btn-success btn-xs refund_live" href="javascript:void(0);">重新退款</a>');
+                        }
 						if(p_receipt && record.status=="2") {
 							node.push('<a class="btn btn-success btn-xs payDeliver" href="javascript:void(0);">发货</a>');
                         }
@@ -192,10 +195,20 @@ $(function() {
                             }
                             $('#receiptInfo').modal('show');
                         });
-                        //点击退款
+                        //点击线下退款
                         $operate.find(".refund").click(function () {
                             $("#refund-orderId").val(v);
                             $('#refundInfo').modal('show');
+                        });
+                        // 退款失败，重新退款
+                        $operate.find(".refund_live").click(function () {
+                            if(confirm("是否确认再次退款？")){
+                                $.post("order/order-refund-live", {orderId: v}, function (data) {
+                                    dataList.reload();
+                                    alert(data.data);
+                                }, "json");
+                            }
+
                         });
                         //点击发货
                         $operate.find(".payDeliver").click(function () {
@@ -283,6 +296,13 @@ $(function() {
 		dataList.reload();
 	}
 
+    $(document).on("click","#receiptInfo .modal-footer .btn-success",function() {
+        $.post("order/order-receipt",$("#receiptInfo form").serialize(),function(data){
+            $('#receiptInfo').modal('hide');
+            dataList.reload();
+            alert(data.data);
+        },"json");
+    });
     $(document).on("click","#receiptInfo .modal-footer .btn-success",function() {
         $.post("order/order-receipt",$("#receiptInfo form").serialize(),function(data){
             $('#receiptInfo').modal('hide');
