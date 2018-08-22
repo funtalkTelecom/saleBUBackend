@@ -806,7 +806,7 @@ public class ApiOrderService {
 			order.setPageNum(pageNum);
 			order.setConsumer(consumer.getId());
 			if(status==0){
-				st = "1,2,3,4,5,6,7";
+				st = "1,2,3,4,5,6,7,11,12,13,14";
 			}else if(status==1){
 				st = "'1'";
 			}else if(status==2){
