@@ -941,6 +941,7 @@ public class ApiOrderService {
 						orderType(orderId);
 					}else { //退款失败
 						CancelOrderStatus(orderId,13,""); //退款失败
+
 					}
 				}else {//线下支付
 					CancelOrderStatus(orderId,14,""); //待财务退款
@@ -952,7 +953,7 @@ public class ApiOrderService {
 		}else {
 			log.info("调用仓储取消订单接口前封装参数");
 			Map param = new HashMap();
-			String callbackUrl =SystemParam.get("domain-full")+"/api/cancel-order-callback";
+			String callbackUrl =SystemParam.get("domain-full")+"/order/cancel-order-callback";
 			param.put("order_id",orderId);
 			param.put("callback_url",callbackUrl);
 			param.put("reason",reason);
@@ -960,14 +961,13 @@ public class ApiOrderService {
 			log.info("调用仓储接口");
 			Result res = StorageApiCallUtil.storageApiCall(param, "HK0005");
 			Map maps =  MapJsonUtils.parseJSON2Map(res.getData().toString());
-			String code = maps.get("code").toString();
+			String code =maps.get("code").toString();
 			String desc =maps.get("desc").toString();
 			if("10000".equals(code)){
 				log.info("业务受理成功,等待回调");
 				log.info("更新订单状态为11:待仓库撤销");
 				int status =11;
 				CancelOrderStatus(orderId,status,reason);
-
 			}else if ("00000".equals(code)){
 				log.info("成功");
 				log.info("更新订单状态为7:已取消");
@@ -975,10 +975,10 @@ public class ApiOrderService {
 				CancelOrderStatus(orderId,status,reason);
 				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 				if(ispay.getCode()==200){  //已支付
-					if(ispay.getData().equals("1")){//线上支付
+					if(ispay.getData().equals("1")){ //线上支付
 						CancelOrderStatus(orderId,12,""); //退款中
 						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
-						if(payR.getCode()==200){  //退款成功
+						if(payR.getCode()==Result.OK){  //退款成功
 							orderType(orderId);
 						}else { //退款失败
 							CancelOrderStatus(orderId,13,""); //退款失败
@@ -990,7 +990,9 @@ public class ApiOrderService {
 					//上架涉及的表，数量，状态
 					orderType(orderId);
 				}
-			}//其他视为失败，不做任何操作动作
+			}else { //异常或者超时
+				return new Result(Result.ERROR, "超时或者异常，请稍后再试");
+			}
 		}
 		return new Result(Result.OK, "取消成功");
 	}

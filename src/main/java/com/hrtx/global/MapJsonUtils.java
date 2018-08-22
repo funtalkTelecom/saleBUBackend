@@ -1,6 +1,7 @@
 package com.hrtx.global;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONNull;
 import net.sf.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -49,7 +50,7 @@ public class MapJsonUtils {
     			}
     			map.put(k.toString(), list);
     		}else {
-    			map.put(k.toString(), v);
+    			map.put(k.toString(), v instanceof JSONNull ? null:v);
     		}
     	}
     	return map;
