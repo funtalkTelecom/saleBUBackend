@@ -315,6 +315,7 @@
             var p_receipt = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_RECEIPT)%>;
             var p_bindCard = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_BINDCARD)%>;
             var p_refund = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_REFUND)%>;
+            var p_refund_live = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_REFUND_LIVE)%>;
 		</script>
 	</body>
 </html>
