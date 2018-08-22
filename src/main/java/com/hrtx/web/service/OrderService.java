@@ -12,6 +12,7 @@ import com.hrtx.global.*;
 import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
+import com.hrtx.web.pojo.System;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -287,7 +288,19 @@ public class OrderService extends BaseService {
             return new Result(Result.ERROR, "未找到支付方式");
         }
     }
-
+    public Result reFund(Order order, HttpServletRequest request) {
+        Long orderId = order.getOrderId();
+        String refunReason = request.getParameter("refunReason");
+        if(StringUtils.isBlank(refunReason)) return new Result(Result.ERROR, "退款备注信息不能为空");
+        //获取订单信息
+        Order parm = orderMapper.selectByPrimaryKey(orderId);
+        parm.setRefundReason(refunReason);
+        orderMapper.updateByPrimaryKey(parm);
+        apiOrderService.CancelOrderStatus(orderId,7,"null"); //取消
+        //上架涉及的表，数量，状态
+        apiOrderService.orderType(orderId);
+        return new Result(Result.OK, "退款成功");
+    }
 
     /**
      * 线下付款
@@ -401,6 +414,7 @@ public class OrderService extends BaseService {
         return new Result(Result.OK, "绑卡成功");
     }
 
+
     /***
      * 仓库回调的方法
      * @param storageInterfaceRequest
@@ -410,7 +424,10 @@ public class OrderService extends BaseService {
         Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
         long orderId = NumberUtils.toLong(ObjectUtils.toString(platrequest.get("order_id")));
         int cancel_res = NumberUtils.toInt(ObjectUtils.toString(platrequest.get("cancel_res")));
-        String reson = ObjectUtils.toString(platrequest.get("reson"));
+//        java.lang.System.out.println((platrequest.get("reson")==null)+"     =======================");
+//        java.lang.System.out.println((platrequest.get("reson").equals(null))+"     =======================");
+//        java.lang.System.out.println((platrequest.get("reson").equals("null"))+"     =======================");
+        String reason = ObjectUtils.toString(platrequest.get("reson"));
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getStatus() != 11) return new Result(Result.ERROR, "非待仓库撤销状态的订单");
@@ -419,25 +436,28 @@ public class OrderService extends BaseService {
             Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
             if(ispay.getCode()==200){
                 //已支付
-                if(ispay.getData().equals("1")){//线上支付
-                    apiOrderService.CancelOrderStatus(orderId,12,""); //退款中
-                    Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reson);
+                if("1".equals(String.valueOf(ispay.getData()))){//线上支付
+                    Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
                     if(payR.getCode()==200){  //退款成功
+                        apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
                         apiOrderService.orderType(orderId);
+                        return new Result(Result.OK, "取消成功");
                     }else { //退款失败
-                        apiOrderService.CancelOrderStatus(orderId,13,""); //退款失败
+                        apiOrderService.CancelOrderStatus(orderId,13,reason); //退款失败
+                        return new Result(Result.OK, "退款失败");
                     }
                 }else {//线下支付
-                    apiOrderService.CancelOrderStatus(orderId,14,""); //待财务退款
+                    apiOrderService.CancelOrderStatus(orderId,14,reason); //待财务退款
+                    return new Result(Result.OK, "线下支付,待财务退款");
                 }
             }else {//未支付
                 //上架涉及的表，数量，状态
                 apiOrderService.orderType(orderId);
             }
         }else if (cancel_res==2){//撤销取消,还原订单状态
-            apiOrderService.CancelOrderStatus(orderId,3,reson);
+            apiOrderService.CancelOrderStatus(orderId,3,reason);
         }
-        return new Result(Result.OK, "取消成功");
+        return new Result(Result.OK, "撤销取消成功");
     }
 
 

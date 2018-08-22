@@ -284,8 +284,9 @@
     <update id="CancelOrderStatus">
         update tb_order a
         set a.status= #{status}
-
+        <if test="reason != null and reason != '' and reason != 'null' ">
             ,a.reason =#{reason}
+        </if>
         where  a.order_id = #{orderId}
     </update>
 

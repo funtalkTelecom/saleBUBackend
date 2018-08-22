@@ -95,6 +95,9 @@ $(function() {
                 },{
                     "header" : "付款日期",
                     "dataIndex" : "payDate"
+                },{
+                    "header" : "合计",
+                    "dataIndex" : "total"
                 }/*,{
                     "header" : "快递公司",
                     "dataIndex" : "发货后  字典表	expressId"
@@ -126,9 +129,6 @@ $(function() {
                     "header" : "子项小计",
                     "dataIndex" : "subTotal"
                 },{
-                    "header" : "合计",
-                    "dataIndex" : "total"
-                },{
                     "header" : "摘要",
                     "dataIndex" : "conment"
                 }*/,{
@@ -141,6 +141,9 @@ $(function() {
                         }
 						if(p_receipt && record.status=="1") {
 							node.push('<a class="btn btn-success btn-xs receipt" href="javascript:void(0);">收款</a>');
+                        }
+						if(p_refund && record.status=="14") {
+							node.push('<a class="btn btn-success btn-xs refund" href="javascript:void(0);">退款</a>');
                         }
 						if(p_receipt && record.status=="2") {
 							node.push('<a class="btn btn-success btn-xs payDeliver" href="javascript:void(0);">发货</a>');
@@ -188,6 +191,11 @@ $(function() {
                                 }, "json");
                             }
                             $('#receiptInfo').modal('show');
+                        });
+                        //点击退款
+                        $operate.find(".refund").click(function () {
+                            $("#refund-orderId").val(v);
+                            $('#refundInfo').modal('show');
                         });
                         //点击发货
                         $operate.find(".payDeliver").click(function () {
@@ -281,6 +289,16 @@ $(function() {
             dataList.reload();
             alert(data.data);
         },"json");
+    });
+    $(document).on("click","#refundInfo .modal-footer .btn-success",function() {
+        if(confirm("是否确认退款？")){
+            $.post("order/order-refund",$("#refundInfo form").serialize(),function(data){
+                $('#refundInfo').modal('hide');
+                dataList.reload();
+                alert(data.data);
+            },"json");
+        }
+
     });
 
     $('#startTime').bind('focus',function() {

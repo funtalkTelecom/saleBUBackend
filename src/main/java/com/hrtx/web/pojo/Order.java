@@ -68,6 +68,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     private int isDel;//
     private String skuGoodsType;
     private String reason;
+    private String refundReason;  //退款备注信息
 
     @Transient
     private String num;
@@ -400,5 +401,13 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public String getRefundReason() {
+        return refundReason;
+    }
+
+    public void setRefundReason(String refundReason) {
+        this.refundReason = refundReason;
     }
 }
