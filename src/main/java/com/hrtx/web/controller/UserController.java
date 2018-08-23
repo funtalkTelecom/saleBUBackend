@@ -39,6 +39,12 @@ public class UserController {
 	@Autowired private PermissionService permissionService;
 	@Autowired private CorporationService corporationService;
 	
+    @GetMapping("/index")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public ModelAndView index(HttpServletRequest request) {
+        return new ModelAndView("admin/index");
+    }
+
     @GetMapping("/login-index")
     @Powers({PowerConsts.NOLOGINPOWER})
     public ModelAndView loginIndex(HttpServletRequest request) {
@@ -67,7 +73,7 @@ public class UserController {
 				response.sendRedirect(redirectURL);
 				return null;
 			}
-			return new ModelAndView("redirect:/user/query-user");
+			return new ModelAndView("redirect:/index");
 		}
     	
     }
