@@ -32,7 +32,7 @@ public class PowerInterceptor implements HandlerInterceptor {
     	boolean _need_login=hasNologin(handler);
 		if(_need_login) return true;//有非登陆注解      直接通过
 		boolean _bool=Utils.isAjax(request);
-		String path=request.getContextPath()+"/";
+		String path=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
 		String redirect = request.getRequestURL() + (request.getQueryString() == null ? "" : "?" + request.getQueryString());
 		redirect = URLEncoder.encode(redirect, "utf-8");
 		String no_login="{code:'401',msg:'登录超时或未登录，请登录！'}";
