@@ -509,7 +509,7 @@
     <select id="queryActiveAuction" resultType="java.util.HashMap">
         select a.sku_id,a.num_id,a.g_id,a.consumer_id,a.price
         from tb_auction a where a.`status`=2 and a.num_id=#{num_id} and a.g_id=#{g_id}
-        order by a.price desc,a.confirm_date asc ,tb_auction.status asc
+        order by a.price desc,a.confirm_date asc ,a.status asc
     </select>
     <!--取出价人数-->
     <select id="countAuctions" resultType="java.util.HashMap">
