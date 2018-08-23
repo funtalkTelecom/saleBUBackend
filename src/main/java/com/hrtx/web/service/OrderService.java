@@ -308,12 +308,12 @@ public class OrderService extends BaseService {
         if(order1 == null) return new Result(Result.ERROR, "订单不存在");
         if(order1.getStatus() != 13) return new Result(Result.ERROR, "非退款失败状态的订单");
         Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
-        if(payR.getCode()==200){  //退款成功
+        if(payR.getCode()==Result.OK){  //退款成功
             apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
             apiOrderService.orderType(orderId);
-            return new Result(Result.OK, "退款成功");
+            return new Result(Result.OK,  payR.getData());
         }else { //退款失败
-            return new Result(Result.OK, "退款失败");
+            return new Result(Result.OK, payR.getData());
         }
     }
 
@@ -456,10 +456,10 @@ public class OrderService extends BaseService {
                     if(payR.getCode()==Result.OK){  //退款成功
                         apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
                         apiOrderService.orderType(orderId);
-                        return new Result(Result.OK, "取消成功");
+                        return new Result(Result.OK, payR.getData());
                     }else { //退款失败
                         apiOrderService.CancelOrderStatus(orderId,13,reason); //退款失败
-                        return new Result(Result.OK, "退款失败");
+                        return new Result(Result.OK, payR.getData());
                     }
                 }else {//线下支付
                     apiOrderService.CancelOrderStatus(orderId,14,reason); //待财务退款
