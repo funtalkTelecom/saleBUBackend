@@ -90,6 +90,13 @@
         inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
         left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1)
+        order by
+        case
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[>=0]]> and TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[<=0]]>
+        then 1
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[<0]]> then 2
+        when TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[>0]]> then 3
+        else 0 end,ep.id
     </select>
 
     <select id="findEPSaleList3" resultType="java.util.HashMap">
@@ -152,6 +159,23 @@
 		  group by epSaleNum.g_active
 		  ) as epSaleEndTime
 	on epSaleEndTime.epSaleId=ep.id
+    where ep.is_del=0
+    and ep.id = #{epSaleId};
+    </select>
+
+    <select id="findEPSaleByEPSaleId2" resultType="java.util.HashMap">
+    select
+    concat(ep.id,'') id,
+    case
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,ep.end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,ep.end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+    end as erSatus
+    from tb_ep_sale ep
     where ep.is_del=0
     and ep.id = #{epSaleId};
     </select>
@@ -485,12 +509,12 @@
     <select id="queryActiveAuction" resultType="java.util.HashMap">
         select a.sku_id,a.num_id,a.g_id,a.consumer_id,a.price
         from tb_auction a where a.`status`=2 and a.num_id=#{num_id} and a.g_id=#{g_id}
-        order by a.price desc,a.confirm_date
+        order by a.price desc,a.confirm_date asc ,tb_auction.status asc
     </select>
     <!--取出价人数-->
     <select id="countAuctions" resultType="java.util.HashMap">
         select a.consumer_id,count(1)
-        from tb_auction a where a.`status`=2 and a.num_id=#{num_id} and a.g_id=#{g_id}
+        from tb_auction a where a.`status` in (2,4) and a.num_id=#{num_id} and a.g_id=#{g_id}
         group by a.consumer_id
     </select>
     <!--查询需要退还保证金的用户-->

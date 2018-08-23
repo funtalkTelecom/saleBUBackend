@@ -130,7 +130,7 @@ public class ApiOrderService {
 	/**
 	 * 根据商品id创建订单
 	 * @param request
-	 * @param type 1:普靓和超靓:skuid, numid, 地址id, 支付方式, 套餐id
+	 * @param 1:普靓和超靓:skuid, numid, 地址id, 支付方式, 套餐id
 	 *             2:白卡和普号:skuid,数量,地址
 	 * @return
 	 */
@@ -806,7 +806,7 @@ public class ApiOrderService {
 			order.setPageNum(pageNum);
 			order.setConsumer(consumer.getId());
 			if(status==0){
-				st = "1,2,3,4,5,6,7";
+				st = "1,2,3,4,5,6,7,11,12,13,14";
 			}else if(status==1){
 				st = "'1'";
 			}else if(status==2){
@@ -905,6 +905,12 @@ public class ApiOrderService {
 		return addr.toString();
 	}
 
+	/***
+	 * 小程序端取消订单
+	 * @param orderIds
+	 * @param reason
+	 * @return
+	 */
 	public Result CancelOrderAllCase(String orderIds,String reason){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		long consumerId = consumer.getId();
@@ -915,8 +921,13 @@ public class ApiOrderService {
 		example.createCriteria().andEqualTo("consumer",consumerId).andEqualTo("orderId", orderId);
 		List<Order> orders=orderMapper.selectByExample(example);
 		if(orders.size()==0) return new Result(Result.ERROR, "该订单不存在");
+		return this.CancelOrder(orderIds,reason);
+	}
 
-		Order order = orderMapper.findOrderInfo(Long.parseLong(orderIds));
+
+	public Result CancelOrder(String orderIds,String reason){
+		Long orderId =Long.parseLong(orderIds);
+		Order order = orderMapper.findOrderInfo(orderId);
 		if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
 			log.info("更新订单状态为7:已取消");
 			int status =7;
@@ -930,6 +941,7 @@ public class ApiOrderService {
 						orderType(orderId);
 					}else { //退款失败
 						CancelOrderStatus(orderId,13,""); //退款失败
+
 					}
 				}else {//线下支付
 					CancelOrderStatus(orderId,14,""); //待财务退款
@@ -941,7 +953,7 @@ public class ApiOrderService {
 		}else {
 			log.info("调用仓储取消订单接口前封装参数");
 			Map param = new HashMap();
-			String callbackUrl =SystemParam.get("domain-full")+"/api/cancel-order-callback";
+			String callbackUrl =SystemParam.get("domain-full")+"/order/cancel-order-callback";
 			param.put("order_id",orderId);
 			param.put("callback_url",callbackUrl);
 			param.put("reason",reason);
@@ -949,14 +961,13 @@ public class ApiOrderService {
 			log.info("调用仓储接口");
 			Result res = StorageApiCallUtil.storageApiCall(param, "HK0005");
 			Map maps =  MapJsonUtils.parseJSON2Map(res.getData().toString());
-			String code = maps.get("code").toString();
+			String code =maps.get("code").toString();
 			String desc =maps.get("desc").toString();
 			if("10000".equals(code)){
 				log.info("业务受理成功,等待回调");
 				log.info("更新订单状态为11:待仓库撤销");
 				int status =11;
 				CancelOrderStatus(orderId,status,reason);
-
 			}else if ("00000".equals(code)){
 				log.info("成功");
 				log.info("更新订单状态为7:已取消");
@@ -964,10 +975,10 @@ public class ApiOrderService {
 				CancelOrderStatus(orderId,status,reason);
 				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 				if(ispay.getCode()==200){  //已支付
-					if(ispay.getData().equals("1")){//线上支付
+					if(ispay.getData().equals("1")){ //线上支付
 						CancelOrderStatus(orderId,12,""); //退款中
 						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
-						if(payR.getCode()==200){  //退款成功
+						if(payR.getCode()==Result.OK){  //退款成功
 							orderType(orderId);
 						}else { //退款失败
 							CancelOrderStatus(orderId,13,""); //退款失败
@@ -979,10 +990,13 @@ public class ApiOrderService {
 					//上架涉及的表，数量，状态
 					orderType(orderId);
 				}
-			}//其他视为失败，不做任何操作动作
+			}else { //异常或者超时
+				return new Result(Result.ERROR, "超时或者异常，请稍后再试");
+			}
 		}
 		return new Result(Result.OK, "取消成功");
 	}
+
 
 	/**
 	 * 根据orderId，更新订单状态
@@ -1002,13 +1016,18 @@ public class ApiOrderService {
 			//白卡
 			updateGoogsT(orderId,1);
 		}else if(order.getOrderType()==3 &&  order.getSkuGoodsType().equals("4")){ //竞拍
-			List list = orderMapper.getOrderItmeList(orderId,2);
+			List list = orderMapper.getOrderItmeList(orderId,0);
 			if(list==null || list.size()<=0) return new Result(Result.ERROR, "未找到订单相应的信息");
 			for (int i = 0; i < list.size(); i++) {
 				Map map = (Map) list.get(i);
 				String num_id =String.valueOf( map.get("num_id"));
-				log.info("号码还原销售中");
-				freezeNum(num_id, "1",true);
+				String num =String.valueOf( map.get("num"));
+				Long skuId =Long.parseLong(String.valueOf( map.get("sku_id")));
+				String sku_Id =String.valueOf( map.get("sku_id"));
+				int quantity = Integer.parseInt(String.valueOf(map.get("quantity")));
+				log.info("号码还原在库");
+//				freezeNum(num_id, "1",true);
+				goodsMapper.updateNumStatus(num_id,sku_Id,num);
 			}
 		}else {
 			//普号，普靓，超靓

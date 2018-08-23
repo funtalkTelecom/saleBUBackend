@@ -278,11 +278,44 @@
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal -->
 		</div>
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="refundInfo" tabindex="-1" style="overflow: auto" >
+			<div class="modal-dialog" style="width:700px;">
+				<div class="modal-content" style="width: 700px; max-height:300px; overflow: auto">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title">
+							退款信息
+						</h4>
+					</div>
+					<form role="form" class="form-horizontal">
+						<div class="modal-body">
+							<div class="form-group">
+								<input type="hidden" name="orderId" id="refund-orderId">
+								<label class="col-xs-2 control-label">退款备注</label>
+								<div class="col-xs-8">
+									<textarea  id="refunReason" name="refunReason" style="width: 550px;height: 100px;"></textarea>
+								</div>
+
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-success">确定</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+					</form>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
 		<script type="text/javascript">
             var basePath = "<%=basePath %>";
             var p_query = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_QUEYR)%>;
             var p_receipt = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_RECEIPT)%>;
             var p_bindCard = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_BINDCARD)%>;
+            var p_refund = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_REFUND)%>;
+            var p_refund_live = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_REFUND_LIVE)%>;
 		</script>
 	</body>
 </html>

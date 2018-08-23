@@ -94,6 +94,7 @@ public class GoodsFocusService {
 	  GoodsFocus.isDel;//是否收藏  是0否1
 	 */
 	public Result goodsFocusEdit(GoodsFocus goodsFocus, HttpServletRequest request) {
+            String goodsFocusStr="";
             goodsFocus.setAddIp(SessionUtil.getUserIp());
             goodsFocus.setConsumerId(apiSessionUtil.getConsumer().getId());
             List<Map> goodsFocusList=goodsFocusMapper.finGoodsFocusListByGIdAndNumIdAndConsumerId(goodsFocus.getgId(),goodsFocus.getNumId(),this.apiSessionUtil.getConsumer().getId());
@@ -102,6 +103,7 @@ public class GoodsFocusService {
                 goodsFocus.setUpdateDate(new Date());
                 goodsFocus.setIsDel(1);//取消收藏 否1
                 goodsFocusMapper.goodsFocusEdit(goodsFocus);
+                goodsFocusStr="取消成功";
             } else {
                 List<GoodsFocus> list = new ArrayList<GoodsFocus>();
                 goodsFocus.setId(goodsFocus.getGeneralId());
@@ -110,8 +112,9 @@ public class GoodsFocusService {
                 goodsFocus.setIsDel(0);//添加收藏 是0
                 list.add(goodsFocus);
                 goodsFocusMapper.insertBatch(list);
+                goodsFocusStr="收藏成功";
             }
-			return new Result(Result.OK, "提交成功");
+			return new Result(Result.OK, goodsFocusStr);
 	}
 
 }

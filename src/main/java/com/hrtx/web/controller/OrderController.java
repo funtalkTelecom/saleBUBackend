@@ -51,10 +51,32 @@ public class OrderController extends BaseReturn{
 		return orderService.pageOrder(order);
 	}
 
+	/**
+	 * 线下的单收款
+	 * @param order
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/order-receipt")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
 	public Result receipt(Order order, HttpServletRequest request){
 		return orderService.payReceipt(order, request);
+	}
+
+	/**
+	 *线下单退款
+	 * @param order
+	 * @return
+	 */
+	@RequestMapping("/order-refund")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_REFUND})
+	public Result reFund(Order order, HttpServletRequest request){
+		return orderService.reFund(order,request);
+	}
+	@RequestMapping("/order-refund-live")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_REFUND_LIVE})
+	public Result reFundLive(Order order, HttpServletRequest request){
+		return orderService.reFundLive(order,request);
 	}
 
 	@RequestMapping("/order-yPayAmt")
@@ -148,6 +170,7 @@ public class OrderController extends BaseReturn{
 			String param = this.getParamBody(request);
 			log.info("接收到发货回调参数["+param+"]");
 			StorageInterfaceRequest storageInterfaceRequest = StorageInterfaceRequest.create(param, SystemParam.get("key"));
+//			if(true) return renderHtml("取消订单成功");
 			//接收仓库回调，取消订单操作
 			Result result = orderService.OrderCallbackStatus(storageInterfaceRequest);
 			if (result.getCode() == 200) {

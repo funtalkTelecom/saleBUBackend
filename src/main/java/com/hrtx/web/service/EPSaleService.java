@@ -18,8 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.lang.System;
@@ -33,16 +36,21 @@ public class EPSaleService {
 	@Value("${auction.timer}")
 	private String auction_timer;
 	@Autowired private EPSaleMapper epSaleMapper;
+	@Autowired private EPSaleNoticeMapper ePSaleNoticeMapper;
 	@Autowired private AuctionMapper auctionMapper;
 	@Autowired private AuctionDepositMapper auctionDepositMapper;
 	@Autowired private FileMapper fileMapper;
     @Autowired private ConsumerMapper consumerMapper;
 	@Autowired private DeliveryAddressMapper deliveryAddressMapper;
 	@Autowired private NumberMapper numberMapper;
+	@Autowired private GoodsMapper goodsMapper;
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private FundOrderService fundOrderService;
 	@Autowired private ApiOrderService apiOrderService;
 	@Autowired private EPSaleService epSaleService;
+	@Autowired private AuctionService auctionService;
+	@Autowired private AuctionDepositService auctionDepositService;
+	@Autowired private GoodsService goodsService;
 	public Result pageEPSale(EPSale epSale) {
 		PageHelper.startPage(epSale.startToPageNum(),epSale.getLimit());
 		Page<Object> ob=this.epSaleMapper.queryPageList(epSale);
@@ -98,6 +106,13 @@ public class EPSaleService {
             map.put("serviceTime", java.lang.System.currentTimeMillis());
 		}
 		return list;
+	}
+
+	/*
+      erSatus 状态 1竟拍前，2竟拍中，3竟拍后
+	 */
+	public List<Map> findERSatusByEPSaleId(Long ePSaleId) {
+		return epSaleMapper.findEPSaleByEPSaleId2(ePSaleId);
 	}
 
 	/*
@@ -191,8 +206,17 @@ public class EPSaleService {
 		}
 
     }
+
+	/**
+	 * 防止实际业务方法回滚导致此处数据回滚
+	 * @param mapOrder
+	 * @return
+	 */
 	public Result newCreateOrder(Map mapOrder) {
 		return apiOrderService.createOrder(null,mapOrder);
+	}
+	public Result newByNumToUnShelve(String num,String skuid) {
+		return this.goodsService.ByNumToUnShelve(num,skuid);
 	}
 	public void payEpsaleOrder() {
 		/**
@@ -255,6 +279,8 @@ public class EPSaleService {
 				/*Number number=numberMapper.selectByPrimaryKey(num_id);
 				number.setStatus(1);
 				this.numberMapper.updateByPrimaryKey(number);*/
+				Result result=epSaleService.newByNumToUnShelve(num_resource,String.valueOf(sku_id));
+				log.info(String.format("人数不足，流拍出来结果[%s][%s]",result.getCode(),String.valueOf(result.getData())));
 			}
 			//if(true) throw  new RuntimeException("测试。。。。。。。。。。。。。。。。。");
 			List<Map> needReturn=epSaleMapper.queryNeedReturn(num_id,g_id,success_consumer_id);//success_consumer_id为空时查询该号码所有出价结果
@@ -481,8 +507,284 @@ public class EPSaleService {
 		return false;
 	}
 
-	public Result goodsAuciton(Auction auciton, HttpServletRequest request) {
-		return new Result(Result.OK, "提交成功");
+	/*
+	   竞拍商品出价
+	   *限 每次gId与numId组合
+	   *
+	 */
+	private static Object cjLock = new Object();
+	public void goodsAuciton(Auction auction, HttpServletRequest request) {
+		//***********************************
+		//***************************加锁记录
+		//***********************************
+		log.info("********************************************************************************************");
+		log.info("**********************freezeOneNum锁开始*****************************************************");
+		auctionMapper.freezeOneNum(auction.getNumId());
+		log.info("**********************freezeOneNum锁开始******************************************************");
+		log.info("*********************************************************************************************");
+		Goods goods=goodsMapper.findGoodsInfo(auction.getgId());//上架商品信息gActive
+		Date endTime=null;//结束时间
+		Date currentTime=new Date();//当前时间
+		int goodsAuctionCount=0;//最近10次数出价记录的次数
+		List<Map> numList=epSaleMapper.findNumById(auction.getNumId());
+		if(numList.size()>0)
+		{
+			try {
+				endTime=Utils.stringToDate(String.valueOf(numList.get(0).get("end_time")),"yyyy-MM-dd HH:mm:ss");
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			if(currentTime.compareTo(endTime)>0)
+			{
+				com.hrtx.config.Utils.returnResult(new Result(500, "竞拍已经结束"));
+				return;
+			}
+		}
+		else
+		{
+			com.hrtx.config.Utils.returnResult(new Result(500, "该商品不存在"));
+			return;
+		}
+		double startPrice=0L;
+		Map numMap= numberMapper.getNumInfoById(String.valueOf(auction.getNumId()));
+		if(numMap!=null&&numMap.size()>0)
+		{
+			startPrice=Double.valueOf(numMap.get("skuTobPrice").toString());
+		}
+		//最近10次数出价记录
+		List<Map> goodsAuctionList=auctionMapper.findAuctionListByNumIdAndGId2(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
+		goodsAuctionCount=goodsAuctionList.size();
+		int priceCount=0;//出价次数
+		double priceUp=Double.valueOf(goods.getgPriceUp());//每次加价
+		double priceUp2=0.00;//priceUp*100
+		int mulPrices=0;//每次加价倍数
+		int loopTime=Integer.valueOf(goods.getgLoopTime());//轮咨时间分钟
+		double deposit=Double.valueOf(goods.getgDeposit());//保证金
+		double beforePrice=0.00;//前一次出价记录
+		double subPrice=0.00;//当前出价与前一次出价相差
+		Long epSaleId=goods.getgActive();//竞拍活动Id
+		BigDecimal subPrice2=null;//subPrice*100
+		BigDecimal priceUp3=null;//priceUp*100
+		Long  autionId=0L;//前一次出价记录Id
+		Long consumerId=0L;//前一次出价记录用户Id
+		boolean isDeposit=false;//是否支付保证金
+		Long auctionDepositId=0L;//保证金Id
+		DecimalFormat df=new DecimalFormat("######0.00");
+		DecimalFormat df2=new DecimalFormat("######0");
+		if(Utils.formatFloatNumber(auction.getPrice()).length()>10)//整数7位.小数2位
+		{
+			com.hrtx.config.Utils.returnResult(new Result(606, "当前加价额度不能超过9位"));
+			return;
+		}
+		if(goodsAuctionCount>0)//最近10次数出价记录
+		{
+			beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
+			autionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
+			consumerId=Long.valueOf(goodsAuctionList.get(0).get("consumerId").toString());//前一次出价记录用户Id
+			subPrice=auction.getPrice()-beforePrice;
+		}else
+		{
+			subPrice=auction.getPrice();
+			if(startPrice>subPrice)
+			{
+				com.hrtx.config.Utils.returnResult(new Result(603, "当前加价不符规则;加价不能低于起拍价"+startPrice));
+				return;
+			}
+		}
+		if(subPrice>0)
+		{
+			subPrice=Double.valueOf(df.format(subPrice));//保留两位小数
+			if(Utils.judgeTwoDecimal(subPrice)||Utils.judgeTwoDecimal(priceUp))//若含小数点，转整数进行求%
+			{
+				subPrice=subPrice*100;
+				subPrice=Double.valueOf(df.format(subPrice));//去小数
+				subPrice2=new BigDecimal(subPrice);//可以过虑科学计数格式
+				priceUp2=priceUp*100;
+				priceUp2=Double.valueOf(df.format(priceUp2));//去小数
+				priceUp3=new BigDecimal(priceUp2);//可以过虑科学计数格式
+			}
+			if((goodsAuctionCount>0)&&(subPrice2.divideAndRemainder(priceUp3)[1].compareTo(BigDecimal.ZERO)>0)) {//比较前后次出价差是===>否按每次加价的倍数%,若是第一次出价记录则不要进行比较
+				if(goodsAuctionCount>0)
+				{
+					com.hrtx.config.Utils.returnResult(new Result(602, "当前加价不符规则;加价应按" + priceUp + "的倍数进行加价"));
+					return;
+				}
+			}else
+			{
+				//当前用户保证金已支付成功 状态：2成功
+				List<Map> auctionDepositConsumerList=auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndGId(auction.getNumId(),apiSessionUtil.getConsumer().getId(),auction.getgId());
+				if(auctionDepositConsumerList.size()>0)
+				{
+					auctionDepositId=Long.valueOf(auctionDepositConsumerList.get(0).get("id").toString());
+					if(auctionDepositConsumerList.get(0).get("status").toString().equals("2"))
+					{
+						isDeposit=true;
+					}else
+					{
+						isDeposit=false;
+					}
+				}else//当前用户无保证金记录，预先生成status:1保证金记录
+				{
+					AuctionDeposit auctionDeposit=new AuctionDeposit();
+					auctionDeposit.setStatus(1);
+					auctionDeposit.setgId(auction.getgId());
+					auctionDeposit.setNum(auction.getNum());
+					auctionDeposit.setNumId(auction.getNumId());
+					auctionDeposit.setSkuId(auction.getSkuId());
+					auctionDeposit.setAmt(Double.valueOf(goods.getgDeposit()));//保证金记录  状态：1初始
+					auctionDeposit.setAddIp(SessionUtil.getUserIp());
+					auctionDepositService.auctionDepositEdit(auctionDeposit);
+					auctionDepositId=auctionDeposit.getId();
+					isDeposit=false;
+				}
+				if(isDeposit)//当前用户保证金已支付成功 状态：2成功
+				{
+					//*******************先检测是否有auction.status=1状态的记录
+					List<Map> auctionListStatus2=auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(Long.valueOf(auction.getNumId()),apiSessionUtil.getConsumer().getId(),Long.valueOf(auction.getgId()));
+					//yyyymmddhhiiss 可以用来测试auctionDepositPay接口
+					//auctionDepositService.auctionDepositPay(auctionDepositId,true,"20180620112023");
+					Date addDate=new Date();
+					//auction.setStatus(2);
+					auction.setAddDate(addDate);
+					auction.setConfirmDate(addDate);//status 2 确认时间
+					auction.setAddIp(SessionUtil.getUserIp());
+					double newPrice=0.00;
+					Long newAutionId=0L;
+					Long newConsumerId=0L;
+					String goodsNoticePhone="";//短信通知手机号
+					Auction auctonNew=new Auction();
+
+
+
+					//synchronized (cjLock) {
+						//出价后的最新10次出价记录
+						List<Map> goodsAuctionListNew=auctionMapper.findAuctionListByNumIdAndGId2(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
+						if(goodsAuctionListNew.size()>0)
+						{
+							newPrice=Double.valueOf(goodsAuctionListNew.get(0).get("price").toString());//最新出价记录
+							newAutionId=Long.valueOf(goodsAuctionListNew.get(0).get("id").toString());//最新出价记录Id
+							newConsumerId=Long.valueOf(goodsAuctionListNew.get(0).get("consumerId").toString());//最新出价记录用户Id
+							//1、大于之前的最近出价记录，则最新出价记录状态：4 落败,当前出价记录状态：2成功
+							log.info("****************************************************************************");
+							log.info("******最新出价**"+newPrice+"*******************************************************");
+							log.info("******当前出价**"+auction.getPrice()+"***********************************************");
+							log.info("****************************************************************************");
+							if(auction.getPrice()>newPrice) {
+								//auctonNew  状态：4 落败
+								auctonNew.setId(newAutionId);
+								auctonNew.setStatus(4);//最新出价记录   状态：4 落败
+								auctionService.auctionEditStatusById2(auctonNew);//通知用户
+								//auction  状态：2成功
+								auction.setStatus(2);
+								auctionService.auctionEdit(auction);//出价记录 状态：2成功
+								log.info("****************************************************************************");
+								log.info("******当前出价**"+auction.getPrice()+"***********************出价成功************************");
+								//****************短信通知提醒auctonNew****************已落败
+								List<Map> goodsNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,newConsumerId);
+								if(!goodsNoticeList.isEmpty()&&goodsNoticeList.size()>0)
+								{
+									goodsNoticePhone=String.valueOf(goodsNoticeList.get(0).get("phone").toString());
+									Messager.send(goodsNoticePhone,"你的出价记录低于新的出价记录，已落败");
+								}
+							}//2、出现同价的成功出价记录，则当前出价记录状态：3失败
+							else if(auction.getPrice()==newPrice)//出现同价的成功出价记录
+							{
+								//auction  状态：3失败
+								auction.setStatus(3);
+								auctionService.auctionEdit(auction);//出价记录 状态：2成功
+								log.info("****************************************************************************");
+								log.info("******当前出价**"+auction.getPrice()+"***********************出价失败************************");
+							}else {
+								//auction  状态：4落败
+								auction.setStatus(4);
+								auctionService.auctionEdit(auction);//出价记录 状态：2成功
+								log.info("****************************************************************************");
+								log.info("******当前出价**"+auction.getPrice()+"***********************出价落败************************");
+								//****************短信通知提醒auctonNew****************已落败
+								List<Map> goodsNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,this.apiSessionUtil.getConsumer().getId());
+								if(!goodsNoticeList.isEmpty()&&goodsNoticeList.size()>0)
+								{
+									goodsNoticePhone=String.valueOf(goodsNoticeList.get(0).get("phone").toString());
+									Messager.send(goodsNoticePhone,"你的出价记录低于新的出价记录，已落败");
+								}
+							}
+						}
+
+					//}
+					epSaleService.epsaleDelayed(auction.getNumId());
+					//**************当前出价记录是处于（结束时间-轮询时间）与结束时间 之间************************************************
+				/*	if(epSaleService.isLoopTime(addDate,loopTime,auction.getNumId())) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
+					{
+						//***************************则延长结束时间= 结束时间+loopTime*********************
+						epSaleService.numLoopEdit(auction.getNumId(),loopTime);
+					}*/
+					//出价后的最近10次出价记录
+					List<Map> goodsAuctionListAfter=auctionMapper.findAuctionListByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
+					//String goodsAuctionListStr="";
+					Map goodsAuctionMap=new HashMap();
+					List<Map> epSaleGoodsAuctionPriceInfo=auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(auction.getNumId()),Long.valueOf(auction.getgId()));
+					if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
+						priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
+					}
+					if(goodsAuctionListAfter!=null&&goodsAuctionListAfter.size()>0)
+					{
+						goodsAuctionMap.put("goodsAuctionList",goodsAuctionListAfter);
+						goodsAuctionMap.put("priceCount",priceCount);
+						goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
+						//goodsAuctionListStr="goodsAuctionList:"+goodsAuctionListAfter;
+					}else
+					{
+						goodsAuctionMap.put("goodsAuctionList","");
+						goodsAuctionMap.put("priceCount","");
+						goodsAuctionMap.put("serviceTime",java.lang.System.currentTimeMillis());;
+						//goodsAuctionListStr="goodsAuctionList:"+"";
+					}
+					goodsAuctionMap.put("idDeposit","1");
+					com.hrtx.config.Utils.returnResult(new Result(200, goodsAuctionMap));
+
+					//******************************出价后的向所有WebSocket客户端广播信息
+					//String msg = "{\"code\":\"" +  Result.OK + "\", \"data\":" + JSONArray.fromObject(goodsAuctionMap) + "}";
+					//*/
+					//String msg=this.epSaleService.AuctionAfterInfo(auction.getNumId(),auction.getgId());
+					try {
+						log.info("出价成功************广播信息*************************************");
+						WebSocketServer.sendInfo(String.valueOf(auction.getNumId()),String.valueOf(auction.getgId()));
+						log.info("出价成功*************广播信息************************************");
+					}catch (IOException e)
+					{
+						log.info(String.format("出价成功，广播信息异常【[%s]",e.getMessage())+"】");
+					}
+				}else //当前用户保证金未支付成功    预先生成出价记录 状态：1初始     保证金记录状态：1 初始
+				{
+					//*******************先测
+					//*******************先检测是否有auction.status=1状态的记录
+					List<Map> auctionListStatus1=auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(Long.valueOf(auction.getNumId()),this.apiSessionUtil.getConsumer().getId(),Long.valueOf(auction.getgId()));
+					if(auctionListStatus1==null||auctionListStatus1.size()==0)
+					{
+						auction.setStatus(1);
+						auction.setAddIp(SessionUtil.getUserIp());
+						auctionService.auctionEdit(auction);//出价记录 状态：1初始
+					}
+					String orderNameStr=SystemParam.get("system_name")+auction.getNum()+"号码保证金";
+					Result res=fundOrderService.payPinganWxxDeposit(com.hrtx.global.Utils.doubleToInt(deposit),orderNameStr,auctionDepositId.toString());
+					if(res.getCode()==200)
+					{
+						res.setCode(604);//"保证金支付中"
+					}else
+					{
+						res.setCode(605);//"保证金支付中异常"
+					}
+					//returnResult(new Result(600, "保证金未支付"+res.getData().toString()));
+					com.hrtx.config.Utils.returnResult(res);
+				}
+			}
+		}else
+		{
+			com.hrtx.config.Utils.returnResult(new Result(601, "当前加价不符规则;加价应超过前一次出价"));
+			return;
+		}
+		log.info("**********************freezeOneNum锁结束******************************************************");
+		log.info("****************************************************************************");
 	}
 
 	public Result epSaleEdit(EPSale epSale, HttpServletRequest request, MultipartFile[] files) {

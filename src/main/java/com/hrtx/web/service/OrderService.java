@@ -12,6 +12,7 @@ import com.hrtx.global.*;
 import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
+import com.hrtx.web.pojo.System;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -287,7 +288,34 @@ public class OrderService extends BaseService {
             return new Result(Result.ERROR, "未找到支付方式");
         }
     }
-
+    public Result reFund(Order order, HttpServletRequest request) {
+        Long orderId = order.getOrderId();
+        String refunReason = request.getParameter("refunReason");
+        if(StringUtils.isBlank(refunReason)) return new Result(Result.ERROR, "退款备注信息不能为空");
+        //获取订单信息
+        Order parm = orderMapper.selectByPrimaryKey(orderId);
+        parm.setRefundReason(refunReason);
+        orderMapper.updateByPrimaryKey(parm);
+        apiOrderService.CancelOrderStatus(orderId,7,"null"); //取消
+        //上架涉及的表，数量，状态
+        apiOrderService.orderType(orderId);
+        return new Result(Result.OK, "退款成功");
+    }
+    public Result reFundLive(Order order, HttpServletRequest request) {
+        Long orderId = order.getOrderId();
+        String reason ="null";
+        Order order1 = orderMapper.selectByPrimaryKey(orderId);
+        if(order1 == null) return new Result(Result.ERROR, "订单不存在");
+        if(order1.getStatus() != 13) return new Result(Result.ERROR, "非退款失败状态的订单");
+        Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
+        if(payR.getCode()==200){  //退款成功
+            apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
+            apiOrderService.orderType(orderId);
+            return new Result(Result.OK, "退款成功");
+        }else { //退款失败
+            return new Result(Result.OK, "退款失败");
+        }
+    }
 
     /**
      * 线下付款
@@ -401,6 +429,7 @@ public class OrderService extends BaseService {
         return new Result(Result.OK, "绑卡成功");
     }
 
+
     /***
      * 仓库回调的方法
      * @param storageInterfaceRequest
@@ -410,7 +439,10 @@ public class OrderService extends BaseService {
         Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
         long orderId = NumberUtils.toLong(ObjectUtils.toString(platrequest.get("order_id")));
         int cancel_res = NumberUtils.toInt(ObjectUtils.toString(platrequest.get("cancel_res")));
-        String reson = ObjectUtils.toString(platrequest.get("reson"));
+//        java.lang.System.out.println((platrequest.get("reson")==null)+"     =======================");
+//        java.lang.System.out.println((platrequest.get("reson").equals(null))+"     =======================");
+//        java.lang.System.out.println((platrequest.get("reson").equals("null"))+"     =======================");
+        String reason = ObjectUtils.toString(platrequest.get("reson"));
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getStatus() != 11) return new Result(Result.ERROR, "非待仓库撤销状态的订单");
@@ -419,25 +451,28 @@ public class OrderService extends BaseService {
             Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
             if(ispay.getCode()==200){
                 //已支付
-                if(ispay.getData().equals("1")){//线上支付
-                    apiOrderService.CancelOrderStatus(orderId,12,""); //退款中
-                    Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reson);
-                    if(payR.getCode()==200){  //退款成功
+                if("1".equals(String.valueOf(ispay.getData()))){//线上支付
+                    Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
+                    if(payR.getCode()==Result.OK){  //退款成功
+                        apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
                         apiOrderService.orderType(orderId);
+                        return new Result(Result.OK, "取消成功");
                     }else { //退款失败
-                        apiOrderService.CancelOrderStatus(orderId,13,""); //退款失败
+                        apiOrderService.CancelOrderStatus(orderId,13,reason); //退款失败
+                        return new Result(Result.OK, "退款失败");
                     }
                 }else {//线下支付
-                    apiOrderService.CancelOrderStatus(orderId,14,""); //待财务退款
+                    apiOrderService.CancelOrderStatus(orderId,14,reason); //待财务退款
+                    return new Result(Result.OK, "线下支付,待财务退款");
                 }
             }else {//未支付
                 //上架涉及的表，数量，状态
                 apiOrderService.orderType(orderId);
             }
         }else if (cancel_res==2){//撤销取消,还原订单状态
-            apiOrderService.CancelOrderStatus(orderId,3,reson);
+            apiOrderService.CancelOrderStatus(orderId,3,reason);
         }
-        return new Result(Result.OK, "取消成功");
+        return new Result(Result.OK, "撤销取消成功");
     }
 
 
@@ -455,10 +490,52 @@ public class OrderService extends BaseService {
         return new Result(Result.OK,aamt);
     }
 
+    /**
+     * 待付款订单120分钟后，系统自动取消，除竞拍订单
+     */
+    @Scheduled(fixedRate=6000)
+    public void TowHoursCancelOrderStatusTimer(){
+        if(!"true".equals(SystemParam.get("twoHours_timer"))) return;
+        log.info("开始执行2个小时未付款订单期定时器");
+        List list = orderMapper.getTwoHoursOrderList();
+        if(list.size()>0){
+            for(int i=0; i<list.size(); i++){
+                Map map = (Map) list.get(i);
+                String orderid = String.valueOf(map.get("orderid"));
+                String note ="系统取消，原因：2小时未付款";
+                try {
+                    log.info("取消订单号:"+orderid);
+                    apiOrderService.CancelOrder(orderid,note);
+                }catch (Exception e) {
+                    log.error("未知异常", e);
+                }
 
-    @Scheduled(fixedRate=3000)
-    public void goodsTimer(){
+            }
+        }
+    }
 
+    /***
+     * 系统自动取消竞拍订单
+     */
+    @Scheduled(fixedRate=6000)
+    public void LastPayTimeCancelOrderStatusTimer(){
+        if(!"true".equals(SystemParam.get("lastPay_timer"))) return;
+        log.info("开始执行竞拍订单未付款订单超过最迟付款期定时器");
+        List list = orderMapper.getLastTimePayOrderList();
+        if(list.size()>0){
+            for(int i=0; i<list.size(); i++){
+                Map map = (Map) list.get(i);
+                String orderid = String.valueOf(map.get("order_id"));
+                String note ="系统取消，原因：竞拍订单超过最迟付款时间未付款";
+                try {
+                    log.info("取消订单号:"+orderid);
+                    apiOrderService.CancelOrder(orderid,note);
+                }catch (Exception e) {
+                    log.error("未知异常", e);
+                }
+
+            }
+        }
     }
 }
 

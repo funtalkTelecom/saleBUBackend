@@ -120,7 +120,7 @@
 	   where tb_auction.status in(2,4)
 	   and  tb_auction.num_id = #{numId}
 	   and  tb_auction.g_id = #{gId}
-	  order by tb_auction.price desc,tb_auction.confirm_date asc limit 10
+	  order by tb_auction.price desc,tb_auction.confirm_date asc ,tb_auction.status asc limit 10
     </select>
 
 	<select id="findAuctionListByNumIdAndGId2" resultType="java.util.HashMap">
@@ -132,7 +132,7 @@
 	where tb_auction.status in(2,4)
 	and  tb_auction.num_id = #{numId}
 	and  tb_auction.g_id = #{gId}
-	order by tb_auction.price desc,tb_auction.confirm_date desc limit 10
+	order by tb_auction.price desc,tb_auction.confirm_date asc ,tb_auction.status asc limit 10
    </select>
 
 	<select id="findAuctionOrderListByConsumerId" resultType="java.util.HashMap">
@@ -336,4 +336,8 @@
 	and num_id=#{numId}
 	and sku_id=#{skuId}
 	</update>
+
+	<select id="freezeOneNum" resultType="java.util.HashMap">
+        select * from tb_num  where id=#{numId} for update;
+    </select>
 </mapper>

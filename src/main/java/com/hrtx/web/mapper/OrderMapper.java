@@ -44,6 +44,17 @@ public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
 
     List getOrderItmeCount(@Param("orderId") Long orderId,@Param("isShipment") int isShipment);
 
+    /**
+     *查询下单时间后两个小时未付款的订单
+     * @return
+     */
+    List getTwoHoursOrderList();
+    /**
+     *查询下单时间后两个小时未付款的订单
+     * @return
+     */
+    List getLastTimePayOrderList();
+
     /**----------------end---取消订单操作涉及的方法--------------------------**/
 
 }
