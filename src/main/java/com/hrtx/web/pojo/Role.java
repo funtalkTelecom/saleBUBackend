@@ -1,5 +1,8 @@
 package com.hrtx.web.pojo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -11,6 +14,7 @@ public class Role extends BasePojo implements java.io.Serializable {
 
 	// Fields
 	@Id
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 	private String name;
 	private Integer status;

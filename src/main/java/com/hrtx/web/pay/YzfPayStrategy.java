@@ -214,7 +214,8 @@ public class YzfPayStrategy implements ThirdPayStrategy {
 		TreeMap<String, String> datamap = new TreeMap<String, String>();    // data参数的map
 
 		datamap.put("out_no", payRequest.getOrderNo());
-		datamap.put("pmt_tag", "UYStagPA");
+//		datamap.put("pmt_tag", "UYStagPA");
+		datamap.put("pmt_tag", "UYStagTY");
 //		datamap.put("pmt_tag", "Cash");
 		datamap.put("pmt_name", "");
 		datamap.put("ord_name", payRequest.getOrderName());

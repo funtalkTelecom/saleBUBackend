@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hrtx.web.mapper.UserMapper">
   <select id="findUserInfo" resultType="com.hrtx.web.pojo.User">
-    select id, first_name from tb_user t where t.id = 1;
+    select concat(t.id,'') id, first_name from tb_user t where t.id = 1;
   </select>
   
   <select id="selectByPageAndSelections" resultType="java.util.HashMap">
-  	select id, first_name,login_name,pwd from tb_user t where 1=1 
+  	select concat(t.id,'') id, first_name,login_name,pwd from tb_user t where 1=1
   </select>
   <select id="queryPageList" resultType="java.util.HashMap">
   	select concat(t.id,'') id, t.name, t.login_name, t.phone, t.status, c.name company from tb_user t left join tb_corporation c on t.corp_id = c.id where t.is_del = 0
@@ -24,7 +24,7 @@
   </select>
 
   <select id="finRolesByUserId" resultType="java.util.HashMap">
-  	select r.id id, r.name name, ur.user_id userid  from tb_role r left join tb_user_role ur on r.id = ur.role_id and ur.user_id = #{id}
+  	select concat(r.id,'') id, r.name name, ur.user_id userid  from tb_role r left join tb_user_role ur on r.id = ur.role_id and ur.user_id = #{id} order by r.id desc
   </select>
 
   <delete id="deleteRoleByUserId">
