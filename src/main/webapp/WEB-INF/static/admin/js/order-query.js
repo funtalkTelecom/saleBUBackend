@@ -303,13 +303,7 @@ $(function() {
             alert(data.data);
         },"json");
     });
-    $(document).on("click","#receiptInfo .modal-footer .btn-success",function() {
-        $.post("order/order-receipt",$("#receiptInfo form").serialize(),function(data){
-            $('#receiptInfo').modal('hide');
-            dataList.reload();
-            alert(data.data);
-        },"json");
-    });
+
     $(document).on("click","#refundInfo .modal-footer .btn-success",function() {
         if(confirm("是否确认退款？")){
             $.post("order/order-refund",$("#refundInfo form").serialize(),function(data){
