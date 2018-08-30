@@ -20,9 +20,13 @@ public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<
 
     List<Map> findAuctionDepositListByNumIdAndConsumerIdAndGId(@Param("numId") Long numId,@Param("consumerId") Long consumerId,@Param("gId") Long gId);
 
+    List<Map> findAuctionDepositListByConsumerIdAndGId(@Param("consumerId") Long consumerId,@Param("gId") Long gId);
+
     List<Map> findAuctionDepositListByConsumerId(@Param("consumerId") Long consumerId);
 
     Page<Object> queryPageDepositListByConsumerId(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Long consumerId);
+
+    Page<Object> queryPageDepositListByConsumerId2(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Long consumerId);
     /*
         通过NumId、ConsumerId、Status查询对应AuctionDepositList
      */
@@ -30,7 +34,11 @@ public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<
 
     List<Map> findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(AuctionDeposit auctionDeposit);
 
+    List<Map> findAuctionDepositListByConsumerIdAndStatusAndGId(AuctionDeposit auctionDeposit);
+
     List<Map> findAuctionDepositListByNumIdAndStatusAndGId(AuctionDeposit auctionDeposit);
+
+    List<Map> findAuctionDepositListByStatusAndGId(AuctionDeposit auctionDeposit);
 
     void insertBatch(@Param("auctionDepositList") List<AuctionDeposit> list);
 

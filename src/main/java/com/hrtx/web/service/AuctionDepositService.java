@@ -15,6 +15,7 @@ import com.hrtx.web.pojo.AuctionDeposit;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.websocket.WebSocketServer;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,16 @@ public class AuctionDepositService {
 		auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
 		//return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatus(auctionDeposit);
 		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatusAndGId(auctionDeposit);
+	}
+
+	/*
+      获取当前用户已支付保证金记录
+     */
+	public List<Map> findAuctionDepositListByGId(AuctionDeposit auctionDeposit){
+		auctionDeposit.setStatus(2);
+		auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
+		//return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndStatus(auctionDeposit);
+		return auctionDepositMapper.findAuctionDepositListByConsumerIdAndStatusAndGId(auctionDeposit);
 	}
 
 	/*
@@ -134,7 +145,8 @@ public class AuctionDepositService {
 			auctionDeposit.setStart(limit*(pageNum-1));
 			//auctionDeposit.setLimit(auctionDeposit.getLimit());
 			PageHelper.startPage(pageNum,limit);
-			Page<Object> ob=this.auctionDepositMapper.queryPageDepositListByConsumerId(auctionDeposit,apiSessionUtil.getConsumer().getId());
+			//Page<Object> ob=this.auctionDepositMapper.queryPageDepositListByConsumerId(auctionDeposit,apiSessionUtil.getConsumer().getId());
+			Page<Object> ob=this.auctionDepositMapper.queryPageDepositListByConsumerId2(auctionDeposit,apiSessionUtil.getConsumer().getId());
 			pm = new PageInfo<Object>(ob);
 			result = new Result(Result.OK, pm);
 		} catch (NumberFormatException e) {
@@ -163,6 +175,10 @@ public class AuctionDepositService {
 		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndGId(numId,apiSessionUtil.getConsumer().getId(),gId);
 	}
 
+	public List<Map> findAuctionDepositListConsumerByGId(Long gId) {
+		return auctionDepositMapper.findAuctionDepositListByConsumerIdAndGId(apiSessionUtil.getConsumer().getId(),gId);
+	}
+
 	/*
 	  保证金支付
 	  可供支付接口调用操作
@@ -185,6 +201,7 @@ public class AuctionDepositService {
 		Long numId=0L;
 		Long gId=0L;
 		Long epSaleId=0L;//竞拍活动Id
+		Integer erIsPack=0;//商品是否打包
 		int loopTime=0;//轮咨时间分钟
 		if(auctionDepositList.size()>0)
 		{
@@ -194,6 +211,7 @@ public class AuctionDepositService {
 			Goods goods=goodsService.findGoodsById(gId);//上架商品信息
 			loopTime=Integer.valueOf(goods.getgLoopTime());
 			epSaleId=goods.getgActive();
+			erIsPack=NumberUtils.toInt(goods.getgIsPack());
 		}
 		auctionDeposit.setConsumerId(consumerId);
 		auctionDeposit.setNumId(numId);
@@ -226,7 +244,14 @@ public class AuctionDepositService {
 			//***********************************
 			auctionMapper.freezeOneNum(numId);
 			//auction.status=1记录状态的记录
-			List<Map> auctionList =auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getConsumerId(),auctionDeposit.getgId());
+			List<Map> auctionList=new ArrayList<Map>();
+			if(erIsPack==0)//商品是否打包 erIsPack
+			{
+				auctionList =auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getConsumerId(),auctionDeposit.getgId());
+			}else if(erIsPack==1)
+			{
+				auctionList =auctionMapper.findAuctionListByConsumerIdAndGId(auctionDeposit.getConsumerId(),auctionDeposit.getgId());
+			}
 			if(auctionList.size()>0)
 			{
 				autionId=Long.valueOf(auctionList.get(0).get("id").toString());
@@ -234,7 +259,15 @@ public class AuctionDepositService {
 				auction.setConfirmDate(auctionDeposit.getPayDate());
 				auction.setId(autionId);
 				//最近10次数出价记录
-				List<Map> goodsAuctionList=auctionMapper.findAuctionListByNumIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getgId());
+				List<Map> goodsAuctionList=new ArrayList<Map>();
+				if(erIsPack==0)//商品是否打包 erIsPack
+				{
+					goodsAuctionList=auctionMapper.findAuctionListByNumIdAndGId(auctionDeposit.getNumId(),auctionDeposit.getgId());
+
+				}else if(erIsPack==1)
+				{
+					goodsAuctionList=auctionMapper.findAuctionListByGId(auctionDeposit.getgId());
+				}
 				if(goodsAuctionList.size()>0)
 				{
 					beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
@@ -260,7 +293,8 @@ public class AuctionDepositService {
 						//****************保证金支付成功*****当前出价记录状态：2成功*******************
 						auctionDepositMapper.auctionDepositSatusEdit(auctionDeposit);
 						auctionMapper.auctionEditStatusById(auction);
-						epSaleService.epsaleDelayed(numId);
+						//epSaleService.epsaleDelayed(numId);
+						epSaleService.epsaleDelayed(numId,gId,erIsPack);
 						/*if(epSaleService.isLoopTime(auction.getConfirmDate(),loopTime,numId)) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
 						{
 							//***************************则延长结束时间= 结束时间+loopTime*********************
@@ -313,7 +347,7 @@ public class AuctionDepositService {
 				}
 				try {
 					log.info("出价成功**************广播信息***********************************");
-					WebSocketServer.sendInfo(String.valueOf(auctionDeposit.getNumId()),String.valueOf(auctionDeposit.getgId()));
+					WebSocketServer.sendInfo(String.valueOf(auctionDeposit.getNumId()),String.valueOf(auctionDeposit.getgId()),erIsPack);
 					log.info("出价成功**************广播信息***********************************");
 					//log.info("广播信息"+msg);
 					//log.info("保证金支付成功，广播信息,最近10次出价记录，状态：2支付成功保证金列表");

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
-
+import javax.persistence.Transient;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -32,8 +32,8 @@ public class Auction extends BasePojo implements java.io.Serializable {
     private String addIp;//	用户ip
     private Long orderId;//订单id
     private String  remark;//备注
-
-
+    @Transient
+    private Integer erISPack=0;//商品是否打包 erIsPack
 
     public Auction() {
     }
@@ -161,5 +161,8 @@ public class Auction extends BasePojo implements java.io.Serializable {
         this.addIp = addIp;
     }
 
+    public Integer getErISPack() { return erISPack; }
+
+    public void setErISPack(Integer erISPack) { this.erISPack = erISPack; }
 
 }

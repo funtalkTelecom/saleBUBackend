@@ -25,6 +25,17 @@
       and  tb_goods_focus.consumer_id = #{consumerId}
     </select>
 
+	<select id="finGoodsFocusListByGIdAndConsumerId" resultType="java.util.HashMap">
+      select
+	  tb_goods_focus.id,
+	  tb_goods_focus.price as focusPrice,
+	  tb_goods_focus.update_date as addDate
+	  from tb_goods_focus
+	  where tb_goods_focus.is_del=0
+	  and  tb_goods_focus.g_id= #{gId}
+      and  tb_goods_focus.consumer_id = #{consumerId}
+    </select>
+
 	<select id="findGoodsFocusListByConsumerId2" resultType="java.util.HashMap">
   	 select
 	 tb_goods_focus.id,
@@ -32,7 +43,6 @@
 	 tb_goods_focus.g_id as gId,
 	 case when tb_file_info.file_name is null then ''
 	 else  concat("get-img","/",tb_file_info.file_group,"s/",tb_file_info.ref_id,"/",tb_file_info.file_name) end as gImg,
-	 tb_goods_focus.g_id as gId,
 	 case when tb_goods_focus.num !='' and  tb_goods_focus.num is not null then tb_goods_focus.num
 	 else tb_goods_focus.g_name  end as gName,
 	 tb_sku.sku_tob_price as currentPrice,
