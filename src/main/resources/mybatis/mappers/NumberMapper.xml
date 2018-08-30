@@ -303,4 +303,13 @@
         and c.g_is_sale = '1'
         and SYSDATE() between c.g_start_time and c.g_end_time
     </select>
+
+
+    <select id="queryGoodsNumberList" resultType="java.util.HashMap">
+        select g.g_id gid,s.sku_id skuid,n.id numid,n.`status` status
+        from tb_num n ,tb_sku s ,tb_goods g
+        where n.sku_id= s.sku_id and s.g_id = g.g_id
+        and n.status = 2
+        and g.g_id =#{goodsid}
+    </select>
 </mapper>

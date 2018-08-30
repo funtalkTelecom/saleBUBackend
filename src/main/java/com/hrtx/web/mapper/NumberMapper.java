@@ -34,4 +34,11 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
     void updateDelStatus(@Param("delSku") Long delSku);
 
     Page<Object> queryPageByNumList(@Param("num") String num);
+
+    /**
+     * 批量竞拍，根据goodid 查找对应的号码信息，状态=2
+     * @param goodsid
+     * @return
+     */
+    List queryGoodsNumberList(@Param("goodsid")  String goodsid);
 }
