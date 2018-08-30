@@ -125,6 +125,60 @@
         and ep.end_time>now()
     </select>
 
+    <select id="findEPSaleList4" resultType="java.util.HashMap">
+        select
+        concat(ep.id,'') id,
+        ep.title,
+        ep.ep_rule as erRule,
+        ep.start_time as startTime,
+        epSaleEndTime.endTime,
+        case when epImg.file_name is null then ''
+		else concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) end as epImg,
+        case
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as erSatus,
+        tb_goods.g_is_pack as erIsPack
+        from tb_ep_sale ep
+        left join
+        tb_file_info epImg
+        on epImg.ref_id=ep.id
+        left join
+        (
+          select max(epSaleNum.end_time) as endTime,epSaleNum.g_active as epSaleId
+		  from (
+            select num.end_time,goods.g_active from tb_num num
+            inner join tb_sku sku
+		    on num.sku_id=sku.sku_id
+		    inner join tb_goods goods
+		    on goods.g_id=sku.g_id) epSaleNum
+		    group by epSaleNum.g_active
+		  ) as epSaleEndTime
+		on epSaleEndTime.epSaleId=ep.id
+		left join tb_goods on tb_goods.g_active=ep.id
+        where ep.is_del=0
+        and tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and ep.id in(
+        select tb_goods.g_active
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1)
+        order by
+        case
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[>=0]]> and TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[<=0]]>
+        then 1
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[<0]]> then 2
+        when TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[>0]]> then 3
+        else 0 end,ep.id
+    </select>
+
     <select id="findEPSaleByEPSaleId" resultType="java.util.HashMap">
     select
     concat(ep.id,'') id,
@@ -180,6 +234,47 @@
     and ep.id = #{epSaleId};
     </select>
 
+    <select id="findEPSaleByEPSaleId3" resultType="java.util.HashMap">
+    select
+    concat(ep.id,'') id,
+    ep.title,
+    ep.ep_rule as erRule,
+    ep.start_time as startTime,
+    epSaleEndTime.endTime,
+    case when epImg.file_name is null then ''
+		  else concat("get-img","/",epImg.file_group,"/",epImg.ref_id,"/",epImg.file_name) end as epImg,
+	case
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,ep.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,epSaleEndTime.endTime, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as erSatus,
+    tb_goods.g_is_pack as erIsPack
+    from tb_ep_sale ep
+    inner join
+    tb_file_info epImg
+    on epImg.ref_id=ep.id
+    left join
+    (
+          select max(epSaleNum.end_time) as endTime,epSaleNum.g_active as epSaleId
+		  from (
+          select num.end_time,goods.g_active from tb_num num
+          inner join tb_sku sku
+		  on num.sku_id=sku.sku_id
+		  inner join tb_goods goods
+		  on goods.g_id=sku.g_id) epSaleNum
+		  group by epSaleNum.g_active
+		  ) as epSaleEndTime
+	on epSaleEndTime.epSaleId=ep.id
+    left join tb_goods on tb_goods.g_active=ep.id
+    where ep.is_del=0
+    and tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+    and ep.id = #{epSaleId};
+    </select>
+
     <select id="findEPSalePriceCountByEPSaleId" resultType="java.util.HashMap">
     select tb_goods.g_active as epSaleId,
     count(tb_auction.id) as priceCount
@@ -213,6 +308,16 @@
       from tb_num
       where status=2
              and id = #{id};
+    </select>
+
+    <select id="findGoodsByGId" resultType="java.util.HashMap">
+     select tb_num.*
+     from tb_num
+     inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+     inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+     where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+	 and tb_num.status=2
+     and tb_goods.g_id = #{gId}
     </select>
 
     <update id="numLoopEdit">
@@ -265,6 +370,39 @@
     and tb_goods.g_active= #{ePSaleId}
    </select>
 
+    <select id="findEPSaleGoodsListByEPSaleId3" resultType="java.util.HashMap">
+        select
+        distinct
+        concat('0','') as numId,
+        concat(tb_goods.g_active,'')as gEPSaleId,
+        concat(tb_goods.g_id,'')as gId,
+       case
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice,
+        case when tb_file_info.file_name is null then ''
+        else  concat("get-img","/",tb_file_info.file_group,"s/",tb_file_info.ref_id,"/",tb_file_info.file_name) end as gImg,
+        concat(0,'') as skuId,
+        concat('','') as num
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and tb_file_info.file_group='goodsPic'
+        and tb_file_info.seq=1
+        and tb_num.status not in (1,8)
+        and tb_goods.g_active= #{ePSaleId}
+    </select>
+
     <select id="findEPSaleGoodsImgByNumIdAndGId" resultType="java.util.HashMap">
     select
     case when tb_file_info.file_name is null then ''
@@ -278,6 +416,20 @@
     and tb_file_info.seq=1
     and  tb_num.id=#{0}
     and  tb_goods.g_id=#{1}
+    </select>
+
+    <select id="findEPSaleGoodsImgByGId" resultType="java.util.HashMap">
+    select
+    case when tb_file_info.file_name is null then ''
+    else  concat("get-img","/",tb_file_info.file_group,"s/",tb_file_info.ref_id,"/",tb_file_info.file_name) end as gImg
+    from
+    tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+    inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+    left join tb_file_info on tb_file_info.ref_id=tb_goods.g_id
+    where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+    and tb_file_info.file_group='goodsPic'
+    and tb_file_info.seq=1
+    and  tb_goods.g_id=#{0}
     </select>
 
     <select id="findEPSaleGoodsByGoodsId" resultType="java.util.HashMap">
@@ -438,13 +590,75 @@
         tb_goods.g_deposit as gDeposit,
         tb_goods.g_loop_time as gLoopTime,
         tb_num.start_time as gStartTime,
-        tb_num.end_time as gEndTime
+        tb_num.end_time as gEndTime,
+         tb_goods.g_is_pack as erIsPack
         from
         tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
         inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
         where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
         and  tb_num.id=#{0}
         and  tb_goods.g_id=#{1}
+    </select>
+
+    <select id="findEPSaleGoodsByGId" resultType="java.util.HashMap">
+        select
+        concat('','')as numId,
+        concat(tb_goods.g_id,'')as gId,
+        case
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice,
+        concat('','')as skuId,
+        concat('','') as num,
+        tb_goods.g_price_up as gPriceUp,
+        tb_goods.g_deposit as gDeposit,
+        tb_goods.g_loop_time as gLoopTime,
+        tb_num.start_time as gStartTime,
+        tb_num.end_time as gEndTime,
+         tb_goods.g_is_pack as erIsPack
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and  tb_goods.g_id=#{0}
+    </select>
+
+    <select id="findAuctionSumEPSaleGoodsByGId" resultType="java.util.HashMap">
+        select
+        concat('','')as numId,
+        concat(tb_goods.g_id,'')as gId,
+        case
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[<0]]> then 1
+        when TIMESTAMPDIFF(second,tb_num.start_time, now())<![CDATA[>=0]]> and
+        TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[<=0]]>
+        then 2
+        when TIMESTAMPDIFF(second,tb_num.end_time, now())<![CDATA[>0]]>
+        then 3
+        else 0
+        end as gSatus,
+        tb_goods.g_name as gName,
+        tb_goods.g_ad as gAd,
+        tb_sku.sku_tob_price as gStartPrice,
+        concat('','')as skuId,
+        concat('','') as num,
+        tb_goods.g_price_up as gPriceUp,
+        tb_goods.g_deposit as gDeposit,
+        tb_goods.g_loop_time as gLoopTime,
+        tb_num.start_time as gStartTime,
+        tb_num.end_time as gEndTime
+        from
+        tb_num inner join  tb_sku on tb_num.sku_id=tb_sku.sku_id
+        inner join  tb_goods on tb_goods.g_id=tb_sku.g_id
+        where  tb_goods.g_is_auc=1 and tb_goods.g_is_sale=1
+        and  tb_goods.g_id=#{0}
     </select>
 
     <insert id="insertBatch">
@@ -500,23 +714,58 @@
     <select id="freezeOneRecord" resultType="java.util.HashMap">
         select * from tb_system s where s.key_id='system_name' for update
     </select>
-    <!--查询结束的竞拍-->
-    <select id="queryEndAuction" resultType="java.util.HashMap">
-        select n.id num_id,g.g_id,s.sku_id,n.`status`,n.num_resource,g.g_start_num from tb_num n left join tb_sku s on n.sku_id=s.sku_id left join tb_goods g on g.g_id=s.g_id
-        where n.`status`=2 and g.g_is_auc=1 and g.g_is_sale=1 and n.end_time<![CDATA[<=]]>now()
+    <!--查询结束的竞拍（号码）-->
+    <select id="queryEndAuctionNum" resultType="java.util.HashMap">
+        select n.id num_id,g.g_id,s.sku_id,n.`status`,n.num_resource,g.g_start_num,g.g_is_pack  from tb_num n left join tb_sku s on n.sku_id=s.sku_id left join tb_goods g on g.g_id=s.g_id
+        where n.`status`=2 and g.g_is_auc=1 and g.g_is_sale=0 and g.g_is_pack=0 and n.end_time<![CDATA[<=]]>now()
     </select>
+    <!--查询结束的竞拍（商品）-->
+    <select id="queryEndAuctionGoods" resultType="java.util.HashMap">
+      select  distinct  '0' as num_id,g.g_id, '0'  as sku_id,n.`status`,concat('','') as num_resource,g.g_start_num,g.g_is_pack,g.g_name
+      from tb_num n left join tb_sku s on n.sku_id=s.sku_id left join tb_goods g on g.g_id=s.g_id
+      where n.`status`=2 and g.g_is_auc=1 and g.g_is_sale=1 and g.g_is_pack=1 and n.end_time<![CDATA[<=]]>now()
+    </select>
+
     <!--取唯一一条有效出价单(价格最高、时间升序)-->
     <select id="queryActiveAuction" resultType="java.util.HashMap">
         select a.sku_id,a.num_id,a.g_id,a.consumer_id,a.price
         from tb_auction a where a.`status`=2 and a.num_id=#{num_id} and a.g_id=#{g_id}
         order by a.price desc,a.confirm_date asc ,a.status asc
     </select>
+
+    <!--取唯一一条有效出价单(价格最高、时间升序)-->
+    <select id="queryActiveAuctionByNumIdAndGId" resultType="java.util.HashMap">
+        select a.sku_id,a.num_id,a.g_id,a.consumer_id,a.price
+        from tb_auction a where a.`status`=2 and a.num_id=#{num_id} and a.g_id=#{g_id}
+        order by a.price desc,a.confirm_date asc ,a.status asc
+    </select>
+
+    <!--取唯一一条有效出价单(价格最高、时间升序)-->
+    <select id="queryActiveAuctionByGId" resultType="java.util.HashMap">
+        select a.sku_id,a.num_id,a.g_id,a.consumer_id,a.price
+        from tb_auction a where a.`status`=2 and a.g_id=#{g_id}
+        order by a.price desc,a.confirm_date asc ,a.status asc
+    </select>
+
     <!--取出价人数-->
     <select id="countAuctions" resultType="java.util.HashMap">
         select a.consumer_id,count(1)
         from tb_auction a where a.`status` in (2,4) and a.num_id=#{num_id} and a.g_id=#{g_id}
         group by a.consumer_id
     </select>
+    <!--取出价人数-->
+    <select id="countAuctionsByNumIdAndGId" resultType="java.util.HashMap">
+        select a.consumer_id,count(1)
+        from tb_auction a where a.`status` in (2,4) and a.num_id=#{num_id} and a.g_id=#{g_id}
+        group by a.consumer_id
+    </select>
+    <!--取出价人数-->
+    <select id="countAuctionsByGId" resultType="java.util.HashMap">
+        select a.consumer_id,count(1)
+        from tb_auction a where a.`status` in (2,4) and a.g_id=#{g_id}
+        group by a.consumer_id
+    </select>
+
     <!--查询需要退还保证金的用户-->
     <select id="queryNeedReturn" resultType="java.util.HashMap">
         select * from tb_auction_deposit a
@@ -525,15 +774,52 @@
             and a.consumer_id not in (#{consumer_id})
         </if>
     </select>
+
+    <!--查询需要退还保证金的用户-->
+    <select id="queryNeedReturnByNumIdAndGIdAndComsumerId" resultType="java.util.HashMap">
+        select * from tb_auction_deposit a
+        where  a.num_id=#{num_id} and a.g_id=#{g_id} and a.`status`=2
+        <if test="consumer_id!=null and consumer_id!=''">
+            and a.consumer_id not in (#{consumer_id})
+        </if>
+    </select>
+
+    <!--查询需要退还保证金的用户-->
+    <select id="queryNeedReturnByGIdAndComsumerId" resultType="java.util.HashMap">
+        select * from tb_auction_deposit a
+        where  a.num_id=#{num_id} and a.g_id=#{g_id} and a.`status`=2
+        <if test="consumer_id!=null and consumer_id!=''">
+            and a.consumer_id not in (#{consumer_id})
+        </if>
+    </select>
+
     <!--查询号码的时间-->
     <select id="queryNumEndTime" resultType="java.util.HashMap">
         select g.g_id,s.sku_id,n.id num_id,n.end_time,TIMESTAMPDIFF(SECOND,now(),n.end_time)  `time_status`,g.g_loop_time,(g.g_loop_time) `loop_time`
         from tb_goods g left join tb_sku s on g.g_id=s.g_id left join tb_num n on n.sku_id=s.sku_id
         where g.g_is_sale=1 and g.g_is_auc=1 and n.id=#{num_id}
     </select>
+
+    <!--查询打包商品的时间-->
+    <select id="queryGoodsEndTime" resultType="java.util.HashMap">
+        select g.g_id,s.sku_id,n.id num_id,n.end_time,TIMESTAMPDIFF(SECOND,now(),n.end_time)  `time_status`,g.g_loop_time,(g.g_loop_time) `loop_time`
+        from tb_goods g left join tb_sku s on g.g_id=s.g_id left join tb_num n on n.sku_id=s.sku_id
+        where g.g_is_sale=1 and g.g_is_auc=1 and g.g_id = #{g_id} limit 1
+    </select>
+
     <!--延时号码竞拍时间-->
     <update id="updateNumDelayed">
          update tb_num n set n.end_time=date_add(n.end_time, interval #{loop_time} minute) where n.id=#{num_id}
     </update>
 
+    <!--延时打包商品竞拍时间-->
+    <update id="updateGoodsDelayed">
+    update tb_num n
+    inner join tb_sku s on s.sku_id=n.sku_id
+    inner join tb_goods g on g.g_id=s.g_id
+    inner join tb_ep_sale er on er.id=g.g_active
+    set n.end_time=date_add(n.end_time, interval #{loop_time} minute)
+    ,er.end_time=date_add(er.end_time, interval  #{loop_time} minute)
+    where g.g_id=#{g_id}
+    </update>
 </mapper>

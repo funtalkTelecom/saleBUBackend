@@ -27,11 +27,18 @@ public class GoodsFocusController extends BaseReturn{
 	/*
 	  当前用户对应该商品收藏记录
 	 */
-	@GetMapping("/api/goodsFocus/{numId}/{gId}")
+	@GetMapping("/api/goodsFocus/{numId}/{gId}/{erIsPack}")
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
-	public Result findGoodsFocus(@PathVariable("numId") String numId, @PathVariable("gId") String gId) {
-		return new Result(Result.OK,goodsFocusService.findGoodsFocusListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId)));
+	public Result findGoodsFocus(@PathVariable("numId") String numId, @PathVariable("gId") String gId,@PathVariable("erIsPack") Integer erIsPack) {
+		if(erIsPack==0)//商品是否打包 erIsPack
+		{
+			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId)));
+		}else if(erIsPack==1)
+		{
+			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByGId(Long.valueOf(gId)));
+		}
+		return new Result(Result.ERROR,"记录为空");
 	}
 
 	/*

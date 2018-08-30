@@ -135,7 +135,7 @@
                                     <input type="text" class="form-control" id="lastPayTimePicker" onclick="WdatePicker({minDate : '#F{$dp.$D(\'endTimePicker\',{s:1})}',dateFmt : 'yyyy-MM-dd HH:mm:ss'});" readonly>
 								</div>
 								<label class="col-xs-2 control-label hidden">显示条件</label>
-								<div class="col-xs-2 hidden">
+								<div class="col-xs-2">
 								   <select  name="isShow">
 									   <option value="-1">请选择...</option>
 									   <option value="1">是</option>
@@ -174,11 +174,11 @@
             var p_delete= <%=SessionUtil.hasPower(PowerConsts.EPSALEMOUDULE_COMMON_DELETE)%>;
 
             //**************************websocket**************start****************
-           /***
+
             var websocket = null;
             //判断当前浏览器是否支持WebSocket
             if ('WebSocket' in window) {
-                websocket = new WebSocket("ws://localhost:8091/websocket/989303317700030649/1013001752720441344");
+                websocket = new WebSocket("ws://localhost:8091/websocket/0/1034695929078218752/1");
             }
             else {
                 alert('当前浏览器 Not support websocket')
@@ -220,7 +220,7 @@
                 var message = document.getElementById('text').value;
                 websocket.send(message);
             }
-           ****/
+
             //**************************websocket**************end****************
 		</script>
 	</body>

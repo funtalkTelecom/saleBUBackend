@@ -42,6 +42,15 @@ public class GoodsFocusService {
         return goodsFocusMapper.finGoodsFocusListByGIdAndNumIdAndConsumerId(gId,numId,this.apiSessionUtil.getConsumer().getId());
 	}
 
+    /*
+      当前用户对该商品的收藏记录
+     */
+    public List<Map> findGoodsFocusListByGId(Long gId)
+    {
+        //return goodsFocusMapper.findGoodsFocusListBydConsumerId(apiSessionUtil.getConsumer().getId());
+        return goodsFocusMapper.finGoodsFocusListByGIdAndConsumerId(gId,this.apiSessionUtil.getConsumer().getId());
+    }
+
 	/*
 	 当前用户商品收藏记录列表
 	 */
@@ -97,7 +106,14 @@ public class GoodsFocusService {
             String goodsFocusStr="";
             goodsFocus.setAddIp(SessionUtil.getUserIp());
             goodsFocus.setConsumerId(apiSessionUtil.getConsumer().getId());
-            List<Map> goodsFocusList=goodsFocusMapper.finGoodsFocusListByGIdAndNumIdAndConsumerId(goodsFocus.getgId(),goodsFocus.getNumId(),this.apiSessionUtil.getConsumer().getId());
+            List<Map> goodsFocusList=new ArrayList<Map>();
+            if(goodsFocus.getErISPack()==0)//商品是否打包 erIsPack
+            {
+                goodsFocusList=goodsFocusMapper.finGoodsFocusListByGIdAndNumIdAndConsumerId(goodsFocus.getgId(),goodsFocus.getNumId(),this.apiSessionUtil.getConsumer().getId());
+            }else if(goodsFocus.getErISPack()==1)
+            {
+                goodsFocusList=goodsFocusMapper.finGoodsFocusListByGIdAndConsumerId(goodsFocus.getgId(),this.apiSessionUtil.getConsumer().getId());
+            }
             if (!goodsFocusList.isEmpty()&&goodsFocusList.size()>0) {
                 goodsFocus.setId(Long.valueOf(goodsFocusList.get(0).get("id").toString()));
                 goodsFocus.setUpdateDate(new Date());

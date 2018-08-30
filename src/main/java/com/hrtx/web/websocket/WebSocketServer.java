@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @ServerEndpoint 注解是一个类层次的注解，它的功能主要是将目前的类定义成一个websocket服务器端,
  * 注解的值将被用于监听用户连接的终端访问URL地址,客户端可以通过这个URL来连接到WebSocket服务器端
  */
-@ServerEndpoint(value = "/websocket/{numId}/{gId}")
+@ServerEndpoint(value = "/websocket/{numId}/{gId}/{erIsPack}")
 @Component
 //@WebListener
 public class WebSocketServer {
@@ -49,13 +49,22 @@ public class WebSocketServer {
      * @param session 可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
     @OnOpen
-    public void onOpen(Session session,EndpointConfig config,@PathParam("numId") String numId,@PathParam("gId") String gId) {
+    public void onOpen(Session session,EndpointConfig config,@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack) {
         this.session =session;
         // 得到httpSession
       //  HttpSession httpSession= (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
        // log.info("config:{}", config.getUserProperties().get("name"));
        // log.info("session:{}", config.getUserProperties().get("sessionid"));
-        String keyId=numId+"_"+gId;
+        String keyId="";
+        String keyStr="";//log_Str
+        if(erIsPack==0) {//商品是否打包 erIsPack
+             keyId=numId+"_"+gId;
+             keyStr="非打包竟拍 numId_gId";
+        } else if(erIsPack==1)
+        {
+             keyId="_"+gId;
+            keyStr="打包竟拍 _gId";
+        }
         if(webSocketSet.size()>0)
         {
             wsSet=webSocketSet.get(keyId);
@@ -83,8 +92,8 @@ public class WebSocketServer {
         //webSocketSet.put(keyId,this);     //加入set中
         //webSocketSet.putIfAbsent(keyId,this);     //加入set中
         addOnlineCount();           //在线数加1
-        System.out.println("有新连接加入！当前在线总人数为" + getOnlineCount()+";*********** numId_gId:"+keyId+";当前在线人数"+wsSet.size());
-        log.info("有新连接加入！当前在线总人数为" + getOnlineCount()+"*********** numId_gId:"+keyId+";当前在线人数"+wsSet.size());
+        System.out.println("有新连接加入！当前在线总人数为" + getOnlineCount()+";*********** "+keyStr+":"+keyId+";当前在线人数"+wsSet.size());
+        log.info("有新连接加入！当前在线总人数为" + getOnlineCount()+"*********** +keyId+:"+keyStr+";当前在线人数"+wsSet.size());
         log.info("【websocket消息】有新的连接, 商品总数:", webSocketSet.size());
     }
 
@@ -92,9 +101,16 @@ public class WebSocketServer {
      * 连接关闭调用的方法
      */
     @OnClose
-    public void onClose(@PathParam("numId") String numId,@PathParam("gId") String gId) {
+    public void onClose(@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack) {
         String keyId="";
         String sessionId="";
+        String keyStr="";//log_Str
+        if(erIsPack==0) {//商品是否打包 erIsPack
+            keyStr="非打包竟拍 numId_gId";
+        } else if(erIsPack==1)
+        {
+            keyStr="打包竟拍 _gId";
+        }
         sessionId=this.session.getId();
         if(webSocketSet.size()>0)
         {
@@ -121,7 +137,7 @@ public class WebSocketServer {
             e.printStackTrace();
         }*/
         subOnlineCount();           //在线数减1
-        System.out.println("有一连接关闭！当前总在线人数为" + getOnlineCount()+"*********** numId_gId"+keyId);
+        System.out.println("有一连接关闭！当前总在线人数为" + getOnlineCount()+"*********** "+keyStr+keyId);
     }
 
     /**
@@ -131,9 +147,22 @@ public class WebSocketServer {
      * @param session 可选的参数
      */
     @OnMessage
-    public void onMessage(String message,@PathParam("numId") String numId,@PathParam("gId") String gId, Session session) {
+    public void onMessage(String message,@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack, Session session) {
         String msg="";
-        String keyId=numId+"_"+gId;
+        //String keyId=numId+"_"+gId;
+        String keyId="";
+        String keyStr="";//log_Str
+        String keyStr2="";//log_Str
+        if(erIsPack==0) {//商品是否打包 erIsPack
+            keyId=numId+"_"+gId;
+            keyStr="numId:"+numId+";gId:"+gId;
+            keyStr2="非打包竟拍 numId_gId";
+        } else if(erIsPack==1)
+        {
+            keyId="_"+gId;
+            keyStr="gId:"+gId;
+            keyStr2="打包竟拍 _gId";
+        }
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, Object> mapData= new HashMap<String, Object>();
         int priceCount=0;//出价次数
@@ -142,15 +171,36 @@ public class WebSocketServer {
             //最近10次出价记录
             AuctionMapper auctionMapper2=(AuctionMapper) ContextUtils.getContext().getBean("auctionMapper");
             AuctionDepositMapper auctionDepositMapper2=(AuctionDepositMapper) ContextUtils.getContext().getBean("auctionDepositMapper");
-            List<Map> goodsAuctionList=auctionMapper2.findAuctionListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
+            List<Map> goodsAuctionList=new ArrayList<Map>();
+            if(erIsPack==0)//商品是否打包 erIsPack
+            {
+                goodsAuctionList=auctionMapper2.findAuctionListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
+            }else if(erIsPack==1)
+            {
+                goodsAuctionList=auctionMapper2.findAuctionListByGId(Long.valueOf(gId));
+            }
             AuctionDeposit auctionDeposit=new AuctionDeposit();
             auctionDeposit.setStatus(2);
             auctionDeposit.setgId(NumberUtils.toLong(gId,0L));
             auctionDeposit.setNumId(NumberUtils.toLong(numId,0L));
             //对应的状态：2支付成功保证金列表
-            List<Map> auctionDepositList=auctionDepositMapper2.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
+            List<Map> auctionDepositList=new ArrayList<Map>();
+            if(erIsPack==0)//商品是否打包 erIsPack
+            {
+                auctionDepositList=auctionDepositMapper2.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
+            }else if(erIsPack==1)
+            {
+                auctionDepositList=auctionDepositMapper2.findAuctionDepositListByStatusAndGId(auctionDeposit);
+            }
             //出价次数
-            List<Map> epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
+            List<Map> epSaleGoodsAuctionPriceInfo=new ArrayList<Map>();
+            if(erIsPack==0)//商品是否打包 erIsPack
+            {
+                epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
+            }else if(erIsPack==1)
+            {
+                epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByGId(Long.valueOf(gId));
+            }
             if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
                 priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
             }
@@ -194,7 +244,8 @@ public class WebSocketServer {
         }
         else
         {
-            msg="来自客户端的消息:" + message+"numId:"+numId+";gId:"+gId;
+           // msg="来自客户端的消息:" + message+"numId:"+numId+";gId:"+gId;
+            msg="来自客户端的消息:" + message+keyStr;
         }
 
         System.out.println(msg);
@@ -206,13 +257,13 @@ public class WebSocketServer {
             if(wsSet!=null&&wsSet.size()>0)
             {
                 log.info("************************************************");
-                log.info("信息广播开始:numId_gId:"+keyId+"*****");
+                log.info("信息广播开始:"+keyStr2+":"+keyId+"*****");
                 log.info("************************************************");
                 for (WebSocketServer item :wsSet)
                 {
                    try {
                        item.sendMessage(msg);
-                       log.info("信息广播:numId_gId_sessionId:"+keyId+"_"+item.session.getId());
+                       log.info("信息广播:"+keyStr2+"_sessionId:"+keyId+"_"+item.session.getId());
                        log.info("信息广播:信息msg:"+msg);
                    }catch (IOException e) {
                        e.printStackTrace();
@@ -220,19 +271,30 @@ public class WebSocketServer {
                    }
                 }
                 log.info("***********************************************");
-                log.info("信息广播结束:numId_gId:"+keyId+"*****");
+                log.info("信息广播结束:"+keyStr2+":"+keyId+"*****");
                 log.info("***********************************************");
             }
         }
-
     }
 
     /**
      * 群发自定义消息
      * */
-    public static void sendInfo(@PathParam("numId") String numId,@PathParam("gId") String gId) throws IOException {
-        String keyId=numId+"_"+gId;
-        String msg=auctionAfterInfo(Long.valueOf(numId),Long.valueOf(gId));
+    public static void sendInfo(@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack) throws IOException {
+        String keyId="";
+        String keyStr="";//log_Str
+        String keyStr2="";//log_Str
+        if(erIsPack==0) {//商品是否打包 erIsPack
+            keyId=numId+"_"+gId;
+            keyStr="numId:"+numId+";gId:"+gId;
+            keyStr2="非打包竟拍 numId_gId";
+        } else if(erIsPack==1)
+        {
+            keyId="_"+gId;
+            keyStr="gId:"+gId;
+            keyStr2="打包竟拍 _gId";
+        }
+        String msg=auctionAfterInfo(Long.valueOf(numId),Long.valueOf(gId),erIsPack);
         // 群发消息
         if(webSocketSet.size()>0&&msg.trim().length()>0)
         {
@@ -240,7 +302,7 @@ public class WebSocketServer {
             if(wsSet!=null&&wsSet.size()>0)
             {
                 log.info("************************************************");
-                log.info("信息广播开始:numId_gId:"+keyId+"*****");
+                log.info("信息广播开始:"+keyStr2+":"+keyId+"*****");
                 log.info("************************************************");
                 for (WebSocketServer item :wsSet)//socket_Set
                 {
@@ -248,7 +310,7 @@ public class WebSocketServer {
                         item.sendMessage(msg);
                         log.info("出价成功、保证金支付成功，广播信息【最近10次出价的记录，状态=2支付成功的保证金列表】");
                         log.info(msg);
-                        log.info("信息广播:numId_gId_sessionId:"+keyId+"_"+item.session.getId());
+                        log.info("信息广播:"+keyStr2+"_sessionId:"+keyId+"_"+item.session.getId());
                         log.info("信息广播:信息msg:"+msg);
                     }catch (IOException e) {
                         e.printStackTrace();
@@ -257,7 +319,7 @@ public class WebSocketServer {
                     }
                 }
                 log.info("***********************************************");
-                log.info("信息广播结束:numId_gId:"+keyId+"*****");
+                log.info("信息广播结束:"+keyStr2+":"+keyId+"*****");
                 log.info("***********************************************");
             }
         }
@@ -267,21 +329,39 @@ public class WebSocketServer {
 	  出价成功后或保证金支付成功后
 	  返回广播信息
 	 */
-    public static String auctionAfterInfo(Long numId,Long gId) {
+    public static String auctionAfterInfo(Long numId,Long gId,Integer erIsPack) {
         AuctionMapper auctionMapper2=(AuctionMapper) ContextUtils.getContext().getBean("auctionMapper");
         AuctionDepositMapper auctionDepositMapper2=(AuctionDepositMapper) ContextUtils.getContext().getBean("auctionDepositMapper");
         Map goodsAuctionMap=new HashMap();
         int priceCount=0;//出价次数
         //出价后的最近10次出价记录
-        List<Map> goodsAuctionListAfter=auctionMapper2.findAuctionListByNumIdAndGId(numId,gId);
+        List<Map> goodsAuctionListAfter=new ArrayList<Map>();
+        if(erIsPack==0) {//商品是否打包 erIsPack
+            goodsAuctionListAfter=auctionMapper2.findAuctionListByNumIdAndGId(numId,gId);
+        }else if(erIsPack==1)
+        {
+            goodsAuctionListAfter=auctionMapper2.findAuctionListByGId(gId);
+        }
         //出价次数
-        List<Map> epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByNumIdAndGId(numId,gId);
+        List<Map> epSaleGoodsAuctionPriceInfo=new ArrayList<Map>();
+        if(erIsPack==0) {//商品是否打包 erIsPack
+            epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByNumIdAndGId(numId,gId);
+        }else if(erIsPack==1)
+        {
+            epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByGId(gId);
+        }
         //对应的状态：2支付成功保证金列表
         AuctionDeposit auctionDeposit=new AuctionDeposit();
         auctionDeposit.setStatus(2);
         auctionDeposit.setNumId(numId);
         auctionDeposit.setgId(gId);
-        List<Map> auctionDepositLisAftet=auctionDepositMapper2.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
+        List<Map> auctionDepositLisAftet=new ArrayList<Map>();
+        if(erIsPack==0) {//商品是否打包 erIsPack
+            auctionDepositLisAftet=auctionDepositMapper2.findAuctionDepositListByNumIdAndStatusAndGId(auctionDeposit);
+        }else if(erIsPack==1)
+        {
+            auctionDepositLisAftet=auctionDepositMapper2.findAuctionDepositListByStatusAndGId(auctionDeposit);
+        }
         if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
             priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
         }

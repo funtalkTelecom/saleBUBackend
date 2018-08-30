@@ -37,10 +37,24 @@
 	  and tb_auction_deposit.g_id=#{gId}
     </select>
 
+	<select id="findAuctionDepositListByConsumerIdAndStatusAndGId" resultType="java.util.HashMap">
+	  select * from 	tb_auction_deposit
+	  where tb_auction_deposit.consumer_id=#{consumerId}
+	  and tb_auction_deposit.status=#{status}
+	  and tb_auction_deposit.g_id=#{gId}
+    </select>
+
 	<select id="findAuctionDepositListByNumIdAndStatusAndGId" resultType="java.util.HashMap">
 	  select * from 	tb_auction_deposit
 	  where tb_auction_deposit.num_id = #{numId}
 	  and tb_auction_deposit.status=#{status}
+	  and tb_auction_deposit.g_id=#{gId}
+    </select>
+
+    <select id="findAuctionDepositListByStatusAndGId" resultType="java.util.HashMap">
+	  select * from 	tb_auction_deposit
+	  where
+	  tb_auction_deposit.status=#{status}
 	  and tb_auction_deposit.g_id=#{gId}
     </select>
 
@@ -81,11 +95,34 @@
 	order by tb_auction_deposit.add_date desc
     </select>
 
+	<select id="queryPageDepositListByConsumerId2" resultType="java.util.HashMap">
+	 select
+ 	 concat(tb_auction_deposit.id,'') as id, num,
+ 	 concat(tb_auction_deposit.num_id,'') as numId,
+ 	 concat(tb_auction_deposit.g_id,'')  as gId,
+     tb_auction_deposit.status,
+  	  case when tb_auction_deposit.pay_date is null then '' else tb_auction_deposit.pay_date end as payDate,
+      tb_auction_deposit.amt as price,
+      case when tb_auction_deposit.refund_date is null then '' else tb_auction_deposit.refund_date end as refundDate ,
+      tb_goods.g_is_pack as erIsPack
+ 	  from tb_auction_deposit
+ 	  inner join tb_goods on tb_goods.g_id=tb_auction_deposit.g_id
+ 	  where tb_auction_deposit.status in(2,3)
+ 	  and tb_auction_deposit.consumer_id=#{consumerId}
+ 	  order by tb_auction_deposit.add_date desc
+    </select>
+
 	<select id="findAuctionDepositListByNumIdAndConsumerIdAndGId" resultType="java.util.HashMap">
 	  select * from 	tb_auction_deposit
 	  where  tb_auction_deposit.num_id = #{numId}
 	       and tb_auction_deposit.consumer_id=#{consumerId}
 	       and tb_auction_deposit.g_id=#{gId}
+    </select>
+
+	<select id="findAuctionDepositListByConsumerIdAndGId" resultType="java.util.HashMap">
+	  select * from 	tb_auction_deposit
+	  where  tb_auction_deposit.consumer_id=#{consumerId}
+	  and tb_auction_deposit.g_id=#{gId}
     </select>
 
 	<insert id="insertBatch">

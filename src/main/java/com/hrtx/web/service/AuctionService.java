@@ -36,6 +36,10 @@ public class AuctionService {
 		return auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(numId,gId);
 	}
 
+	public List<Map> findAuctionSumEPSaleGoodsByGId(Long gId) {
+		return auctionMapper.findAuctionSumEPSaleGoodsByGId(gId);
+	}
+
 	public List<Map> findAuctionListByNumId(Long numId) {
 		return auctionMapper.findAuctionListByNumId(numId);
 	}
@@ -46,13 +50,30 @@ public class AuctionService {
     public List<Map> findAuctionListByNumIdAndGId2(Long numId,Long gId)
 	{
 		return auctionMapper.findAuctionListByNumIdAndConsumerIdAndGId(numId,apiSessionUtil.getConsumer().getId(),gId);
-	};
+	}
+
+	/*
+	  status:1状态记录
+	 */
+	public List<Map> findAuctionListByGId2(Long gId)
+	{
+		return auctionMapper.findAuctionListByConsumerIdAndGId(apiSessionUtil.getConsumer().getId(),gId);
+	}
+
 	public List<Map> findAuctionListByNumIdAndGId(Long numId,Long gId) {
-		return auctionMapper.findAuctionListByNumIdAndGId(numId,gId);
+        return auctionMapper.findAuctionListByNumIdAndGId(numId,gId);
+    }
+
+	public List<Map> findAuctionListByGId(Long gId) {
+		return auctionMapper.findAuctionListByGId(gId);
 	}
 
 	public List<Map> findAuctionListByNumIdAndGId3(Long numId,Long gId) {
 		return auctionMapper.findAuctionListByNumIdAndGId2(numId,gId);
+	}
+
+	public List<Map> findAuctionListByGId3(Long gId) {
+		return auctionMapper.findAuctionListByGId2(gId);
 	}
 
 	public List<Map> findAuctionGoodsByNumId(Long numId) {

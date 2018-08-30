@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 @Table(name = "tb_goods_focus")
@@ -34,7 +35,8 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
     private String addIp;//	用户ip
     private String  remark;//备注
     private Integer isDel;//是否收藏  是0否1
-
+    @Transient
+    private Integer erISPack=0;//商品是否打包 erIsPack
 
 
     public GoodsFocus() {
@@ -150,4 +152,7 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
 
     public void setIsDel(Integer isDel) { this.isDel = isDel; }
 
+    public Integer getErISPack() { return erISPack; }
+
+    public void setErISPack(Integer erISPack) { this.erISPack = erISPack; }
 }
