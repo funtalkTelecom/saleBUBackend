@@ -51,12 +51,6 @@ public class OrderController extends BaseReturn{
 		return orderService.pageOrder(order);
 	}
 
-	/**
-	 * 线下的单收款
-	 * @param order
-	 * @param request
-	 * @return
-	 */
 	@RequestMapping("/order-receipt")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
 	public Result receipt(Order order, HttpServletRequest request){
@@ -73,6 +67,13 @@ public class OrderController extends BaseReturn{
 	public Result reFund(Order order, HttpServletRequest request){
 		return orderService.reFund(order,request);
 	}
+
+	/***
+	 * 线上单退款
+	 * @param order
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/order-refund-live")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_REFUND_LIVE})
 	public Result reFundLive(Order order, HttpServletRequest request){
@@ -156,35 +157,6 @@ public class OrderController extends BaseReturn{
 			long err_no=System.currentTimeMillis();
 			log.error("系统未知异常"+err_no, e);
 			return renderHtml("系统未知异常"+err_no);
-		}
-	}
-
-	/***
-	 * 取消订单回调地址
-	 * @return
-	 */
-	@RequestMapping("/cancel-order-callback")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public String CancelOrderCallback(HttpServletRequest request) {
-		try {
-			String param = this.getParamBody(request);
-			log.info("接收到发货回调参数["+param+"]");
-			StorageInterfaceRequest storageInterfaceRequest = StorageInterfaceRequest.create(param, SystemParam.get("key"));
-//			if(true) return renderHtml("取消订单成功");
-			//接收仓库回调，取消订单操作
-			Result result = orderService.OrderCallbackStatus(storageInterfaceRequest);
-			if (result.getCode() == 200) {
-				renderHtml("取消订单成功");
-			} else {
-				renderHtml("取消订单失败");
-			}
-			return null;
-		}catch (ServiceException e) {
-			log.error(e.getMessage(), e);
-			return renderHtml(e.getMessage());
-		}catch (Exception e){
-			log.error("未知异常", e);
-			return renderHtml("error");
 		}
 	}
 

@@ -29,14 +29,14 @@ public class ApiOrderController extends BaseReturn{
 
 
     @PostMapping("/order")
-    @Powers(PowerConsts.NOPOWER)
-//    @Powers(PowerConsts.NOLOGINPOWER)
+//    @Powers(PowerConsts.NOPOWER)
+    @Powers(PowerConsts.NOLOGINPOWER)
     @ResponseBody
     public Result createOrder(HttpServletRequest request){
         String type =  request.getParameter("type");
         String skuid = request.getParameter("skuid");
         String numid = request.getParameter("numid");
-        if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
+//        if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
         if("1".equals(type)) {
             //冻结号码
             if (!LockUtils.tryLock(skuid)) return new Result(Result.ERROR, "请稍后再试!");
@@ -47,7 +47,7 @@ public class ApiOrderController extends BaseReturn{
             }
         }else {
             //冻结号码
-            if (numid == null || "".equals(numid)) return new Result(Result.ERROR, "numid不能为空");
+//            if (numid == null || "".equals(numid)) return new Result(Result.ERROR, "numid不能为空");
             if (!LockUtils.tryLock(numid)) return new Result(Result.ERROR, "请稍后再试!");
             try {
                 return apiOrderService.createOrder(request, null);
