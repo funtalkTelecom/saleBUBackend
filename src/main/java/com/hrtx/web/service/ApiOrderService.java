@@ -52,6 +52,8 @@ public class ApiOrderService {
 	private FileMapper fileMapper;
 	@Autowired
 	FundOrderService fundOrderService;
+	@Autowired
+	EPSaleService ePSaleService;
 
 	public  List<Map> findOrderListByNumId(Long numId)
 	{
@@ -522,6 +524,10 @@ public class ApiOrderService {
 				}
 				try {
 					action=new Auction();
+					action.setgId(Long.valueOf(goodsid));
+					action.setNumId(Long.valueOf(numid));
+					action.setSkuId(Long.valueOf(skuid));
+					action.setErISPack(Integer.valueOf(isPack));
 					if (price == null || "".equals(price)) return new Result(Result.ERROR, "price不能为空");
 					Double prices = Double.parseDouble(price);
 					//更新订单明细表信息
@@ -616,7 +622,17 @@ public class ApiOrderService {
 			try{
 				orderMapper.insertBatch(orderList);
 				orderItemMapper.insertBatch(orderItems);
+				if (type.equals("3"))//竞拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+				{
+					action.setOrderId(preOrderId);
+					ePSaleService.auctionEditOrderID(action);
+				}
 			}catch(Exception e){
+				if(type.equals("3"))//竞拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+				{
+					action.setOrderId(0L);//异常处理
+					ePSaleService.auctionEditOrderID(action);
+				}
 			    //写入数据异常,回滚
 				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 				return new Result(Result.ERROR, "写入订单数据异常");
@@ -644,11 +660,11 @@ public class ApiOrderService {
 			}
 			//清除已生成的订单
 			deleteOrder(orderList);
-//			if(type.equals("3"))//竞拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
-//			{
-//				action.setOrderId(0L);
-//				auctionMapper.auctionEditOrderIDByNumIdAndSkuId(action);
-//			}
+			if(type.equals("3"))//竞拍订单生成，对应订单Id回填到 出价记录(aution.status=2)的orderId字段
+			{
+			    action.setOrderId(0L);//异常处理
+				ePSaleService.auctionEditOrderID(action);
+			}
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return new Result(Result.ERROR, "创建订单异常");
 		}

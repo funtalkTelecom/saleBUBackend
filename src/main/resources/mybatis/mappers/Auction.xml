@@ -394,6 +394,26 @@
 	and sku_id=#{skuId}
 	</update>
 
+	<update id="auctionEditOrderIDByNumIdAndSkuIdAndGId">
+	update
+	tb_auction
+	set
+	tb_auction.order_id=#{orderId}
+	where tb_auction.status=2
+	and tb_auction.num_id=#{numId}
+	and tb_auction.sku_id=#{skuId}
+	and tb_auction.g_id= #{gId}
+	</update>
+
+	<update id="auctionEditOrderIDByGId">
+	update
+	tb_auction
+	set
+	tb_auction.order_id=#{orderId}
+	where tb_auction.status=2
+	and tb_auction.g_id= #{gId}
+	</update>
+
 	<select id="freezeOneNum" resultType="java.util.HashMap">
         select * from tb_num  where id=#{numId} for update;
     </select>
