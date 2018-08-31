@@ -787,7 +787,7 @@
     <!--查询需要退还保证金的用户-->
     <select id="queryNeedReturnByGIdAndComsumerId" resultType="java.util.HashMap">
         select * from tb_auction_deposit a
-        where  a.num_id=#{num_id} and a.g_id=#{g_id} and a.`status`=2
+        where  a.g_id=#{g_id} and a.`status`=2
         <if test="consumer_id!=null and consumer_id!=''">
             and a.consumer_id not in (#{consumer_id})
         </if>
@@ -820,6 +820,6 @@
     inner join tb_ep_sale er on er.id=g.g_active
     set n.end_time=date_add(n.end_time, interval #{loop_time} minute)
     ,er.end_time=date_add(er.end_time, interval  #{loop_time} minute)
-    where g.g_id=#{g_id}
+    where g.g_is_pack=1 and g.g_id=#{g_id}
     </update>
 </mapper>

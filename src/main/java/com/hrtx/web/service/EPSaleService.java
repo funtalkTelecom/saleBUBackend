@@ -1368,4 +1368,19 @@ public class EPSaleService {
 		epSaleMapper.epSaleDelete(epSale);
         return new Result(Result.OK, "删除成功");
     }
+
+    /*
+     *订单是否生成功，出价记录成功的记录的订单号字段回填
+     *商品是否打包 erIsPack
+     */
+    public  void  auctionEditOrderID(Auction auction)
+    {
+        if(auction.getErISPack()==0)//商品是否打包 erIsPack
+        {
+            auctionMapper.auctionEditOrderIDByNumIdAndSkuIdAndGId(auction);
+        }else if(auction.getErISPack()==1)
+        {
+            auctionMapper.auctionEditOrderIDByGId(auction);
+        }
+    }
 }

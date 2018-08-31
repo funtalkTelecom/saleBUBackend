@@ -361,7 +361,7 @@ public class EPSaleController extends BaseReturn{
 						}
 
 					}
-					epSaleService.epsaleDelayed(auction.getNumId(),auction.getId(),auction.getErISPack());
+					epSaleService.epsaleDelayed(auction.getNumId(),auction.getgId(),auction.getErISPack());
 					//**************当前出价记录是处于（结束时间-轮询时间）与结束时间 之间************************************************
 				/*	if(epSaleService.isLoopTime(addDate,loopTime,auction.getNumId())) //处于（结束时间-轮询时间）与结束时间 之间;则延长结束时间= 结束时间+loopTime;
 					{
