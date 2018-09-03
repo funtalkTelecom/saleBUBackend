@@ -143,6 +143,13 @@ public class EPSaleController extends BaseReturn{
 	@ResponseBody
 	public void goodsAuciton2(Auction auction, HttpServletRequest request) {
 		Goods goods=goodsService.findGoodsById(auction.getgId());//上架商品信息gActive
+		Integer erIsPack=0;//商品是否打包
+		erIsPack=Integer.valueOf(goods.getgIsPack());
+		if(erIsPack!=auction.getErISPack())
+		{
+			returnResult(new Result(607, "是否打包传参不符，请核对"));
+			return;
+		}
 		Date endTime=null;//结束时间
 		Date currentTime=new Date();//当前时间
 		int goodsAuctionCount=0;//最近10次数出价记录的次数
