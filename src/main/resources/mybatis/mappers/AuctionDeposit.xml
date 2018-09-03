@@ -100,6 +100,7 @@
  	 concat(tb_auction_deposit.id,'') as id, num,
  	 concat(tb_auction_deposit.num_id,'') as numId,
  	 concat(tb_auction_deposit.g_id,'')  as gId,
+     tb_goods.g_name as gName,
      tb_auction_deposit.status,
   	  case when tb_auction_deposit.pay_date is null then '' else tb_auction_deposit.pay_date end as payDate,
       tb_auction_deposit.amt as price,
