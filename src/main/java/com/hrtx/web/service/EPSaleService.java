@@ -183,15 +183,18 @@ public class EPSaleService {
 			map.put("gImg",urlImg);
 			numId=Long.valueOf(map.get("numId").toString());
 			gId=Long.valueOf(map.get("gId").toString());
-			if(numId>0)
-			{  //每个numId,gId的商品的出价次数及当前价
+			 //每个numId,gId的商品的出价次数及当前价
 				List<Map> listAuction=new ArrayList<Map>();
 				if(erIsPack==1)
 				{
-					listAuction=auctionMapper.findAuctionSumEPSaleGoodsByGId(gId);
+                    if(gId>0) {
+						listAuction = auctionMapper.findAuctionSumEPSaleGoodsByGId(gId);
+					}
 				}else if(erIsPack==0)
 				{
-					listAuction=auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(numId,gId);
+					if(numId>0) {
+						listAuction = auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(numId, gId);
+					}
 				}
 				if(listAuction.size()>0)
 				{
@@ -205,7 +208,6 @@ public class EPSaleService {
 				}
 				map.put("priceCount",priceCount);
 				map.put("currentPrice",currentPrice);
-			}
 		}
 		return list;
 	}
