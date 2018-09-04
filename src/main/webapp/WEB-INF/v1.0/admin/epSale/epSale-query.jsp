@@ -174,11 +174,11 @@
             var p_delete= <%=SessionUtil.hasPower(PowerConsts.EPSALEMOUDULE_COMMON_DELETE)%>;
 
             //**************************websocket**************start****************
-           /***
+/**
             var websocket = null;
             //判断当前浏览器是否支持WebSocket
             if ('WebSocket' in window) {
-                websocket = new WebSocket("ws://localhost:8091/websocket/989303317700030649/1013001752720441344");
+                websocket = new WebSocket("ws://localhost:8091/websocket/0/1035345689040650240/1");
             }
             else {
                 alert('当前浏览器 Not support websocket')
@@ -220,7 +220,7 @@
                 var message = document.getElementById('text').value;
                 websocket.send(message);
             }
-           ****/
+**/
             //**************************websocket**************end****************
 		</script>
 	</body>

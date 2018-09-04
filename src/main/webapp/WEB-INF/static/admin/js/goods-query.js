@@ -238,6 +238,7 @@ $(function() {
         var msg = "";
         $('#gStartTime').val($('#gStartTimePicker').val());
         $('#gEndTime').val($('#gEndTimePicker').val());
+
         //是竞拍,就触发选择活动下拉框的change事件
         if($("input[name=gIsAuc]:checked").val()=="1") {
             $("#gActive").change();
@@ -246,6 +247,17 @@ $(function() {
                 isError = true;
             }
         }
+
+        // bengin by zdh
+        // 是打包的商品只能竞拍
+        if($("input[name=gIsPack]:checked").val()=="1") {
+            if($("input[name=gIsAuc]:checked").val()=="0") {
+                msg = "打包的商品需要选择竞拍模式";
+                isError = true;
+            }
+        }
+        // end by zdh
+
         //判断sku列表
         if($("#skuResult tr").length<2){
             msg = "sku列表为空,请选择商品属性添加";
