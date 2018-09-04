@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -597,6 +596,14 @@ public class EPSaleController extends BaseReturn{
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> mapData= new HashMap<String, Object>();
 		List<Map> goodsList=new ArrayList<Map>();
+		Goods goods=goodsService.findGoodsById(Long.valueOf(gId));//上架商品信息gActive
+		if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
+		{
+			mapData.put("errorStr","是否打包传参不符，请核对");
+			map.put("data",mapData);
+			map.put("code", Result.ERROR);
+			return map;
+		}
 		if(erIsPack==0)//商品是否打包 erIsPack
 		{
 			goodsList=epSaleService.findEPSaleGoodsByGoodsId(Long.valueOf(numId),Long.valueOf(gId));

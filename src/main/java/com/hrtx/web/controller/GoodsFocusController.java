@@ -4,8 +4,10 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.pojo.GoodsFocus;
 import com.hrtx.web.service.GoodsFocusService;
+import com.hrtx.web.service.GoodsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ public class GoodsFocusController extends BaseReturn{
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 	private static Object cjLock = new Object();
+	@Autowired
+	private GoodsService goodsService;
 
 	/*
 	  当前用户对应该商品收藏记录
@@ -31,6 +35,11 @@ public class GoodsFocusController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result findGoodsFocus(@PathVariable("numId") String numId, @PathVariable("gId") String gId,@PathVariable("erIsPack") Integer erIsPack) {
+		Goods goods=goodsService.findGoodsById(Long.valueOf(gId));//上架商品信息gActive
+		if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
+		{
+			return new Result(Result.ERROR,"是否打包传参不符，请核对");
+		}
 		if(erIsPack==0)//商品是否打包 erIsPack
 		{
 			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId)));

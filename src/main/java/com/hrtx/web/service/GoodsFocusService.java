@@ -32,7 +32,6 @@ public class GoodsFocusService {
     private NumMapper numMapper;
     @Autowired
     private GoodsMapper goodsMapper;
-
     /*
       当前用户对该商品的收藏记录
      */
@@ -103,6 +102,11 @@ public class GoodsFocusService {
 	  GoodsFocus.isDel;//是否收藏  是0否1
 	 */
 	public Result goodsFocusEdit(GoodsFocus goodsFocus, HttpServletRequest request) {
+            Goods goods=goodsMapper.findGoodsInfo(goodsFocus.getgId());//上架商品信息gActive
+            if(goodsFocus.getErISPack().equals(goods.getgIsPack()))
+            {
+                return new Result(Result.ERROR,"是否打包传参不符，请核对");
+            }
             String goodsFocusStr="";
             goodsFocus.setAddIp(SessionUtil.getUserIp());
             goodsFocus.setConsumerId(apiSessionUtil.getConsumer().getId());

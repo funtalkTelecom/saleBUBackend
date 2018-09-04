@@ -4,7 +4,9 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.ContextUtils;
 import com.hrtx.web.mapper.AuctionDepositMapper;
 import com.hrtx.web.mapper.AuctionMapper;
+import com.hrtx.web.mapper.GoodsMapper;
 import com.hrtx.web.pojo.AuctionDeposit;
+import com.hrtx.web.pojo.Goods;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,13 @@ public class WebSocketServer {
      */
     @OnOpen
     public void onOpen(Session session,EndpointConfig config,@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack) {
+        GoodsMapper goodsMapper2=(GoodsMapper) ContextUtils.getContext().getBean("goodsMapper");
+        Goods goods=goodsMapper2.findGoodsInfo(Long.valueOf(gId));//上架商品信息gActive
+        if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
+        {
+            log.info("是否打包传参不符，请核对");
+            return;
+        }
         this.session =session;
         // 得到httpSession
       //  HttpSession httpSession= (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
@@ -102,6 +111,13 @@ public class WebSocketServer {
      */
     @OnClose
     public void onClose(@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack) {
+        GoodsMapper goodsMapper2=(GoodsMapper) ContextUtils.getContext().getBean("goodsMapper");
+        Goods goods=goodsMapper2.findGoodsInfo(Long.valueOf(gId));//上架商品信息gActive
+        if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
+        {
+            log.info("是否打包传参不符，请核对");
+            return;
+        }
         String keyId="";
         String sessionId="";
         String keyStr="";//log_Str
@@ -148,6 +164,13 @@ public class WebSocketServer {
      */
     @OnMessage
     public void onMessage(String message,@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack, Session session) {
+        GoodsMapper goodsMapper2=(GoodsMapper) ContextUtils.getContext().getBean("goodsMapper");
+        Goods goods=goodsMapper2.findGoodsInfo(Long.valueOf(gId));//上架商品信息gActive
+        if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
+        {
+            log.info("是否打包传参不符，请核对");
+            return;
+        }
         String msg="";
         //String keyId=numId+"_"+gId;
         String keyId="";
@@ -281,6 +304,13 @@ public class WebSocketServer {
      * 群发自定义消息
      * */
     public static void sendInfo(@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack) throws IOException {
+        GoodsMapper goodsMapper2=(GoodsMapper) ContextUtils.getContext().getBean("goodsMapper");
+        Goods goods=goodsMapper2.findGoodsInfo(Long.valueOf(gId));//上架商品信息gActive
+        if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
+        {
+            log.info("是否打包传参不符，请核对");
+            return;
+        }
         String keyId="";
         String keyStr="";//log_Str
         String keyStr2="";//log_Str
