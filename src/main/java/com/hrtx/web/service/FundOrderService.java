@@ -126,7 +126,8 @@ public class FundOrderService extends BaseService {
             Result result = null;
             try {
                 if(FundOrder.THIRD_PAY_PINGANAPP.equals(third)) {
-                    result=pinganService.payOrder(contractno,"WeixinOL",orderName,amt,amt,remark,notify_url,sub_appid,payer,"JSAPI");
+//                    result=pinganService.payOrder(contractno,"WeixinOL",orderName,amt,amt,remark,notify_url,sub_appid,payer,"JSAPI");
+                    result=pinganService.payOrder(contractno,"Weixin",orderName,amt,amt,remark,notify_url,sub_appid,payer,"JSAPI");
                     if(result.getCode() == Result.OK) {
                         JSONObject json1=(JSONObject) result.getData();
                         String[] keys={"appId","nonceStr","timeStamp","signType","package","paySign"};
