@@ -596,6 +596,7 @@ public class EPSaleController extends BaseReturn{
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> mapData= new HashMap<String, Object>();
 		List<Map> goodsList=new ArrayList<Map>();
+		double gStartPrice=0.00;//起拍价
 		Goods goods=goodsService.findGoodsById(Long.valueOf(gId));//上架商品信息gActive
 		if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
 		{
@@ -610,6 +611,15 @@ public class EPSaleController extends BaseReturn{
 		}else if(erIsPack==1)
 		{
 			goodsList=epSaleService.findEPSaleGoodsByGoodsId(Long.valueOf(gId));
+			if(goodsList.size()>1)
+			{
+				for(Map map2:goodsList)
+				{
+					gStartPrice+=Double.valueOf(map2.get("gStartPrice").toString());
+				}
+				goodsList.get(0).remove("gStartPrice");
+				goodsList.get(0).put("gStartPrice",gStartPrice);
+			}
 		}
 		if(goodsList.size()>0){
 			Map<String, Object> goodsMap= goodsList.get(0);

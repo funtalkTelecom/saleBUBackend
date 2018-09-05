@@ -187,7 +187,25 @@
         and c.g_id = #{gId}
         and a.status in ('2','4')
         and c.g_is_sale = '1'
-        limit 1
+        group by b.sku_id
+    </select>
+
+    <select id="getNumInfoByGId2" resultMap="saleNumber">
+        select sum(sku_tob_price) as sku_tob_price
+        from (
+        select
+        distinct
+		b.g_id,
+        b.sku_id,
+        b.sku_tob_price
+        from tb_num a
+        left join tb_sku b on b.sku_id = a.sku_id
+        left join tb_goods c on c.g_id = b.g_id
+        where 1=1
+        and c.g_id = #{gId}
+        and a.status in ('2','4')
+        and c.g_is_sale = '1'
+        ) g  group by g.g_id
     </select>
 
     <select id="getNumInfoByNum" resultMap="saleNumber">
