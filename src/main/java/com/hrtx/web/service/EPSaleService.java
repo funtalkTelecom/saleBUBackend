@@ -165,9 +165,24 @@ public class EPSaleService {
 	public List<Map> findEPSaleGoodsListByEPSaleId(Long ePSaleId,int erIsPack) {
 		//获取竞拍活动ePSaleId的商品列表信息，图片限商品首图
 		List<Map> list=new ArrayList<Map>();
+		double gStartPrice=0.00;//起拍价
 		if(erIsPack==1)
 		{
-			list=epSaleMapper.findEPSaleGoodsListByEPSaleId3(ePSaleId);//商品是打包
+			List<Map> listIsPack=new ArrayList<Map>();
+			listIsPack=epSaleMapper.findEPSaleGoodsListByEPSaleId3(ePSaleId);//商品是打包
+			if(listIsPack!=null&&listIsPack.size()>0)
+			{
+				list.add(listIsPack.get(0));
+				if(listIsPack.size()>1)
+				{
+					for(Map map:listIsPack)
+					{
+						gStartPrice+=Double.valueOf(map.get("gStartPrice").toString());
+					}
+					list.get(0).remove("gStartPrice");
+					list.get(0).put("gStartPrice",gStartPrice);
+				}
+			}
 		}else if(erIsPack==0)
 		{
 			list=epSaleMapper.findEPSaleGoodsListByEPSaleId(ePSaleId);
@@ -239,7 +254,7 @@ public class EPSaleService {
 	}
 
 	public Map findEPSaleNumInfoByNumGId(Long gId) {
-		return  numberMapper.getNumInfoByGId(gId.toString());
+		return  numberMapper.getNumInfoByGId2(gId.toString());
 	}
 
 	public EPSale finEPSaleById(Long id) {

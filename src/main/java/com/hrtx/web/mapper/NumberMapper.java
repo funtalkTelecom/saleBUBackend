@@ -19,6 +19,8 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
 
     Map getNumInfoByGId(@Param("gId") String gId);
 
+    Map getNumInfoByGId2(@Param("gId") String gId);
+
     void freezeNum(@Param("id") String numid, @Param("status") String status,@Param("isUpdateSukid") boolean isUpdateSukid);
 
     List<Number> getListBySkuid(@Param("skuid")String skuid);
