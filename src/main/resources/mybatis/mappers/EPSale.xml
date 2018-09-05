@@ -718,7 +718,7 @@
     <!--查询结束的竞拍（号码）-->
     <select id="queryEndAuctionNum" resultType="java.util.HashMap">
         select n.id num_id,g.g_id,s.sku_id,n.`status`,n.num_resource,g.g_start_num,g.g_is_pack  from tb_num n left join tb_sku s on n.sku_id=s.sku_id left join tb_goods g on g.g_id=s.g_id
-        where n.`status`=2 and g.g_is_auc=1 and g.g_is_sale=0 and g.g_is_pack=0 and n.end_time<![CDATA[<=]]>now()
+        where n.`status`=2 and g.g_is_auc=1 and g.g_is_sale=1 and g.g_is_pack=0 and n.end_time<![CDATA[<=]]>now()
     </select>
     <!--查询结束的竞拍（商品）-->
     <select id="queryEndAuctionGoods" resultType="java.util.HashMap">
