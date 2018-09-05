@@ -172,9 +172,9 @@
             var basePath = "<%=basePath %>";
             var p_edit = <%=SessionUtil.hasPower(PowerConsts.EPSALEMOUDULE_COMMON_EDIT)%>;
             var p_delete= <%=SessionUtil.hasPower(PowerConsts.EPSALEMOUDULE_COMMON_DELETE)%>;
-
+          /**
             //**************************websocket**************start****************
-/**
+
             var websocket = null;
             //判断当前浏览器是否支持WebSocket
             if ('WebSocket' in window) {
@@ -220,8 +220,9 @@
                 var message = document.getElementById('text').value;
                 websocket.send(message);
             }
-**/
+
             //**************************websocket**************end****************
+            **/
 		</script>
 	</body>
 </html>

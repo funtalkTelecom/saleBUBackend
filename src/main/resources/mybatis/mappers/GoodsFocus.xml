@@ -56,6 +56,27 @@
 	 and  tb_goods_focus.consumer_id = #{consumerId}
 	</select>
 
+	<select id="findGoodsFocusListByConsumerId3" resultType="java.util.HashMap">
+  	 select
+	 tb_goods_focus.id,
+	 tb_goods_focus.num_id as numId,
+	 tb_goods_focus.g_id as gId,
+	 case when tb_file_info.file_name is null then ''
+	 else  concat("get-img","/",tb_file_info.file_group,"s/",tb_file_info.ref_id,"/",tb_file_info.file_name) end as gImg,
+	 case when tb_goods_focus.num !='' and  tb_goods_focus.num is not null then tb_goods_focus.num
+	 else tb_goods_focus.g_name  end as gName,
+	 sum(tb_sku.sku_tob_price) as currentPrice,
+	 tb_goods_focus.price as focusPrice,
+	 tb_goods_focus.update_date as addDate
+	 from tb_goods_focus
+	 left join tb_file_info on tb_file_info.ref_id=tb_goods_focus.g_id
+	 inner join tb_sku on tb_sku.g_id=tb_goods_focus.g_id
+	 where  tb_file_info.file_group='goodsPic' and tb_file_info.seq=1
+	 and tb_goods_focus.is_del=0
+	 and  tb_goods_focus.consumer_id = #{consumerId}
+	 group by tb_goods_focus.g_id
+	</select>
+
 	<update id="goodsFocusEdit">
         update tb_goods_focus t set
          t.sku_id=#{skuId},
