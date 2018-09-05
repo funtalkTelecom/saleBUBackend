@@ -17,6 +17,8 @@ public interface GoodsFocusMapper extends Mapper<GoodsFocus>,BaseMapper<GoodsFoc
 
     List<Map> findGoodsFocusListByConsumerId2(@Param("consumerId") Long consumerId);
 
+    List<Map> findGoodsFocusListByConsumerId3(@Param("consumerId") Long consumerId);
+
     void goodsFocusEdit(GoodsFocus goodsFocus);
 
     void insertBatch(@Param("goodsFocusList") List<GoodsFocus> list);

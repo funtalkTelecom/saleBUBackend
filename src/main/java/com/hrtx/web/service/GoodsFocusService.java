@@ -55,7 +55,8 @@ public class GoodsFocusService {
 	 */
     public Result findGoodsFocusList()
     {
-        List<Map> list=goodsFocusMapper.findGoodsFocusListByConsumerId2(apiSessionUtil.getConsumer().getId());
+       // List<Map> list=goodsFocusMapper.findGoodsFocusListByConsumerId2(apiSessionUtil.getConsumer().getId());
+        List<Map> list=goodsFocusMapper.findGoodsFocusListByConsumerId3(apiSessionUtil.getConsumer().getId());
         Long numId=0L;
         Long gId=0L;
         int numStatus=0;//状态 号码记录
@@ -103,7 +104,7 @@ public class GoodsFocusService {
 	 */
 	public Result goodsFocusEdit(GoodsFocus goodsFocus, HttpServletRequest request) {
             Goods goods=goodsMapper.findGoodsInfo(goodsFocus.getgId());//上架商品信息gActive
-            if(goodsFocus.getErISPack().equals(goods.getgIsPack()))
+            if(goods!=null&&goodsFocus.getErISPack().equals(goods.getgIsPack()))
             {
                 return new Result(Result.ERROR,"是否打包传参不符，请核对");
             }
