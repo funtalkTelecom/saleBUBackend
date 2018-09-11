@@ -127,6 +127,7 @@
 
     <select id="findEPSaleList4" resultType="java.util.HashMap">
         select
+        distinct
         concat(ep.id,'') id,
         ep.title,
         ep.ep_rule as erRule,
