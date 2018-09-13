@@ -182,8 +182,9 @@ $(function() {
                                 var aamt;
                                 $.post("order/order-deposit", {orderId: v}, function (data) {
                                     deposit = data["deposit"];
-                                    $("#receivable").val(Number(record.total)-Number(deposit));
-                                    $("#receipts").val(Number(record.total)-Number(deposit));
+                                    var bb =Number(record.total)-Number(deposit);
+                                    $("#receivable").val(bb.toFixed(2));
+                                    $("#receipts").val(bb.toFixed(2));
                                 }, "json");
                             }else {
                                 $.post("order/order-yPayAmt", {orderId: v}, function (data) {
