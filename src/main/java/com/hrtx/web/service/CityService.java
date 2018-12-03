@@ -77,4 +77,8 @@ public class CityService {
 		}
 		return list;
 	}
+
+    public List<Map> findCityByGrade(int grade) {
+		return  cityMapper.findCityByGrade(grade);
+    }
 }

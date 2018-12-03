@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @Component
 public interface CityMapper extends Mapper<City>,BaseMapper<City>{
     List<City> queryByPidList(@Param("pid") int pid);
@@ -19,4 +21,6 @@ public interface CityMapper extends Mapper<City>,BaseMapper<City>{
     List queryByThird(@Param("third")  String third);
 
     List queryByPidListForZtree(@Param("pid") int pid, @Param("isopen") String isopen);
+
+    List<Map> findCityByGrade(@Param("grade") int grade);
 }

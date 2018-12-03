@@ -22,6 +22,9 @@ public class BasePojo {
 	protected List<Object> list = new ArrayList<Object>();
 	@Transient
 	protected Map<String, Object> map = new HashMap<String, Object>();
+
+	@Transient
+	protected String temp;
 	
 	@Transient
 	@Value("${app.idworker.workerid}")
@@ -76,5 +79,13 @@ public class BasePojo {
 	}
 	public void setMap(Map<String, Object> map) {
 		this.map = map;
+	}
+
+	public String getTemp() {
+		return temp;
+	}
+
+	public void setTemp(String temp) {
+		this.temp = temp;
 	}
 }

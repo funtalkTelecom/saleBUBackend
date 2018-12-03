@@ -135,7 +135,36 @@ public class User extends BasePojo implements java.io.Serializable {
 	public void setRoles(String roles) {
 		this.roles = roles;
 	}
-
-	
+//36.110.179.*,106.39.177.*,120.52.149.*,111.206.226.*
+	public static void main(String[] args) {
+//		36.110.179.96-119，106.39.177.176-191（共48个IP）
+//		120.52.149.80-111，111.206.226.32-47（共48个IP)
+//		120.52.149.65
+//		36.110.177.16-23
+//		String aa = "36.110.177.(16|17|18|19|20|21|22|23),36.110.179.(96|97|98|99|100|101|102|103|104|105|106|107|108|109|110|111|112|113|114|115|116|117|118|119),106.39.177.(176|177|178|179|180|181|182|183|184|185|186|187|188|189|190|191),120.52.149.(65|80|81|82|83|84|85|86|87|88|89|90|91|92|93|94|95|96|97|98|99|100|101|102|103|104|105|106|107|108|109|110|111),111.206.226.(32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47)";
+//		String bb = "<platrequest>    <req__no>1001010220181126155930000012</req__no> </platrequest>";
+//		java.lang.System.out.println(bb.replaceAll("\\s*","").replaceAll("</platrequest>","").replaceAll("<platrequest>", ""));
+		//        A
+//                AA
+//        AAA
+//                AAAA
+//        AAAAA
+//                AAAAAA
+//        ABC
+//                ABCD
+//        AABB
+//                AAABBB
+//        AAAABBBB
+//                ABAB
+//        ABB
+//                ABABAB
+//        AABBAABB
+		String aa = "12345644444";
+		java.lang.System.out.println(aa.matches("\\d{6}(\\d)\\1{4}"));
+		String bb = "00000121212";
+		java.lang.System.out.println(bb.matches("\\d{5}([0-9])((?!\\1)([0-9]))\\1\\2\\1\\2"));
+		String cc = "00011441144";
+		java.lang.System.out.println(cc.matches("\\d{3}([0-9])\\1((?!\\1)([0-9]))\\2\\1{2}\\2{2}"));
+	}
 
 }

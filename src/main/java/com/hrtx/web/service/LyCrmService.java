@@ -71,6 +71,7 @@ public class LyCrmService {
     @Autowired private DictMapper dictMapper;
     @Autowired private DictService dictService;
     @Autowired private IccidMapper iccidMapper;
+    @Autowired private NumRuleMapper numRuleMapper;
 
     /**
      * 获取服务
@@ -281,7 +282,7 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 6 * * ?")
     public void praseLyPhoneData() {//String type, int dateOffset
-        if(!"true".equals(SystemParam.get("exe_timer"))) return;
+//        if(!"true".equals(SystemParam.get("exe_timer"))) return;
 //        if("ly_corp".equals(type)) this.praseLyCorpData(dateOffset);
 //        if("ly_phone".equals(type))
         log.info("开始执行号码资源下载定时器");
@@ -337,6 +338,7 @@ public class LyCrmService {
         List<String> datas = this.readFile(tFileName);
         numBaseMapper.delete(null);
         if(datas != null) {
+            List<NumBase> batch = new ArrayList<>();
             log.info("解析到乐语号码数据["+datas.size()+"]条");
             for (int j = 0, len = datas.size(); j < len; j++) {
                 String line = datas.get(j)+"|00";;
@@ -347,12 +349,55 @@ public class LyCrmService {
                 }
                 NumBase numBase = new NumBase(0l,row[0],row[1],row[2],row[3],row[4],row[5],NumberUtils.toDouble(row[6]),new Date(), tFileName);
                 numBase.setId(numBase.getGeneralId());
-                numBaseMapper.insert(numBase);
+                batch.add(numBase);
+                if(batch.size() >= 1000 || j+1 >= len) {
+                    numBaseMapper.batchInsert(batch);
+                    batch = new ArrayList<>();
+                }
 //              numMapper.insertLyPhone(ArrayUtils.subarray(row, 0, 7));
             }
+            long a = System.currentTimeMillis();
+            this.addNumFeature();
+            log.info("------添加特性耗时"+((System.currentTimeMillis()-a)/1000)+"s");
             this.matchNum();
         }
     }
+
+    private void addNumFeature() {
+        List<Map> nums = numMapper.queryActiveNum();
+        List<Map> feathers = dictMapper.findDictByGroup("FEATHER_TYPE");
+        List<NumRule> batch = new ArrayList<>();
+        for (int j = 0, len = nums.size(); j < len; j++) {
+            Map num = nums.get(j);
+            long id = NumberUtils.toLong(String.valueOf(num.get("id")));
+            String num_resource = String.valueOf(num.get("num_resource"));
+            this.addNumFeature(id, num_resource, feathers, batch);
+            if(batch.size() >= 1000 || j+1 >= len) {
+                if(batch.size() > 0) numRuleMapper.batchInsert(batch);
+                batch = new ArrayList<>();
+            }
+        }
+    }
+
+    private void addNumFeature(long id, String num_resource, List<Map> feathers, List<NumRule> batch) {
+        for (Map map: feathers) {
+            String keyId = org.apache.commons.lang.ObjectUtils.toString(map.get("keyId"));
+//            String keyValue = org.apache.commons.lang.ObjectUtils.toString("keyValue");
+            String note = org.apache.commons.lang.ObjectUtils.toString(map.get("note"));
+            if(num_resource.matches(note)) {
+                NumRule numRule = new NumRule();
+                numRule.setId(numRule.getGeneralId());
+                numRule.setNum(num_resource);
+                numRule.setNumId(id);
+                numRule.setRuleType("FEATHER_TYPE");
+                numRule.setValue(keyId);
+                batch.add(numRule);
+//                numRuleMapper.insert(numRule);
+            }
+        }
+    }
+//    1在库、2销售中、3冻结(下单未付款)、4待配卡(已付款 针对2C或电销无需购买卡时、代理商买号而未指定白卡时)、5待受理(代理商已提交或仓库已发货，待提交乐语BOSS)、
+//            6已受理(乐语BOSS处理成功)、7受理失败(BOSS受理失败，需要人介入解决)、8已失效(乐语BOSS提示号码已非可用)、9受理中
 
     private void matchNum() {
         numMapper.insertAcitveNum();

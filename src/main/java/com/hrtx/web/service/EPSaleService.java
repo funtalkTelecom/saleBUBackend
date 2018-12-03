@@ -33,8 +33,6 @@ public class EPSaleService {
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired SessionUtil sessionUtil;
 
-	@Value("${auction.timer}")
-	private String auction_timer;
 	@Autowired private EPSaleMapper epSaleMapper;
 	@Autowired private EPSaleNoticeMapper ePSaleNoticeMapper;
 	@Autowired private AuctionMapper auctionMapper;
@@ -319,7 +317,7 @@ public class EPSaleService {
 
     @Scheduled(fixedRate=1000)
     public void epsaleOrder() {
-		if(!StringUtils.equals(auction_timer,"true"))return;
+		if(!"true".equals(SystemParam.get("auction_timer")))return;
 	    this.epSaleMapper.freezeOneRecord();
 	    try {
 			epSaleService.payEpsaleOrderByNum();//商品否打包 erIsPack

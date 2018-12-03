@@ -50,4 +50,8 @@
     <select id="queryByThird" resultMap="thirdCityList">
         select * from tb_third_city a where a.third = #{third}
     </select>
+    <select id="findCityByGrade" resultType="java.util.HashMap">
+        select c.pid, p.`name` pname, c.id, c.`name` from tb_city c left join tb_city p on c.pid = p.id where c.grade = #{grade}
+        order by c.id
+    </select>
 </mapper>

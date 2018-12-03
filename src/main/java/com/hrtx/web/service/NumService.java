@@ -1,6 +1,9 @@
 package com.hrtx.web.service;
 
 import com.github.abel533.entity.Example;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
 import com.hrtx.web.mapper.*;
@@ -24,6 +27,7 @@ public class NumService {
 	@Autowired private OrderItemMapper orderItemMapper;
 	@Autowired private NumMapper numMapper;
 	@Autowired private MealMapper mealMapper;
+	@Autowired private NumPriceMapper numPriceMapper;
 
     /**
      * 绑卡
@@ -91,5 +95,12 @@ public class NumService {
             }
         }
         return new Result(Result.OK, "success");
+    }
+
+    public PageInfo<Object> queryNumPrice(NumPrice numPrice) {
+        PageHelper.startPage(numPrice.getPageNum(),numPrice.getLimit());
+        Page<Object> ob=this.numPriceMapper.queryPageList(numPrice);
+        PageInfo<Object> pm = new PageInfo<Object>(ob);
+        return pm;
     }
 }

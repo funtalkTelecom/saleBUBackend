@@ -28,6 +28,10 @@ public class MyBatisConfig {
     private String jdbcUsername;
     @Value("${jdbc.password}")
     private String jdbcPassword;
+    @Value("${jdbc.min.connection}")
+    private int minConnection;
+    @Value("${jdbc.max.connection}")
+    private int maxConnection;
 
     @Bean(destroyMethod = "close")
     public DataSource dataSource() {
@@ -45,9 +49,9 @@ public class MyBatisConfig {
         // 连接池中未使用的链接最大存活时间，单位是分，默认值：60，如果要永远存活设置为0
         boneCPDataSource.setIdleMaxAgeInMinutes(30);
         // 每个分区最大的连接数
-        boneCPDataSource.setMaxConnectionsPerPartition(100);
+        boneCPDataSource.setMaxConnectionsPerPartition(maxConnection);
         // 每个分区最小的连接数
-        boneCPDataSource.setMinConnectionsPerPartition(5);
+        boneCPDataSource.setMinConnectionsPerPartition(minConnection);
         return boneCPDataSource;
     }
 	

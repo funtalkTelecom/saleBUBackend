@@ -3,6 +3,10 @@ package com.hrtx.global;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -138,7 +142,6 @@ public class Utils {
 
 	/**
 	 * @param offset 距离date时间的 分偏移量
-	 * @param format 返回字符串格式
 	 * @return
 	 */
 	public static Date getDate2(int offset, Date date) {
@@ -569,4 +572,9 @@ public class Utils {
 		BigDecimal bd2 = new BigDecimal(Double.toString(d2));
 		return bd1.divide(bd2,demical,BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
+
+    public static Element prase_xml(String message) throws DocumentException {
+		Document xml = DocumentHelper.parseText(message);
+		return xml.getRootElement();
+    }
 }

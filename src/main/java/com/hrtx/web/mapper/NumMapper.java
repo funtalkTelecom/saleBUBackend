@@ -13,6 +13,11 @@ import java.util.Map;
 public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
 
     /**
+     * 查询本次需要插入的号码
+     * @return
+     */
+    List<Map> queryActiveNum();
+    /**
      * 添加可用号码
      */
     void insertAcitveNum();

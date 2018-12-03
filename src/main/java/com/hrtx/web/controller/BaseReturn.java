@@ -253,7 +253,7 @@ public class BaseReturn {
 			return buffer.toString();
 		} catch (Exception e) {
 			log.error("解析参数流异常",e);
-			return "解析参数流异常";
+			return null;
 		}finally{
 			try {
 				if(is != null) {
