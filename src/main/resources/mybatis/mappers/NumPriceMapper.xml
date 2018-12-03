@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrtx.web.mapper.NumPriceMapper" >
+  <select id="queryPageList" resultType="java.util.HashMap">
+    select a.resource, case when a.net_type = '电信' then 1 when a.net_type = '联通' then 2 when a.net_type = '移动' then 3 else 0 end net_type,
+    a.province_name, a.city_name, a.feature, a.price
+    from (
+    SELECT  IF(@resource = b.resource, @rn := @rn + 1, @rn := 1) AS rn,
+    @resource := b.resource AS resource, b.net_type, b.province_name, b.city_name, b.feature,  b.price, b.agent_id
+    FROM tb_num_price b, tb_num n, (select @rn := 0, @resource := null) d
+    where b.num_id = n.id and n.status = 2 and b.is_del = 0
+    <if test="param.channel!=null and param.channel > 0"> and b.channel = #{param.channel}</if>
+    <if test="param.agentId!=null and param.agentId > 0"> and (b.agent_id = -1 or b.agent_id = #{param.agentId})</if>
+    <if test="param.provinceCode!=null and param.provinceCode > 0"> and b.province_code = #{param.provinceCode}</if>
+    <if test="param.cityCode!=null and param.cityCode > 0"> and b.city_code = #{param.cityCode}</if>
+    <if test="param.netType!=null and param.netType != ''"> and b.net_type = #{param.netType}</if>
+    <if test="param.feature!=null and param.feature != ''"> and b.feature REGEXP ".*,"#{param.feature}",.*"</if>
+    <if test="param.temp!=null and param.temp!=''"> and b.resource like #{param.temp}</if>
+
+    ORDER BY b.agent_id desc ) a where a.rn = 1
+
+  </select>
+</mapper>
