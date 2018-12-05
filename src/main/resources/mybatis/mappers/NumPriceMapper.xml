@@ -3,10 +3,10 @@
 <mapper namespace="com.hrtx.web.mapper.NumPriceMapper" >
   <select id="queryPageList" resultType="java.util.HashMap">
     select a.resource, case when a.net_type = '电信' then 1 when a.net_type = '联通' then 2 when a.net_type = '移动' then 3 else 0 end net_type,
-    a.province_name, a.city_name, a.feature, a.price
+    a.province_name, a.city_name, a.feature, a.price, a.is_freeze,a.numId
     from (
     SELECT  IF(@resource = b.resource, @rn := @rn + 1, @rn := 1) AS rn,
-    @resource := b.resource AS resource, b.net_type, b.province_name, b.city_name, b.feature,  b.price, b.agent_id
+    @resource := b.resource AS resource, b.net_type, b.province_name, b.city_name, b.feature,  b.price, b.agent_id,n.is_freeze,concat(n.id,'') numId
     FROM tb_num_price b, tb_num n, (select @rn := 0, @resource := null) d
     where b.num_id = n.id and n.status = 2 and b.is_del = 0
     <if test="param.channel!=null and param.channel > 0"> and b.channel = #{param.channel}</if>
@@ -16,7 +16,7 @@
     <if test="param.netType!=null and param.netType != ''"> and b.net_type = #{param.netType}</if>
     <if test="param.feature!=null and param.feature != ''"> and b.feature REGEXP ".*,"#{param.feature}",.*"</if>
     <if test="param.temp!=null and param.temp!=''"> and b.resource like #{param.temp}</if>
-    <if test="param.resource!=null and param.resource!=''"> and b.resource like "%"#{param.temp}"%"</if>
+    <if test="param.resource!=null and param.resource!=''"> and b.resource like "%"#{param.resource}"%"</if>
 
     ORDER BY b.agent_id desc ) a where a.rn = 1
 

@@ -42,6 +42,7 @@ public class Num extends BasePojo{
     private Long mealMid;
     private String slReason;
     private String uploadFileName;
+    private Integer isFreeze;
 
 
     private Integer status; //1在库、2销售中、3冻结(下单未付款)、4待配卡(已付款 针对2C或电销无需购买卡时、代理商买号而未指定白卡时)、5待受理(代理商已提交或仓库已发货，待提交乐语BOSS)、6已受理(乐语BOSS处理成功)、7受理失败(BOSS受理失败，需要人介入解决)、8已失效(乐语BOSS提示号码已非可用)
@@ -242,5 +243,13 @@ public class Num extends BasePojo{
 
     public void setUploadFileName(String uploadFileName) {
         this.uploadFileName = uploadFileName;
+    }
+
+    public Integer getIsFreeze() {
+        return isFreeze;
+    }
+
+    public void setIsFreeze(Integer isFreeze) {
+        this.isFreeze = isFreeze;
     }
 }
