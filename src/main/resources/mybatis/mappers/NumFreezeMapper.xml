@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrtx.web.mapper.NumFreezeMapper" >
+    <select id="queryFreeze" resultType="java.lang.Long">
+        select nf.add_user,nf.add_Date from  tb_num_freeze nf
+        where  nf.add_Date=(select max(nf.add_Date) from tb_num_freeze nf where nf.num_id=#{numId} and nf.is_freeze=1);
+    </select>
+</mapper>

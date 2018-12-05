@@ -84,4 +84,12 @@
         and m.`status`=#{status}
     </select>
 
+    <select id="findNumFreezeList" resultType="java.util.HashMap">
+        select max(nf.add_Date),n.id
+        from tb_num n left join tb_num_freeze nf on n.id=nf.num_id
+        where n.is_freeze=1
+        group by n.id
+        having TIMESTAMPDIFF(MINUTE,max(nf.add_Date), now()) >30;
+    </select>
+
 </mapper>
