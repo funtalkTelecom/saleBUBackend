@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
 import com.hrtx.global.SessionUtil;
+import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
@@ -18,6 +19,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -152,5 +154,33 @@ public class NumService {
             }
         }
         return objectPageInfo;
+    }
+
+    /*
+	 订单 已发货待签收>7天
+	 */
+    @Scheduled(fixedRate=6000)
+    public void unFreezeSystem() {
+        if(!"true".equals(SystemParam.get("numFreeze_timer"))) return;
+        log.info("开始执行.....冻结号码>30分钟,系统自动解冻......定时器");
+        List<Map> list=this.numMapper.findNumFreezeList();
+        if(list.size()>0)
+        {
+            for(Map map :list)
+            {
+                long id = NumberUtils.toLong(String.valueOf(map.get("id")));
+                Num num = numMapper.selectByPrimaryKey(id);
+                NumFreeze numFreeze = new NumFreeze();
+                numFreeze.setId(numFreeze.getGeneralId());
+                numFreeze.setAddDate(new Date());
+                numFreeze.setNumId(num.getId());
+                numFreeze.setNumResource(num.getNumResource());
+                numFreeze.setIsFreeze(0);
+                numFreezeMapper.insert(numFreeze);
+                num.setIsFreeze(0);
+                numMapper.updateByPrimaryKey(num);
+                log.info("号码冻结>30分钟系统自动解冻,numId:"+id);
+            }
+        }
     }
 }
