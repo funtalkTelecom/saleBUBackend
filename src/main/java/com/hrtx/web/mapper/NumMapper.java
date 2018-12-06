@@ -68,6 +68,5 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
     Map queryNumCountByskuid(@Param("skuid") long skuid,@Param("status") String status);
 
 
-
-
+    List<Map> findNumFreezeList();
 }
