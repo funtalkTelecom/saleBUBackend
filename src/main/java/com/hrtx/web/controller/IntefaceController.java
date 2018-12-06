@@ -33,6 +33,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/interface")
@@ -59,13 +61,17 @@ public class IntefaceController extends BaseReturn{
     public InterfaceResult parseXmlParam(String xml) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
+			Pattern p = Pattern.compile("<platrequest>[\\s\\S]*</platrequest>|<platrequest/>|<platresponse>[\\s\\S]*</platresponse>|<platresponse/>");
 			Element root = Utils.prase_xml(xml);
 			List<Element> list = root.elements();
 			for (Element element : list) {
 			    String name = element.getName();
 			    if("platresponse".equals(name) || "platrequest".equals(name)) {
                     map.put("data", element);
-                    map.put(name, element.asXML().replaceAll("<platresponse>","").replaceAll("</platresponse>","")
+					String a = "";
+					Matcher m = p.matcher(xml);
+					if(m.find())  a = m.group();
+                    map.put(name, a.replaceAll("<platresponse>","").replaceAll("</platresponse>","")
                             .replaceAll("<platrequest>","").replaceAll("</platrequest>","")
                             .replaceAll("<platrequest/>","").replaceAll("<platresponse/>","")
                             .replaceAll("\\s*",""));

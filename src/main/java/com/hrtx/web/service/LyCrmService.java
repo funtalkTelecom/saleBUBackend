@@ -282,7 +282,7 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 6 * * ?")
     public void praseLyPhoneData() {//String type, int dateOffset
-//        if(!"true".equals(SystemParam.get("exe_timer"))) return;
+        if(!"true".equals(SystemParam.get("exe_timer"))) return;
 //        if("ly_corp".equals(type)) this.praseLyCorpData(dateOffset);
 //        if("ly_phone".equals(type))
         log.info("开始执行号码资源下载定时器");
@@ -303,7 +303,7 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 2 * * ?")
     public void uploadLyIccidData() {
-        if(!"true".equals(SystemParam.get("exe_timer"))) return;
+//        if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行上传iccid定时器");
         try {
             this.uploadLyIccidData(0);
