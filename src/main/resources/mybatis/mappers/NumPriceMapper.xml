@@ -16,6 +16,7 @@
     <if test="param.netType!=null and param.netType != ''"> and b.net_type = #{param.netType}</if>
     <if test="param.feature!=null and param.feature != ''"> and b.feature REGEXP ".*,"#{param.feature}",.*"</if>
     <if test="param.temp!=null and param.temp!=''"> and b.resource like #{param.temp}</if>
+    <if test="param.resource!=null and param.resource!=''"> and b.resource like "%"#{param.temp}"%"</if>
 
     ORDER BY b.agent_id desc ) a where a.rn = 1
 
