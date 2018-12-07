@@ -37,7 +37,6 @@ public class PowerInterceptor implements HandlerInterceptor {
 		redirect = URLEncoder.encode(redirect, "utf-8");
 		String no_login="{code:'401',msg:'登录超时或未登录，请登录！'}";
 		String actionName=request.getRequestURI();
-		System.out.println("Method : "+actionName+"   ===="+request.getQueryString());
 		String login_page=path+"login-index"+(ArrayUtils.contains(no_redirect,actionName)?"":"?redirectURL="+redirect);
 		String power_info_page=path+"/no-power";
 		String no_power="{code:'401',msg:'抱歉，权限不足！'}";
@@ -58,7 +57,7 @@ public class PowerInterceptor implements HandlerInterceptor {
 
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,ModelAndView modelAndView) throws Exception {
     	Long _t_start_time=(Long) request.getAttribute("_t_start_time");
-    	log.info(String.format("当前请求耗时[%s]ms",(System.currentTimeMillis()-_t_start_time)));
+		log.info(String.format("请求[%s]耗时[%s]ms",request.getRequestURI(),(System.currentTimeMillis()-_t_start_time)));
     }
 
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,Exception ex) throws Exception {

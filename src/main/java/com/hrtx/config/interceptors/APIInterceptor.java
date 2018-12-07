@@ -53,7 +53,7 @@ public class APIInterceptor implements HandlerInterceptor {
 
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,ModelAndView modelAndView) throws Exception {
     	Long _t_start_time=(Long) request.getAttribute("_t_start_time");
-    	log.info(String.format("当前请求耗时[%s]ms",(System.currentTimeMillis()-_t_start_time)));
+		log.info(String.format("请求[%s]耗时[%s]ms",request.getRequestURI(),(System.currentTimeMillis()-_t_start_time)));
     }
 
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,Exception ex) throws Exception {
