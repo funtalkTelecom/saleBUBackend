@@ -2,6 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hrtx.web.mapper.ChannelMapper">
 
+    <select id="queryPageList" resultType="java.util.HashMap">
+        select concat(c.id,'') id,c.channel channel ,c.ratio_price ratioPrice from tb_channel c where c.is_del=0 order by c.channel_id
+    </select>
+
     <select id="getChannelList" resultType="java.util.HashMap">
       select c.id,c.channel_id,c.channel,c.ratio_price	from tb_channel c where c.is_del=0 order by c.id
     </select>
