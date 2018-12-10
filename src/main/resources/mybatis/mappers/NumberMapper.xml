@@ -127,7 +127,7 @@
         from tb_num a
         left join tb_sku b on b.sku_id = a.sku_id
         left join tb_goods c on c.g_id = b.g_id
-        where c.g_is_auc = 0
+        where c.g_is_auc = 0 and c.`status`=1
         <if test="tags!=null and tags!='' and tags !='\'\''">
         and a.id in (
             select d.num_id from tb_num_rule d where d.`value` in (${tags}) and d.rule_type = 'tag'
@@ -235,6 +235,13 @@
     <select id="checkNumberIsOk" resultType="java.lang.Integer">
         select count(1) as num from tb_num a
         where a.status = 1
+        <if test="numResource!=null and numResource!=''">
+            and a.num_resource = #{numResource}
+        </if>
+    </select>
+    <select id="checkNumberIsOkStatus" resultType="java.lang.Integer">
+        select count(1) as num from tb_num a
+        where a.status in(1)
         <if test="numResource!=null and numResource!=''">
             and a.num_resource = #{numResource}
         </if>

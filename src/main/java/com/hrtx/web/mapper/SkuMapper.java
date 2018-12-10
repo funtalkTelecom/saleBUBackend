@@ -23,8 +23,11 @@ public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
 
     void updateSku(Sku sku);
 
+    void updateSkuStatus(Sku sku);
+
     void deleteSkuBySkuids(@Param("delSkus") String delSkus);
 
-
     List findNumStatus(@Param("gId") Long gId);
+
+    List queryStatusList(@Param("gId") Long gId,@Param("statusArry") String statusArry);
 }
