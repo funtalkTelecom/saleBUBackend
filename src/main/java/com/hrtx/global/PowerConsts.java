@@ -73,6 +73,10 @@ public enum PowerConsts {
 	LIANGHAOMOUDULE_COMMON_QUEYR(70701,"查询",70700,1,"",3,1),//靓号查询
 	LIANGHAOMOUDULE_COMMON_FREEZE(70702,"冻结",70700,1,"",3,2),//冻结
 
+	CHANNELMOUDULE(70800,"渠道和价格规则管理",70000,0,"channel/channel-query",2,1),
+	CHANNELMOUDULE_COMMON_QUEYR(70801,"查询",70800,1,"",3,1),//靓号查询
+	CHANNELMOUDULE_COMMON_EDIT(70802,"修改",70800,1,"",3,2),//冻结
+
 	SYSMOUDULE(90300,"配置管理",90000,0,"system/system-query",2,1),//配置管理
 	SYSMOUDULE_COMMON_QUEYR(90301,"查询",90300,1,"",3,1),//配置查询
 	SYSMOUDULE_COMMON_EDIT(90302,"修改",90300,1,"",3,2),//配置修改
