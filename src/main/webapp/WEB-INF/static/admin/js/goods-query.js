@@ -157,7 +157,7 @@ $(function() {
                             }
                         });
                         $operate.find(".unsale").click(function () {
-                            if (confirm("确认下架？")) {
+                            if (confirm("商品下架会影响到手动添加的价格，确定要下架吗")) {
                                 $.post("goods/goods-unsale", {gId: v}, function (data) {
                                     dataList.reload();
                                     alert(data.data);
