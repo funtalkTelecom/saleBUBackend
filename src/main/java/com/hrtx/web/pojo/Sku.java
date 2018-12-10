@@ -2,9 +2,9 @@ package com.hrtx.web.pojo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 @Table(name = "tb_sku")
@@ -23,10 +23,17 @@ public class Sku extends BasePojo implements java.io.Serializable {
     private String skuRepoGoods;
     private String skuRepoGoodsName;
 
+    private int status;
+    private Integer isDel;
+
+    @Transient
+    private String statusText;
+
     public Sku() {
     }
 
-    public Sku(Long skuId, Long gId, Double skuTobPrice, Double skuTocPrice, String skuIsNum, String skuSaleNum, int skuNum, String skuGoodsType, String skuRepoGoods, String skuRepoGoodsName) {
+    public Sku(Long skuId, Long gId, Double skuTobPrice, Double skuTocPrice, String skuIsNum,
+               String skuSaleNum, int skuNum, String skuGoodsType, String skuRepoGoods, String skuRepoGoodsName,int status,Integer isDel) {
         this.skuId = skuId;
         this.gId = gId;
         this.skuTobPrice = skuTobPrice;
@@ -37,6 +44,8 @@ public class Sku extends BasePojo implements java.io.Serializable {
         this.skuGoodsType = skuGoodsType;
         this.skuRepoGoods = skuRepoGoods;
         this.skuRepoGoodsName = skuRepoGoodsName;
+        this.status = status;
+        this.isDel = isDel;
     }
 
     public Long getSkuId() {
@@ -117,5 +126,29 @@ public class Sku extends BasePojo implements java.io.Serializable {
 
     public void setSkuRepoGoodsName(String skuRepoGoodsName) {
         this.skuRepoGoodsName = skuRepoGoodsName;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public Integer getIsDel() {
+        return isDel;
+    }
+
+    public void setIsDel(Integer isDel) {
+        this.isDel = isDel;
+    }
+
+    public String getStatusText() {
+        return statusText;
+    }
+
+    public void setStatusText(String statusText) {
+        this.statusText = statusText;
     }
 }

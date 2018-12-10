@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 @Table(name = "tb_goods")
@@ -38,11 +39,17 @@ public class Goods extends BasePojo implements java.io.Serializable {
     private Long gSellerId;
     private String gSellerName;
     private String gIsSale;
+    private Integer status;
+
+    @Transient
+    private String statusText;
 
     public Goods() {
     }
 
-    public Goods(Long gId, String gType1, String gType2, String gName, String gAd, Date gStartTime, Date gEndTime, String gSaleCity, String gIsAuc, Long gActive, String gIsPack, String gLoopTime, String gDeposit, String gStartNum, String gPriceUp, Long gSellerId, String gSellerName, String gIsSale) {
+    public Goods(Long gId, String gType1, String gType2, String gName, String gAd, Date gStartTime,
+                 Date gEndTime, String gSaleCity, String gIsAuc, Long gActive, String gIsPack, String gLoopTime,
+                 String gDeposit, String gStartNum, String gPriceUp, Long gSellerId, String gSellerName, String gIsSale,int status) {
         this.gId = gId;
         this.gType1 = gType1;
         this.gType2 = gType2;
@@ -61,6 +68,7 @@ public class Goods extends BasePojo implements java.io.Serializable {
         this.gSellerId = gSellerId;
         this.gSellerName = gSellerName;
         this.gIsSale = gIsSale;
+        this.status = status;
     }
 
     public Long getgId() {
@@ -205,5 +213,21 @@ public class Goods extends BasePojo implements java.io.Serializable {
 
     public void setgIsSale(String gIsSale) {
         this.gIsSale = gIsSale;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getStatusText() {
+        return statusText;
+    }
+
+    public void setStatusText(String statusText) {
+        this.statusText = statusText;
     }
 }

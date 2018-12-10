@@ -45,6 +45,7 @@ public class SkuService {
 				skuMap.put("skuGoodsType", sku.getSkuGoodsType());
 				skuMap.put("skuRepoGoods", sku.getSkuRepoGoods());
 				skuMap.put("skuRepoGoodsName", sku.getSkuRepoGoodsName());
+				skuMap.put("skustatusText", sku.getStatusText());
 
 				skuidMap.put(sku.getSkuId().toString(), skuMap);
 			}

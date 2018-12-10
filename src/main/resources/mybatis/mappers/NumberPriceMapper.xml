@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.NumberPriceMapper">
+
+    <insert id="insertBatch">
+        insert into tb_num_price ( id,sku_id,num_id,province_code,province_name,city_code,city_name,
+        resource,base_price,net_type,feature,low_consume,
+        corp_id,channel,ratio_price,price,agent_id,agent,is_del,add_date)
+        VALUES
+        <foreach collection="numberPriceList" item="numberPrice" separator=",">
+            (
+            #{numberPrice.id},
+            #{numberPrice.skuId},
+            #{numberPrice.numId},
+            #{numberPrice.provinceCode},
+            #{numberPrice.provinceName},
+            #{numberPrice.cityCode},
+            #{numberPrice.cityName},
+
+            #{numberPrice.resource},
+            #{numberPrice.basePrice},
+            #{numberPrice.netType},
+            #{numberPrice.feature},
+            #{numberPrice.lowConsume},
+
+            #{numberPrice.corpId},
+            #{numberPrice.channel},
+            #{numberPrice.ratioPrice},
+            #{numberPrice.price},
+            #{numberPrice.agentId},
+            #{numberPrice.agent},
+            #{numberPrice.isDel},
+            #{numberPrice.addDate}
+            )
+        </foreach>
+    </insert>
+
+
+    <update id="updateNumberPrice">
+        update tb_num_price set is_del =1 where sku_id = #{skuId}
+    </update>
+
+</mapper>
