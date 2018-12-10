@@ -17,9 +17,9 @@
         when a.`status` =0 then '初始'
         when  a.`status` =1 then '上架成功'
         when  a.`status` =2 then '下架成功'
-        when  a.`status` =90 then '上架库存验证失败'
+        when  a.`status` =90 then '上架库存未知'
         when  a.`status` =91 then '上架冻结库存失败'
-         when  a.`status` =92 then '下架库存验证失败'
+         when  a.`status` =92 then '下架未知异常'
           when  a.`status` =93 then '下架冻结库存失败'
         else '未知'
         end  as statusText

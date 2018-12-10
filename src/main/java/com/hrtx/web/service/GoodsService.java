@@ -70,7 +70,7 @@ public class GoodsService {
 		return goods;
 	}
 
-    public Result paygoodsEdit1(Goods goods, HttpServletRequest request, MultipartFile[] files) {
+    public Result paygoodsEdit(Goods goods, HttpServletRequest request, MultipartFile[] files) {
         //商品主表操作
         List<Goods> list = new ArrayList<Goods>();
         String isSale = goods.getgIsSale();  //是否上架
@@ -132,7 +132,7 @@ public class GoodsService {
             }
         }
         if(list!=null && list.size()>0) goodsMapper.insertBatch(list);
-
+        //sku ,numPrice 操作
         this.putaway(goods,skuPropertyJsonStr);
 
         return new Result(Result.OK, "提交成功");
@@ -221,7 +221,7 @@ public class GoodsService {
                     if(!"0".equals(param.get("quantity").toString())) {
                         res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                         if (200 != (res.getCode())) {
-                            sku.setStatus(90);
+                            sku.setStatus(90);  //未知异常
 //                            return new Result(Result.ERROR, "第"+(i+1)+"行,库存验证失败");
 //                            continue;
                         } else {
@@ -255,6 +255,7 @@ public class GoodsService {
                 }
                 skuMapper.updateSkuStatus(sku);
             }
+
 
             for(int i=0; i<isGoodSkuMap.size(); i++){
                 Map map1 =(Map) isGoodSkuMap.get(i);
@@ -816,8 +817,8 @@ public class GoodsService {
 	    return skuSaleNum+"★"+errorNum;
     }
 
-    public Result payUnsale(Goods goods, HttpServletRequest request){
-        List<Sku> skuList = skuMapper.queryStatusList(goods.getgId(),"1,92,93");
+    public Result payGoodsUnsale(Goods goods, HttpServletRequest request){
+        List<Sku> skuList = skuMapper.queryStatusList(goods.getgId(),"1,90,92,93");
         //批量验证号码
         for(Sku s : skuList){
             Long skuIds =s.getSkuId();
@@ -841,7 +842,7 @@ public class GoodsService {
                 if(s.getSkuNum()!=0) {
                     res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                     if (200 != (res.getCode())) {
-                        s.setStatus(92);  //库存验证失败
+                        s.setStatus(92);  //未知异常
                     } else {
                         StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                         if (!"00000".equals(sir.getCode())) {
