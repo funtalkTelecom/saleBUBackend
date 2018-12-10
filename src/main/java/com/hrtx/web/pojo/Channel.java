@@ -1,32 +1,23 @@
 package com.hrtx.web.pojo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 @Table(name = "tb_channel")
-public class Channel extends BasePojo implements java.io.Serializable {
-	private static final long serialVersionUID = 1L;
+public class Channel extends BasePojo{
     @Id
-    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
-    private int channelId;
-    private Double ratioPrice;
+
+    private Integer channelId;
+
     private String channel;
+
     private Integer isDel;
 
-    public Channel() {
-    }
+    private Double ratioPrice;
 
-    public Channel(Long id, int channelId, Double ratioPrice,String channel, Integer isDel) {
-        this.id = id;
-        this.channelId = channelId;
-        this.ratioPrice = ratioPrice;
-        this.channel = channel;
-        this.isDel = isDel;
-    }
+
 
     public Long getId() {
         return id;
@@ -36,20 +27,12 @@ public class Channel extends BasePojo implements java.io.Serializable {
         this.id = id;
     }
 
-    public int getChannelId() {
+    public Integer getChannelId() {
         return channelId;
     }
 
-    public void setChannelId(int channelId) {
+    public void setChannelId(Integer channelId) {
         this.channelId = channelId;
-    }
-
-    public Double getRatioPrice() {
-        return ratioPrice;
-    }
-
-    public void setRatioPrice(Double ratioPrice) {
-        this.ratioPrice = ratioPrice;
     }
 
     public String getChannel() {
@@ -66,5 +49,13 @@ public class Channel extends BasePojo implements java.io.Serializable {
 
     public void setIsDel(Integer isDel) {
         this.isDel = isDel;
+    }
+
+    public Double getRatioPrice() {
+        return ratioPrice;
+    }
+
+    public void setRatioPrice(Double ratioPrice) {
+        this.ratioPrice = ratioPrice;
     }
 }
