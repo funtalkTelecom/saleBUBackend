@@ -305,6 +305,7 @@ public class GoodsService {
                                 numberPrice.setRatioPrice(Double.valueOf(String.valueOf(mapc.get("ratio_price"))));
                                 numberPrice.setPrice(Utils.mul(basePrice,Double.parseDouble(String.valueOf(mapc.get("ratio_price")))));
                                 numberPrice.setAgentId(-1);
+                                numberPrice.setIsDel(0);
                                 numberPrice.setAgent("");
                                 numberPrice.setAddDate(new Date());
 
