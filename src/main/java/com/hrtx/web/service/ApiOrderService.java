@@ -12,6 +12,7 @@ import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,7 @@ public class ApiOrderService {
 	FundOrderService fundOrderService;
 	@Autowired
 	EPSaleService ePSaleService;
+	@Autowired private NumPriceMapper numPriceMapper;
 
 	public  List<Map> findOrderListByNumId(Long numId)
 	{
@@ -131,12 +133,11 @@ public class ApiOrderService {
 
 	/**
 	 * 根据商品id创建订单
-	 * @param request
-	 * @param 1:普靓和超靓:skuid, numid, 地址id, 支付方式, 套餐id
+	 * @param :普靓和超靓:skuid, numid, 地址id, 支付方式, 套餐id
 	 *             2:白卡和普号:skuid,数量,地址
 	 * @return
 	 */
-	public Result createOrder(HttpServletRequest request, Map oparam){
+	public Result createOrder(Map<String, String> param, Map oparam){
 		log.info("进入创建订单");
 		//子项小计
 		double sub_total = 0;
@@ -178,8 +179,15 @@ public class ApiOrderService {
 				user = (Consumer) oparam.get("user");
 			}
 			else {
-				type = request.getParameter("type");
+				type = param.get("type");
 				user = apiSessionUtil.getConsumer();
+				User u = SessionUtil.getUser();
+				if(user == null && u != null) {
+					user = new Consumer();
+					user.setId(u.getId());
+					user.setName(u.getName());
+					user.setIsAgent(0);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -199,9 +207,9 @@ public class ApiOrderService {
 				List<com.hrtx.web.pojo.Number> nlist = null;
 				try {
 					log.info("获取传入参数");
-					skuid = request.getParameter("skuid");
-					addrid = request.getParameter("addrid");//普通靓号可不填
-					numcount = request.getParameter("numcount")==null?-1:Integer.parseInt(request.getParameter("numcount"));
+					skuid = param.get("skuid");
+					addrid = param.get("addrid");//普通靓号可不填
+					numcount = param.get("numcount")==null?-1:Integer.parseInt(param.get("numcount"));
 					storagen=numcount;
 
 					if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
@@ -306,7 +314,7 @@ public class ApiOrderService {
 					order.setConsumer(user.getId());
 					order.setConsumerName(user.getName());
 					order.setStatus(1);//设置成待付款
-					order.setReqUserAgent(request.getHeader("user-agent"));
+					order.setReqUserAgent(param.get("user-agent"));
 					order.setReqIp(SessionUtil.getUserIp());
 					order.setAddDate(new Date());
 					order.setOrderType(1);
@@ -347,25 +355,27 @@ public class ApiOrderService {
 //						不出货		出货
 //				type:2  普通靓号3或超级靓号4    skuid, numid, addrid, payType, mealid
 				String skuid, numid = null, addrid, payType, mealid;
-				Map number = null;
+				Map numberPrice = null;
 				try {
 					log.info("获取传入参数");
-					skuid = request.getParameter("skuid");
-					numid = request.getParameter("numid");
-					addrid = request.getParameter("addrid") == null ? "" : request.getParameter("addrid");//普通靓号可不填
-					payType = request.getParameter("payMethod") == null ? "" : request.getParameter("payMethod");
-					mealid = request.getParameter("mealid") == null ? "" : request.getParameter("mealid");
+					skuid = param.get("skuid");
+					numid = param.get("numid");
+					addrid = param.get("addrid") == null ? "" : param.get("addrid");//普通靓号可不填
+					payType = param.get("payMethod") == null ? "" : param.get("payMethod");
+					mealid = param.get("mealid") == null ? "" : param.get("mealid");
 
 					if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
 					if (numid == null || "".equals(numid)) return new Result(Result.ERROR, "numid不能为空");
 
 					log.info("获取号码信息");
 					//获取号码
-					number = numberMapper.getNumInfoById(numid);
+//					number = numberMapper.getNumInfoById(numid);
+					NumPrice numPrice = new NumPrice();
+					numberPrice = null;//numPriceMapper.queryPageList(numPrice);
 					//冻结号码
 					log.info("验证号码是否可下单");
 					//验证号码是否可下单,2:销售中
-					if (number == null || !"2".equals(String.valueOf(number.get("status"))))
+					if (numberPrice == null || !"2".equals(String.valueOf(numberPrice.get("status"))))
 						return new Result(Result.ERROR, "号码已被购买!");
 					log.info("冻结号码");
 					freezeNum(numid, "3",false);
@@ -384,14 +394,14 @@ public class ApiOrderService {
 						if("3".equals(sku.get("skuGoodsType"))){
 							log.info("普通靓号,验证一级代理商");
 							if(user.getIsAgent() != 2){
-								freezeNum(numid, String.valueOf(number.get("status")),false);
+								freezeNum(numid, String.valueOf(numberPrice.get("status")),false);
 								return new Result(Result.ERROR, "您不是一级代理商,无法提交普通靓号订单");
 							}
 							log.info("判断商品地市和代理商地市");
 							//判断商品地市和代理商地市
 
-							if(!StringUtils.equals(number.get("cityId")+"",user.getAgentCity()+"")) {
-								freezeNum(numid, String.valueOf(number.get("status")),false);
+							if(!StringUtils.equals(numberPrice.get("city_code")+"",user.getAgentCity()+"")) {
+								freezeNum(numid, String.valueOf(numberPrice.get("status")),false);
 								return new Result(Result.ERROR, "不属于您的地市,无法操作");
 							}
 							/*if(user.getAgentCity()==null || !goods.getgSaleCity().contains(String.valueOf(user.getAgentCity()))) {
@@ -419,7 +429,7 @@ public class ApiOrderService {
 							orderItem.setSkuId(Long.parseLong(skuid));
 							orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
 							orderItem.setNumId(Long.parseLong(numid));
-							orderItem.setNum(String.valueOf( number.get("numResource")));
+							orderItem.setNum(String.valueOf( numberPrice.get("resource")));
 							orderItem.setIsShipment(1);//卡体发货
 							orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
 							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
@@ -446,7 +456,7 @@ public class ApiOrderService {
 						orderItem.setSkuId(Long.parseLong(skuid));
 						orderItem.setSkuProperty(JSONArray.fromObject(skuPropertyList).toString());
 						orderItem.setNumId(Long.parseLong(numid));
-						orderItem.setNum(String.valueOf( number.get("numResource")));
+						orderItem.setNum(String.valueOf( numberPrice.get("resource")));
 						orderItem.setIsShipment(0);//普通靓号不发货
 						orderItem.setSellerId(Long.parseLong(String.valueOf( sku.get("gSellerId"))));
 						orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
@@ -469,11 +479,24 @@ public class ApiOrderService {
 					order.setConsumer(user.getId());
 					order.setConsumerName(user.getName());
 					order.setStatus(1);//设置成待付款
-					order.setReqUserAgent(request.getHeader("user-agent"));
+					order.setReqUserAgent(param.get("user-agent"));
 					order.setReqIp(SessionUtil.getUserIp());
 					order.setAddDate(new Date());
 					order.setOrderType(2);
-					if (addrid == null) order.setAddressId(null);
+
+					order.setConment(param.get("conment"));
+					order.setThirdOrder(param.get("thirdOrder"));
+					order.setBossNum(param.get("bossNum"));
+					order.setPhoneConsumer(param.get("phoneConsumer"));
+					order.setPhoneConsumerIdType(param.get("phoneConsumerIdType"));
+					order.setPhoneConsumerIdNum(param.get("phoneConsumerIdNum"));
+
+					if (StringUtils.isBlank(addrid)) {
+						order.setAddressId(null);
+						order.setPersonName(param.get("personName"));
+						order.setPersonTel(param.get("personTel"));
+						order.setAddress(param.get("address"));
+					}
 					else {
 						//获取收货地址信息
 						DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(Long.parseLong(addrid));
@@ -495,7 +518,7 @@ public class ApiOrderService {
 					//清除已生成的订单
 					deleteOrder(orderList);
 					//解冻号码,把冻结之前的状态还原
-					freezeNum(numid, String.valueOf(number.get("status")),false);
+					freezeNum(numid, String.valueOf(numberPrice.get("status")),false);
 					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new Result(Result.ERROR, "获取数据异常");
 				}
@@ -515,12 +538,12 @@ public class ApiOrderService {
 					isPack = String.valueOf(oparam.get("gispack"));
 					goodsid = String.valueOf(oparam.get("gid"));
 				}else {
-					skuid = request.getParameter("skuid");
-					numid = request.getParameter("numid");
-					addrid = request.getParameter("addrid");
-					price = request.getParameter("price");
-					isPack = request.getParameter("gispack");
-					goodsid = request.getParameter("gid");
+					skuid = param.get("skuid");
+					numid = param.get("numid");
+					addrid = param.get("addrid");
+					price = param.get("price");
+					isPack = param.get("gispack");
+					goodsid = param.get("gid");
 				}
 				try {
 					action=new Auction();
@@ -596,16 +619,16 @@ public class ApiOrderService {
 			}
 
 			log.info("调用仓储接口前封装参数");
-			Map param = new HashMap();
+			Map iparam = new HashMap();
 			List items = new ArrayList();
 			Long preOrderId = 0L;
 			for (OrderItem i : orderItems) {
 				if(i.getIsShipment()==0) continue;
 				if(preOrderId!=i.getOrderId()) {
 					preOrderId = i.getOrderId();
-					param = new HashMap();
+					iparam = new HashMap();
 					items = new ArrayList();
-					param.put("order_id", i.getOrderId());
+					iparam.put("order_id", i.getOrderId());
 				}
 
 				Map item = new HashMap();
@@ -617,7 +640,7 @@ public class ApiOrderService {
 
 			}
 
-			param.put("commodities", items);
+			iparam.put("commodities", items);
 			//先写入表,再调用仓储
 			try{
 				orderMapper.insertBatch(orderList);
@@ -640,7 +663,7 @@ public class ApiOrderService {
 			//要发货的item,调用仓储接口
 			if(items!=null && items.size()>0) {
 				log.info("调用仓储接口");
-				Result res = StorageApiCallUtil.storageApiCall(param, "HK0003");
+				Result res = StorageApiCallUtil.storageApiCall(iparam, "HK0003");
 				if (200 != (res.getCode())) {
 					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new Result(Result.ERROR, "库存验证失败");

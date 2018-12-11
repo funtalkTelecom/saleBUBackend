@@ -77,6 +77,7 @@
 
 		<script type="text/javascript">
             var lh_freeze = <%=SessionUtil.hasPower(PowerConsts.LIANGHAOMOUDULE_COMMON_FREEZE)%>;
+            var lh_add = <%=SessionUtil.hasPower(PowerConsts.LIANGHAOMOUDULE_COMMON_ADD)%>;
             var userId = <%=SessionUtil.getUserId()%>;
 		</script>
 	</body>

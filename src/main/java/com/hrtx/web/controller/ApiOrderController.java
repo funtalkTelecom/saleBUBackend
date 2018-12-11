@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import sun.rmi.runtime.Log;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -37,11 +39,23 @@ public class ApiOrderController extends BaseReturn{
         String skuid = request.getParameter("skuid");
         String numid = request.getParameter("numid");
 //        if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
+        Map<String, String> param = new HashMap<>();
+        param.put("user-agent", request.getHeader("user-agent"));
+        param.put("type", type);
+        param.put("skuid", skuid);
+        param.put("numid", numid);
+        param.put("addrid", request.getHeader("addrid"));
+        param.put("numcount", request.getParameter("numcount"));
+        param.put("mealid", request.getParameter("mealid"));
+        param.put("bossNum", request.getParameter("bossNum"));
+        param.put("phoneConsumer", request.getParameter("phoneConsumer"));
+        param.put("phoneConsumerIdType", request.getParameter("phoneConsumerIdType"));
+        param.put("phoneConsumerIdNum", request.getParameter("phoneConsumerIdNum"));
         if("1".equals(type)) {
             //冻结号码
             if (!LockUtils.tryLock(skuid)) return new Result(Result.ERROR, "请稍后再试!");
             try {
-                return apiOrderService.createOrder(request, null);
+                return apiOrderService.createOrder(param, null);
             }finally {
                 LockUtils.unLock(skuid);
             }
@@ -50,7 +64,7 @@ public class ApiOrderController extends BaseReturn{
 //            if (numid == null || "".equals(numid)) return new Result(Result.ERROR, "numid不能为空");
             if (!LockUtils.tryLock(numid)) return new Result(Result.ERROR, "请稍后再试!");
             try {
-                return apiOrderService.createOrder(request, null);
+                return apiOrderService.createOrder(param, null);
             }finally {
                 LockUtils.unLock(numid);
             }

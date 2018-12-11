@@ -6,4 +6,5 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface NumPriceMapper extends BaseMapper<NumPrice>,Mapper<NumPrice> {
+    long countList(NumPrice numPrice);
 }

@@ -69,6 +69,11 @@ public class Order extends BasePojo implements java.io.Serializable {
     private String skuGoodsType;
     private String reason;
     private String refundReason;  //退款备注信息
+    private String thirdOrder; //第三方订单号
+    private String bossNum; //BOSS开户工号
+    private String phoneConsumer; //客户名称
+    private String phoneConsumerIdType; //客户证件类型
+    private String phoneConsumerIdNum; //客户证件编码
 
     @Transient
     private String num;
@@ -409,5 +414,45 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public void setRefundReason(String refundReason) {
         this.refundReason = refundReason;
+    }
+
+    public String getThirdOrder() {
+        return thirdOrder;
+    }
+
+    public void setThirdOrder(String thirdOrder) {
+        this.thirdOrder = thirdOrder;
+    }
+
+    public String getBossNum() {
+        return bossNum;
+    }
+
+    public void setBossNum(String bossNum) {
+        this.bossNum = bossNum;
+    }
+
+    public String getPhoneConsumer() {
+        return phoneConsumer;
+    }
+
+    public void setPhoneConsumer(String phoneConsumer) {
+        this.phoneConsumer = phoneConsumer;
+    }
+
+    public String getPhoneConsumerIdType() {
+        return phoneConsumerIdType;
+    }
+
+    public void setPhoneConsumerIdType(String phoneConsumerIdType) {
+        this.phoneConsumerIdType = phoneConsumerIdType;
+    }
+
+    public String getPhoneConsumerIdNum() {
+        return phoneConsumerIdNum;
+    }
+
+    public void setPhoneConsumerIdNum(String phoneConsumerIdNum) {
+        this.phoneConsumerIdNum = phoneConsumerIdNum;
     }
 }

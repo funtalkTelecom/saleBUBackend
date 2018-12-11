@@ -229,7 +229,7 @@ public class IntefaceController extends BaseReturn{
 		numPrice.setTemp(pattern.replaceAll("\\?","_"));
 		numPrice.setAgentId(merchant.getCorpId());
 		numPrice.setChannel(merchant.getChanel());
-long a = System.currentTimeMillis();
+		long a = System.currentTimeMillis();
 		PageInfo<Object> pm = numService.queryNumPrice(numPrice);
 		log.info("----------------------------------------------------------耗时："+(System.currentTimeMillis()-a));
         for (Object object : pm.getList()) {

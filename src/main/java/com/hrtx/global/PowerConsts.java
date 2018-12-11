@@ -72,6 +72,7 @@ public enum PowerConsts {
 	LIANGHAOMOUDULE(70700,"客服靓号",70000,0,"lianghao/lianghao-query",2,1),
 	LIANGHAOMOUDULE_COMMON_QUEYR(70701,"查询",70700,1,"",3,1),//靓号查询
 	LIANGHAOMOUDULE_COMMON_FREEZE(70702,"冻结",70700,1,"",3,2),//冻结
+	LIANGHAOMOUDULE_COMMON_ADD(70703,"下单",70700,1,"",3,2),//下单
 
 	SYSMOUDULE(90300,"配置管理",90000,0,"system/system-query",2,1),//配置管理
 	SYSMOUDULE_COMMON_QUEYR(90301,"查询",90300,1,"",3,1),//配置查询

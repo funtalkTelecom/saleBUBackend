@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
+import com.hrtx.global.EgtPage;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
@@ -14,6 +15,7 @@ import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
 import net.sf.json.JSONObject;
 import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -108,10 +110,18 @@ public class NumService {
     }
 
     public PageInfo<Object> queryNumPrice(NumPrice numPrice) {
-        PageHelper.startPage(numPrice.getPageNum(),numPrice.getLimit());
-        Page<Object> ob=this.numPriceMapper.queryPageList(numPrice);
-        PageInfo<Object> pm = new PageInfo<Object>(ob);
+//        PageHelper.startPage(numPrice.getPageNum(),numPrice.getLimit());
+//        Page<Object> ob=this.numPriceMapper.queryPageList(numPrice);
+        long total = numPriceMapper.countList(numPrice);
+        EgtPage egtPage = new EgtPage(numPrice.getPageNum(), numPrice.getLimit(), total);
+        egtPage.addAll(this.queryList(numPrice));
+        PageInfo<Object> pm = new PageInfo<Object>(egtPage);
         return pm;
+    }
+
+    public List queryList(NumPrice numPrice) {
+        numPrice.setStart((numPrice.getPageNum()-1)*numPrice.getLimit());
+        return numPriceMapper.queryList(numPrice);
     }
 
     public Result freezeNum(Num num) {
@@ -182,5 +192,13 @@ public class NumService {
                 log.info("号码冻结>30分钟系统自动解冻,numId:"+id);
             }
         }
+    }
+
+    public NumPrice getNumPrice(Long id) {
+        return numPriceMapper.selectByPrimaryKey(id);
+    }
+
+    public Long queryFreeze(Long numId) {
+        return numFreezeMapper.queryFreeze(numId);
     }
 }
