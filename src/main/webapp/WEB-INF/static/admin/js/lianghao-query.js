@@ -49,12 +49,12 @@ $(function() {
             		    $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
             		    //点击详情
                         $operate.find(".freeze").click(function (){
-                            $.post("lianghao/freeze-num",{id:record.numId,isFreeze:1,t:new Date().getTime()},function(data){
+                            $.post("lianghao/freeze-num",{id:record.id,isFreeze:1,t:new Date().getTime()},function(data){
                                 dataList.reload();
                             },"json");
                         });
 						$operate.find(".unfreeze").click(function (){
-                            $.post("lianghao/freeze-num",{id:record.numId,isFreeze:0,t:new Date().getTime()},function(data){
+                            $.post("lianghao/freeze-num",{id:record.id,isFreeze:0,t:new Date().getTime()},function(data){
                                 dataList.reload();
                             },"json");
                         });
