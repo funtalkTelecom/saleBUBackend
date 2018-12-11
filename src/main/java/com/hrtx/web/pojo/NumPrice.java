@@ -2,6 +2,7 @@ package com.hrtx.web.pojo;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -47,6 +48,9 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     private Integer isDel;
 
     private Date addDate;
+
+    @Transient
+    private String tag;
 
     public NumPrice(Long id, Long skuId, Long numId, Integer provinceCode, String provinceName, Integer cityCode, String cityName, String resource, BigDecimal basePrice, String netType, String feature, BigDecimal lowConsume, Long corpId, Integer channel, BigDecimal ratioPrice, BigDecimal price, String agent, Long agentId, Integer isDel, Date addDate) {
         this.id = id;
@@ -233,5 +237,13 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
 
     public void setAddDate(Date addDate) {
         this.addDate = addDate;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

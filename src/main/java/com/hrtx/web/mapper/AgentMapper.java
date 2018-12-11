@@ -23,4 +23,6 @@ public interface AgentMapper extends Mapper<Agent>,BaseMapper<Agent>{
 
     List<Map> findIsLyByConsumerId(@Param("ConsumerId") Long ConsumerId);
 
+    List findConsumenrIdCount(@Param("ConsumerId") Long ConsumerId);
+
 }

@@ -9,6 +9,7 @@ import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.mapper.NumberMapper;
 import com.hrtx.web.pojo.Consumer;
+import com.hrtx.web.pojo.NumPrice;
 import com.hrtx.web.pojo.Number;
 import com.hrtx.web.service.ApiNumberService;
 import org.slf4j.Logger;
@@ -30,15 +31,15 @@ public class ApiNumberController extends BaseReturn{
 
 	/**
 	 * 根据tags获取号码
-	 * @param number
+	 * @param numPrice
 	 * @param request
 	 * @return
 	 */
 	@GetMapping("/number")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public Result numberList(Number number, HttpServletRequest request){
-		return apiNumberService.numberList(number, request);
+	public Result numberList(NumPrice numPrice, HttpServletRequest request){
+		return apiNumberService.numberList(numPrice, request);
 	}
 
 	@GetMapping("/numberTypeList")
@@ -58,14 +59,14 @@ public class ApiNumberController extends BaseReturn{
 
 	/**
 	 * 根据号码模糊查询获取号码列表
-	 * @param number
+	 * @param numPrice
 	 * @param request
 	 * @return
 	 */
 	@GetMapping("/fand-number")
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public Result numberListByNum(Number number, HttpServletRequest request){
-		return apiNumberService.numberListByNum(number, request);
+	public Result numberListByNum(NumPrice numPrice, HttpServletRequest request){
+		return apiNumberService.numberListByNum(numPrice, request);
 	}
 }
