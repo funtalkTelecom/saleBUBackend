@@ -166,7 +166,7 @@ public class OrderController extends BaseReturn{
 	 */
 	@RequestMapping("/cancel-order-callback")
 	@Powers({PowerConsts.NOLOGINPOWER})
-	public String CancelOrderCallback(org.apache.catalina.servlet4preview.http.HttpServletRequest request) {
+	public String CancelOrderCallback(HttpServletRequest request) {
 		try {
 			String param = this.getParamBody(request);
 			log.info("接收到发货回调参数["+param+"]");
