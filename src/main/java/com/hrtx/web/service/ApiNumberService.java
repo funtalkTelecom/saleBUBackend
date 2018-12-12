@@ -58,6 +58,7 @@ public class ApiNumberService {
 			agentId = Long.valueOf(SystemParam.get("default_agent"));  //默认代理商id
 		}
 		numPrice.setAgentId(agentId);
+		numPrice.setChannel(3);
 		numPrice.setTag(tags);
 		Page<Object> ob=numPriceMapper.queryPageList(numPrice);
 		if(ob!=null && ob.size()>0){
