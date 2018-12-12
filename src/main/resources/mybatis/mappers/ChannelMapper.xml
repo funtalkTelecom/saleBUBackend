@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.ChannelMapper">
+
+    <select id="queryPageList" resultType="java.util.HashMap">
+        select concat(c.id,'') id,c.channel channel ,c.ratio_price ratioPrice from tb_channel c where c.is_del=0 order by c.channel_id
+    </select>
+
+    <select id="getChannelList" resultType="java.util.HashMap">
+      select c.id,c.channel_id,c.channel,c.ratio_price	from tb_channel c where c.is_del=0 order by c.id
+    </select>
+
+    <select id="getListbyNum" resultType="java.util.HashMap">
+      select m.sku_id,m.id numid,yy.id provinceCode,yy.name provinceName,y.id cityCode,y.name cityName,
+      m.num_resource,m.net_type,tt.keyvalue feature,m.low_consume
+        from tb_num m
+        left join tb_city  y on m.city_id = y.id
+        left join tb_city yy on  y.pid= yy.id
+        left join (
+        select e.num num,GROUP_CONCAT(t.key_id) keyid, Concat(',', GROUP_CONCAT(t.key_value),',') keyvalue  from tb_num_rule e ,tb_dict t where e.`value` = t.key_id and t.key_group='FEATHER_TYPE'
+        and  e.num=${num_resource}
+        group by e.num
+        ) tt on m.num_resource = tt.num
+        where
+        1=1
+        and m.`status` in (1,2) and m.num_resource=${num_resource}
+    </select>
+</mapper>

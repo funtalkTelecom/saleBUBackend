@@ -157,7 +157,7 @@ public class NumService {
             JSONObject m = JSONObject.fromObject(list.get(i));
             Integer integer = NumberUtils.toInt(String.valueOf(m.get("is_freeze")));
             if(integer==1){
-                long numId = NumberUtils.toLong(String.valueOf(m.get("numId")));
+                long numId = NumberUtils.toLong(String.valueOf(m.get("id")));
                 Long addUser=numFreezeMapper.queryFreeze(numId);
                 m.put("addUser",addUser );
                 list.set(i, m);
@@ -167,7 +167,7 @@ public class NumService {
     }
 
     /*
-	 订单 已发货待签收>7天
+	 号码冻结>30分钟系统自动解冻
 	 */
     @Scheduled(fixedRate=6000)
     public void unFreezeSystem() {

@@ -1,58 +1,52 @@
 package com.hrtx.web.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Table(name = "tb_num_price")
-public class NumPrice extends BasePojo implements java.io.Serializable {
-    @Id
+public class NumberPrice extends BasePojo implements java.io.Serializable {
+	private static final long serialVersionUID = 1L;
+	@Id
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long id;
-
     private Long skuId;
-
     private Long numId;
-
-    private Integer provinceCode;
-
+    private int provinceCode;
     private String provinceName;
-
-    private Integer cityCode;
-
+    private int cityCode;
     private String cityName;
 
-    private String resource;
-
-    private BigDecimal basePrice;
-
+    private String resource;   //号码
+    private double basePrice;   //基础价格
     private String netType;
-
     private String feature;
+    private double lowConsume;
 
-    private BigDecimal lowConsume;
-
-    private Long corpId;
-
-    private Integer channel;
-
-    private BigDecimal ratioPrice;
-
-    private BigDecimal price;
-
+    private Long corpId;    //供销商
+    private int channel;   //渠道名称
+    private double ratioPrice;    //价格系数
+    private double price ;       //销售价
+    private long agentId;      //代理商id
     private String agent;
-
-    private Long agentId;
-
     private Integer isDel;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date addDate;
 
-    @Transient
-    private String tag;
 
-    public NumPrice(Long id, Long skuId, Long numId, Integer provinceCode, String provinceName, Integer cityCode, String cityName, String resource, BigDecimal basePrice, String netType, String feature, BigDecimal lowConsume, Long corpId, Integer channel, BigDecimal ratioPrice, BigDecimal price, String agent, Long agentId, Integer isDel, Date addDate) {
+    public NumberPrice() {
+    }
+
+    public NumberPrice(Long id, Long skuId, Long numId, int provinceCode, String provinceName, int cityCode, String cityName,
+                        String resource,double basePrice, String netType, String feature, double lowConsume,
+                       Long corpId, int channel, double ratioPrice,double price, long agentId, String agent,  Integer isDel, Date addDate) {
         this.id = id;
         this.skuId = skuId;
         this.numId = numId;
@@ -60,23 +54,21 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
         this.provinceName = provinceName;
         this.cityCode = cityCode;
         this.cityName = cityName;
+
         this.resource = resource;
         this.basePrice = basePrice;
         this.netType = netType;
         this.feature = feature;
         this.lowConsume = lowConsume;
+
         this.corpId = corpId;
         this.channel = channel;
         this.ratioPrice = ratioPrice;
         this.price = price;
-        this.agent = agent;
         this.agentId = agentId;
+        this.agent = agent;
         this.isDel = isDel;
         this.addDate = addDate;
-    }
-
-    public NumPrice() {
-        super();
     }
 
     public Long getId() {
@@ -103,11 +95,11 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
         this.numId = numId;
     }
 
-    public Integer getProvinceCode() {
+    public int getProvinceCode() {
         return provinceCode;
     }
 
-    public void setProvinceCode(Integer provinceCode) {
+    public void setProvinceCode(int provinceCode) {
         this.provinceCode = provinceCode;
     }
 
@@ -116,14 +108,14 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     }
 
     public void setProvinceName(String provinceName) {
-        this.provinceName = provinceName == null ? null : provinceName.trim();
+        this.provinceName = provinceName;
     }
 
-    public Integer getCityCode() {
+    public int getCityCode() {
         return cityCode;
     }
 
-    public void setCityCode(Integer cityCode) {
+    public void setCityCode(int cityCode) {
         this.cityCode = cityCode;
     }
 
@@ -132,7 +124,7 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     }
 
     public void setCityName(String cityName) {
-        this.cityName = cityName == null ? null : cityName.trim();
+        this.cityName = cityName;
     }
 
     public String getResource() {
@@ -140,14 +132,14 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     }
 
     public void setResource(String resource) {
-        this.resource = resource == null ? null : resource.trim();
+        this.resource = resource;
     }
 
-    public BigDecimal getBasePrice() {
+    public double getBasePrice() {
         return basePrice;
     }
 
-    public void setBasePrice(BigDecimal basePrice) {
+    public void setBasePrice(double basePrice) {
         this.basePrice = basePrice;
     }
 
@@ -156,7 +148,7 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     }
 
     public void setNetType(String netType) {
-        this.netType = netType == null ? null : netType.trim();
+        this.netType = netType;
     }
 
     public String getFeature() {
@@ -164,14 +156,14 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     }
 
     public void setFeature(String feature) {
-        this.feature = feature == null ? null : feature.trim();
+        this.feature = feature;
     }
 
-    public BigDecimal getLowConsume() {
+    public double getLowConsume() {
         return lowConsume;
     }
 
-    public void setLowConsume(BigDecimal lowConsume) {
+    public void setLowConsume(double lowConsume) {
         this.lowConsume = lowConsume;
     }
 
@@ -183,28 +175,36 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
         this.corpId = corpId;
     }
 
-    public Integer getChannel() {
+    public int getChannel() {
         return channel;
     }
 
-    public void setChannel(Integer channel) {
+    public void setChannel(int channel) {
         this.channel = channel;
     }
 
-    public BigDecimal getRatioPrice() {
+    public double getRatioPrice() {
         return ratioPrice;
     }
 
-    public void setRatioPrice(BigDecimal ratioPrice) {
+    public void setRatioPrice(double ratioPrice) {
         this.ratioPrice = ratioPrice;
     }
 
-    public BigDecimal getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(double price) {
         this.price = price;
+    }
+
+    public long getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(long agentId) {
+        this.agentId = agentId;
     }
 
     public String getAgent() {
@@ -212,15 +212,7 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     }
 
     public void setAgent(String agent) {
-        this.agent = agent == null ? null : agent.trim();
-    }
-
-    public Long getAgentId() {
-        return agentId;
-    }
-
-    public void setAgentId(Long agentId) {
-        this.agentId = agentId;
+        this.agent = agent;
     }
 
     public Integer getIsDel() {
@@ -237,13 +229,5 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
 
     public void setAddDate(Date addDate) {
         this.addDate = addDate;
-    }
-
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
     }
 }

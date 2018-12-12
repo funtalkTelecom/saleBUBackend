@@ -13,6 +13,8 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
 
     int checkNumberIsOk(Number number);
 
+    int checkNumberIsOkStatus(Number number);
+
     Page<Object> queryPageListApi(@Param("tags") String tags);
 
     Map getNumInfoById(@Param("id") String id);

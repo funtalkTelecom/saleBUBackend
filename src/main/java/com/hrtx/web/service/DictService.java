@@ -6,6 +6,8 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
 import com.hrtx.web.mapper.DictMapper;
 import com.hrtx.web.pojo.Dict;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,7 @@ import java.util.List;
 
 @Service
 public class DictService {
-	
+	private Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private DictMapper dictMapper;
 
@@ -72,4 +74,14 @@ public class DictService {
     public List findDictByTypeGroup(String group) {
 		return dictMapper.findDictByTypeGroup(group);
     }
+
+	public Result editFeather(Dict dict) {
+		Dict dict1 = dictMapper.selectByPrimaryKey(dict.getId());
+		if(dict1==null) return new Result(Result.OK, "数据不存在");
+		dict1.setExt1(dict.getExt1());
+		dict1.setExt2(dict.getExt2());
+		dictMapper.updateByPrimaryKey(dict1);
+		log.info("号码规则["+dict1.getKeyValue()+"]更改后的不带4价为["+dict.getExt1()+"],带4价为["+dict.getExt2()+"]");
+		return new Result(Result.OK, "成功");
+	}
 }

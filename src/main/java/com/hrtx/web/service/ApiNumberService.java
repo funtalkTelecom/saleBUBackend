@@ -3,27 +3,22 @@ package com.hrtx.web.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
-import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
-import com.hrtx.web.mapper.MealMapper;
+import com.hrtx.web.mapper.AgentMapper;
+import com.hrtx.web.mapper.NumPriceMapper;
 import com.hrtx.web.mapper.NumberMapper;
 import com.hrtx.web.pojo.Consumer;
-import com.hrtx.web.pojo.Meal;
+import com.hrtx.web.pojo.NumPrice;
 import com.hrtx.web.pojo.Number;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,42 +32,72 @@ public class ApiNumberService {
 	private NumberMapper numberMapper;
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
-
+	@Autowired
+	private AgentMapper agentMapper;
+	@Autowired
+	private NumPriceMapper numPriceMapper;
 	/**
 	 * 根据tags获取号码
-	 * @param number
+	 * @param numPrice
 	 * @param request
 	 * @return
 	 */
-	public Result numberList(Number number, HttpServletRequest request){
+	public Result numberList(NumPrice numPrice, HttpServletRequest request){
 		PageInfo<Object> pm = null;
-		try {
-			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
-			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-//			number.setStart(limit*(pageNum-1));
-			number.setPageNum(pageNum);
-			number.setLimit(limit);
-			String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
-			tags = "'"+ tags.replaceAll(",", "','") +"'";
-
-			PageHelper.startPage(number.getPageNum(),number.getLimit());
-			Page<Object> ob=this.numberMapper.queryPageListApi(tags);
-			if(ob!=null && ob.size()>0){
-				//处理号码,生成号码块字段(numBlock)
-				for (int i = 0; i < ob.size(); i++) {
-					Map obj= (Map) ob.get(i);
-					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
-				}
-			}
-			pm = new PageInfo<Object>(ob);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			pm = new PageInfo<Object>(null);
-			return new Result(Result.ERROR, pm);
+		numPrice.setPageNum(numPrice.startToPageNum());
+		String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
+		tags = "'"+ tags.replaceAll(",", "','") +"'";
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		long consumerId = consumer.getId();
+		List _list = agentMapper.findConsumenrIdCount(consumer.getId());
+		long agentId;
+		if(_list.size()>0){
+			Map _map = (Map) _list.get(0);
+			agentId =Long.valueOf(String.valueOf(_map.get("id"))) ;
+		}else{
+			agentId = Long.valueOf(SystemParam.get("default_agent"));  //默认代理商id
 		}
-
+		numPrice.setAgentId(agentId);
+		numPrice.setTag(tags);
+		Page<Object> ob=numPriceMapper.queryPageList(numPrice);
+		if(ob!=null && ob.size()>0){
+			//处理号码,生成号码块字段(numBlock)
+			for (int i = 0; i < ob.size(); i++) {
+				Map obj= (Map) ob.get(i);
+				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+			}
+		}
+		pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);
 	}
+//	public Result numberList(Number number, HttpServletRequest request){
+//		PageInfo<Object> pm = null;
+//		try {
+//			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+//			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+////			number.setStart(limit*(pageNum-1));
+//			number.setPageNum(pageNum);
+//			number.setLimit(limit);
+//			String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
+//			tags = "'"+ tags.replaceAll(",", "','") +"'";
+//			PageHelper.startPage(number.getPageNum(),number.getLimit());
+//			Page<Object> ob=this.numberMapper.queryPageListApi(tags);
+//			if(ob!=null && ob.size()>0){
+//				//处理号码,生成号码块字段(numBlock)
+//				for (int i = 0; i < ob.size(); i++) {
+//					Map obj= (Map) ob.get(i);
+//					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
+//				}
+//			}
+//			pm = new PageInfo<Object>(ob);
+//		} catch (NumberFormatException e) {
+//			e.printStackTrace();
+//			pm = new PageInfo<Object>(null);
+//			return new Result(Result.ERROR, pm);
+//		}
+//
+//		return new Result(Result.OK, pm);
+//	}
 
 	public Result numberTypeList(Number number, HttpServletRequest request){
 		Map map = new HashMap();
@@ -165,37 +190,60 @@ public class ApiNumberService {
 
 
 	/**
-	 * 根据tags获取号码
-	 * @param number
+	 * 根据号码查询获取号码
+	 * @param numPrice
 	 * @param request
 	 * @return
 	 */
-	public Result numberListByNum(Number number, HttpServletRequest request){
+	public Result numberListByNum(NumPrice numPrice, HttpServletRequest request){
 		PageInfo<Object> pm = null;
-		try {
-			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
-			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-//			number.setStart(limit*(pageNum-1));
-			number.setLimit(limit);
-			number.setPageNum(pageNum);
-			String num = request.getParameter("num")==null?"": request.getParameter("num");
+//		try {
+//			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+//			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+////			number.setStart(limit*(pageNum-1));
+//			number.setLimit(limit);
+//			number.setPageNum(pageNum);
+//			String num = request.getParameter("num")==null?"": request.getParameter("num");
+//
+//			PageHelper.startPage(number.getPageNum(),number.getLimit());
+//			Page<Object> ob=this.numberMapper.queryPageByNumList(num);
+//			if(ob!=null && ob.size()>0){
+//				//处理号码,生成号码块字段(numBlock)
+//				for (int i = 0; i < ob.size(); i++) {
+//					Map obj= (Map) ob.get(i);
+//					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
+//				}
+//			}
+//			pm = new PageInfo<Object>(ob);
+//		} catch (NumberFormatException e) {
+//			e.printStackTrace();
+//			pm = new PageInfo<Object>(null);
+//			return new Result(Result.ERROR, pm);
+//		}
 
-			PageHelper.startPage(number.getPageNum(),number.getLimit());
-			Page<Object> ob=this.numberMapper.queryPageByNumList(num);
-			if(ob!=null && ob.size()>0){
-				//处理号码,生成号码块字段(numBlock)
-				for (int i = 0; i < ob.size(); i++) {
-					Map obj= (Map) ob.get(i);
-					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
-				}
-			}
-			pm = new PageInfo<Object>(ob);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			pm = new PageInfo<Object>(null);
-			return new Result(Result.ERROR, pm);
+		numPrice.setPageNum(numPrice.startToPageNum());
+		String num = request.getParameter("num")==null?"": request.getParameter("num");
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		long consumerId = consumer.getId();
+		List _list = agentMapper.findConsumenrIdCount(consumer.getId());
+		long agentId;
+		if(_list.size()>0){
+			Map _map = (Map) _list.get(0);
+			agentId =Long.valueOf(String.valueOf(_map.get("id"))) ;
+		}else{
+			agentId = Long.valueOf(SystemParam.get("default_agent"));  //默认代理商id
 		}
-
+		numPrice.setAgentId(agentId);
+		numPrice.setResource(num);
+		Page<Object> ob=numPriceMapper.queryPageList(numPrice);
+		if(ob!=null && ob.size()>0){
+			//处理号码,生成号码块字段(numBlock)
+			for (int i = 0; i < ob.size(); i++) {
+				Map obj= (Map) ob.get(i);
+				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+			}
+		}
+		pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);
 	}
 

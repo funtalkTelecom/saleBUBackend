@@ -36,4 +36,10 @@ public interface GoodsMapper extends Mapper<Goods>,BaseMapper<Goods>{
     List findNumStatus(@Param("num") String num,@Param("skuid") String skuid);
 
     void updateNumStatus(@Param("num_id") String num_id,@Param("skuid") String skuid,@Param("num") String num);
+
+    /**
+     * 更新goods.status
+     * @param goods
+     */
+    void updateGoodStatus(Goods goods);
 }

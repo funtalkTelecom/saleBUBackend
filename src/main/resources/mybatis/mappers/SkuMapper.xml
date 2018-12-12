@@ -11,7 +11,18 @@
         a.sku_num as skuNum,
         a.sku_goods_type as skuGoodsType,
         a.sku_repo_goods as skuRepoGoods,
-        a.sku_repo_goods_name as skuRepoGoodsName
+        a.sku_repo_goods_name as skuRepoGoodsName,
+        a.`status` as status,
+        case
+        when a.`status` =0 then '初始'
+        when  a.`status` =1 then '上架成功'
+        when  a.`status` =2 then '下架成功'
+        when  a.`status` =90 then '上架库存未知'
+        when  a.`status` =91 then '上架冻结库存失败'
+         when  a.`status` =92 then '下架未知异常'
+          when  a.`status` =93 then '下架冻结库存失败'
+        else '未知'
+        end  as statusText
     </sql>
     <select id="findSkuInfo" resultType="Sku">
         select
@@ -74,7 +85,7 @@
             sku_num,
             sku_goods_type,
             sku_repo_goods,
-            sku_repo_goods_name
+            sku_repo_goods_name,status,is_del
         ) values
         <foreach collection="skuList" item="sku" separator=",">
             (
@@ -87,7 +98,9 @@
             #{sku.skuNum},
             #{sku.skuGoodsType},
             #{sku.skuRepoGoods},
-            #{sku.skuRepoGoodsName}
+            #{sku.skuRepoGoodsName},
+            #{sku.status},
+            #{sku.isDel}
             )
         </foreach>
     </insert>
@@ -106,6 +119,11 @@
 
     <update id="updateSkuNum">
         update tb_sku set sku_num = #{skuNum} where sku_id = #{skuId}
+    </update>
+
+    <update id="updateSkuStatus">
+        update tb_sku set status=#{status}
+        where sku_id = #{skuId}
     </update>
 
     <update id="updateSku">
@@ -128,5 +146,16 @@
     and  s.g_id= #{gId}
     and m.`status`!=2
     </select>
+
+    <select id="queryStatusList" resultType="Sku">
+    select
+        <include refid="col_list"/>
+        from tb_sku a where a.g_id=#{gId} and a.`status` in(
+    <foreach collection="statusArry.split(',')" item="status" separator=",">
+        #{status}
+    </foreach>
+    )
+    </select>
+
 
 </mapper>

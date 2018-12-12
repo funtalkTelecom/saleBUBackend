@@ -62,7 +62,7 @@
 											</select>
 										</div>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.GOODSMOUDULE_COMMON_ADD)%>">
-											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#goodsInfo" >上架商品</button>
+											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" id="opengoodsInfo" data-target="#goodsInfo" >上架商品</button>
 										</c:if>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
@@ -259,7 +259,7 @@
 							</div>
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-success">提交</button>
+							<button type="button" class="btn btn-success" id="btn">提交</button>
 							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
 						</div>
 					</form>

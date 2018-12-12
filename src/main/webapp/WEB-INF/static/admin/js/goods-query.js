@@ -1,5 +1,12 @@
 var dataList = null;
 var gIsAuc;
+var gid =$("#gId").val();
+if(gid =""){
+    $("#btn").show();
+}else{
+    $("#btn").hide();
+}
+
 $.post("dict-to-map", {group: "gIsAuc"},function(data){
     gIsAuc = data;
 },"json");
@@ -27,13 +34,16 @@ $(function() {
                     "header" : "结束时间",
                     "dataIndex" : "gEndTime"
                 },{
+                    "header" : "状态",
+                    "dataIndex" : "statusText"
+                },{
 					"header" : "操作",
 					"dataIndex" : "gId",
 					"renderer":function(v,record){
 						var node = [];
 						if(p_edit) {
-							node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">修改</a>');
-							if(record.gIsSale=="1")
+							node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">详情</a>');
+							if(record.gIsSale=="1" && (record.status=="1" || record.status=="2" || record.status=="4"))
 							    node.push('<a class="btn btn-success btn-xs unsale" href="javascript:void(0);">下架</a>');
                         }
                         // if(p_delete && record.gIsSale!="1") {
@@ -71,6 +81,10 @@ $(function() {
                                             $("#gEndTimePicker").val(_data["gEndTime"]);
                                             $("#gStartTime").val(_data["gStartTime"]);
                                             $("#gEndTime").val(_data["gEndTime"]);
+                                            var gid =$("#gId").val();
+                                            if(gid!=""){
+                                                $("#btn").hide();
+                                            }
                                             //给cityTree赋值
                                             var zTree = $.fn.zTree.getZTreeObj("cityTree");
                                             var gSaleCitys = record.gSaleCity.split(",");
@@ -143,7 +157,7 @@ $(function() {
                             }
                         });
                         $operate.find(".unsale").click(function () {
-                            if (confirm("确认下架？")) {
+                            if (confirm("商品下架会影响到手动添加的价格，确定要下架吗")) {
                                 $.post("goods/goods-unsale", {gId: v}, function (data) {
                                     dataList.reload();
                                     alert(data.data);
@@ -804,6 +818,13 @@ $(function() {
     }
     getRepoGodds();
     getActive();
+
+    $("#opengoodsInfo").click(function(){
+        var gid =$("#gId").val();
+        if(gid==""){
+            $("#btn").show();
+        }
+    });
 });
 var activeSelectOptions;
 function getActive(){
@@ -892,6 +913,18 @@ var titleStrObj = {
         "type":'<select class="chosen-select" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="1">白卡</option><option value="2">成卡</option><option value="3">普卡</option></select>',
         "titleClass":""
     },
+    "skustatusText":{
+        "isShow":true,
+        "title":"状态",
+        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12" readonly>',
+        "titleClass":""
+    },
+    // "statusText":{
+    //     "isShow":false,
+    //     "title":"状态",
+    //     "type":'',
+    //     "titleClass":""
+    // },
     "operation":{
         "isShow":true,
         "title":"操作",
@@ -1005,3 +1038,4 @@ function dateFtt(fmt,date) {
     }
     return fmt;
 } ;
+
