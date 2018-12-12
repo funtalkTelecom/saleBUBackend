@@ -12,8 +12,6 @@ import java.util.Map;
 @Component
 public interface ChannelMapper extends Mapper<Channel>,BaseMapper<Channel>{
 
-    List getChannelList();
-
     Map getListbyNum(@Param("num_resource") String num_resource);
 
 }

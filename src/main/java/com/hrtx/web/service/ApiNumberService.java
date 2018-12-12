@@ -36,6 +36,8 @@ public class ApiNumberService {
 	private AgentMapper agentMapper;
 	@Autowired
 	private NumPriceMapper numPriceMapper;
+	@Autowired
+	private NumService numService;
 	/**
 	 * 根据tags获取号码
 	 * @param numPrice
@@ -45,6 +47,7 @@ public class ApiNumberService {
 	public Result numberList(NumPrice numPrice, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		numPrice.setPageNum(numPrice.startToPageNum());
+		numPrice.setLimit(numPrice.getLimit());
 		String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
 		tags = "'"+ tags.replaceAll(",", "','") +"'";
 		Consumer consumer= this.apiSessionUtil.getConsumer();
@@ -60,15 +63,14 @@ public class ApiNumberService {
 		numPrice.setAgentId(agentId);
 		numPrice.setChannel(3);
 		numPrice.setTag(tags);
-		Page<Object> ob=numPriceMapper.queryPageList(numPrice);
-		if(ob!=null && ob.size()>0){
-			//处理号码,生成号码块字段(numBlock)
-			for (int i = 0; i < ob.size(); i++) {
-				Map obj= (Map) ob.get(i);
-				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
-			}
+		pm = numService.queryNumPrice(numPrice);
+		//处理号码,生成号码块字段(numBlock)
+		List ob =pm.getList();
+		for (int i = 0; i < ob.size(); i++) {
+			Map obj= (Map) ob.get(i);
+			obj.put("numBlock", getNumBlock((String) obj.get("resource")));
 		}
-		pm = new PageInfo<Object>(ob);
+
 		return new Result(Result.OK, pm);
 	}
 //	public Result numberList(Number number, HttpServletRequest request){
