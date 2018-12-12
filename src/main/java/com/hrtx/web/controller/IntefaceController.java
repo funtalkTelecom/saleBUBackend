@@ -229,15 +229,21 @@ public class IntefaceController extends BaseReturn{
 		numPrice.setTemp(pattern.replaceAll("\\?","_"));
 		numPrice.setAgentId(merchant.getCorpId());
 		numPrice.setChannel(merchant.getChanel());
+
+		if(numPrice.getPageNum() == 1 && "???????????".equals(pattern) && operator == 0 && province_code == 0 && city_code == 0 && StringUtils.isBlank(feature)) {
+			numPrice.setProvinceCode(1);
+			numPrice.setCityCode(44);
+		}
+
 		long a = System.currentTimeMillis();
-		PageInfo<Object> pm = numService.queryNumPrice(numPrice);
+		List list = numService.queryNumPriceList(numPrice);
 		log.info("----------------------------------------------------------耗时："+(System.currentTimeMillis()-a));
-        for (Object object : pm.getList()) {
+        for (Object object : list) {
 			Map map = (Map) object;
 			sb.append("<number><operator>"+map.get("net_type")+"</operator><province>"+map.get("province_name")+"</province><city>"+map.get("city_name")+"</city>" +
 					"<feather>"+map.get("feature")+"</feather><mobile_number>"+map.get("resource")+"</mobile_number><price>"+map.get("price")+"</price></number>");
 		}
-		return new InterfaceResult("00000", "success", String.format("<req_no>"+data.elementText("req_no")+"</req_no><total>"+pm.getTotal()+"</total><numbers>%s</numbers>", sb.toString()));
+		return new InterfaceResult("00000", "success", String.format("<req_no>"+data.elementText("req_no")+"</req_no><total>0</total><numbers>%s</numbers>", sb.toString()));
 
 	}
 

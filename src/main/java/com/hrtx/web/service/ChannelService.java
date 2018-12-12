@@ -27,6 +27,7 @@ import java.util.Map;
 public class ChannelService {
 
 	@Autowired private ChannelMapper channelMapper;
+	@Autowired private NumPriceMapper numPriceMapper;
 
 
     public Result queryChannel(Channel channel) {
@@ -48,7 +49,7 @@ public class ChannelService {
         channelMapper.insert(cl);
         c.setIsDel(1);
         channelMapper.updateByPrimaryKey(c);
-
+        numPriceMapper.matchNumPrice();
         return new Result(Result.OK, "成功");
     }
 }

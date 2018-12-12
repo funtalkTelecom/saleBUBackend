@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
 import com.hrtx.web.mapper.DictMapper;
+import com.hrtx.web.mapper.NumPriceMapper;
 import com.hrtx.web.pojo.Dict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ public class DictService {
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private DictMapper dictMapper;
+	@Autowired private NumPriceMapper numPriceMapper;
 
 	public Result pageDict(Dict dict) {
 		PageHelper.startPage(dict.startToPageNum(),dict.getLimit());
@@ -82,6 +84,7 @@ public class DictService {
 		dict1.setExt2(dict.getExt2());
 		dictMapper.updateByPrimaryKey(dict1);
 		log.info("号码规则["+dict1.getKeyValue()+"]更改后的不带4价为["+dict.getExt1()+"],带4价为["+dict.getExt2()+"]");
+		numPriceMapper.matchNumPrice();
 		return new Result(Result.OK, "成功");
 	}
 }
