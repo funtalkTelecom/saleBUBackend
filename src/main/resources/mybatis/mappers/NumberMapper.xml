@@ -363,4 +363,22 @@
         and n.status = 2
         and g.g_id =#{goodsid}
     </select>
+
+    <update id="updateStatusByNumber">
+        update tb_num a set
+        <if test="StartTime!=null">
+            a.start_time = #{StartTime},
+        </if>
+        <if test="EndTime!=null">
+            a.end_time = #{EndTime},
+        </if>
+            a.sku_id=#{skuId},
+            a.status=#{status}
+            where
+            a.num_resource in (
+            <foreach collection="StrNums.split(',')" item="Nums" separator=",">
+                #{Nums}
+            </foreach>
+        ) and a.status in (1,2)
+    </update>
 </mapper>

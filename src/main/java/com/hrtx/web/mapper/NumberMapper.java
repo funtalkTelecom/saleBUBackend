@@ -5,6 +5,7 @@ import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.Number;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -47,4 +48,7 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
      * @return
      */
     List queryGoodsNumberList(@Param("goodsid")  String goodsid);
+
+    void updateStatusByNumber(@Param("StrNums") String StrNums, @Param("skuId") Long skuId,@Param("status") int status,
+                              @Param("StartTime") Date StartTime, @Param("EndTime") Date EndTime);
 }
