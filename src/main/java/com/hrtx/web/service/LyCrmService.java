@@ -282,7 +282,7 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 6 * * ?")
     public void praseLyPhoneData() {//String type, int dateOffset
-//        if(!"true".equals(SystemParam.get("exe_timer"))) return;
+        if(!"true".equals(SystemParam.get("exe_timer"))) return;
 //        if("ly_corp".equals(type)) this.praseLyCorpData(dateOffset);
 //        if("ly_phone".equals(type))
         log.info("开始执行号码资源下载定时器");
@@ -303,7 +303,7 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 2 * * ?")
     public void uploadLyIccidData() {
-//        if(!"true".equals(SystemParam.get("exe_timer"))) return;
+        if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行上传iccid定时器");
         try {
             this.uploadLyIccidData(0);
@@ -332,7 +332,7 @@ public class LyCrmService {
 
     private void praseLyPhoneData(int date_offset) {
         String fileName = Utils.getDate(-1-date_offset, "yyyyMMdd")+".txt";
-//        this.downloadFileToSftp("phone_boss2hr", "phone_boss2hr", fileName);
+        this.downloadFileToSftp("phone_boss2hr", "phone_boss2hr", fileName);
         File dir = new File(this.getLyRootPath()+"phone_boss2hr"+File.separator);
         String tFileName = dir.getPath()+File.separator+fileName;
         List<String> datas = this.readFile(tFileName);
@@ -366,12 +366,14 @@ public class LyCrmService {
     private void addNumFeature() {
         List<Map> nums = numMapper.queryActiveNum();
         List<Map> feathers = dictMapper.findDictByGroup("FEATHER_TYPE");
+        List<Map> priceFeathers = dictMapper.findDictByGroup("feather_price");
         List<NumRule> batch = new ArrayList<>();
         for (int j = 0, len = nums.size(); j < len; j++) {
             Map num = nums.get(j);
             long id = NumberUtils.toLong(String.valueOf(num.get("id")));
             String num_resource = String.valueOf(num.get("num_resource"));
             this.addNumFeature(id, num_resource, feathers, batch);
+            this.addNumPriceFeature(id, num_resource, priceFeathers, batch);
             if(batch.size() >= 1000 || j+1 >= len) {
                 if(batch.size() > 0) numRuleMapper.batchInsert(batch);
                 batch = new ArrayList<>();
@@ -390,6 +392,22 @@ public class LyCrmService {
                 numRule.setNum(num_resource);
                 numRule.setNumId(id);
                 numRule.setRuleType("FEATHER_TYPE");
+                numRule.setValue(keyId);
+                batch.add(numRule);
+//                numRuleMapper.insert(numRule);
+            }
+        }
+    }
+    private void addNumPriceFeature(long id, String num_resource, List<Map> priceFeathers, List<NumRule> batch) {
+        for (Map map: priceFeathers) {
+            String keyId = org.apache.commons.lang.ObjectUtils.toString(map.get("keyId"));
+            String note = org.apache.commons.lang.ObjectUtils.toString(map.get("note"));
+            if(num_resource.matches(note)) {
+                NumRule numRule = new NumRule();
+                numRule.setId(numRule.getGeneralId());
+                numRule.setNum(num_resource);
+                numRule.setNumId(id);
+                numRule.setRuleType("feather_price");
                 numRule.setValue(keyId);
                 batch.add(numRule);
 //                numRuleMapper.insert(numRule);

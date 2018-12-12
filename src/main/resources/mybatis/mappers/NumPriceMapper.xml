@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hrtx.web.mapper.NumPriceMapper" >
-  <select id="queryPageList" resultType="java.util.HashMap">
-    select a.numPriceId , a.resource, case when a.net_type = '电信' then 1 when a.net_type = '联通' then 2 when a.net_type = '移动' then 3 else 0 end net_type,
-    a.province_name, a.city_name, a.feature, a.price, a.is_freeze,a.id
-    ,a.with4,a.teleType,a.skuTobPrice,a.skuTocPrice,a.netType,a.numLevel,a.lowConsume,a.tags
+  <select id="queryList" resultType="java.util.HashMap">
     select a.numPriceId, a.resource, case when a.net_type = '电信' then 1 when a.net_type = '联通' then 2 when a.net_type = '移动' then 3 else 0 end net_type,
-    a.province_name, a.city_name, a.feature, a.price, a.is_freeze,a.numId, a.status, a.city_code
+    a.province_name, a.city_name, a.feature, a.price, a.is_freeze,a.id, a.status, a.city_code,
+    a.with4,a.teleType,a.skuTobPrice,a.skuTocPrice,a.netType,a.numLevel,a.lowConsume,a.tags
     from (
     SELECT  IF(@resource = b.resource, @rn := @rn + 1, @rn := 1) AS rn,
-    @resource := b.resource AS resource, concat(b.id,'') numPriceId, b.net_type, b.province_name, b.city_name, b.feature,  b.price, b.agent_id,n.is_freeze,concat(n.id,'') id
-    ,n.with4,
-    if(n.tele_type is null,'',n.tele_type) as teleType,
-    sku.sku_tob_price as skuTobPrice,
-    sku.sku_toc_price as skuTocPrice,
-    n.net_type as netType,n.num_level as numLevel,n.low_consume as lowConsume,'tag' as tags
+    @resource := b.resource AS resource, concat(b.id,'') numPriceId, n.status, b.city_code,
+    b.net_type, b.province_name, b.city_name, b.feature,  b.price, b.agent_id,n.is_freeze,concat(n.id,'') id,
+    n.with4, if(n.tele_type is null,'',n.tele_type) as teleType, sku.sku_tob_price as skuTobPrice,
+    sku.sku_toc_price as skuTocPrice, n.net_type as netType,n.num_level as numLevel,n.low_consume as lowConsume,'tag' as tags
 
     FROM tb_num_price b, tb_num n, tb_goods c, tb_sku sku, (select @rn := 0, @resource := null) d
     where b.num_id = n.id and n.status = 2 and b.is_del = 0 and b.sku_id = sku.sku_id
@@ -23,11 +19,6 @@
     and c.g_is_sale = '1'
     and SYSDATE() between c.g_start_time and c.g_end_time
 
-
-    SELECT  IF(@resource = b.resource, @rn := @rn + 1, @rn := 1) AS rn, concat(b.id,'') numPriceId, n.status, b.city_code,
-    @resource := b.resource AS resource, b.net_type, b.province_name, b.city_name, b.feature,  b.price, b.agent_id,n.is_freeze,concat(n.id,'') numId
-    FROM tb_num_price b, tb_num n, (select @rn := 0, @resource := null) d
-    where b.num_id = n.id and n.status = 2 and b.is_del = 0
     <if test="param.channel!=null and param.channel > 0"> and b.channel = #{param.channel}</if>
     <if test="param.agentId!=null and param.agentId > 0"> and (b.agent_id = -1 or b.agent_id = #{param.agentId})</if>
     <if test="param.provinceCode!=null and param.provinceCode > 0"> and b.province_code = #{param.provinceCode}</if>
@@ -36,8 +27,41 @@
     <if test="param.feature!=null and param.feature != ''"> and b.feature REGEXP ".*,"#{param.feature}",.*"</if>
     <if test="param.temp!=null and param.temp!=''"> and b.resource like #{param.temp}</if>
     <if test="param.resource!=null and param.resource!=''"> and b.resource like "%"#{param.resource}"%"</if>
+    <if test="param.numId!=null and param.numId > 0"> and b.num_id = ${param.numId}</if>
 
     ORDER BY b.agent_id desc ) a where a.rn = 1
 
   </select>
+  <select id="countList" resultType="java.lang.Long">
+    select count(*) FROM tb_num_price b, tb_num n, tb_goods c, tb_sku sku
+    where b.num_id = n.id and n.status = 2 and b.is_del = 0 and b.agent_id = -1 and b.sku_id = sku.sku_id
+    and c.g_id = sku.g_id and c.g_is_auc = 0 and c.`status`=1
+    and sku.sku_goods_type = '4'
+    and c.g_is_sale = '1'
+    and SYSDATE() between c.g_start_time and c.g_end_time
+
+    <if test="param.channel!=null and param.channel > 0"> and b.channel = #{param.channel}</if>
+    <if test="param.provinceCode!=null and param.provinceCode > 0"> and b.province_code = #{param.provinceCode}</if>
+    <if test="param.cityCode!=null and param.cityCode > 0"> and b.city_code = #{param.cityCode}</if>
+    <if test="param.netType!=null and param.netType != ''"> and b.net_type = #{param.netType}</if>
+    <if test="param.feature!=null and param.feature != ''"> and b.feature REGEXP ".*,"#{param.feature}",.*"</if>
+    <if test="param.temp!=null and param.temp!=''"> and b.resource like #{param.temp}</if>
+    <if test="param.resource!=null and param.resource!=''"> and b.resource like "%"#{param.resource}"%"</if>
+    <if test="param.numId!=null and param.numId > 0"> and b.num_id = ${param.numId}</if>
+
+  </select>
+
+  <update id="matchNumPrice">
+    update tb_num_price t, (
+    select n.id, c.ratio_price, bp.price from tb_num_price n, tb_channel c,
+    (
+    select t.num_id, max(t.num) num, max(t.price) price from (
+    select r.num_id, r.num, case when locate('4',r.num) > 0 then d.ext2 else d.ext1 end price
+    from tb_num_rule r, tb_dict d where r.`value` = d.key_id and r.rule_type = 'feather_price' and d.key_group = 'feather_price' and d.is_del = 0
+    ) t group by t.num_id
+    ) bp where n.agent_id = -1 and n.channel = c.id and c.is_del = 0 and n.num_id = bp.num_id and (n.base_price != bp.price or n.ratio_price != c.ratio_price)
+
+    ) t1 set t.ratio_price = t1.ratio_price, t.base_price = t1.price, t.price = t1.ratio_price * t1.price where t.id = t1.id
+
+  </update>
 </mapper>

@@ -3,10 +3,7 @@ package com.hrtx.web.controller;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
-import com.hrtx.global.LockUtils;
-import com.hrtx.global.PowerConsts;
-import com.hrtx.global.SessionUtil;
-import com.hrtx.global.SystemParam;
+import com.hrtx.global.*;
 import com.hrtx.web.pojo.Num;
 import com.hrtx.web.pojo.NumPrice;
 import com.hrtx.web.pojo.Number;
@@ -124,6 +121,7 @@ public class LiangHaoController extends BaseReturn{
         if(StringUtils.isBlank(request.getParameter("phoneConsumerIdNum"))) return new Result(Result.ERROR,"请填写客户证件编码");
         if(StringUtils.isBlank(request.getParameter("personName"))) return new Result(Result.ERROR,"请填写邮寄联系人");
         if(StringUtils.isBlank(request.getParameter("personTel"))) return new Result(Result.ERROR,"请填写邮寄联系电话");
+        if(!request.getParameter("personTel").matches(RegexConsts.REGEX_MOBILE_COMMON)) return new Result(Result.ERROR,"邮寄联系电话格式不正确");
         if(StringUtils.isBlank(request.getParameter("address"))) return new Result(Result.ERROR,"请填写邮寄地址");
         return new Result(Result.OK, "");
     }

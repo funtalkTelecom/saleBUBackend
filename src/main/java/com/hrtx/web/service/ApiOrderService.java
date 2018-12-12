@@ -371,7 +371,9 @@ public class ApiOrderService {
 					//获取号码
 //					number = numberMapper.getNumInfoById(numid);
 					NumPrice numPrice = new NumPrice();
-					numberPrice = null;//numPriceMapper.queryPageList(numPrice);
+					numPrice.setNumId(NumberUtils.toLong(numid));
+					List nps = numPriceMapper.queryList(numPrice);//numPriceMapper.queryPageList(numPrice);
+					numberPrice = nps.size() != 1 ? null : (Map) nps.get(0);
 					//冻结号码
 					log.info("验证号码是否可下单");
 					//验证号码是否可下单,2:销售中

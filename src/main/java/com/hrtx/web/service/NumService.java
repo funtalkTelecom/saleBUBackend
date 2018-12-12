@@ -109,17 +109,27 @@ public class NumService {
         return new Result(Result.OK, "success");
     }
 
+    /**
+     * 前端销售展示列表（分页，有总数）
+     * @param numPrice
+     * @return
+     */
     public PageInfo<Object> queryNumPrice(NumPrice numPrice) {
 //        PageHelper.startPage(numPrice.getPageNum(),numPrice.getLimit());
 //        Page<Object> ob=this.numPriceMapper.queryPageList(numPrice);
         long total = numPriceMapper.countList(numPrice);
         EgtPage egtPage = new EgtPage(numPrice.getPageNum(), numPrice.getLimit(), total);
-        egtPage.addAll(this.queryList(numPrice));
+        egtPage.addAll(this.queryNumPriceList(numPrice));
         PageInfo<Object> pm = new PageInfo<Object>(egtPage);
         return pm;
     }
 
-    public List queryList(NumPrice numPrice) {
+    /**
+     * 前端销售展示列表（分页，无总数）
+     * @param numPrice
+     * @return
+     */
+    public List queryNumPriceList(NumPrice numPrice) {
         numPrice.setStart((numPrice.getPageNum()-1)*numPrice.getLimit());
         return numPriceMapper.queryList(numPrice);
     }
@@ -200,5 +210,9 @@ public class NumService {
 
     public Long queryFreeze(Long numId) {
         return numFreezeMapper.queryFreeze(numId);
+    }
+
+    public long matchNumPrice(){
+        return numPriceMapper.matchNumPrice();
     }
 }

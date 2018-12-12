@@ -48,6 +48,7 @@ public class ChannelService {
         channelMapper.insert(cl);
         c.setIsDel(1);
         channelMapper.updateByPrimaryKey(c);
+
         return new Result(Result.OK, "成功");
     }
 }
