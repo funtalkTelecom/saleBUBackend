@@ -219,9 +219,10 @@ public class IntefaceController extends BaseReturn{
 		int city_code = NumberUtils.toInt(String.valueOf(data.elementText("city_code")));
 		String feature = ObjectUtils.toString(data.elementText("feature"));
 		String pattern = ObjectUtils.toString(data.elementText("pattern"));
+		int page_num = NumberUtils.toInt(String.valueOf(data.elementText("page_num")));
 		NumPrice numPrice = new NumPrice();
-		numPrice.setPageNum(NumberUtils.toInt(String.valueOf(data.elementText("page_num"))));
-		numPrice.setLimit(30);
+        numPrice.setLimit(30);
+        numPrice.setStart((page_num-1)*numPrice.getLimit());
 		numPrice.setNetType(operator == 1 ? "电信":(operator == 2 ? "联通" : (operator == 3 ? "移动" : "")));
 		numPrice.setProvinceCode(province_code);
 		numPrice.setCityCode(city_code);

@@ -119,6 +119,7 @@ public class NumService {
 //        Page<Object> ob=this.numPriceMapper.queryPageList(numPrice);
         long total = numPriceMapper.countList(numPrice);
         EgtPage egtPage = new EgtPage(numPrice.getPageNum(), numPrice.getLimit(), total);
+        numPrice.setStart((numPrice.getPageNum()-1)*numPrice.getLimit());
         egtPage.addAll(this.queryNumPriceList(numPrice));
         PageInfo<Object> pm = new PageInfo<Object>(egtPage);
         return pm;
@@ -130,7 +131,6 @@ public class NumService {
      * @return
      */
     public List queryNumPriceList(NumPrice numPrice) {
-        numPrice.setStart((numPrice.getPageNum()-1)*numPrice.getLimit());
         return numPriceMapper.queryList(numPrice);
     }
 
