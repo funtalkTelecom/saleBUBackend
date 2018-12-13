@@ -804,8 +804,10 @@ public class GoodsService {
             Long skuIds =s.getSkuId();
             Map map = numMapper.queryNumCountByskuid(skuIds,"2");
             int counts = NumberUtils.toInt(String.valueOf(map.get("count")));
-            if(!s.getSkuGoodsType().equals("1")){
-                if(counts!=s.getSkuNum()) throw new WarmException("上架中的号码数量和销售中的号码数量不一致");
+            if(!s.getSkuGoodsType().equals("1")){//上架未知异常不验证号码
+                if(s.getStatus()!=90){
+                    if(counts!=s.getSkuNum()) throw new WarmException("上架中的号码数量和销售中的号码数量不一致");
+                }
             }
         }
         //批量验证仓库库存

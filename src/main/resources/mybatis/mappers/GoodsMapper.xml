@@ -22,10 +22,12 @@
         a.g_is_sale as gIsSale,
         a.status as status,
         case
+        when a.status =0 then '初始'
         when a.status =1 then '上架'
         when  a.status =2 then '部分上架'
         when  a.status =3 then '下架'
         when  a.status =4 then '部分下架'
+        when  a.status =5 then '价格更新失败'
         else '未知'
         end as statusText
     </sql>
