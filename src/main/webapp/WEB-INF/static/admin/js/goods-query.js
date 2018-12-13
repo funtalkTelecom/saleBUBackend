@@ -43,7 +43,7 @@ $(function() {
 						var node = [];
 						if(p_edit) {
 							node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">详情</a>');
-							if(record.gIsSale=="1" && (record.status=="1" || record.status=="2" || record.status=="4"))
+							if(record.status=="1" || record.status=="2" || record.status=="4" || record.status=="5")
 							    node.push('<a class="btn btn-success btn-xs unsale" href="javascript:void(0);">下架</a>');
                         }
                         // if(p_delete && record.gIsSale!="1") {
