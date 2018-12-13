@@ -4,10 +4,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.web.mapper.NumRuleMapper;
 import com.hrtx.web.mapper.NumberMapper;
-import com.hrtx.web.pojo.NumRule;
+import com.hrtx.web.mapper.NumberPriceMapper;
+import com.hrtx.web.mapper.SkuMapper;
+import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,47 @@ public class NumberService {
 	private NumberMapper numberMapper;
 	@Autowired
 	private NumRuleMapper numRuleMapper;
+	@Autowired
+	private SkuMapper skuMapper;
+	@Autowired
+	private NumberPriceMapper numberPriceMapper;
+
+	public Result numberUpdate(List<Map<String,Object>> isGoodSkuMap, Goods goods){
+        for(int i=0; i<isGoodSkuMap.size(); i++){
+            Map map1 =(Map) isGoodSkuMap.get(i);
+            Long skuid =Long.parseLong( String.valueOf(map1.get("SkuId")));
+            Sku s =  skuMapper.selectByPrimaryKey(skuid);
+            String skuSaleNumb = String.valueOf(map1.get("skuSaleNumbs"));
+            double basePrice =Double.valueOf(String.valueOf(map1.get("basePrice")));
+            String[] skuSaleNumbs = skuSaleNumb.split("\\r?\\n");
+            List<NumberPrice> numberPriceList = new ArrayList<NumberPrice>();
+            if(s.getStatus()==1  ){
+                if(!"1".equals(s.getSkuGoodsType())) {
+                    //更tb_num
+                    int size = skuSaleNumbs.length;
+                    int starts =0;
+                    Object[] numResource = null;
+                    int limitSize = 1000;
+                    while (starts < size){
+                        numResource = ArrayUtils.subarray(skuSaleNumbs,starts, starts+limitSize);
+                        starts = starts + numResource.length;
+                        String b = ArrayUtils.toString(numResource,"");
+                        String StrNums = b.substring(b.indexOf("{") + 1, b.indexOf("}"));
+                        if("1".equals(goods.getgIsAuc())){
+                            numberMapper.updateStatusByNumber(StrNums,skuid,2,goods.getgStartTime(),goods.getgEndTime());
+                        }else{
+                            numberMapper.updateStatusByNumber(StrNums,skuid,2,null,null);
+                        }
+
+                    }
+                    if("0".equals(goods.getgIsAuc()) && "4".equals(s.getSkuGoodsType())){//更新tb_num_price
+                        numberPriceMapper.insertListNumPrice(skuid,basePrice,SessionUtil.getUser().getCorpId());
+                    }
+                }
+            }
+        }
+	    return  new Result(Result.OK, "");
+    }
 
 	public Result pageNumber(Number number, Map param) {
 		PageHelper.startPage(number.startToPageNum(),number.getLimit());

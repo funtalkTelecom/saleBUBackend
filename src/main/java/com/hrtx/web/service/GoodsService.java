@@ -61,6 +61,8 @@ public class GoodsService {
     private NumberPriceMapper numberPriceMapper;
     @Autowired
     private NumPriceMapper numPriceMapper;
+    @Autowired
+    private NumberService numberService;
 	public Result pageGoods(Goods goods) {
 		PageHelper.startPage(goods.startToPageNum(),goods.getLimit());
 		Page<Object> ob=this.goodsMapper.queryPageList(goods);
@@ -265,39 +267,8 @@ public class GoodsService {
                 skuMapper.updateSkuStatus(sku);
             }
 
-            for(int i=0; i<isGoodSkuMap.size(); i++){
-                Map map1 =(Map) isGoodSkuMap.get(i);
-                Long skuid =Long.parseLong( String.valueOf(map1.get("SkuId")));
-                Sku s =  skuMapper.selectByPrimaryKey(skuid);
-                String skuSaleNumb = String.valueOf(map1.get("skuSaleNumbs"));
-                double basePrice =Double.valueOf(String.valueOf(map1.get("basePrice")));
-                String[] skuSaleNumbs = skuSaleNumb.split("\\r?\\n");
-                List<NumberPrice> numberPriceList = new ArrayList<NumberPrice>();
-                if(s.getStatus()==1  ){
-                    if(!"1".equals(s.getSkuGoodsType())) {
-                        //更tb_num
-                        int size = skuSaleNumbs.length;
-                        int starts =0;
-                        Object[] numResource = null;
-                        int limitSize = 1000;
-                        while (starts < size){
-                            numResource = ArrayUtils.subarray(skuSaleNumbs,starts, starts+limitSize);
-                            starts = starts + numResource.length;
-                            String b = ArrayUtils.toString(numResource,"");
-                            String StrNums = b.substring(b.indexOf("{") + 1, b.indexOf("}"));
-                            if("1".equals(goods.getgIsAuc())){
-                                numberMapper.updateStatusByNumber(StrNums,skuid,2,goods.getgStartTime(),goods.getgEndTime());
-                            }else{
-                                numberMapper.updateStatusByNumber(StrNums,skuid,2,null,null);
-                            }
+            numberService.numberUpdate(isGoodSkuMap,goods);
 
-                        }
-                        if("0".equals(goods.getgIsAuc()) && "4".equals(s.getSkuGoodsType())){//更新tb_num_price
-                            numberPriceMapper.insertListNumPrice(skuid,basePrice,SessionUtil.getUser().getCorpId());
-                        }
-                    }
-                }
-            }
             goods.setStatus(5);   //价格更新失败
             goodsMapper.updateGoodStatus(goods);
             numPriceMapper.matchNumPrice();
@@ -886,7 +857,7 @@ public class GoodsService {
             numberPriceMapper.updateNumberPrice(ss.getSkuId());
         }
 
-        List isWz = skuMapper.queryStatusList(goods.getgId(),"92,93");
+        List isWz = skuMapper.queryStatusList(goods.getgId(),"90,92,93");
         Goods d = goodsMapper.selectByPrimaryKey(goods);
         if(isWz.size()>0){
             d.setStatus(4); //部分下架
