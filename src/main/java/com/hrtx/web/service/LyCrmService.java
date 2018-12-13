@@ -282,7 +282,7 @@ public class LyCrmService {
      */
     @Scheduled(cron = "0 0 6 * * ?")
     public void praseLyPhoneData() {//String type, int dateOffset
-        if(!"true".equals(SystemParam.get("exe_timer"))) return;
+//        if(!"true".equals(SystemParam.get("exe_timer"))) return;
 //        if("ly_corp".equals(type)) this.praseLyCorpData(dateOffset);
 //        if("ly_phone".equals(type))
         log.info("开始执行号码资源下载定时器");
@@ -291,9 +291,11 @@ public class LyCrmService {
         }catch (ServiceException e) {
             log.error(e.getMessage(), e);
             Messager.send(SystemParam.get("system_phone"),"下载乐语号码库数据异常("+e.getMessage()+")");
+            throw e;
         }catch (Exception e) {
             log.error(e.getMessage(), e);
             Messager.send(SystemParam.get("system_phone"),"下载乐语号码库数据异常");
+            throw e;
         }
 //        if("ly_iccid".equals(type)) this.uploadLyIccidData(dateOffset);
     }
@@ -332,7 +334,7 @@ public class LyCrmService {
 
     private void praseLyPhoneData(int date_offset) {
         String fileName = Utils.getDate(-1-date_offset, "yyyyMMdd")+".txt";
-        this.downloadFileToSftp("phone_boss2hr", "phone_boss2hr", fileName);
+//        this.downloadFileToSftp("phone_boss2hr", "phone_boss2hr", fileName);
         File dir = new File(this.getLyRootPath()+"phone_boss2hr"+File.separator);
         String tFileName = dir.getPath()+File.separator+fileName;
         List<String> datas = this.readFile(tFileName);
@@ -356,6 +358,7 @@ public class LyCrmService {
                 }
 //              numMapper.insertLyPhone(ArrayUtils.subarray(row, 0, 7));
             }
+            if(batch.size() > 0)  numBaseMapper.batchInsert(batch);
             long a = System.currentTimeMillis();
             this.addNumFeature();
             log.info("------添加特性耗时"+((System.currentTimeMillis()-a)/1000)+"s");
@@ -379,6 +382,7 @@ public class LyCrmService {
                 batch = new ArrayList<>();
             }
         }
+        if(batch.size() > 0)  numRuleMapper.batchInsert(batch);
     }
 
     private void addNumFeature(long id, String num_resource, List<Map> feathers, List<NumRule> batch) {
@@ -419,7 +423,7 @@ public class LyCrmService {
 
     private void matchNum() {
         numMapper.insertAcitveNum();
-        numMapper.updateLoseNum();
+//        numMapper.updateLoseNum();
     }
 
     public void praseLyCorpData(int date_offset) {
