@@ -4,13 +4,13 @@
   <select id="queryList" resultType="java.util.HashMap">
     select a.numPriceId, a.resource, case when a.net_type = '电信' then 1 when a.net_type = '联通' then 2 when a.net_type = '移动' then 3 else 0 end net_type,
     a.province_name, a.city_name, a.feature, a.price, a.is_freeze,a.id, a.status, a.city_code,
-    a.with4,a.teleType,a.skuTobPrice,a.skuTocPrice,a.netType,a.numLevel,a.lowConsume,a.tags
+    a.with4,a.teleType,a.skuTobPrice,a.skuTocPrice,a.netType,a.numLevel,a.lowConsume,a.skuId,a.tags
     from (
     SELECT  IF(@resource = b.resource, @rn := @rn + 1, @rn := 1) AS rn,
     @resource := b.resource AS resource, concat(b.id,'') numPriceId, n.status, b.city_code,
     b.net_type, b.province_name, b.city_name, b.feature,  b.price, b.agent_id,n.is_freeze,concat(n.id,'') id,
     n.with4, if(n.tele_type is null,'',n.tele_type) as teleType, sku.sku_tob_price as skuTobPrice,
-    sku.sku_toc_price as skuTocPrice, n.net_type as netType,n.num_level as numLevel,n.low_consume as lowConsume,'tag' as tags
+    sku.sku_toc_price as skuTocPrice, n.net_type as netType,n.num_level as numLevel,n.low_consume as lowConsume,n.sku_id as skuId,'tag' as tags
 
     FROM tb_num_price b, tb_num n, tb_goods c, tb_sku sku, (select @rn := 0, @resource := null) d
     where b.num_id = n.id and n.status = 2 and b.is_del = 0 and b.sku_id = sku.sku_id
