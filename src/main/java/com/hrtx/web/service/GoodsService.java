@@ -360,7 +360,7 @@ public class GoodsService {
                         }
                         set.add(a);
                     }
-                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku.getSkuId());
+                    skuSaleNum = checkSkuSaleNum(skuSaleNum);
                     sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
                     String[] okSkuNum = new String[] {};
                     if(skuSaleNum.indexOf("★")!=0){
@@ -746,11 +746,10 @@ public class GoodsService {
     /**
      * 验证可以上架的号码 status in 1,2
      * @param skuSaleNum
-     * @param skuid
      * by zdh
      * @return
      */
-    private String checkSkuSaleNum(String skuSaleNum, Long skuid) {
+    private String checkSkuSaleNum(String skuSaleNum) {
         String errorNum = "";
         Number number = new Number();
         String[] skuSaleNumbs = skuSaleNum.split("\\r?\\n");
