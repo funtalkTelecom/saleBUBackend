@@ -170,17 +170,21 @@ public class ApiNumberService {
 	}
 
 	public Result numberInfo(String id, HttpServletRequest request){
-		Map number = new HashMap();
-		try {
-			number = numberMapper.getNumInfoById(id);
-			if(number==null) return new Result(Result.ERROR, "未找到号码");
-			number.put("numBlock", getNumBlock((String) number.get("numResource")));
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			return new Result(Result.ERROR, "查找出错");
+		PageInfo<Object> pm = null;
+		NumPrice numPrice = new NumPrice();
+		Long unmId = Long.valueOf(id);
+		numPrice.setNumId(unmId);
+		numPrice.setChannel(3);
+		pm = numService.queryNumPrice(numPrice);
+		List ob = pm.getList();
+		if(ob.size()==0) return new Result(Result.ERROR, "未找到号码");
+//		 numberMapper.getNumInfoById(id);
+		Map obj = new HashMap();
+		for (int i = 0; i < ob.size(); i++) {
+			 obj= (Map) ob.get(i);
+			obj.put("numBlock", getNumBlock((String) obj.get("resource")));
 		}
-
-		return new Result(Result.OK, number);
+		return new Result(Result.OK, obj);
 	}
 
 	private String[] getNumBlock(String num) {

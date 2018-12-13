@@ -360,7 +360,7 @@ public class GoodsService {
                         }
                         set.add(a);
                     }
-                    skuSaleNum = checkSkuSaleNum(skuSaleNum, sku.getSkuId());
+                    skuSaleNum = checkSkuSaleNum(skuSaleNum);
                     sku.setSkuNum(((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?0: Integer.parseInt(((JSONObject) obj.get("skuNum")).get("value").toString()));
                     String[] okSkuNum = new String[] {};
                     if(skuSaleNum.indexOf("★")!=0){
@@ -746,20 +746,20 @@ public class GoodsService {
     /**
      * 验证可以上架的号码 status in 1,2
      * @param skuSaleNum
-     * @param skuid
      * by zdh
      * @return
      */
-    private String checkSkuSaleNum(String skuSaleNum, Long skuid) {
+    private String checkSkuSaleNum(String skuSaleNum) {
         String errorNum = "";
         Number number = new Number();
-        number.setSkuId(skuid);
-        number.setStatus(1);
         String[] skuSaleNumbs = skuSaleNum.split("\\r?\\n");
         if(skuSaleNumbs!=null && skuSaleNumbs.length>0){
             skuSaleNum = "";
             for (int i = 0; i < skuSaleNumbs.length; i++) {
                 if(StringUtils.isBlank(skuSaleNumbs[i])) continue;
+                //验证号码可用性
+                number = new Number();
+                number.setNumResource(skuSaleNumbs[i].trim());
                 if(numberMapper.checkNumberIsOkStatus(number) > 0) {
                     skuSaleNum += skuSaleNumbs[i].trim()+"\n";
                 }else{
