@@ -49,7 +49,7 @@ public class ChannelController extends BaseReturn{
     @Powers({PowerConsts.CHANNELMOUDULE_COMMON_QUEYR})
     public Result featherList(){
         Dict dict = new Dict();
-        dict.setKeyGroup("FEATHER_TYPE");
+        dict.setKeyGroup("feather_price");
         dict.setIsDel(1);
         return dictService.pageDict(dict);
     }

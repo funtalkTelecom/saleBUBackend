@@ -17,6 +17,7 @@ import com.hrtx.web.pojo.Number;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -58,6 +59,8 @@ public class GoodsService {
     private ChannelMapper channelMapper;
     @Autowired
     private NumberPriceMapper numberPriceMapper;
+    @Autowired
+    private NumPriceMapper numPriceMapper;
 	public Result pageGoods(Goods goods) {
 		PageHelper.startPage(goods.startToPageNum(),goods.getLimit());
 		Page<Object> ob=this.goodsMapper.queryPageList(goods);
@@ -84,11 +87,12 @@ public class GoodsService {
             return new Result(Result.ERROR, resd.getData());
         }
         if (goods.getgId() != null && goods.getgId() > 0) { //修改
-            goodsMapper.goodsEdit(goods);
-            goods = goodsMapper.findGoodsInfo(goods.getgId());
+//            goodsMapper.goodsEdit(goods);
+//            goods = goodsMapper.findGoodsInfo(goods.getgId());
         } else { //添加
             Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");
             goods.setgId(goods.getGeneralId());
+            goods.setStatus(0);  //商品上架初始值0
             goods.setgSellerId(corporation.getId());
             goods.setgSellerName(corporation.getName());
             list.add(goods);
@@ -256,75 +260,50 @@ public class GoodsService {
                 skuMapper.updateSkuStatus(sku);
             }
 
-
             for(int i=0; i<isGoodSkuMap.size(); i++){
                 Map map1 =(Map) isGoodSkuMap.get(i);
                 Long skuid =Long.parseLong( String.valueOf(map1.get("SkuId")));
                 Sku s =  skuMapper.selectByPrimaryKey(skuid);
                 String skuSaleNumb = String.valueOf(map1.get("skuSaleNumbs"));
-                String skuGoodsType =String.valueOf(map1.get("skuGoodsType"));
                 double basePrice =Double.valueOf(String.valueOf(map1.get("basePrice")));
                 String[] skuSaleNumbs = skuSaleNumb.split("\\r?\\n");
-                String skuSaleNum1="";
                 List<NumberPrice> numberPriceList = new ArrayList<NumberPrice>();
                 if(s.getStatus()==1  ){
                     if(!"1".equals(s.getSkuGoodsType())) {
-                        for (int j = 0; j < skuSaleNumbs.length; j++) {
-                            skuSaleNum1= skuSaleNumbs[j].trim();
-                            Number okNumber = new Number();
-                            okNumber.setSkuId(skuid);
-                            okNumber.setStatus(2);
-                            okNumber.setNumResource(skuSaleNum1);
-                            //竞拍商品把时间往tb_num写入
+                        //更tb_num
+                        int size = skuSaleNumbs.length;
+                        int starts =0;
+                        Object[] numResource = null;
+                        int limitSize = 1000;
+                        while (starts < size){
+                            numResource = ArrayUtils.subarray(skuSaleNumbs,starts, starts+limitSize);
+                            starts = starts + numResource.length;
+                            String b = ArrayUtils.toString(numResource,"");
+                            String StrNums = b.substring(b.indexOf("{") + 1, b.indexOf("}"));
                             if("1".equals(goods.getgIsAuc())){
-                                okNumber.setStartTime(goods.getgStartTime());
-                                okNumber.setEndTime(goods.getgEndTime());
+                                numberMapper.updateStatusByNumber(StrNums,skuid,2,goods.getgStartTime(),goods.getgEndTime());
+                            }else{
+                                numberMapper.updateStatusByNumber(StrNums,skuid,2,null,null);
                             }
-                            numberMapper.updateStatus(okNumber, false);
 
-                            //insert tb_number_price
-                            List lisCh= channelMapper.getChannelList();
-                            for(int k = 0; k < lisCh.size(); k++){
-                                NumberPrice numberPrice = new NumberPrice();
-                                Map mapc = (Map) lisCh.get(k);
-                                Map _map = channelMapper.getListbyNum(skuSaleNum1);
-                                numberPrice.setId(numberPrice.getGeneralId());
-                                numberPrice.setSkuId(skuid);
-                                numberPrice.setNumId(Long.parseLong( String.valueOf(_map.get("numid"))));
-                                numberPrice.setProvinceCode(Integer.valueOf(String.valueOf(_map.get("provinceCode"))));
-                                numberPrice.setProvinceName(String.valueOf(_map.get("provinceName")));
-                                numberPrice.setCityCode(Integer.valueOf(String.valueOf(_map.get("cityCode"))));
-                                numberPrice.setCityName(String.valueOf(_map.get("cityName")));
-                                numberPrice.setResource(String.valueOf(_map.get("num_resource")));
-                                numberPrice.setBasePrice(basePrice);
-                                numberPrice.setNetType(String.valueOf(_map.get("net_type")));
-                                numberPrice.setFeature(String.valueOf(_map.get("feature")));
-                                numberPrice.setLowConsume(Double.valueOf(String.valueOf(_map.get("low_consume"))));
-                                numberPrice.setCorpId(SessionUtil.getUser().getCorpId());
-                                numberPrice.setChannel(Integer.parseInt( String.valueOf(mapc.get("channel_id"))));
-                                numberPrice.setRatioPrice(Double.valueOf(String.valueOf(mapc.get("ratio_price"))));
-                                numberPrice.setPrice(Utils.mul(basePrice,Double.parseDouble(String.valueOf(mapc.get("ratio_price")))));
-                                numberPrice.setAgentId(-1);
-                                numberPrice.setIsDel(0);
-                                numberPrice.setAgent("");
-                                numberPrice.setAddDate(new Date());
-
-                                numberPriceList.add(numberPrice);
-                            }
+                        }
+                        if("0".equals(goods.getgIsAuc()) && "4".equals(s.getSkuGoodsType())){//更新tb_num_price
+                            numberPriceMapper.insertListNumPrice(skuid,basePrice,SessionUtil.getUser().getCorpId());
                         }
                     }
                 }
+            }
+            goods.setStatus(5);   //价格更新失败
+            goodsMapper.updateGoodStatus(goods);
+            numPriceMapper.matchNumPrice();
 
-                if(numberPriceList!=null && numberPriceList.size()>0) numberPriceMapper.insertBatch(numberPriceList);
-            }
             List isWz = skuMapper.queryStatusList(goods.getgId(),"90,91");
-            Goods d = goodsMapper.selectByPrimaryKey(goods);
             if(isWz.size()>0){
-                d.setStatus(2); //部分上架
+                goods.setStatus(2); //部分上架
             }else {
-                d.setStatus(1); //全部上架
+                goods.setStatus(1); //全部上架
             }
-            goodsMapper.updateGoodStatus(d);
+            goodsMapper.updateGoodStatus(goods);
         }
         return new Result(Result.OK,"提交成功");
     }

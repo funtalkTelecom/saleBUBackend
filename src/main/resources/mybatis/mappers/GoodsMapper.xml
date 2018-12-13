@@ -230,7 +230,8 @@
             g_price_up,
             g_seller_id,
             g_seller_name,
-            g_is_sale
+            g_is_sale,
+            status
         ) values
         <foreach collection="goodsList" item="goods" separator=",">
             (
@@ -251,7 +252,8 @@
             #{goods.gPriceUp},
             #{goods.gSellerId},
             #{goods.gSellerName},
-            '1'
+            '1',
+            #{goods.status}
             )
         </foreach>
     </insert>

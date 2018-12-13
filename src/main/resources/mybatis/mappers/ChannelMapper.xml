@@ -6,10 +6,6 @@
         select concat(c.id,'') id,c.channel channel ,c.ratio_price ratioPrice from tb_channel c where c.is_del=0 order by c.channel_id
     </select>
 
-    <select id="getChannelList" resultType="java.util.HashMap">
-      select c.id,c.channel_id,c.channel,c.ratio_price	from tb_channel c where c.is_del=0 order by c.id
-    </select>
-
     <select id="getListbyNum" resultType="java.util.HashMap">
       select m.sku_id,m.id numid,yy.id provinceCode,yy.name provinceName,y.id cityCode,y.name cityName,
       m.num_resource,m.net_type,tt.keyvalue feature,m.low_consume

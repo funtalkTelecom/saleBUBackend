@@ -48,12 +48,17 @@ $(function() {
                                 alert('请输入大于1的数');
                                 return false
 							}
-                            $.post("channel/channel-edit",{id:record.id,ratioPrice:ratioPrice},function(data){
-                            	if(data.code!=200){
-                            		alert(data.data)
-								}
-                                channlList.reload();
-                            },"json");
+                            if (confirm("提交后将按最新的价格规则同步更新当前在售的号码价格，请确认是否提交？")) {
+                                $.post("channel/channel-edit", {
+                                    id: record.id,
+                                    ratioPrice: ratioPrice
+                                }, function (data) {
+                                    if (data.code != 200) {
+                                        alert(data.data)
+                                    }
+                                    channlList.reload();
+                                }, "json");
+                            }
                         })
 
         		        return $operate;
@@ -129,12 +134,14 @@ $(function() {
                         alert('请输入大于0的数');
                         return false
                     }
-                    $.post("channel/feather-edit",{id:record.id,ext1:ext1,ext2:ext2},function(data){
-                        if(data.code!=200){
-                            alert(data.data)
-                        }
-                        dataList.reload();
-                    },"json");
+                    if (confirm("提交后将按最新的价格规则同步更新当前在售的号码价格，请确认是否提交？")) {
+                        $.post("channel/feather-edit", {id: record.id, ext1: ext1, ext2: ext2}, function (data) {
+                            if (data.code != 200) {
+                                alert(data.data)
+                            }
+                            dataList.reload();
+                        }, "json");
+                    }
                 })
 
                 return $operate;
