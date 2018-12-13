@@ -26,14 +26,14 @@ public class Sku extends BasePojo implements java.io.Serializable {
     private int status;
     private Integer isDel;
 
-    @Transient
     private String statusText;
 
     public Sku() {
     }
 
     public Sku(Long skuId, Long gId, Double skuTobPrice, Double skuTocPrice, String skuIsNum,
-               String skuSaleNum, int skuNum, String skuGoodsType, String skuRepoGoods, String skuRepoGoodsName,int status,Integer isDel) {
+               String skuSaleNum, int skuNum, String skuGoodsType, String skuRepoGoods,
+               String skuRepoGoodsName,int status,Integer isDel,String statusText) {
         this.skuId = skuId;
         this.gId = gId;
         this.skuTobPrice = skuTobPrice;
@@ -46,6 +46,7 @@ public class Sku extends BasePojo implements java.io.Serializable {
         this.skuRepoGoodsName = skuRepoGoodsName;
         this.status = status;
         this.isDel = isDel;
+        this.statusText = statusText;
     }
 
     public Long getSkuId() {
@@ -150,5 +151,9 @@ public class Sku extends BasePojo implements java.io.Serializable {
 
     public void setStatusText(String statusText) {
         this.statusText = statusText;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 }
