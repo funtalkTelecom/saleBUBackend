@@ -753,13 +753,14 @@ public class GoodsService {
     private String checkSkuSaleNum(String skuSaleNum, Long skuid) {
         String errorNum = "";
         Number number = new Number();
-        number.setSkuId(skuid);
-        number.setStatus(1);
         String[] skuSaleNumbs = skuSaleNum.split("\\r?\\n");
         if(skuSaleNumbs!=null && skuSaleNumbs.length>0){
             skuSaleNum = "";
             for (int i = 0; i < skuSaleNumbs.length; i++) {
                 if(StringUtils.isBlank(skuSaleNumbs[i])) continue;
+                //验证号码可用性
+                number = new Number();
+                number.setNumResource(skuSaleNumbs[i].trim());
                 if(numberMapper.checkNumberIsOkStatus(number) > 0) {
                     skuSaleNum += skuSaleNumbs[i].trim()+"\n";
                 }else{
