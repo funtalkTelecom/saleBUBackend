@@ -831,13 +831,22 @@ public class GoodsService {
                 if(s.getSkuNum()!=0) {
                     res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                     if (200 != (res.getCode())) {
-                        s.setStatus(92);  //未知异常
-                        s.setStatusText("下架调用仓库接口异常");
+                        if(s.getStatus()!=90){
+                            s.setStatus(92);  //未知异常
+                            s.setStatusText("下架调用仓库接口异常");
+                        }
                     } else {
                         StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                         if (!"00000".equals(sir.getCode())) {
-                            s.setStatus(93);
-                            s.setStatusText(sir.getDesc());
+                            if(s.getStatus()==90){
+                                if("F0002".equals(sir.getCode())){  //单据不存在
+                                    s.setStatus(2);
+                                    s.setStatusText("下架成功");
+                                }
+                            }else{
+                                s.setStatus(93);
+                                s.setStatusText(sir.getDesc());
+                            }
                         }else {
                             s.setStatus(2);  //下架成功
                             s.setStatusText("下架成功");
