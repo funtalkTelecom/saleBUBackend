@@ -389,8 +389,8 @@ public class ApiOrderService {
 					//冻结号码
 					log.info("验证号码是否可下单");
 					//验证号码是否可下单,2:销售中
-					if (numberPrice == null || !"2".equals(String.valueOf(numberPrice.get("status"))))
-						return new Result(Result.ERROR, "号码已被购买!");
+					if (numberPrice == null || !"2".equals(String.valueOf(numberPrice.get("status"))) || "1".equals(String.valueOf(numberPrice.get("is_freeze"))))
+						return new Result(Result.ERROR, "号码已被购买或冻结!");
 					log.info("冻结号码");
 					freezeNum(numid, "3",false);
 					log.info("获取sku信息");
