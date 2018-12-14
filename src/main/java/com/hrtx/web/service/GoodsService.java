@@ -141,6 +141,8 @@ public class GoodsService {
         //sku ,numPrice 操作
         Result isRes = this.putaway(goods,skuPropertyJsonStr);
 
+
+
         return new Result(Result.OK, isRes.getData());
     }
 

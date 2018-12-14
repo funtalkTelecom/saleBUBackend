@@ -46,12 +46,14 @@ public class ApiNumberService {
 	 */
 	public Result numberList(NumPrice numPrice, HttpServletRequest request){
 		PageInfo<Object> pm = null;
-		numPrice.setPageNum(numPrice.startToPageNum());
-		numPrice.setLimit(numPrice.getLimit());
+		int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+		int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+
+		numPrice.setPageNum(pageNum);
+		numPrice.setLimit(limit);
 		String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
 		tags = "'"+ tags.replaceAll(",", "','") +"'";
 		Consumer consumer= this.apiSessionUtil.getConsumer();
-		long consumerId = consumer.getId();
 		List _list = agentMapper.findConsumenrIdCount(consumer.getId());
 		long agentId;
 		if(_list.size()>0){
@@ -242,7 +244,8 @@ public class ApiNumberService {
 		}
 		numPrice.setAgentId(agentId);
 		numPrice.setResource(num);
-		Page<Object> ob=numPriceMapper.queryPageList(numPrice);
+		pm = numService.queryNumPrice(numPrice);
+		List ob =pm.getList();
 		if(ob!=null && ob.size()>0){
 			//处理号码,生成号码块字段(numBlock)
 			for (int i = 0; i < ob.size(); i++) {

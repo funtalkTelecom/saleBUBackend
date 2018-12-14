@@ -44,13 +44,14 @@ public class ApiOrderController extends BaseReturn{
         param.put("type", type);
         param.put("skuid", skuid);
         param.put("numid", numid);
-        param.put("addrid", request.getHeader("addrid"));
+        param.put("addrid", request.getParameter("addrid"));
         param.put("numcount", request.getParameter("numcount"));
         param.put("mealid", request.getParameter("mealid"));
         param.put("bossNum", request.getParameter("bossNum"));
         param.put("phoneConsumer", request.getParameter("phoneConsumer"));
         param.put("phoneConsumerIdType", request.getParameter("phoneConsumerIdType"));
         param.put("phoneConsumerIdNum", request.getParameter("phoneConsumerIdNum"));
+        param.put("channel", "3");
         if("1".equals(type)) {
             //冻结号码
             if (!LockUtils.tryLock(skuid)) return new Result(Result.ERROR, "请稍后再试!");
