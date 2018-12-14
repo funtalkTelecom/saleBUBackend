@@ -48,7 +48,6 @@ public class ApiNumberService {
 		PageInfo<Object> pm = null;
 		int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
 		int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-
 		numPrice.setPageNum(pageNum);
 		numPrice.setLimit(limit);
 		String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
