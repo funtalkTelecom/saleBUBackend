@@ -19,6 +19,8 @@ public class BasePojo {
 	@Transient
 	protected int pageNum = 0;
 	@Transient
+	protected int sort = 0;
+	@Transient
 	protected List<Object> list = new ArrayList<Object>();
 	@Transient
 	protected Map<String, Object> map = new HashMap<String, Object>();
@@ -87,5 +89,13 @@ public class BasePojo {
 
 	public void setTemp(String temp) {
 		this.temp = temp;
+	}
+
+	public int getSort() {
+		return sort;
+	}
+
+	public void setSort(int sort) {
+		this.sort = sort;
 	}
 }
