@@ -56,6 +56,7 @@ public class ApiOrderService {
 	@Autowired
 	EPSaleService ePSaleService;
 	@Autowired private NumPriceMapper numPriceMapper;
+	@Autowired private AgentMapper agentMapper;
 
 	public  List<Map> findOrderListByNumId(Long numId)
 	{
@@ -168,7 +169,7 @@ public class ApiOrderService {
 //		apiSessionUtil.saveOrUpdate(token,u);
 //		Consumer user = apiSessionUtil.getConsumer();
 		//模拟登陆end
-
+		long agentId;
 		log.info("获取用户信息");
 		Consumer user =null;
 		Auction action=null;//type:3 出价记录
@@ -188,6 +189,14 @@ public class ApiOrderService {
 					user.setName(u.getName());
 					user.setIsAgent(0);
 				}
+			}
+			List _list = agentMapper.findConsumenrIdCount(user.getId());
+
+			if(_list.size()>0){
+				Map _map = (Map) _list.get(0);
+				agentId =Long.valueOf(String.valueOf(_map.get("id"))) ;
+			}else{
+				agentId = Long.valueOf(SystemParam.get("default_agent"));  //默认代理商id
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -354,7 +363,7 @@ public class ApiOrderService {
 				storagen = 1;
 //						不出货		出货
 //				type:2  普通靓号3或超级靓号4    skuid, numid, addrid, payType, mealid
-				String skuid, numid = null, addrid, payType, mealid;
+				String skuid, numid = null, addrid, payType, mealid,channel;
 				Map numberPrice = null;
 				try {
 					log.info("获取传入参数");
@@ -363,6 +372,7 @@ public class ApiOrderService {
 					addrid = param.get("addrid") == null ? "" : param.get("addrid");//普通靓号可不填
 					payType = param.get("payMethod") == null ? "" : param.get("payMethod");
 					mealid = param.get("mealid") == null ? "" : param.get("mealid");
+					channel = param.get("channel") == null ? "" : param.get("channel");
 
 					if (skuid == null || "".equals(skuid)) return new Result(Result.ERROR, "skuid不能为空");
 					if (numid == null || "".equals(numid)) return new Result(Result.ERROR, "numid不能为空");
@@ -372,6 +382,8 @@ public class ApiOrderService {
 //					number = numberMapper.getNumInfoById(numid);
 					NumPrice numPrice = new NumPrice();
 					numPrice.setNumId(NumberUtils.toLong(numid));
+					numPrice.setChannel(Integer.parseInt(channel));
+					numPrice.setAgentId(agentId);
 					List nps = numPriceMapper.queryList(numPrice);//numPriceMapper.queryPageList(numPrice);
 					numberPrice = nps.size() != 1 ? null : (Map) nps.get(0);
 					//冻结号码
@@ -466,7 +478,7 @@ public class ApiOrderService {
 						orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
 						num = 1;
 						orderItem.setQuantity(num);
-						twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
+						twobPrice = Double.parseDouble(String.valueOf( numberPrice.get("price")));
 						orderItem.setPrice(twobPrice);
 						orderItem.setTotal(twobPrice * num);
 						if(!StringUtils.isBlank(mealid)) orderItem.setMealId(Long.parseLong(mealid));

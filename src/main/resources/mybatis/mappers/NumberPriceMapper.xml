@@ -44,7 +44,7 @@
         insert into tb_num_price(sku_id, num_id,province_code,province_name,city_code,city_name,resource, base_price, net_type,feature,low_consume,corp_id,channel,ratio_price,price,agent_id,agent,is_del,add_date)
 
         select  m.sku_id as sku_id,m.id ,yy.id as provinceCode,yy.name as provinceName,y.id as cityCode,y.name as cityName, m.num_resource,#{basePrice} as basePrice ,m.net_type,tt.keyvalue feature,m.low_consume,
-        #{addCorpId} as corp_id,c.channel_id,c.ratio_price,c.ratio_price*6 as price, '-1' as agent ,'' as agent,'0' as is_del,SYSDATE()
+        #{addCorpId} as corp_id,c.channel_id,c.ratio_price,c.ratio_price*#{basePrice} as price, '-1' as agent ,'' as agent,'0' as is_del,SYSDATE()
         from tb_num m left join tb_city y on m.city_id = y.id
         left join tb_city yy on y.pid= yy.id
         left join (

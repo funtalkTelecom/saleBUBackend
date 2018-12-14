@@ -61,6 +61,8 @@ public class GoodsService {
     private NumberPriceMapper numberPriceMapper;
     @Autowired
     private NumPriceMapper numPriceMapper;
+    @Autowired
+    private NumberService numberService;
 	public Result pageGoods(Goods goods) {
 		PageHelper.startPage(goods.startToPageNum(),goods.getLimit());
 		Page<Object> ob=this.goodsMapper.queryPageList(goods);
@@ -137,14 +139,17 @@ public class GoodsService {
         }
         if(list!=null && list.size()>0) goodsMapper.insertBatch(list);
         //sku ,numPrice 操作
-        this.putaway(goods,skuPropertyJsonStr);
+        Result isRes = this.putaway(goods,skuPropertyJsonStr);
 
-        return new Result(Result.OK, "提交成功");
+
+
+        return new Result(Result.OK, isRes.getData());
     }
 
     public Result putaway(Goods goods,String skuPropertyJsonStr){
         JSONArray skuPropertyJsonArr = JSONArray.fromObject(skuPropertyJsonStr);
         String ignoreKey = "undefined,skuId,skuTobPrice,skuTocPrice,skuIsNum,skuSaleNum,skuNum,skuGoodsType,skuRepoGoods,skuRepoGoodsName,skustatusText";
+        String noticeStr="";
         if(!skuPropertyJsonArr.isEmpty()){
             List<SkuProperty> skuPropertyList = new ArrayList<SkuProperty>();
             List<Sku> skuList = new ArrayList<Sku>();
@@ -226,17 +231,20 @@ public class GoodsService {
                         res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                         if (200 != (res.getCode())) {
                             sku.setStatus(90);  //未知异常
+                            sku.setStatusText("上架调用仓库接口异常");
 //                            return new Result(Result.ERROR, "第"+(i+1)+"行,库存验证失败");
 //                            continue;
                         } else {
                             StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                             if (!"00000".equals(sir.getCode())) {
                                 sku.setStatus(91);
+                                sku.setStatusText(sir.getDesc());
 //                                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 //                                return new Result(Result.ERROR, "第"+(i+1)+"行,冻结库存失败\n"+sir.getDesc());
 //                                continue;
                             }else {
                                 sku.setStatus(1);
+                                sku.setStatusText("上架成功");
                                 map.put("SkuId",skuid);
                                 map.put("skuSaleNumbs",skuSaleNumb);
                                 map.put("skuNum",skuNum);
@@ -249,6 +257,7 @@ public class GoodsService {
                     }
                 }else{
                     sku.setStatus(1);
+                    sku.setStatusText("");
                     map.put("SkuId",skuid);
                     map.put("skuSaleNumbs",skuSaleNumb);
                     map.put("skuNum",skuNum);
@@ -260,52 +269,22 @@ public class GoodsService {
                 skuMapper.updateSkuStatus(sku);
             }
 
-            for(int i=0; i<isGoodSkuMap.size(); i++){
-                Map map1 =(Map) isGoodSkuMap.get(i);
-                Long skuid =Long.parseLong( String.valueOf(map1.get("SkuId")));
-                Sku s =  skuMapper.selectByPrimaryKey(skuid);
-                String skuSaleNumb = String.valueOf(map1.get("skuSaleNumbs"));
-                double basePrice =Double.valueOf(String.valueOf(map1.get("basePrice")));
-                String[] skuSaleNumbs = skuSaleNumb.split("\\r?\\n");
-                List<NumberPrice> numberPriceList = new ArrayList<NumberPrice>();
-                if(s.getStatus()==1  ){
-                    if(!"1".equals(s.getSkuGoodsType())) {
-                        //更tb_num
-                        int size = skuSaleNumbs.length;
-                        int starts =0;
-                        Object[] numResource = null;
-                        int limitSize = 1000;
-                        while (starts < size){
-                            numResource = ArrayUtils.subarray(skuSaleNumbs,starts, starts+limitSize);
-                            starts = starts + numResource.length;
-                            String b = ArrayUtils.toString(numResource,"");
-                            String StrNums = b.substring(b.indexOf("{") + 1, b.indexOf("}"));
-                            if("1".equals(goods.getgIsAuc())){
-                                numberMapper.updateStatusByNumber(StrNums,skuid,2,goods.getgStartTime(),goods.getgEndTime());
-                            }else{
-                                numberMapper.updateStatusByNumber(StrNums,skuid,2,null,null);
-                            }
+            numberService.numberUpdate(isGoodSkuMap,goods);
 
-                        }
-                        if("0".equals(goods.getgIsAuc()) && "4".equals(s.getSkuGoodsType())){//更新tb_num_price
-                            numberPriceMapper.insertListNumPrice(skuid,basePrice,SessionUtil.getUser().getCorpId());
-                        }
-                    }
-                }
-            }
             goods.setStatus(5);   //价格更新失败
             goodsMapper.updateGoodStatus(goods);
             numPriceMapper.matchNumPrice();
-
             List isWz = skuMapper.queryStatusList(goods.getgId(),"90,91");
             if(isWz.size()>0){
                 goods.setStatus(2); //部分上架
+                noticeStr="上架失败";
             }else {
                 goods.setStatus(1); //全部上架
+                noticeStr="上架成功";
             }
             goodsMapper.updateGoodStatus(goods);
         }
-        return new Result(Result.OK,"提交成功");
+        return new Result(Result.OK,noticeStr);
     }
 
     /***
@@ -371,7 +350,7 @@ public class GoodsService {
                     //有错误号码
                     if (skuSaleNum.split("★").length > 1) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return new Result(Result.ERROR, "第" + (i + 1) + "行,以下号码不符合,请重新确认\n" + skuSaleNum.split("★")[1]);
+                        return new Result(Result.ERROR, "第" + (i + 1) + "行,以下号码不可以上架,请重新确认\n" + skuSaleNum.split("★")[1]);
                     }
                     if (sku.getSkuNum() != okCount) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -798,6 +777,7 @@ public class GoodsService {
     }
 
     public Result payGoodsUnsale(Goods goods, HttpServletRequest request){
+        String noticeStr="";
         List<Sku> skuList = skuMapper.queryStatusList(goods.getgId(),"1,90,92,93");
         //批量验证号码
         for(Sku s : skuList){
@@ -824,14 +804,25 @@ public class GoodsService {
                 if(s.getSkuNum()!=0) {
                     res = StorageApiCallUtil.storageApiCall(param, "HK0002");
                     if (200 != (res.getCode())) {
-                        s.setStatus(92);  //未知异常
+                        if(s.getStatus()!=90){
+                            s.setStatus(92);  //未知异常
+                            s.setStatusText("下架调用仓库接口异常");
+                        }
                     } else {
                         StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
                         if (!"00000".equals(sir.getCode())) {
-//                            throw new ServiceException("冻结库存失败");
-                            s.setStatus(93);
+                            if(s.getStatus()==90){
+                                if("F0002".equals(sir.getCode())){  //单据不存在
+                                    s.setStatus(2);
+                                    s.setStatusText("下架成功");
+                                }
+                            }else{
+                                s.setStatus(93);
+                                s.setStatusText(sir.getDesc());
+                            }
                         }else {
                             s.setStatus(2);  //下架成功
+                            s.setStatusText("下架成功");
                             map.put("SkuId",s.getSkuId());
                             mapList.add(map);
                         }
@@ -839,6 +830,7 @@ public class GoodsService {
                 }
             }else {
                 s.setStatus(2);
+                s.setStatusText("");
                 map.put("SkuId",s.getSkuId());
                 mapList.add(map);
             }
@@ -867,16 +859,18 @@ public class GoodsService {
             numberPriceMapper.updateNumberPrice(ss.getSkuId());
         }
 
-        List isWz = skuMapper.queryStatusList(goods.getgId(),"92,93");
+        List isWz = skuMapper.queryStatusList(goods.getgId(),"90,92,93");
         Goods d = goodsMapper.selectByPrimaryKey(goods);
         if(isWz.size()>0){
             d.setStatus(4); //部分下架
+            noticeStr="下架失败";
         }else {
             d.setStatus(3); //全部下架
+            noticeStr="下架成功";
         }
         goodsMapper.updateGoodStatus(d);
         goodsMapper.goodsUnsale(goods);
-        return new Result(Result.OK, "操作成功");
+        return new Result(Result.OK, noticeStr);
     }
 
     public Result goodsUnsale(Goods goods, HttpServletRequest request) {

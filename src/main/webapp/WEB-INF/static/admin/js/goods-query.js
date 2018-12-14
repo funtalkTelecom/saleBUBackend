@@ -332,7 +332,7 @@ $(function() {
             success : function(data) {
                 dataList.load();
                 $('#goodsInfo').modal('hide');
-                alert("提交成功");
+                alert(data.data);
             }
         };
         //提交前把需要传到后台的disabled去掉
