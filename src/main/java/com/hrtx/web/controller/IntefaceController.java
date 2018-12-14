@@ -231,9 +231,10 @@ public class IntefaceController extends BaseReturn{
 		numPrice.setAgentId(merchant.getCorpId());
 		numPrice.setChannel(merchant.getChanel());
 
-		if(numPrice.getPageNum() == 1 && "???????????".equals(pattern) && operator == 0 && province_code == 0 && city_code == 0 && StringUtils.isBlank(feature)) {
-			numPrice.setProvinceCode(1);
-			numPrice.setCityCode(44);
+		if(page_num == 1 && "???????????".equals(pattern) && operator == 0 && province_code == 0 && city_code == 0 && StringUtils.isBlank(feature)) {
+//			numPrice.setProvinceCode(1);
+//			numPrice.setCityCode(44);
+			numPrice.setSort(1);
 		}
 
 		long a = System.currentTimeMillis();

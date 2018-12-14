@@ -30,7 +30,17 @@
     <if test="param.numId!=null and param.numId > 0"> and b.num_id = ${param.numId}</if>
 
     ORDER BY b.agent_id desc ) a where a.rn = 1
-    order by case when a.feature REGEXP ".*,AAAA,.*" THEN 2 when a.feature REGEXP ".*,AAA,.*" then 1 ELSE 0 end desc
+    <choose>
+      <when test="param.sort == 1">
+        order by
+        case when a.province_name = '北京市' then 1 else 0 end desc,
+        a.province_name desc,
+        case when a.feature REGEXP ".*,AAAA,.*" THEN 2 when a.feature REGEXP ".*,AAA,.*" then 1 ELSE 0 end desc
+      </when>
+      <otherwise>
+        order by a.price desc
+      </otherwise>
+    </choose>
     <if test="param.limit!=null and param.limit > 0"> limit #{param.start}, #{param.limit} </if>
 
   </select>
@@ -66,5 +76,17 @@
 
     ) t1 set t.ratio_price = t1.ratio_price, t.base_price = t1.price, t.price = t1.ratio_price * t1.price where t.id = t1.id and t.is_del = 0
 
+  </update>
+
+  <update id="batchUpateFeature">
+    update tb_num_price p set p.feature = CONCAT(p.feature,#{feature}) where p.num_id in (
+    <foreach collection="batch" item="item" separator=",">
+      #{item.numId}
+    </foreach>
+    ) and p.is_del = 0
+  </update>
+
+  <update id="updateFeature">
+      update tb_num_price p set p.feature = REPLACE(p.feature,#{feature},',') where p.is_del = 0 and p.feature REGEXP  ".*"#{feature}".*";
   </update>
 </mapper>
