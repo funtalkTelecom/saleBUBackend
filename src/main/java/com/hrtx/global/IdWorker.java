@@ -35,7 +35,7 @@ public class IdWorker {
         LOG.info(String.format("worker starting. timestamp left shift %d, datacenter id bits %d, worker id bits %d, sequence bits %d, workerid %d", timestampLeftShift, datacenterIdBits, workerIdBits, sequenceBits, workerId));
     }
  
-    public synchronized long nextId() {
+    public synchronized long nextId1() {
         long timestamp = timeGen();
         if (timestamp < lastTimestamp) {
             LOG.error(String.format("clock is moving backwards.  Rejecting requests until %d.", lastTimestamp));
@@ -72,13 +72,13 @@ public class IdWorker {
             this.idWorker = idWorker;
         }
         public void run() {
-            while (true) {
-                long id = idWorker.nextId();
-                System.out.println("duplicate:" + id+"   "+set.size()+"  "+idWorker.workerId);
-                if (!set.add(id)) {
-                    System.out.println("duplicate:" + id);
-                }
-            }
+//            while (true) {
+//                long id = idWorker.nextId();
+//                System.out.println("duplicate:" + id+"   "+set.size()+"  "+idWorker.workerId);
+//                if (!set.add(id)) {
+//                    System.out.println("duplicate:" + id);
+//                }
+//            }
         }
     }
  

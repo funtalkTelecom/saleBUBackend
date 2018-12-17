@@ -3,6 +3,8 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -10,8 +12,9 @@ import javax.persistence.Table;
 public class Dict extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private Integer id;
     private String keyId;
     private String keyGroup;
     private String keyValue;
@@ -30,7 +33,7 @@ public class Dict extends BasePojo implements java.io.Serializable {
         this.keyGroup = keyGroup;
     }
 
-    public Dict(Long id, String keyId, String keyGroup, String keyValue, int isDel, String note, Long pid, int seq) {
+    public Dict(Integer id, String keyId, String keyGroup, String keyValue, int isDel, String note, Long pid, int seq) {
         this.id = id;
         this.keyId = keyId;
         this.keyGroup = keyGroup;
@@ -41,11 +44,11 @@ public class Dict extends BasePojo implements java.io.Serializable {
         this.seq = seq;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

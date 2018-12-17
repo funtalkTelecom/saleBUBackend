@@ -69,4 +69,6 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
 
 
     List<Map> findNumFreezeList();
+
+    List<Map> queryInNum();
 }

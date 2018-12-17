@@ -28,17 +28,17 @@ public class BasePojo {
 	@Transient
 	protected String temp;
 	
-	@Transient
-	@Value("${app.idworker.workerid}")
-	private static int workerId;
-	@Transient
-	public static IdWorker idWorker = new IdWorker(workerId, 0);
-	@Transient
-	private long generalId = idWorker.nextId();
+//	@Transient
+//	@Value("${app.idworker.workerid}")
+//	private static int workerId;
+//	@Transient
+//	public static IdWorker idWorker = new IdWorker(workerId, 0);
+//	@Transient
+//	private long generalId = idWorker.nextId();
 
-	public static long nextId() {
-		return idWorker.nextId();
-	}
+//	public static long nextId() {
+//		return idWorker.nextId();
+//	}
 
 	public int startToPageNum() {
 		if(this.limit==0) return 0;
@@ -52,12 +52,12 @@ public class BasePojo {
 		this.pageNum = pageNum;
 	}
 
-	public long getGeneralId() {
-		return generalId;
-	}
-	public void setGeneralId(long generalId) {
-		this.generalId = generalId;
-	}
+//	public long getGeneralId() {
+//		return generalId;
+//	}
+//	public void setGeneralId(long generalId) {
+//		this.generalId = generalId;
+//	}
 	public int getLimit() {
 		return limit;
 	}
