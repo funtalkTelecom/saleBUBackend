@@ -1,5 +1,6 @@
 package com.hrtx.web.service;
 
+import com.github.abel533.entity.Example;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -7,6 +8,9 @@ import com.hrtx.dto.Result;
 import com.hrtx.web.mapper.DictMapper;
 import com.hrtx.web.mapper.NumPriceMapper;
 import com.hrtx.web.pojo.Dict;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -77,14 +82,48 @@ public class DictService {
 		return dictMapper.findDictByTypeGroup(group);
     }
 
-	public Result editFeather(Dict dict) {
-		Dict dict1 = dictMapper.selectByPrimaryKey(dict.getId());
-		if(dict1==null) return new Result(Result.OK, "数据不存在");
-		dict1.setExt1(dict.getExt1());
-		dict1.setExt2(dict.getExt2());
-		dictMapper.updateByPrimaryKey(dict1);
-		log.info("号码规则["+dict1.getKeyValue()+"]更改后的不带4价为["+dict.getExt1()+"],带4价为["+dict.getExt2()+"]");
+	public Result editFeatherPrice(Dict dict) {
+		int id = NumberUtils.toInt(String.valueOf(dict.getId()));
+		if(id==0){
+			String name =ObjectUtils.toString(dict.getKeyValue(), " ");
+			Dict d = new Dict();
+			d.setKeyValue(dict.getKeyValue());
+			d.setKeyGroup("feather_price");
+			d.setIsDel(0);
+			Dict dict2 = dictMapper.selectOne(d);
+			if(dict2!=null) return new Result(Result.ERROR,"["+name+"]在该类别已存在");
+			dict.setKeyGroup("feather_price");
+			dict.setIsDel(0);
+			Map map=dictMapper.maxSeqAndKeyId("feather_price");
+			dict.setKeyId(String.valueOf(NumberUtils.toInt(String.valueOf(map.get("keyId")))+1));
+			dict.setSeq(NumberUtils.toInt(String.valueOf(map.get("seq")))+1);
+			dictMapper.insert(dict);
+		}else {
+			Dict dict1 = dictMapper.selectByPrimaryKey(dict.getId());
+			if(dict1==null) return new Result(Result.OK, "数据不存在");
+			dict1.setExt1(dict.getExt1());
+			dict1.setExt2(dict.getExt2());
+			dictMapper.updateByPrimaryKey(dict1);
+			log.info("号码规则["+dict1.getKeyValue()+"]更改后的不带4价为["+dict.getExt1()+"],带4价为["+dict.getExt2()+"]");
+		}
 		numPriceMapper.matchNumPrice();
+		return new Result(Result.OK, "成功");
+	}
+
+	public Result addFeatherType(Dict dict) {
+		String name =ObjectUtils.toString(dict.getKeyValue(), " ");
+		Dict d = new Dict();
+		d.setKeyValue(dict.getKeyValue());
+		d.setKeyGroup("FEATHER_TYPE");
+		d.setIsDel(0);
+		Dict dict2 = dictMapper.selectOne(d);
+		if(dict2!=null) return new Result(Result.ERROR,"["+name+"]在该类别已存在");
+		dict.setKeyGroup("FEATHER_TYPE");
+		dict.setIsDel(0);
+		Map map=dictMapper.maxSeqAndKeyId("keyValue");
+		dict.setKeyId(String.valueOf(NumberUtils.toInt(String.valueOf(map.get("keyId")))+1));
+		dict.setSeq(NumberUtils.toInt(String.valueOf(map.get("seq")))+1);
+		dictMapper.insert(dict);
 		return new Result(Result.OK, "成功");
 	}
 }

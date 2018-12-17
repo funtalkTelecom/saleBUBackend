@@ -116,4 +116,7 @@
         left join  tb_dict b on a.gtp_dict_group_key = b.key_group
         where a.g_type2 = #{keyGroup} order by a.seq, b.seq asc
     </select>
+    <select id="maxSeqAndKeyId" resultType="java.util.HashMap">
+        select ifnull(max(d.seq),0) seq, ifnull(max(cast(d.key_id as UNSIGNED INTEGER)),0) keyId from tb_dict d where d.key_group=#{keyGroup}
+    </select>
 </mapper>

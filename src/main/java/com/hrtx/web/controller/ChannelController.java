@@ -45,11 +45,19 @@ public class ChannelController extends BaseReturn{
         return channelService.queryChannel(channel);
     }
 
-    @RequestMapping("/feather-list")
+    @RequestMapping("/feather-price-list")
     @Powers({PowerConsts.CHANNELMOUDULE_COMMON_QUEYR})
-    public Result featherList(){
+    public Result featherPriceList(){
         Dict dict = new Dict();
         dict.setKeyGroup("feather_price");
+        dict.setIsDel(1);
+        return dictService.pageDict(dict);
+    }
+    @RequestMapping("/feather-type-list")
+    @Powers({PowerConsts.CHANNELMOUDULE_COMMON_QUEYR})
+    public Result featherTypeList(){
+        Dict dict = new Dict();
+        dict.setKeyGroup("FEATHER_TYPE");
         dict.setIsDel(1);
         return dictService.pageDict(dict);
     }
@@ -59,9 +67,24 @@ public class ChannelController extends BaseReturn{
     public Result editChannel(Channel channel){
         return channelService.editChannel(channel);
     }
-    @PostMapping("/feather-edit")
+
+    @PostMapping("/feather-price-edit")
     @Powers({PowerConsts.CHANNELMOUDULE_COMMON_EDIT})
-    public Result editFeather(Dict dict){
-        return dictService.editFeather(dict);
+    public Result editFeatherPrice(Dict dict){
+        return dictService.editFeatherPrice(dict);
     }
+
+    @PostMapping("/add-feather-type")
+    @Powers({PowerConsts.CHANNELMOUDULE_COMMON_EDIT})
+    public Result addFeatherType(Dict dict){
+        return dictService.addFeatherType(dict);
+    }
+
+
+    @RequestMapping("/feather-delete")
+    @Powers({PowerConsts.CHANNELMOUDULE_COMMON_EDIT})
+    public Result featherDelete(Dict dict){
+        return dictService.dictDelete(dict);
+    }
+
 }

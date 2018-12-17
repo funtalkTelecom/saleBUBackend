@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+
 @Component
 public interface DictMapper extends Mapper<Dict>,BaseMapper<Dict>{
     Dict findDictInfo(@Param("id") Long id);
@@ -23,4 +25,6 @@ public interface DictMapper extends Mapper<Dict>,BaseMapper<Dict>{
     List findDictByGroup(@Param("keyGroup")String group);
 
     List findDictByTypeGroup(@Param("keyGroup")String group);
+
+    Map maxSeqAndKeyId(@Param("keyGroup") String keyGroup);
 }
