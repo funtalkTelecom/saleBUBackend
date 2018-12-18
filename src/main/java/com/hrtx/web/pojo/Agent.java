@@ -239,4 +239,11 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	public void setType(Integer type) {
 		this.type = type;
 	}
+
+	public Integer getChannelId() {
+		return channelId;
+	}
+	public void setChannelId(Integer channelId) {
+		this.channelId = channelId;
+	}
 }

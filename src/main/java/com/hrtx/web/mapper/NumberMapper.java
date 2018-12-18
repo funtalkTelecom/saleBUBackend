@@ -51,4 +51,7 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
 
     void updateStatusByNumber(@Param("StrNums") String StrNums, @Param("skuId") Integer skuId,@Param("status") int status,
                               @Param("StartTime") Date StartTime, @Param("EndTime") Date EndTime);
+
+    int updateNumStatusWithData(@Param("org_status")int org_status,@Param("new_status")int new_status,@Param("num_id")int num_id);
+
 }

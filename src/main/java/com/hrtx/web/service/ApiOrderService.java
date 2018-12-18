@@ -4,6 +4,7 @@ import com.github.abel533.entity.Example;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hrtx.config.advice.ServiceException;
 import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
 import com.hrtx.global.*;
@@ -52,7 +53,7 @@ public class ApiOrderService {
 	@Autowired private AgentMapper agentMapper;
 	@Autowired private CityMapper cityMapper;
 	@Autowired private MealMapper mealMapper;
-
+	@Autowired private NumService numService;
 	@Autowired private ApiOrderService apiOrderService;
 
 	public  List<Map> findOrderListByNumId(Integer numId)
@@ -129,16 +130,69 @@ public class ApiOrderService {
 		}
 	}
 //////////////////////////////////////////////////////////////////////////////////////
-	public Result submitEpOrderEP(Integer sku_id,Integer num_id,double ep_price,Integer mead_id,Integer address_id,String conment){
+
+	/**
+	 * 提交竞拍单
+	 * @param goods_id		竞拍商品
+	 * @param sku_id		竞拍商品
+	 * @param num_id		竞拍号码
+	 * @param ep_price		竞拍价格
+	 * @param address_id	收获地址
+	 * @param isPack 是否打包  尚未实现
+	 * @param conment	备注 (选填)
+	 * @return 返回result code=200成功；=888订单已生成，仓储异常；=500失败
+	 */
+	public Result submitEpOrderEP(Integer goods_id,Integer sku_id,Integer num_id,double ep_price,Integer address_id,int isPack,String conment){
 		Consumer user = apiSessionUtil.getConsumer();
 		Result adresult=this.checkAddress(address_id,user.getId());
 		if(adresult.getCode()!=Result.OK)return adresult;
 		DeliveryAddress address=(DeliveryAddress)adresult.getData();
 		String shippingMenthodId="";
-		return this.submitOrder("3",sku_id,num_id,1,ep_price,user,address,shippingMenthodId,mead_id,conment,"","",null);
+		int mead_id=-1;
+		Result result= this.submitOrder("3",sku_id,num_id,1,ep_price,user,address,shippingMenthodId,mead_id,conment,"","",null);
+
+		if(result.getCode()!=Result.OK)return result;
+		Auction action=new Auction();
+		action.setgId(goods_id);
+		action.setNumId(num_id);
+		action.setSkuId(sku_id);
+		action.setErISPack(Integer.valueOf(isPack));
+		action.setOrderId(NumberUtils.toInt(ObjectUtils.toString(result.getData())));
+		ePSaleService.auctionEditOrderID(action);
+
+		return result;
 	}
 
-	public Result submitNormalOrder(Integer sku_id,Integer num_id,Integer mead_id,Integer address_id,String conment){
+	/**
+	 * 提交 白卡或普号 单
+	 * 	skuid,数量,地址
+	 * @param sku_id		商品
+	 * @param order_amount	订购数量
+	 * @param address_id	收获地址
+	 * @param conment		备注（选填）
+	 * @return 返回result code=200成功；=888订单已生成，仓储异常；=500失败
+	 */
+	public Result submitGoodsOrder(Integer sku_id,int order_amount,Integer address_id,String conment){
+		Consumer user = apiSessionUtil.getConsumer();
+		Result adresult=this.checkAddress(address_id,user.getId());
+		if(adresult.getCode()!=Result.OK)return adresult;
+		DeliveryAddress address=(DeliveryAddress)adresult.getData();
+		String shippingMenthodId="";
+		int mead_id=-1;
+		return this.submitOrder("1",sku_id,0,order_amount,0d,user,address,shippingMenthodId,mead_id,conment,"","",null);
+	}
+
+	/**
+	 * 提交 普靓或超靓常规 单
+	 * skuid, numid, addrid, payType, mealid
+	 * @param sku_id	商品信息
+	 * @param num_id	订购号码
+	 * @param mead_id	配对套餐
+	 * @param address_id	收获地址
+	 * @param conment		备注(选填)
+	 * @return 返回result code=200成功；=888订单已生成，仓储异常；=500失败
+	 */
+	public Result submitNumOrder(Integer sku_id,Integer num_id,Integer mead_id,Integer address_id,String conment){
 		Consumer user = apiSessionUtil.getConsumer();
 		Result adresult=this.checkAddress(address_id,user.getId());
 		if(adresult.getCode()!=Result.OK)return adresult;
@@ -146,18 +200,34 @@ public class ApiOrderService {
 		String shippingMenthodId="";
 		return this.submitOrder("2",sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",null);
 	}
+
 	/**
-	 *客服下单
+	 * 客服下单
+	 * @param num_id	订购号码
+	 * @param mead_id	配对套餐
+	 * @param addr_name	收件人
+	 * @param addr_phone	收件人电话
+	 * @param addr	收件地址
+	 * @param conment	备注(选填)
+	 * @param thirdOrder 第三方订单号(选填)
+	 * @param bossNum	BOOS工号(选填)
+	 * @param phoneConsumer	客户（使用此号码的人）姓名(选填)
+	 * @param phoneConsumerIdType	客户证件类型(选填) 目前只支持身份证
+	 * @param phoneConsumerIdNum	客户证件号码(选填)
+	 * @return 返回result code=200成功；=888订单已生成，仓储异常；=500失败
 	 */
 	public Result submitCustomOrder(Integer num_id,Integer mead_id,String addr_name,String addr_phone,String addr,String conment,String thirdOrder,String bossNum,String phoneConsumer,String phoneConsumerIdType,String phoneConsumerIdNum){
 		Number number=this.numberMapper.selectByPrimaryKey(num_id);
-		if(number==null)new Result(Result.OTHER,"抱歉，尚未找到您提交的号码");
+		if(number==null)return new Result(Result.OTHER,"抱歉，尚未找到您提交的号码");
 		Integer sku_id=number.getSkuId();
 		User u = SessionUtil.getUser();
-		Consumer user =new Consumer();
-		user.setId(u.getId());
-		user.setName(u.getName());
-		user.setIsAgent(0);
+		Consumer user =apiSessionUtil.getConsumer();
+		if(u==null&&user==null)return new Result(Result.OTHER,"您尚未登陆，请登陆后再提交订单");
+		if(user==null){
+			user.setId(u.getId());
+			user.setName(u.getName());
+			user.setIsAgent(0);
+		}
 		DeliveryAddress address=new DeliveryAddress();
 		address.setId(-1);
 		address.setPersonName(addr_name);
@@ -172,11 +242,23 @@ public class ApiOrderService {
 		order_ext_param.put("phoneConsumerIdNum",phoneConsumerIdNum);
 		return this.submitOrder("2",sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);
 	}
+
 	/**
-	 *
-	 *
-	 * 返回result code=200成功；=888订单已生成，仓储异常；=500失败
-	 * */
+	 * @param order_type
+	 * @param sku_id
+	 * @param num_id
+	 * @param order_amount
+	 * @param ep_price
+	 * @param user
+	 * @param address
+	 * @param shippingMenthodId
+	 * @param mead_id
+	 * @param conment
+	 * @param user_agent
+	 * @param req_id
+	 * @param order_ext_param
+	 * @return   返回result code=200成功；=888订单已生成，仓储异常；=500失败
+	 */
 	public Result submitOrder(String order_type,Integer sku_id,Integer num_id,int order_amount,double ep_price,Consumer user,DeliveryAddress address,String shippingMenthodId,Integer mead_id,String conment,String user_agent,String req_id,Map<String,Object> order_ext_param){
 		Result result=this.apiOrderService.newCreateOrder(order_type,sku_id,num_id,order_amount,ep_price,user,address,shippingMenthodId,mead_id,conment,user_agent,req_id,order_ext_param);
 		if(result.getCode()!=Result.OK)return result;
@@ -198,7 +280,7 @@ public class ApiOrderService {
 	}
 	public Result payPushOrderToStorage(Integer order_id){
 		Order order=this.orderMapper.selectByPrimaryKey(order_id);
-		order.setStatus(99);
+		order.setStatus(Constants.ORDER_STATUS_20.getIntKey());
 		this.orderMapper.updateByPrimaryKey(order);
 		Example example = new Example(OrderItem.class);
 		example.createCriteria().andEqualTo("orderId",order.getOrderId());
@@ -223,9 +305,16 @@ public class ApiOrderService {
 		if(!StringUtils.equals("200",String.valueOf(res.getCode())))return new Result(Result.ERROR, "调用冻结库存失败");
 		StorageInterfaceResponse sir = StorageInterfaceResponse.create(ObjectUtils.toString(res.getData()), SystemParam.get("key"));
 		if(!StringUtils.equals("00000",String.valueOf(sir.getCode())))return new Result(Result.ERROR, sir.getDesc());
-		order.setStatus(1);
+		order.setStatus(Constants.ORDER_STATUS_1.getIntKey());
 		this.orderMapper.updateByPrimaryKey(order);
 		return new Result(Result.OK,"冻结成功");
+	}
+	public void test() {
+		String aa=Utils.randomNoByDateTime();
+		Sku sku=this.skuMapper.selectByPrimaryKey(501);
+		log.info(aa+" 测试 "+sku.getSkuNum());
+		int a=this.skuMapper.updateSkuNumWithDataNum(2,501);
+		log.info(aa+" 测试 "+a);
 	}
 
 	public Result newCreateOrder(String order_type,Integer sku_id,Integer num_id,int order_amount,double ep_price,Consumer user,DeliveryAddress address,String shippingMenthodId,Integer mead_id,String conment,String user_agent,String req_ip,Map<String,Object> order_ext_param){
@@ -247,7 +336,7 @@ public class ApiOrderService {
 */
 		String shippingMenthod="";
 
-		Sku sku=this.skuMapper.selectByPrimaryKey(sku_id);//TODO 需要加锁
+		Sku sku=this.skuMapper.selectByPrimaryKey(sku_id);
 		if(sku==null) return new Result(Result.ERROR, "抱歉，尚未找到您所需商品");
 		if(sku.getSkuNum()<=0) return new Result(Result.ERROR, "抱歉，您购买的商品已售罄");
 		if(sku.getSkuNum()<order_amount) return new Result(Result.ERROR, "抱歉，您购买的商品库存不足，请减少下单量再试");
@@ -297,7 +386,7 @@ public class ApiOrderService {
 			if(ordinary_num){
 				Number number=this.numberMapper.selectByPrimaryKey(num_id);
 				if(!StringUtils.equals(String.valueOf(number),agent_city))return new Result(Result.ERROR, "抱歉，您权限不足，无法订购此地市商品");
-				Result result=this.checkNumCondition(number);
+				Result result=this.checkNumCondition(number,sku_id);
 				if(result.getCode()!=Result.OK)return result;
 
 				OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),0,goods,sku,number,1,sku.getSkuTobPrice());
@@ -330,10 +419,19 @@ public class ApiOrderService {
 
 		if(super_num||ep_num){
 			Number number=this.numberMapper.selectByPrimaryKey(num_id);
-			Result result=this.checkNumCondition(number);
+			Result result=this.checkNumCondition(number,sku_id);
 			if(result.getCode()!=Result.OK)return result;
 			double num_price=ep_num?ep_price:sku.getSkuTobPrice();
-			int channel=3;//TODO 待处理 use.getchannel
+			int channel=3;//一般用户无渠道，即默认是线上商城渠道，价格最高
+			Example example = new Example(Agent.class);
+			example.createCriteria().andEqualTo("addConsumerId",user.getId());
+			List<Agent> agent_list=agentMapper.selectByExample(example);
+			if(agent_list.size()>1)return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
+			//说明当前的用户有对应的渠道，取其渠道对应的价格
+			if(agent_list.size()==1){
+				if(agent_list.get(0).getChannelId()==null)return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
+				else channel=NumberUtils.toInt(String.valueOf(agent_list.get(0).getChannelId()),3);
+			}
 //			if(channel==3)return new Result(Result.ERROR, "未知代理渠道，无法订购");
 			if(order.getOrderType()==2&&StringUtils.equals(order.getSkuGoodsType(),"4")){
 				NumPrice numPrice=new NumPrice();
@@ -363,7 +461,10 @@ public class ApiOrderService {
 		for (int i=0;itemNums!=null&&i<itemNums.size();i++){
 			itemNums.get(i).setItemId(itemNums.get(i).getGeneralId());
 		}*/
-
+		//类似for update，在最后更新时刻获取库内数据进行更新,降低锁的范围
+		int update_num=this.skuMapper.updateSkuNumWithDataNum(order_amount,sku.getSkuId());
+		if(update_num==0)return new Result(Result.ERROR,"抱歉，您购买的商品库存不足");
+		if(update_num>1)throw new ServiceException("数据异常，无法下单");//数据错误，回滚当前事务
 		this.orderMapper.insert(order);
 		double subTotal=0d;
 		if(itemIccid!=null){
@@ -377,15 +478,15 @@ public class ApiOrderService {
 			if(itemIccid!=null)itemNum.setpItemId(itemIccid.getItemId());
 			this.orderItemMapper.insert(itemNum);
 			subTotal=Utils.sum(subTotal,itemNum.getTotal());
-			Number number=this.numberMapper.selectByPrimaryKey(itemNum.getNumId());
-			number.setStatus(3);
-			this.numberMapper.updateByPrimaryKey(number);
+			//类似for update，在最后更新时刻获取库内数据进行更新,降低锁的范围
+			update_num=this.numberMapper.updateNumStatusWithData(Constants.NUM_STATUS_2.getIntKey(),Constants.NUM_STATUS_3.getIntKey(),itemNum.getNumId());
+			if(update_num==0)throw new ServiceException("抱歉，您选择的商品已被订购");//数据错误，回滚当前事务
+			if(update_num>1)throw new ServiceException("数据异常，无法下单");//数据错误，回滚当前事务
 		}
 		order.setSubTotal(subTotal);
 		order.setTotal(Order.calculateTotal(order));
 		this.orderMapper.updateByPrimaryKey(order);
-		sku.setSkuNum(sku.getSkuNum()-order_amount);
-		this.skuMapper.updateByPrimaryKey(sku);
+//		if(true)throw new ServiceException("测试数据异常，订单被回滚");
 		return new Result(Result.OK, order.getOrderId());
 	}
 	private Result checkAddress(Integer address_id,Integer consumer_id){
@@ -396,11 +497,12 @@ public class ApiOrderService {
 	}
 
 
-	private Result checkNumCondition(Number number){//TODO 还需要验证sku是否一致
+	private Result checkNumCondition(Number number,int sku_id){
 		if(number==null)return new Result(Result.ERROR, "抱歉，您购买的号码并非在售中");
 		if(!StringUtils.equals(String.valueOf(number.getStatus()),"2"))return new Result(Result.ERROR, "抱歉，您购买的号码并非在售中");
-		//TODO 冻结处理
-//			if(!StringUtils.equals(String.valueOf(number.getStatus()),"2"))return new Result(Result.ERROR, "抱歉，您购买的号码已冻结");
+		if(!Integer.valueOf(sku_id).equals(number.getSkuId()) )return new Result(Result.ERROR, "抱歉，您购买的号码存在异常");
+		Integer fuser = numService.queryFreeze(number.getId());//判断是否冻结
+        if(fuser != null && !fuser.equals(SessionUtil.getUserId())) return new Result(Result.ERROR, "抱歉，您购买的号码已冻结");
 		return new Result(Result.OK,null);
 	}
 	private OrderItem createOrderItemBean(Integer orderId,Integer parent_item_id,Goods goods,Sku sku,Number number,int quantity,double goods_price){
@@ -416,7 +518,7 @@ public class ApiOrderService {
 	}
 
 	private Order createOrderBean(int orderType,String skuGoodsType,Consumer user,String user_agent,String req_ip,DeliveryAddress address,String shippingMenthodId,String shippingMenthod,double commission, double shippingTotal, double subTotal,String conment){
-		int status=0;
+		int status=Constants.ORDER_STATUS_0.getIntKey();
 		String address1=address.getAddress();
 		if(address.getDistrictId()>0){
 			City city=cityMapper.selectByPrimaryKey(address.getDistrictId());

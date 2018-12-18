@@ -151,6 +151,8 @@
     <select id="getId" resultType="java.lang.Integer">
       select `nextval`('hk')
     </select>-->
-
+    <update id="updateSkuNumWithDataNum">
+        update tb_sku s set s.sku_num=s.sku_num-#{order_amount} where s.sku_num>#{order_amount} and s.sku_id=#{sku_id}
+    </update>
 
 </mapper>

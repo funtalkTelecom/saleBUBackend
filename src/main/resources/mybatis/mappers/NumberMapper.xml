@@ -381,4 +381,9 @@
             </foreach>
         ) and a.status in (1,2)
     </update>
+
+    <update id="updateNumStatusWithData">
+        update tb_num n set n.`status`=#{new_status} where n.`status`=#{org_status} and n.id=#{num_id}
+    </update>
+
 </mapper>
