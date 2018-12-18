@@ -7,7 +7,7 @@ import java.util.Date;
 @Table(name = "tb_channel")
 public class Channel extends BasePojo{
     @Id
-    private Long id;
+    private Integer id;
 
     private Integer channelId;
 
@@ -19,11 +19,11 @@ public class Channel extends BasePojo{
 
 
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

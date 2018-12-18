@@ -61,7 +61,7 @@ public final class SessionUtil {
 	 * 获取放在session中的userID
 	 * @return
 	 */
-	public final static long getUserId(){
+	public final static Integer getUserId(){
 		User user = getUser();
 		return user == null ? -1 : user.getId();
 	}

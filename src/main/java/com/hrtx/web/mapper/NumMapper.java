@@ -41,12 +41,12 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
     /*
      5,6,7,9已绑定
      */
-    Page<Object> queryPageNumList(Num   num, @Param("consumerId") Long consumerId, @Param("status") String status);
+    Page<Object> queryPageNumList(Num   num, @Param("consumerId") Integer consumerId, @Param("status") String status);
 
     /*
       sku_goods_type=3  status4 未绑定
      */
-    Page<Object> queryPageNumList2(Num   num, @Param("consumerId") Long consumerId, @Param("status") String status);
+    Page<Object> queryPageNumList2(Num   num, @Param("consumerId") Integer consumerId, @Param("status") String status);
 
     /**
      * 查找所有待受理号码

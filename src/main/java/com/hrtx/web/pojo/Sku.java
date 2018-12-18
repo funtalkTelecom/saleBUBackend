@@ -12,8 +12,8 @@ public class Sku extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     @Id
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long skuId;
-    private Long gId;
+    private Integer skuId;
+    private Integer gId;
     private Double skuTobPrice;
     private Double skuTocPrice;
     private String skuIsNum;
@@ -31,7 +31,7 @@ public class Sku extends BasePojo implements java.io.Serializable {
     public Sku() {
     }
 
-    public Sku(Long skuId, Long gId, Double skuTobPrice, Double skuTocPrice, String skuIsNum,
+    public Sku(Integer skuId, Integer gId, Double skuTobPrice, Double skuTocPrice, String skuIsNum,
                String skuSaleNum, int skuNum, String skuGoodsType, String skuRepoGoods,
                String skuRepoGoodsName,int status,Integer isDel,String statusText) {
         this.skuId = skuId;
@@ -49,19 +49,19 @@ public class Sku extends BasePojo implements java.io.Serializable {
         this.statusText = statusText;
     }
 
-    public Long getSkuId() {
+    public Integer getSkuId() {
         return skuId;
     }
 
-    public void setSkuId(Long skuId) {
+    public void setSkuId(Integer skuId) {
         this.skuId = skuId;
     }
 
-    public Long getgId() {
+    public Integer getgId() {
         return gId;
     }
 
-    public void setgId(Long gId) {
+    public void setgId(Integer gId) {
         this.gId = gId;
     }
 

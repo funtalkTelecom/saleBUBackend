@@ -11,18 +11,18 @@ import java.util.Map;
 public interface AgentMapper extends Mapper<Agent>,BaseMapper<Agent>{
     void updateAgent(Agent agent);
 
-     List<Map> findAgentListByConsumerId(@Param("ConsumerId") Long ConsumerId);
+     List<Map> findAgentListByConsumerId(@Param("ConsumerId") Integer ConsumerId);
 
 //    List<Map> findAgentById(@Param("id") Long id);
 
-    Agent findAgentById(@Param("id") Long id);
+    Agent findAgentById(@Param("id") Integer id);
 
     void updateAgentStatus(Agent agent);
 
     void updateAgentStatusToLeyu(Agent agent);
 
-    List<Map> findIsLyByConsumerId(@Param("ConsumerId") Long ConsumerId);
+    List<Map> findIsLyByConsumerId(@Param("ConsumerId") Integer ConsumerId);
 
-    List findConsumenrIdCount(@Param("ConsumerId") Long ConsumerId);
+    List findConsumenrIdCount(@Param("ConsumerId") Integer ConsumerId);
 
 }

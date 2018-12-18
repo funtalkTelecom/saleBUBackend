@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -13,22 +15,23 @@ import java.util.Date;
 public class AuctionDeposit extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private Integer id;
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long skuId;//	tb_sku.id  二级属性关联到一级商品保证金;号码三级
+    private Integer skuId;//	tb_sku.id  二级属性关联到一级商品保证金;号码三级
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long numId;//	号码编码
+    private Integer numId;//	号码编码
     private String num;//	号码  来自 tb_num.num_resource
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long gId;//商品编码tb_goods.id
+    private Integer gId;//商品编码tb_goods.id
     private double amt;//	金额
     private int status;//	状态  1初始；2已支付；3已退款
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date addDate;//	创建时间
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long  consumerId;//	用户id  来自tb_consumer.id
+    private Integer  consumerId;//	用户id  来自tb_consumer.id
     private String addIp;//	用户ip
     private String paySnn;//	支付流水
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
@@ -43,7 +46,7 @@ public class AuctionDeposit extends BasePojo implements java.io.Serializable {
     public AuctionDeposit() {
     }
 
-    public AuctionDeposit(Long id, Long skuId, Long numId,Long gId, String num, double amt, int status, Date addDate, Long consumerId, String addIp, String paySnn, Date payDate,
+    public AuctionDeposit(Integer id, Integer skuId, Integer numId,Integer gId, String num, double amt, int status, Date addDate, Integer consumerId, String addIp, String paySnn, Date payDate,
                           double refundAmt, String refundSnn, Date refundDate) {
         this.id = id;
         this.skuId = skuId;
@@ -62,31 +65,31 @@ public class AuctionDeposit extends BasePojo implements java.io.Serializable {
         this.refundDate = refundDate;
     }
 
-    public Long getId() { return id; }
+    public Integer getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public Long getSkuId() {
+    public Integer getSkuId() {
         return skuId;
     }
 
-    public void setSkuId(Long skuId) {
+    public void setSkuId(Integer skuId) {
         this.skuId = skuId;
     }
 
-    public Long getNumId() {
+    public Integer getNumId() {
         return numId;
     }
 
-    public void setNumId(Long numId) {
+    public void setNumId(Integer numId) {
         this.numId = numId;
     }
 
-    public Long getgId() {
+    public Integer getgId() {
         return gId;
     }
 
-    public void setgId(Long gId) {
+    public void setgId(Integer gId) {
         this.gId = gId;
     }
 
@@ -122,11 +125,11 @@ public class AuctionDeposit extends BasePojo implements java.io.Serializable {
         this.addDate = addDate;
     }
 
-    public Long getConsumerId() {
+    public Integer getConsumerId() {
         return consumerId;
     }
 
-    public void setConsumerId(Long consumerId) {
+    public void setConsumerId(Integer consumerId) {
         this.consumerId = consumerId;
     }
 

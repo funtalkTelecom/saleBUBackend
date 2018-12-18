@@ -3,6 +3,8 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -10,10 +12,12 @@ import javax.persistence.Table;
 public class File extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-    private Long fileId;
+    private Integer fileId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long refId;
+    private Integer refId;
     private String fileName;
     private String fileGroup;
     private int seq;
@@ -21,7 +25,7 @@ public class File extends BasePojo implements java.io.Serializable {
     public File() {
 	}
 
-    public File(Long fileId, Long refId, String fileName, String fileGroup, int seq) {
+    public File(Integer fileId, Integer refId, String fileName, String fileGroup, int seq) {
         this.fileId = fileId;
         this.refId = refId;
         this.fileName = fileName;
@@ -29,19 +33,19 @@ public class File extends BasePojo implements java.io.Serializable {
         this.seq = seq;
     }
 
-    public Long getFileId() {
+    public Integer getFileId() {
         return fileId;
     }
 
-    public void setFileId(Long fileId) {
+    public void setFileId(Integer fileId) {
         this.fileId = fileId;
     }
 
-    public Long getRefId() {
+    public Integer getRefId() {
         return refId;
     }
 
-    public void setRefId(Long refId) {
+    public void setRefId(Integer refId) {
         this.refId = refId;
     }
 

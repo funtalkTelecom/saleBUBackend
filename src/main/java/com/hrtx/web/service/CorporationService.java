@@ -26,7 +26,7 @@ public class CorporationService {
 		return new Result(Result.OK, pm);
 	}
 
-	public Corporation findCorporationById(Long id) {
+	public Corporation findCorporationById(Integer id) {
 		Corporation c = new Corporation();
 		c.setId(id);
 		Corporation corporation = corporationMapper.selectOne(c);

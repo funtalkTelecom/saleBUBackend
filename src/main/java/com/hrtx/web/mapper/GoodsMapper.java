@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 @Component
 public interface GoodsMapper extends Mapper<Goods>,BaseMapper<Goods>{
-    Goods findGoodsInfo(@Param("id") Long id);
+    Goods findGoodsInfo(@Param("id") Integer id);
 
     void goodsEdit(Goods goods);
 
@@ -21,7 +21,7 @@ public interface GoodsMapper extends Mapper<Goods>,BaseMapper<Goods>{
 
     void goodsUnsale(Goods goods);
 
-    Goods findGoodsInfoBySkuid(@Param("skuid") String skuid);
+    Goods findGoodsInfoBySkuid(@Param("skuid") Integer skuid);
 
     Page<Object> queryPageSkuListApi(Goods goods, @Param("gSaleCity") String split);
 

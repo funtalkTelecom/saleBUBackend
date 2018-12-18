@@ -11,9 +11,9 @@ public class SkuProperty extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     @Id
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long skupId;
-    private Long skuId;
-    private Long gId;
+    private Integer skupId;
+    private Integer skuId;
+    private Integer gId;
     private String skupKey;
     private String skupValue;
     private int seq;
@@ -21,7 +21,7 @@ public class SkuProperty extends BasePojo implements java.io.Serializable {
     public SkuProperty() {
     }
 
-    public SkuProperty(Long skupId, Long skuId, Long gId, String skupKey, String skupValue, int seq) {
+    public SkuProperty(Integer skupId, Integer skuId, Integer gId, String skupKey, String skupValue, int seq) {
         this.skupId = skupId;
         this.skuId = skuId;
         this.gId = gId;
@@ -30,27 +30,27 @@ public class SkuProperty extends BasePojo implements java.io.Serializable {
         this.seq = seq;
     }
 
-    public Long getSkupId() {
+    public Integer getSkupId() {
         return skupId;
     }
 
-    public void setSkupId(Long skupId) {
+    public void setSkupId(Integer skupId) {
         this.skupId = skupId;
     }
 
-    public Long getSkuId() {
+    public Integer getSkuId() {
         return skuId;
     }
 
-    public void setSkuId(Long skuId) {
+    public void setSkuId(Integer skuId) {
         this.skuId = skuId;
     }
 
-    public Long getgId() {
+    public Integer getgId() {
         return gId;
     }
 
-    public void setgId(Long gId) {
+    public void setgId(Integer gId) {
         this.gId = gId;
     }
 

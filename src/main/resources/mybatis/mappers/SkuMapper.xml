@@ -148,5 +148,9 @@
     )
     </select>
 
+    <select id="getId" resultType="java.lang.Integer">
+      select `nextval`('hk')
+    </select>
+
 
 </mapper>

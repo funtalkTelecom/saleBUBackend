@@ -14,7 +14,7 @@ public interface IccidMapper extends Mapper<Iccid>,BaseMapper<Iccid>{
      * 插入回调串码
      * @param allImeis
      */
-    int batchInsertTemp(@Param("list") List allImeis, @Param("orderId") Long orderId);
+    int batchInsertTemp(@Param("list") List allImeis, @Param("orderId") Integer orderId);
 
     void iccidEditStatus(Iccid iccid);
 
@@ -23,31 +23,31 @@ public interface IccidMapper extends Mapper<Iccid>,BaseMapper<Iccid>{
      * @param consumer
      * @return
      */
-    int batchInsertNoFund(@Param("consumer") Long consumer, @Param("orderId") Long orderId);
+    int batchInsertNoFund(@Param("consumer") Integer consumer, @Param("orderId") Integer orderId);
 
     /**
      * 更新已找到的的iccid  客户订单归属
      * @param consumer
      */
-    int batchUpdate(@Param("consumer") Long consumer, @Param("orderId") Long orderId);
+    int batchUpdate(@Param("consumer") Integer consumer, @Param("orderId") Integer orderId);
 
     /**
      * 删除回调串码
      * @param orderId
      */
-    void deleteTempByBatchNum(@Param("orderId") Long orderId);
+    void deleteTempByBatchNum(@Param("orderId") Integer orderId);
 
     /**
      * 分组查询回调串码
      * @param orderId
      * @return
      */
-    List<Map> queryTempItemsByBatchNum(@Param("orderId") Long orderId);
+    List<Map> queryTempItemsByBatchNum(@Param("orderId") Integer orderId);
 
     /**
      * 回调串码与明细号码匹配
      * @param item_id
      * @return
      */
-    List matchOrderItem(@Param("item_id") long item_id);
+    List matchOrderItem(@Param("item_id") Integer item_id);
 }

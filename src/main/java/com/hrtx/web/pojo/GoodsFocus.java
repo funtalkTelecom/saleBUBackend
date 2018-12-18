@@ -15,15 +15,15 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     @Id
 	@JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private Integer id;
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long skuId;//	tb_sku.id  二级属性关联到一级商品保证金;号码三级
+    private Integer skuId;//	tb_sku.id  二级属性关联到一级商品保证金;号码三级
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long numId;//	号码编码
+    private Integer numId;//	号码编码
     private String num;//	号码  来自 tb_num.num_resource
     private String gName;//商品名称
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long gId;//商品编码tb_goods.id
+    private Integer gId;//商品编码tb_goods.id
     private double price;//	当前价格
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -31,7 +31,7 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateDate;//	关注时间  修改
-    private Long  consumerId;//	用户id  来自tb_consumer.id
+    private Integer  consumerId;//	用户id  来自tb_consumer.id
     private String addIp;//	用户ip
     private String  remark;//备注
     private Integer isDel;//是否收藏  是0否1
@@ -42,7 +42,7 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
     public GoodsFocus() {
     }
 
-    public GoodsFocus(Long id, Long skuId, Long numId, String num, String gName, Long gId, double price, Date addDate, Date updateDate, Long consumerId,
+    public GoodsFocus(Integer id, Integer skuId, Integer numId, String num, String gName, Integer gId, double price, Date addDate, Date updateDate, Integer consumerId,
                       String addIp, String remark, Integer isDel) {
         this.id = id;
         this.skuId = skuId;
@@ -60,23 +60,23 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
         this.isDel = isDel;
     }
 
-    public Long getId() { return id; }
+    public Integer getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public Long getSkuId() {
+    public Integer getSkuId() {
         return skuId;
     }
 
-    public void setSkuId(Long skuId) {
+    public void setSkuId(Integer skuId) {
         this.skuId = skuId;
     }
 
-    public Long getNumId() {
+    public Integer getNumId() {
         return numId;
     }
 
-    public void setNumId(Long numId) {
+    public void setNumId(Integer numId) {
         this.numId = numId;
     }
 
@@ -96,11 +96,11 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
         this.gName = gName;
     }
 
-    public Long getgId() {
+    public Integer getgId() {
         return gId;
     }
 
-    public void setgId(Long gId) {
+    public void setgId(Integer gId) {
         this.gId = gId;
     }
 
@@ -132,11 +132,11 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
 
     public void setUpdateDate(Date updateDate) { this.updateDate = updateDate; }
 
-    public Long getConsumerId() {
+    public Integer getConsumerId() {
         return consumerId;
     }
 
-    public void setConsumerId(Long consumerId) {
+    public void setConsumerId(Integer consumerId) {
         this.consumerId = consumerId;
     }
 

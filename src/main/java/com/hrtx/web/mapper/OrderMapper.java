@@ -14,13 +14,13 @@ import java.util.Map;
 public interface OrderMapper extends Mapper<Order>,BaseMapper<Order>{
     void insertBatch(@Param("orderList") List<Order> orderList);
 
-    void deleteByOrderid(@Param("orderid") Long orderId);
+    void deleteByOrderid(@Param("orderid") Integer orderId);
 
     void signByOrderid(Order order);
 
     List<Map> findOrderSignList();
 
-    List<Map> findOrderListByNumIdAndConsumerId(@Param("numId") Long numId,@Param("consumerId") Long consumerId);
+    List<Map> findOrderListByNumIdAndConsumerId(@Param("numId") Integer numId,@Param("consumerId") Integer consumerId);
 
     Order findOrderInfo(@Param("orderid") Long id);
 

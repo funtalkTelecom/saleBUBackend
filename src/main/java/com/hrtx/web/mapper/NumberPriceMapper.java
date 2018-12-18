@@ -14,8 +14,8 @@ public interface NumberPriceMapper extends Mapper<NumberPrice>,BaseMapper<Number
 
     void insertBatch(@Param("numberPriceList") List<NumberPrice> numberPriceList);
 
-    void updateNumberPrice(@Param("skuId") Long skuId);
+    void updateNumberPrice(@Param("skuId") Integer skuId);
 
-    void insertListNumPrice(@Param("skuId") Long skuId,@Param("basePrice") double basePrice,@Param("addCorpId") Long addCorpId);
+    void insertListNumPrice(@Param("skuId") Integer skuId,@Param("basePrice") double basePrice,@Param("addCorpId") Integer addCorpId);
 
 }

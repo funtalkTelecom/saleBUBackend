@@ -14,4 +14,6 @@ public interface BaseMapper<T> {
 	public Page<Object> queryPageList(@Param("param")T t);
 	
 	public Page<Object> queryPageList(@Param("param")Map<String, Object> map);
+
+	public int getId();
 }

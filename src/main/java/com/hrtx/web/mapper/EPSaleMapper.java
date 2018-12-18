@@ -14,11 +14,11 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     EPSale findEPSaleById(@Param("id") Long id);
 
-    List<Map> findNumById(@Param("id") Long id);
+    List<Map> findNumById(@Param("id") Integer id);
 
     List<Map> findGoodsByGId(@Param("gId") Long gId);
 
-    void numLoopEdit(@Param("endTime")String endTime, @Param("id") Long id);
+    void numLoopEdit(@Param("endTime")String endTime, @Param("id") Integer id);
 
     List<Map> findEPSaleListByUserId(@Param("addUserId") Long addUserId);
 
@@ -79,26 +79,26 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     List<Map> queryActiveAuction(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
 
-    List<Map> queryActiveAuctionByNumIdAndGId(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
+    List<Map> queryActiveAuctionByNumIdAndGId(@Param("num_id") Integer num_id,@Param("g_id") Integer g_id);
 
-    List<Map> queryActiveAuctionByGId(@Param("g_id") Long g_id);
+    List<Map> queryActiveAuctionByGId(@Param("g_id") Integer g_id);
 
     List<Map> countAuctions(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
 
-    List<Map> countAuctionsByNumIdAndGId(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
+    List<Map> countAuctionsByNumIdAndGId(@Param("num_id") Integer num_id,@Param("g_id") Integer g_id);
 
-    List<Map> countAuctionsByGId(@Param("g_id") Long g_id);
+    List<Map> countAuctionsByGId(@Param("g_id") Integer g_id);
 
     List<Map> queryNeedReturn(@Param("num_id") Long num_id,@Param("g_id") Long g_id,@Param("consumer_id") Long consumer_id);
 
-    List<Map> queryNeedReturnByNumIdAndGIdAndComsumerId(@Param("num_id") Long num_id,@Param("g_id") Long g_id,@Param("consumer_id") Long consumer_id);
+    List<Map> queryNeedReturnByNumIdAndGIdAndComsumerId(@Param("num_id") Integer num_id,@Param("g_id") Integer g_id,@Param("consumer_id") Integer consumer_id);
 
-    List<Map> queryNeedReturnByGIdAndComsumerId(@Param("g_id") Long g_id,@Param("consumer_id") Long consumer_id);
+    List<Map> queryNeedReturnByGIdAndComsumerId(@Param("g_id") Integer g_id,@Param("consumer_id") Integer consumer_id);
 
     ///////////////////////////////////
-    List<Map> queryNumEndTime(@Param("num_id") Long num_id);
+    List<Map> queryNumEndTime(@Param("num_id") Integer num_id);
 
-    List<Map> queryGoodsEndTime(@Param("g_id") Long g_id);
+    List<Map> queryGoodsEndTime(@Param("g_id") Integer g_id);
 
     void updateNumDelayed(@Param("num_id") Long num_id,@Param("loop_time") Integer loop_time);
 

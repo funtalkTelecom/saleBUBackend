@@ -19,17 +19,17 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
 
     List<Map> findAuctionListByNumId(@Param("numId") Long numId);
 
-    List<Map> findAuctionListByNumIdAndGId(@Param("numId") Long numId,@Param("gId") Long gId);
+    List<Map> findAuctionListByNumIdAndGId(@Param("numId") Integer numId,@Param("gId") Integer gId);
 
-    List<Map> findAuctionListByGId(@Param("gId") Long gId);
+    List<Map> findAuctionListByGId(@Param("gId") Integer gId);
 
-    List<Map> findAuctionListByNumIdAndGId2(@Param("numId") Long numId,@Param("gId") Long gId);
+    List<Map> findAuctionListByNumIdAndGId2(@Param("numId") Integer numId,@Param("gId") Integer gId);
 
     List<Map> findAuctionListByGId2(@Param("gId") Long gId);
 
-    List<Map> findAuctionListByNumIdAndConsumerIdAndGId(@Param("numId") Long numId,@Param("consumerId") Long consumerId,@Param("gId") Long gId);
+    List<Map> findAuctionListByNumIdAndConsumerIdAndGId(@Param("numId") Integer numId,@Param("consumerId") Integer consumerId,@Param("gId") Integer gId);
 
-    List<Map> findAuctionListByConsumerIdAndGId(@Param("consumerId") Long consumerId,@Param("gId") Long gId);
+    List<Map> findAuctionListByConsumerIdAndGId(@Param("consumerId") Integer consumerId,@Param("gId") Integer gId);
 
     List<Map> findAuctionOrderListByConsumerId(Auction auction);
 
@@ -45,13 +45,13 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
 
     List<Map> findAuctionListDepositByNumId2(@Param("numId") Long numId);
 
-    List<Map> findAuctionListDepositByNumIdAndGId(@Param("numId") Long numId,@Param("gId") Long gId);
+    List<Map> findAuctionListDepositByNumIdAndGId(@Param("numId") Integer numId,@Param("gId") Integer gId);
 
-    List<Map> findAuctionListDepositByNumIdAndGId2(@Param("numId") Long numId,@Param("gId") Long gId);
+    List<Map> findAuctionListDepositByNumIdAndGId2(@Param("numId") Integer numId,@Param("gId") Integer gId);
 
     List<Map> findAuctionGoodsByNumId(@Param("numId") Long numId);
 
-    List<Map> findCustomersByNumIdAndGId(@Param("numId") Long numId,@Param("gId") Long gId);
+    List<Map> findCustomersByNumIdAndGId(@Param("numId") Integer numId,@Param("gId") Integer gId);
 
     List<Map>  findAuctionByNumIdAndStatus(Auction auction);
 
@@ -73,5 +73,5 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
 
     void auctionEditOrderIDByGId(Auction auction);
 
-    List<Map> freezeOneNum(@Param("numId") Long numId);
+    List<Map> freezeOneNum(@Param("numId") Integer numId);
 }

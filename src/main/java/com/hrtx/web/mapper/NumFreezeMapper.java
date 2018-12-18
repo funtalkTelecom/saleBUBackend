@@ -7,5 +7,5 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface NumFreezeMapper extends BaseMapper<NumFreeze>,Mapper<NumFreeze> {
-    Long queryFreeze(@Param("numId")long numId);
+    Integer queryFreeze(@Param("numId") Integer numId);
 }

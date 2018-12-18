@@ -5,22 +5,21 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import java.util.Date;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 @Table(name = "tb_user")
 public class User extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
 	private String loginName;
 	private String pwd;
 	private String name;
-	private Long corpId;
+	private Integer corpId;
 	private String phone;
-	private Long addUser;
+	private Integer addUser;
 	private Date addDate;
 	private Integer status;
 	protected Integer isDel;
@@ -30,12 +29,12 @@ public class User extends BasePojo implements java.io.Serializable {
 	public User() {
 	}
 
-	public User(Long id) {
+	public User(Integer id) {
 		this.id = id;
 	}
 
-	private User(Long id, String loginName, String pwd, String name,
-				 Long corpId, String phone, Long addUserId, Date addDate, Integer status) {
+	private User(Integer id, String loginName, String pwd, String name,
+				 Integer corpId, String phone, Integer addUserId, Date addDate, Integer status) {
 		super();
 		this.id = id;
 		this.loginName = loginName;
@@ -48,11 +47,11 @@ public class User extends BasePojo implements java.io.Serializable {
 		this.status = status;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -80,11 +79,11 @@ public class User extends BasePojo implements java.io.Serializable {
 		this.name = name;
 	}
 
-	public Long getCorpId() {
+	public Integer getCorpId() {
 		return corpId;
 	}
 
-	public void setCorpId(Long corpId) {
+	public void setCorpId(Integer corpId) {
 		this.corpId = corpId;
 	}
 
@@ -96,11 +95,11 @@ public class User extends BasePojo implements java.io.Serializable {
 		this.phone = phone;
 	}
 
-	public Long getAddUser() {
+	public Integer getAddUser() {
 		return addUser;
 	}
 
-	public void setAddUser(Long addUser) {
+	public void setAddUser(Integer addUser) {
 		this.addUser = addUser;
 	}
 
