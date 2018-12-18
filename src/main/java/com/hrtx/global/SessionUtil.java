@@ -89,7 +89,7 @@ public final class SessionUtil {
 		return (","+getRoles()+",").indexOf(","+roleStr+",") != -1;
 	}
 	
-	public static final boolean hasPower(long id) {
+	public static final boolean hasPower(int id) {
 		Map<Integer,Object> powerMap = getPower();
 		if(powerMap == null)return false;
 		if(powerMap.containsKey(id)){
