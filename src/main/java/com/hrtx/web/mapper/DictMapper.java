@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 @Component
 public interface DictMapper extends Mapper<Dict>,BaseMapper<Dict>{
-    Dict findDictInfo(@Param("id") Long id);
+    Dict findDictInfo(@Param("id") Integer id);
 
     int checkDictKeyIdIsExist(Dict dict);
 

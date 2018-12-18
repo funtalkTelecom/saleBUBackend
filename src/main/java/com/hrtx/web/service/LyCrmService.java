@@ -347,7 +347,7 @@ public class LyCrmService {
                     log.info("第["+j+"]行数据字段不足，异常");
                     continue;
                 }
-                NumBase numBase = new NumBase(0l,row[0],row[1],row[2],row[3],row[4],row[5],NumberUtils.toDouble(row[6]),new Date(), tFileName);
+                NumBase numBase = new NumBase(row[0],row[1],row[2],row[3],row[4],row[5],NumberUtils.toDouble(row[6]),new Date(), tFileName);
 //                numBase.setId(numBase.getGeneralId());
                 batch.add(numBase);
                 if(batch.size() >= 1000 || j+1 >= len) {
@@ -371,7 +371,7 @@ public class LyCrmService {
         List<NumRule> batch = new ArrayList<>();
         for (int j = 0, len = nums.size(); j < len; j++) {
             Map num = nums.get(j);
-            long id = NumberUtils.toLong(String.valueOf(num.get("id")));
+            int id = NumberUtils.toInt(String.valueOf(num.get("id")));
             String num_resource = String.valueOf(num.get("num_resource"));
             this.addNumFeature(id, num_resource, feathers, batch, "FEATHER_TYPE");
             this.addNumFeature(id, num_resource, priceFeathers, batch, "feather_price");
@@ -383,7 +383,7 @@ public class LyCrmService {
         if(batch.size() > 0)  numRuleMapper.batchInsert(batch);
     }
 
-    private void addNumFeature(long id, String num_resource, List<Map> feathers, List<NumRule> batch, String type) {
+    private void addNumFeature(Integer id, String num_resource, List<Map> feathers, List<NumRule> batch, String type) {
         for (Map map: feathers) {
             String keyId = org.apache.commons.lang.ObjectUtils.toString(map.get("keyId"));
             String note = org.apache.commons.lang.ObjectUtils.toString(map.get("note"));
@@ -414,7 +414,7 @@ public class LyCrmService {
         List<NumRule> batch = new ArrayList<>();
         for (int j = 0, len = nums.size(); j < len; j++) {
             Map num = nums.get(j);
-            long id = NumberUtils.toLong(String.valueOf(num.get("id")));
+            int id = NumberUtils.toInt(String.valueOf(num.get("id")));
             String num_resource = String.valueOf(num.get("num_resource"));
             this.addNumFeature(id, num_resource, feathers, batch, type);
             if(batch.size() >= 1000) {

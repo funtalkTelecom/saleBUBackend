@@ -49,6 +49,6 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
      */
     List queryGoodsNumberList(@Param("goodsid")  String goodsid);
 
-    void updateStatusByNumber(@Param("StrNums") String StrNums, @Param("skuId") Long skuId,@Param("status") int status,
+    void updateStatusByNumber(@Param("StrNums") String StrNums, @Param("skuId") Integer skuId,@Param("status") int status,
                               @Param("StartTime") Date StartTime, @Param("EndTime") Date EndTime);
 }

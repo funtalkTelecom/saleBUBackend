@@ -78,7 +78,7 @@ public class AuctionDepositService {
 	/*
 	   通过OrderId获取保证金记录
 	 */
-	public Map  findAuctionDepositListByOrderId(Long orderId)
+	public Map  findAuctionDepositListByOrderId(Integer orderId)
 	{
 		Map map=new HashMap();
 	    List<Map> auctionList=auctionMapper.findAuctionListByOrderId(orderId);

@@ -103,7 +103,7 @@ public class AuctionService {
 		auctionMapper.auctionEditStatusById2(auction);
 	}
 
-	public List<Map> findCustomersByNumIdAndGId(Long numId,Long gId) {
+	public List<Map> findCustomersByNumIdAndGId(Integer numId,Integer gId) {
 		return auctionMapper.findCustomersByNumIdAndGId(numId,gId);
 	}
 }

@@ -15,10 +15,10 @@ public interface AccountMapper extends Mapper<Account>,BaseMapper<Account>{
 
     void insertAccount(@Param("accountList") List<Account> list);
 
-    Account findAccountInfo(@Param("id") Long id);
+    Account findAccountInfo(@Param("id") Integer id);
 
     void accountDelete(Account account);
 
-    List<Map> findAccountListByUserId(@Param("addUserId") Long addUserId);
+    List<Map> findAccountListByUserId(@Param("addUserId") Integer addUserId);
 
 }

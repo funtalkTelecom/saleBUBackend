@@ -35,7 +35,7 @@ public class GoodsFocusService {
     /*
       当前用户对该商品的收藏记录
      */
-    public List<Map> findGoodsFocusListByNumIdAndGId(Long numId,Long gId)
+    public List<Map> findGoodsFocusListByNumIdAndGId(Integer numId,Integer gId)
 	{
 	    //return goodsFocusMapper.findGoodsFocusListBydConsumerId(apiSessionUtil.getConsumer().getId());
         return goodsFocusMapper.finGoodsFocusListByGIdAndNumIdAndConsumerId(gId,numId,this.apiSessionUtil.getConsumer().getId());
@@ -44,7 +44,7 @@ public class GoodsFocusService {
     /*
       当前用户对该商品的收藏记录
      */
-    public List<Map> findGoodsFocusListByGId(Long gId)
+    public List<Map> findGoodsFocusListByGId(Integer gId)
     {
         //return goodsFocusMapper.findGoodsFocusListBydConsumerId(apiSessionUtil.getConsumer().getId());
         return goodsFocusMapper.finGoodsFocusListByGIdAndConsumerId(gId,this.apiSessionUtil.getConsumer().getId());
@@ -57,8 +57,8 @@ public class GoodsFocusService {
     {
        // List<Map> list=goodsFocusMapper.findGoodsFocusListByConsumerId2(apiSessionUtil.getConsumer().getId());
         List<Map> list=goodsFocusMapper.findGoodsFocusListByConsumerId3(apiSessionUtil.getConsumer().getId());
-        Long numId=0L;
-        Long gId=0L;
+        Integer numId=0;
+        Integer gId=0;
         int numStatus=0;//状态 号码记录
         String urlImg="";
         int gStatus=0;//0 未上架，1上架，2 失效 tb_num.stauts<>2
@@ -67,8 +67,8 @@ public class GoodsFocusService {
         {
             urlImg=SystemParam.get("domain-full") +map.get("gImg").toString();
             map.put("gImg",urlImg);
-            numId=Long.valueOf(map.get("numId").toString());
-            gId=Long.valueOf(map.get("gId").toString());
+            numId=NumberUtils.toInt(map.get("numId").toString());
+            gId=NumberUtils.toInt(map.get("gId").toString());
             if(gId>0)
             {
                 Goods goods = goodsMapper.findGoodsInfo(gId);
@@ -120,7 +120,7 @@ public class GoodsFocusService {
                 goodsFocusList=goodsFocusMapper.finGoodsFocusListByGIdAndConsumerId(goodsFocus.getgId(),this.apiSessionUtil.getConsumer().getId());
             }
             if (!goodsFocusList.isEmpty()&&goodsFocusList.size()>0) {
-                goodsFocus.setId(Long.valueOf(goodsFocusList.get(0).get("id").toString()));
+                goodsFocus.setId(NumberUtils.toInt(goodsFocusList.get(0).get("id").toString()));
                 goodsFocus.setUpdateDate(new Date());
                 goodsFocus.setIsDel(1);//取消收藏 否1
                 goodsFocusMapper.goodsFocusEdit(goodsFocus);

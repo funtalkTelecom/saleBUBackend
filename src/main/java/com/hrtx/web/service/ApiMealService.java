@@ -13,6 +13,7 @@ import com.hrtx.web.pojo.File;
 import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.pojo.Meal;
 import com.hrtx.web.pojo.Sku;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class ApiMealService {
 //			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
 //			meal.setStart(limit*(pageNum-1));
 //			meal.setLimit(limit);
-			meal.setCreateBy(Long.parseLong(supplier));
+			meal.setCreateBy(NumberUtils.toInt(supplier));
 
 			PageHelper.startPage(meal.getPageNum(),meal.getLimit());
 			Page<Object> ob=this.mealMapper.queryPageListApi(meal);

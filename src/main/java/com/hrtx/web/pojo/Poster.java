@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -13,8 +15,9 @@ import java.util.Date;
 public class Poster extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
 	private String title;
     private String position;
     private String positionName;
@@ -31,7 +34,7 @@ public class Poster extends BasePojo implements java.io.Serializable {
     public Poster() {
 	}
 
-    public Poster(Long id, String title, String position, String positionName, String pic, String url, String remark, Date startTime, Date endTime) {
+    public Poster(Integer id, String title, String position, String positionName, String pic, String url, String remark, Date startTime, Date endTime) {
         this.id = id;
         this.title = title;
         this.position = position;
@@ -43,11 +46,11 @@ public class Poster extends BasePojo implements java.io.Serializable {
         this.endTime = endTime;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

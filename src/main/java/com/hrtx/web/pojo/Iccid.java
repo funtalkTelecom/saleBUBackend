@@ -7,7 +7,7 @@ import java.util.Date;
 @Table(name = "tb_iccid")
 public class Iccid {
     @Id
-    private Long id;
+    private Integer id;
 
     private String cityCode;
 
@@ -21,9 +21,9 @@ public class Iccid {
 
     private String dealStatus;
 
-    private Long orderId;
+    private Integer orderId;
 
-    private Long consumerId;
+    private Integer consumerId;
 
     private Integer stockStatus;
 
@@ -31,7 +31,7 @@ public class Iccid {
 
     private Date outStockDate;
 
-    public Iccid(Long id, String cityCode, String cityName, String sections, String netType, String iccid, String dealStatus, Long orderId, Long consumerId, Integer stockStatus, Date inStockDate, Date outStockDate) {
+    public Iccid(Integer id, String cityCode, String cityName, String sections, String netType, String iccid, String dealStatus, Integer orderId, Integer consumerId, Integer stockStatus, Date inStockDate, Date outStockDate) {
         this.id = id;
         this.cityCode = cityCode;
         this.cityName = cityName;
@@ -50,11 +50,11 @@ public class Iccid {
         super();
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -106,19 +106,19 @@ public class Iccid {
         this.dealStatus = dealStatus == null ? null : dealStatus.trim();
     }
 
-    public Long getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 
-    public Long getConsumerId() {
+    public Integer getConsumerId() {
         return consumerId;
     }
 
-    public void setConsumerId(Long consumerId) {
+    public void setConsumerId(Integer consumerId) {
         this.consumerId = consumerId;
     }
 

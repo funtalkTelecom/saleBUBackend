@@ -25,7 +25,7 @@ public class SkuService {
 	@Autowired
 	private SkuPropertyMapper skuPropertyMapper;
 
-	public LinkedHashMap<String, LinkedHashMap<String, String>> skuListByGid(Long gId) {
+	public LinkedHashMap<String, LinkedHashMap<String, String>> skuListByGid(Integer gId) {
 		LinkedHashMap<String, LinkedHashMap<String, String>> skuidMap = new LinkedHashMap<String, LinkedHashMap<String, String>>();
 
 		List<Sku> skuList = skuMapper.findSkuInfo(gId);

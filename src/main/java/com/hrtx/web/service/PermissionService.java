@@ -218,12 +218,12 @@ public class PermissionService {
 		}
 	}
 
-	public void distributeRole(long userId, String roles) {
+	public void distributeRole(int userId, String roles) {
 		userMapper.deleteRoleByUserId(userId);
 		String[] rolesArray=StringUtils.split(roles ,",");
 		if(rolesArray == null||rolesArray.length==0)return;
 		for(String s :rolesArray){
-			long roleId = NumberUtils.toLong(s.trim());
+			int roleId = NumberUtils.toInt(s.trim());
 			userMapper.insertUr(roleId, userId);
 		}
 	}

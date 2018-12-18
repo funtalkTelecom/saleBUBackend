@@ -13,6 +13,7 @@ import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class NumberService {
 	public Result numberUpdate(List<Map<String,Object>> isGoodSkuMap, Goods goods){
         for(int i=0; i<isGoodSkuMap.size(); i++){
             Map map1 =(Map) isGoodSkuMap.get(i);
-            Long skuid =Long.parseLong( String.valueOf(map1.get("SkuId")));
+            Integer skuid =NumberUtils.toInt(String.valueOf(map1.get("SkuId")));
             Sku s =  skuMapper.selectByPrimaryKey(skuid);
             String skuSaleNumb = String.valueOf(map1.get("skuSaleNumbs"));
             double basePrice =Double.valueOf(String.valueOf(map1.get("basePrice")));

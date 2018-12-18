@@ -1001,7 +1001,7 @@ public class GoodsService {
             //更新tb_num 表 skuid,start_time,end_time,status
             goodsMapper.updateNumStatus(num_id,skuid,num);
             //更新 tb_sku 表 sku_num 数量
-            Long skuids = NumberUtils.toLong(skuid);
+            int skuids = NumberUtils.toInt(skuid);
             Sku nowSku = skuMapper.getSkuBySkuid(skuids);
             nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-1);//修改sku数量
             skuMapper.updateSkuNum(nowSku);
@@ -1029,7 +1029,7 @@ public class GoodsService {
             //更新tb_num 表 skuid,start_time,end_time,status
             goodsMapper.updateNumStatus(num_id,skuid,num);
             //更新 tb_sku 表 sku_num 数量
-            Long skuids = NumberUtils.toLong(skuid);
+            int skuids = NumberUtils.toInt(skuid);
             Sku nowSku = skuMapper.getSkuBySkuid(skuids);
             nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-1);//修改sku数量
             skuMapper.updateSkuNum(nowSku);

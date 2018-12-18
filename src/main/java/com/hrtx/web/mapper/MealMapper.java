@@ -14,7 +14,7 @@ public interface MealMapper extends Mapper<Meal>,BaseMapper<Meal>{
 
     void insertBatch(@Param("mealList") List<Meal> mealList);
 
-    Meal findMealById(@Param("mid") Long id);
+    Meal findMealById(@Param("mid") Integer id);
 
     void mealEdit(Meal meal);
 

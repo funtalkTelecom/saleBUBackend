@@ -8,6 +8,7 @@ import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.pojo.GoodsFocus;
 import com.hrtx.web.service.GoodsFocusService;
 import com.hrtx.web.service.GoodsService;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class GoodsFocusController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result findGoodsFocus(@PathVariable("numId") String numId, @PathVariable("gId") String gId,@PathVariable("erIsPack") Integer erIsPack) {
-		Goods goods=goodsService.findGoodsById(Long.valueOf(gId));//上架商品信息gActive
+		Goods goods=goodsService.findGoodsById(NumberUtils.toInt(gId));//上架商品信息gActive
 		if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
 		{
 			return new Result(Result.ERROR,"是否打包传参不符，请核对");

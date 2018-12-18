@@ -54,7 +54,7 @@ public class OrderService extends BaseService {
         return new Result(Result.OK, pm);
     }
 
-    public Order findOrderById(Long id) {
+    public Order findOrderById(Integer id) {
         Order order = orderMapper.findOrderInfo(id);
         return order;
     }
@@ -65,7 +65,7 @@ public class OrderService extends BaseService {
      * @return
      */
     @NoRepeat
-    public Result payDeliverOrder(Long orderId) {
+    public Result payDeliverOrder(Integer orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 2) return new Result(Result.ERROR, "订单状态异常");
@@ -115,7 +115,7 @@ public class OrderService extends BaseService {
         return new Result(Result.OK, "发货成功");
     }
 
-    private int batchUpdateDpk(Long consumer, String consumerName, List<Map> nums) {
+    private int batchUpdateDpk(Integer consumer, String consumerName, List<Map> nums) {
         int ucount = 0;
         int start = 0;
         int len = nums.size();
@@ -137,7 +137,7 @@ public class OrderService extends BaseService {
      * @return
      */
     @NoRepeat
-    public Result payOrderSuccess(Long orderId) {
+    public Result payOrderSuccess(Integer orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
@@ -155,7 +155,7 @@ public class OrderService extends BaseService {
     @NoRepeat
     public Result updateDeliverCallbackInfo(StorageInterfaceRequest storageInterfaceRequest) {
         Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
-        long orderId = NumberUtils.toLong(ObjectUtils.toString(platrequest.get("order_id")));
+        int orderId = NumberUtils.toInt(ObjectUtils.toString(platrequest.get("order_id")));
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getStatus() != 3) return new Result(Result.ERROR, "订单状态异常");
@@ -213,7 +213,7 @@ public class OrderService extends BaseService {
      * 更新订单为待签收
      * @param orderId
      */
-    public Result updateDqx(Long orderId) {
+    public Result updateDqx(Integer orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         order.setStatus(5);
@@ -226,10 +226,10 @@ public class OrderService extends BaseService {
      * @param order
      */
     @NoRepeat
-    public Result payBalance(Order order, Long mealId) {
-        Long addresId = order.getAddressId();
+    public Result payBalance(Order order, Integer mealId) {
+        Integer addresId = order.getAddressId();
         String payMenthod = order.getPayMenthodId();
-        Long orderId = order.getOrderId();
+        Integer orderId = order.getOrderId();
         if(!ArrayUtils.contains(Constants.getKeyObject("PAY_MENTHOD_TYPE"), payMenthod)) return new Result(Result.ERROR, "支付方式不存在");
         Meal meal = new Meal();
         meal.setMid(mealId);
@@ -289,7 +289,7 @@ public class OrderService extends BaseService {
         }
     }
     public Result reFund(Order order, HttpServletRequest request) {
-        Long orderId = order.getOrderId();
+        Integer orderId = order.getOrderId();
         String refunReason = request.getParameter("refunReason");
         if(StringUtils.isBlank(refunReason)) return new Result(Result.ERROR, "退款备注信息不能为空");
         //获取订单信息
@@ -302,7 +302,7 @@ public class OrderService extends BaseService {
         return new Result(Result.OK, "退款成功");
     }
     public Result reFundLive(Order order, HttpServletRequest request) {
-        Long orderId = order.getOrderId();
+        Integer orderId = order.getOrderId();
         String reason ="null";
         Order order1 = orderMapper.selectByPrimaryKey(orderId);
         if(order1 == null) return new Result(Result.ERROR, "订单不存在");
@@ -437,7 +437,7 @@ public class OrderService extends BaseService {
      */
     public Result OrderCallbackStatus(StorageInterfaceRequest storageInterfaceRequest){
         Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
-        long orderId = NumberUtils.toLong(ObjectUtils.toString(platrequest.get("order_id")));
+        int orderId = NumberUtils.toInt(ObjectUtils.toString(platrequest.get("order_id")));
         int cancel_res = NumberUtils.toInt(ObjectUtils.toString(platrequest.get("cancel_res")));
 //        java.lang.System.out.println((platrequest.get("reson")==null)+"     =======================");
 //        java.lang.System.out.println((platrequest.get("reson").equals(null))+"     =======================");

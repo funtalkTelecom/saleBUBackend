@@ -33,7 +33,7 @@ public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
 
     List<Map> findAuctionOrderListByConsumerId(Auction auction);
 
-    List<Map>  findAuctionListByOrderId(@Param("orderId") Long orderId);
+    List<Map>  findAuctionListByOrderId(@Param("orderId") Integer orderId);
 
     Page<Object> queryPageNumList(Num num, @Param("consumerId") Long consumerId, @Param("status") String status);
 

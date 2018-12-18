@@ -9,12 +9,11 @@
     </update>
     <insert id="batchInsertTemp">
         INSERT INTO tb_iccid_temp
-        (id, item_id, iccid, order_id)
+        (item_id, iccid, order_id)
         VALUES
         <foreach collection ="list" item="item" separator =",">
             <foreach collection="item.iccids" item="iccid"  separator =",">
             (
-              '${@com.hrtx.web.pojo.BasePojo@nextId()}',
               #{item.itemId}, #{iccid}, #{orderId})
             </foreach>
         </foreach >

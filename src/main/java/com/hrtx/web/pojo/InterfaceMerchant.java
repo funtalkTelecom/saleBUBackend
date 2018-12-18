@@ -14,7 +14,7 @@ public class InterfaceMerchant {
 
     private String ip;
 
-    private Long corpId;
+    private Integer corpId;
 
     private Integer chanel;
 
@@ -24,7 +24,7 @@ public class InterfaceMerchant {
 
     private String secretKey;
 
-    public InterfaceMerchant(Integer id, String name, String code, String ip, Long corpId, Integer status, String remark, String secretKey) {
+    public InterfaceMerchant(Integer id, String name, String code, String ip, Integer corpId, Integer status, String remark, String secretKey) {
         this.id = id;
         this.name = name;
         this.code = code;
@@ -71,11 +71,11 @@ public class InterfaceMerchant {
         this.ip = ip == null ? null : ip.trim();
     }
 
-    public Long getCorpId() {
+    public Integer getCorpId() {
         return corpId;
     }
 
-    public void setCorpId(Long corpId) {
+    public void setCorpId(Integer corpId) {
         this.corpId = corpId;
     }
 

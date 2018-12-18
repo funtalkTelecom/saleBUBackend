@@ -49,7 +49,7 @@ public class LiangHaoController extends BaseReturn{
     public Result listNumber(NumPrice numPrice){
         numPrice.setPageNum(numPrice.startToPageNum());
         numPrice.setChannel(NumberUtils.toInt(String.valueOf(SystemParam.get("lianghao_channel"))));
-        numPrice.setAgentId(NumberUtils.toLong(String.valueOf(SystemParam.get("lianghao_agent_id"))));
+        numPrice.setAgentId(NumberUtils.toInt(String.valueOf(SystemParam.get("lianghao_agent_id"))));
         PageInfo<Object> objectPageInfo = numService.queryNumPrice(numPrice);
         objectPageInfo =numService.queryFreeze(objectPageInfo);
         return new Result(Result.OK, objectPageInfo);
@@ -83,10 +83,10 @@ public class LiangHaoController extends BaseReturn{
         String id = request.getParameter("id");
         if(!LockUtils.tryLock("kfadd"+id)) return new Result(Result.ERROR, "此号码下单中，请稍后再试!");
         try {
-            NumPrice numPrice = numService.getNumPrice(NumberUtils.toLong(id));
+            NumPrice numPrice = numService.getNumPrice(NumberUtils.toInt(id));
             if(numPrice == null) return new Result(Result.ERROR, "未找到号码");
             //判断是否冻结
-            Long fuser = numService.queryFreeze(numPrice.getNumId());
+            Integer fuser = numService.queryFreeze(numPrice.getNumId());
             if(fuser != null && !fuser.equals(SessionUtil.getUserId())) return new Result(Result.ERROR, "此号码已冻结不可下单");
 
             Map<String, String> param = new HashMap<>();

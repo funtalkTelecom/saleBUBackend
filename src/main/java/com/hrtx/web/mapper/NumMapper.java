@@ -36,7 +36,7 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
      * 批量更新为待配卡状态
      * @param nums
      */
-    int batchUpdateDpk(@Param("buyerId") Long buyerId, @Param("buyer") String buyer, @Param("list") List<Map> nums);
+    int batchUpdateDpk(@Param("buyerId") Integer buyerId, @Param("buyer") String buyer, @Param("list") List<Map> nums);
 
     /*
      5,6,7,9已绑定

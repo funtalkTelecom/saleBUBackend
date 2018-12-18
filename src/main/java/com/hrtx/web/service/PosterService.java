@@ -35,7 +35,7 @@ public class PosterService {
 		return new Result(Result.OK, pm);
 	}
 
-	public Poster findPosterById(Long id) {
+	public Poster findPosterById(Integer id) {
 		Poster poster = posterMapper.findPosterInfo(id);
 		return poster;
 	}
@@ -57,10 +57,7 @@ public class PosterService {
 		if (poster.getId() != null && poster.getId() > 0) {
 				posterMapper.posterEdit(poster);
 		} else {
-			List<Poster> list = new ArrayList<Poster>();
-			poster.setId(poster.getGeneralId());
-			list.add(poster);
-			posterMapper.insertBatch(list);
+			posterMapper.insert(poster);
 		}
 		return new Result(Result.OK, "提交成功");
 	}

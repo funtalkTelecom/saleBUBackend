@@ -41,8 +41,8 @@ public class BoundController extends BaseReturn{
 	@ResponseBody
 	public void  boundNumIccid(Num num, HttpServletRequest request) {
 	    Boolean isEdit=true;
-		Long numId=0L;//Id  号码记录
-        Long numBuyerId=0L;//buyer_id 用户Id  号码记录
+		Integer numId=0;//Id  号码记录
+        Integer numBuyerId=0;//buyer_id 用户Id  号码记录
         String numSectionNo="";//号段 号码记录
         int numStatus=0;//状态 号码记录
 		String iccids="";//iccid  iccid记录 iccid
@@ -50,9 +50,9 @@ public class BoundController extends BaseReturn{
         String iccidSectionNo="";//号段  iccid记录
         Long iccidConsumerId=0L;//用户Id  iccid记录
         String iccidStatus="";//状态 iccid记录
-		Long mealMid=0L;//mdelMid 套餐记录
+        Integer mealMid=0;//mdelMid 套餐记录
         int orderStatus=0;//订单状态
-        Long orderId=0L;//订单Id
+        Integer orderId=0;//订单Id
         Order order=new Order();//签收订单
 		numId=num.getId();
         iccidStr=num.getIccid();
@@ -62,7 +62,7 @@ public class BoundController extends BaseReturn{
         if(orderList!=null&&orderList.size()>0)
         {
             orderStatus= NumberUtils.toInt(String.valueOf(orderList.get(0).get("orderStatus")),0) ;
-            orderId=NumberUtils.toLong(String.valueOf(orderList.get(0).get("orderId")),0L);
+            orderId=NumberUtils.toInt(String.valueOf(orderList.get(0).get("orderId")),0);
         }else
         {
             returnResult(new Result(Result.ERROR,"号码对应的订单记录为空，请核对！"));
@@ -73,7 +73,7 @@ public class BoundController extends BaseReturn{
         if(number==null) returnResult(new Result(Result.ERROR,"号码记录为空，请核对！"));
         if(iccid==null) returnResult(new Result(Result.ERROR,"你所填写的iccid不存在，请重新填写！"));
         if(meal==null) returnResult(new Result(Result.ERROR,"套餐记录为空，请核对！"));
-        numBuyerId=NumberUtils.toLong(String.valueOf(number.getBuyerId()),0L);
+        numBuyerId=NumberUtils.toInt(String.valueOf(number.getBuyerId()));
         if(StringUtils.isNotBlank(number.getSectionNo()))
         {
             numSectionNo=number.getSectionNo();

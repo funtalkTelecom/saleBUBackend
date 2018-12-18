@@ -171,7 +171,7 @@ public class ApiOrderService {
 //		apiSessionUtil.saveOrUpdate(token,u);
 //		Consumer user = apiSessionUtil.getConsumer();
 		//模拟登陆end
-		long agentId;
+		int agentId = 0;
 		log.info("获取用户信息");
 		Consumer user =null;
 		Auction action=null;//type:3 出价记录
@@ -196,9 +196,9 @@ public class ApiOrderService {
 
 			if(_list.size()>0){
 				Map _map = (Map) _list.get(0);
-				agentId =Long.valueOf(String.valueOf(_map.get("id"))) ;
+				agentId =NumberUtils.toInt(String.valueOf(_map.get("id"))) ;
 			}else{
-				agentId = Long.valueOf(SystemParam.get("default_agent"));  //默认代理商id
+				agentId = NumberUtils.toInt(SystemParam.get("default_agent"));  //默认代理商id
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -266,7 +266,7 @@ public class ApiOrderService {
 						orderItem.setSellerId(Integer.parseInt(String.valueOf( sku.get("gSellerId"))));
 						orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
 						orderItem.setShipmentApi("egt");
-						orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+						orderItem.setCompanystockId(NumberUtils.toInt(String.valueOf( sku.get("skuRepoGoods"))));
 						orderItem.setQuantity(numcount);
 						double twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
 						orderItem.setPrice(twobPrice);
@@ -307,7 +307,7 @@ public class ApiOrderService {
 								orderItem.setSellerId(Integer.parseInt(String.valueOf( sku.get("gSellerId"))));
 								orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
 								orderItem.setShipmentApi("egt");
-								orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+								orderItem.setCompanystockId(NumberUtils.toInt(String.valueOf( sku.get("skuRepoGoods"))));
 								orderItem.setQuantity(1);
 								twobPrice = Double.parseDouble(String.valueOf(sku.get("skuTobPrice")));
 								orderItem.setPrice(0);
@@ -383,7 +383,7 @@ public class ApiOrderService {
 					//获取号码
 //					number = numberMapper.getNumInfoById(numid);
 					NumPrice numPrice = new NumPrice();
-					numPrice.setNumId(NumberUtils.toLong(numid));
+					numPrice.setNumId(NumberUtils.toInt(numid));
 					numPrice.setChannel(Integer.parseInt(channel));
 					numPrice.setAgentId(agentId);
 					List nps = numPriceMapper.queryList(numPrice);//numPriceMapper.queryPageList(numPrice);
@@ -450,11 +450,11 @@ public class ApiOrderService {
 							orderItem.setSellerId(Integer.parseInt(String.valueOf( sku.get("gSellerId"))));
 							orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
 							orderItem.setShipmentApi("egt");
-							orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+							orderItem.setCompanystockId(NumberUtils.toInt(String.valueOf( sku.get("skuRepoGoods"))));
 							orderItem.setQuantity(num);
 							orderItem.setPrice(twobPrice);
 							orderItem.setTotal(twobPrice * num);
-							if(!StringUtils.isBlank(mealid)) orderItem.setMealId(Long.parseLong(mealid));
+							if(!StringUtils.isBlank(mealid)) orderItem.setMealId(NumberUtils.toInt(mealid));
 							sub_total += orderItem.getTotal();
 
 							pOrderItem = orderItem;
@@ -477,13 +477,13 @@ public class ApiOrderService {
 						orderItem.setSellerId(Integer.parseInt(String.valueOf( sku.get("gSellerId"))));
 						orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
 						orderItem.setShipmentApi("egt");
-						orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+						orderItem.setCompanystockId(NumberUtils.toInt(String.valueOf( sku.get("skuRepoGoods"))));
 						num = 1;
 						orderItem.setQuantity(num);
 						twobPrice = Double.parseDouble(String.valueOf( numberPrice.get("price")));
 						orderItem.setPrice(twobPrice);
 						orderItem.setTotal(twobPrice * num);
-						if(!StringUtils.isBlank(mealid)) orderItem.setMealId(Long.parseLong(mealid));
+						if(!StringUtils.isBlank(mealid)) orderItem.setMealId(NumberUtils.toInt(mealid));
 						sub_total += orderItem.getTotal();
 
 						orderItems.add(orderItem);
@@ -830,7 +830,7 @@ public class ApiOrderService {
 	public Result getOrderAndItemsByOrderId(HttpServletRequest request, String id) {
 		Map o = new HashMap();
 		try{
-			Order order = orderMapper.findOrderInfo(Long.parseLong(id));
+			Order order = orderMapper.findOrderInfo(NumberUtils.toInt(id));
 			OrderItem orderItem = new OrderItem();
 			orderItem.setOrderId(Integer.valueOf(id));
 			List list = orderItemMapper.queryPageListDetailForConsumer(orderItem);
@@ -910,7 +910,7 @@ public class ApiOrderService {
 
 
 	public Result CancelOrder(String orderIds,String reason){
-		Long orderId =Long.parseLong(orderIds);
+		int orderId =NumberUtils.toInt(orderIds);
 		Order order = orderMapper.findOrderInfo(orderId);
 		if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
 			log.info("更新订单状态为7:已取消");
@@ -989,12 +989,12 @@ public class ApiOrderService {
 	 * @param reason
 	 * @return
 	 */
-	public Result CancelOrderStatus(Long orderId,int status,String  reason){
+	public Result CancelOrderStatus(Integer orderId,int status,String  reason){
 		orderMapper.CancelOrderStatus(orderId,status,reason);
 		return new Result(Result.OK, "更新订单状态成功");
 	}
 
-	public Result orderType(Long orderId){
+	public Result orderType(Integer orderId){
 		Order order = orderMapper.findOrderInfo(orderId);
 		if(order.getOrderType()==1 && order.getSkuGoodsType().equals("1")){
 			//白卡
@@ -1020,7 +1020,7 @@ public class ApiOrderService {
 		return new Result(Result.OK, "更新订单状态成功");
 	}
 	//isShipment==1 白卡，2 其他
-	public Result updateGoogsT(Long orderId ,int isShipment){
+	public Result updateGoogsT(Integer orderId ,int isShipment){
 		List itemList = orderMapper.getOrderItmeCount(orderId,isShipment);
 		for(int i = 0; i < itemList.size(); i++){
 			Map cmap = (Map) itemList.get(i);
@@ -1192,7 +1192,7 @@ public class ApiOrderService {
 				orderItem.setSellerId(Integer.parseInt(String.valueOf( sku.get("gSellerId"))));
 				orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
 				orderItem.setShipmentApi("egt");
-				orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+				orderItem.setCompanystockId(NumberUtils.toInt(String.valueOf( sku.get("skuRepoGoods"))));
 				num = 1;
 				orderItem.setQuantity(num);
 				twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
@@ -1218,7 +1218,7 @@ public class ApiOrderService {
 				orderItem.setSellerId(Integer.parseInt(String.valueOf( sku.get("gSellerId"))));
 				orderItem.setSellerName(String.valueOf( sku.get("gSellerName")));
 				orderItem.setShipmentApi("egt");
-				orderItem.setCompanystockId(Long.parseLong(String.valueOf( sku.get("skuRepoGoods"))));
+				orderItem.setCompanystockId(NumberUtils.toInt(String.valueOf( sku.get("skuRepoGoods"))));
 				num = 1;
 				orderItem.setQuantity(num);
 				twobPrice = price;

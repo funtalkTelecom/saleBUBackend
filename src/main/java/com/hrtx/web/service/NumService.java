@@ -1,21 +1,15 @@
 package com.hrtx.web.service;
 
 import com.github.abel533.entity.Example;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
 import com.hrtx.global.EgtPage;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
-import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
-import com.hrtx.web.pojo.Number;
 import net.sf.json.JSONObject;
-import org.apache.commons.beanutils.BeanMap;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -24,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -204,7 +197,7 @@ public class NumService {
         }
     }
 
-    public NumPrice getNumPrice(Long id) {
+    public NumPrice getNumPrice(Integer id) {
         return numPriceMapper.selectByPrimaryKey(id);
     }
 

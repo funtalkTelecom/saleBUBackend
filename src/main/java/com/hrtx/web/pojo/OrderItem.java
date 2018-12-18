@@ -26,17 +26,17 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
     private Integer sellerId;
     private String sellerName;
     private String shipmentApi;
-    private Long companystockId;
+    private Integer companystockId;
     private int quantity;
     private double price;
     private double total;
-    private Long mealId;
+    private Integer mealId;
     private String iccid;
 
     public OrderItem() {
     }
 
-    public OrderItem(Integer itemId, Integer pItemId, Integer orderId, Integer goodsId, Integer skuId, String skuProperty, Integer numId, String num, int isShipment, Integer sellerId, String sellerName, String shipmentApi, Long companystockId, int quantity, double price, double total, Long mealId, String iccid) {
+    public OrderItem(Integer itemId, Integer pItemId, Integer orderId, Integer goodsId, Integer skuId, String skuProperty, Integer numId, String num, int isShipment, Integer sellerId, String sellerName, String shipmentApi, Integer companystockId, int quantity, double price, double total, Integer mealId, String iccid) {
         this.itemId = itemId;
         this.pItemId = pItemId;
         this.orderId = orderId;
@@ -153,11 +153,11 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
         this.shipmentApi = shipmentApi;
     }
 
-    public Long getCompanystockId() {
+    public Integer getCompanystockId() {
         return companystockId;
     }
 
-    public void setCompanystockId(Long companystockId) {
+    public void setCompanystockId(Integer companystockId) {
         this.companystockId = companystockId;
     }
 
@@ -185,11 +185,11 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
         this.total = total;
     }
 
-    public Long getMealId() {
+    public Integer getMealId() {
         return mealId;
     }
 
-    public void setMealId(Long mealId) {
+    public void setMealId(Integer mealId) {
         this.mealId = mealId;
     }
 

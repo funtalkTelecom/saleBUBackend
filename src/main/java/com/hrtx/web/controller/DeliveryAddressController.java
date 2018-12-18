@@ -9,6 +9,7 @@ import com.hrtx.web.pojo.DeliveryAddress;
 import com.hrtx.web.service.AccountService;
 import com.hrtx.web.service.CityService;
 import com.hrtx.web.service.DeliveryAddressService;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class DeliveryAddressController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result DeliveryAddressDefault(){
-		Long cunsumerId=0L;
+		Integer cunsumerId=0;
 		cunsumerId=this.apiSessionUtil.getConsumer().getId();
 		return deliveryAddressService.findDeliveryAddressDefault(cunsumerId);
 	}
@@ -70,7 +71,7 @@ public class DeliveryAddressController extends BaseReturn{
 		Map<String, Object> map = new HashMap<String, Object>();
 		//Object list=cityService.queryByPidList(0);
 /*		deliveryAddress.setId(new Long(5000));*/
-		List<Map> list=deliveryAddressService.findDeliveryAddressById(Long.valueOf(id));
+		List<Map> list=deliveryAddressService.findDeliveryAddressById(NumberUtils.toInt(id));
 		map.put("code", Result.OK);
 		map.put("data", list);
 		request.setAttribute("bean", list);
@@ -89,14 +90,14 @@ public class DeliveryAddressController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public void deliveryAddressDefault(DeliveryAddress deliveryAddress, HttpServletRequest request,@PathVariable("id") String id) {
-		deliveryAddress.setId(Long.valueOf(id));
+		deliveryAddress.setId(NumberUtils.toInt(id));
 		returnResult(deliveryAddressService.deliveryAddressDefault(deliveryAddress, request));
 	}
 
 	@DeleteMapping("/api/deliveryAddress/{id}")
 	@Powers({PowerConsts.NOPOWER})
 	public void deliveryAddressDelete(DeliveryAddress deliveryAddress, HttpServletRequest request,@PathVariable("id") String id){
-		deliveryAddress.setId(Long.valueOf(id));
+		deliveryAddress.setId(NumberUtils.toInt(id));
 		returnResult(deliveryAddressService.deliveryAddressDelete(deliveryAddress));
 	}
 

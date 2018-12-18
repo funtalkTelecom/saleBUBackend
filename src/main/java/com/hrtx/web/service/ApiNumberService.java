@@ -13,6 +13,7 @@ import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.NumPrice;
 import com.hrtx.web.pojo.Number;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +55,12 @@ public class ApiNumberService {
 		tags = "'"+ tags.replaceAll(",", "','") +"'";
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		List _list = agentMapper.findConsumenrIdCount(consumer.getId());
-		long agentId;
+		int agentId;
 		if(_list.size()>0){
 			Map _map = (Map) _list.get(0);
-			agentId =Long.valueOf(String.valueOf(_map.get("id"))) ;
+			agentId =NumberUtils.toInt(String.valueOf(_map.get("id"))) ;
 		}else{
-			agentId = Long.valueOf(SystemParam.get("default_agent"));  //默认代理商id
+			agentId = NumberUtils.toInt(SystemParam.get("default_agent"));  //默认代理商id
 		}
 		numPrice.setAgentId(agentId);
 		numPrice.setChannel(3);
@@ -173,7 +174,7 @@ public class ApiNumberService {
 	public Result numberInfo(String id, HttpServletRequest request){
 		PageInfo<Object> pm = null;
 		NumPrice numPrice = new NumPrice();
-		Long unmId = Long.valueOf(id);
+		int unmId = NumberUtils.toInt(id);
 		numPrice.setNumId(unmId);
 		numPrice.setChannel(3);
 		pm = numService.queryNumPrice(numPrice);
@@ -234,12 +235,12 @@ public class ApiNumberService {
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		long consumerId = consumer.getId();
 		List _list = agentMapper.findConsumenrIdCount(consumer.getId());
-		long agentId;
+		int agentId;
 		if(_list.size()>0){
 			Map _map = (Map) _list.get(0);
-			agentId =Long.valueOf(String.valueOf(_map.get("id"))) ;
+			agentId =NumberUtils.toInt(String.valueOf(_map.get("id"))) ;
 		}else{
-			agentId = Long.valueOf(SystemParam.get("default_agent"));  //默认代理商id
+			agentId = NumberUtils.toInt((String.valueOf(SystemParam.get("default_agent"))));  //默认代理商id
 		}
 		numPrice.setAgentId(agentId);
 		numPrice.setResource(num);

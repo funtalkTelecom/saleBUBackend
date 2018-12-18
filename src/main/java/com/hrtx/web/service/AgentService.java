@@ -116,10 +116,10 @@ public class AgentService {
 
 		return new Result(Result.OK, "绑定成功");
 	}
-	public List<Map> findAgentListByaddConsumerId(Long ConsumerId) {
+	public List<Map> findAgentListByaddConsumerId(Integer ConsumerId) {
 		return this.agentMapper.findAgentListByConsumerId( ConsumerId);
 	}
-	public List<Map> findIsLyByConsumerId(Long ConsumerId) {
+	public List<Map> findIsLyByConsumerId(Integer ConsumerId) {
 		return this.agentMapper.findIsLyByConsumerId( ConsumerId);
 	}
 

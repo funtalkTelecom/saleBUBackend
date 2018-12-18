@@ -85,7 +85,7 @@
         ) values
         <foreach collection="mealList" item="meal" separator=",">
             (
-                #{meal.mid},
+                `nextval`('hk'),
                 #{meal.mealId},
                 #{meal.mealName},
                 #{meal.mealDesc},
