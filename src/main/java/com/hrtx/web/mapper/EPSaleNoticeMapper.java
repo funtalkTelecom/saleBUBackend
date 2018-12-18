@@ -18,7 +18,7 @@ public interface EPSaleNoticeMapper extends Mapper<EPSaleNotice>,BaseMapper<EPSa
 
     List<Map> findEPSaleNoticeListByEPSaleIdAndConsumerId2(@Param("epSaleId") Integer epSaleId, @Param("consumerId") Integer consumerId);
 
-    List<Map> findEPSaleNoticeListByGIdAndConsumerId(@Param("gId") Long gId , @Param("consumerId") Long consumerId);
+    List<Map> findEPSaleNoticeListByGIdAndConsumerId(@Param("gId") Integer gId , @Param("consumerId") Integer consumerId);
 
     void ePSaleNoticeEdit(EPSaleNotice ePSaleNotice);
 

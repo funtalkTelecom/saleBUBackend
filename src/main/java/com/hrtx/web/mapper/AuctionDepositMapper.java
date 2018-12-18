@@ -10,9 +10,9 @@ import java.util.Map;
 
 public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<AuctionDeposit>{
 
-    List<Map> findAuctionDepositSumEPSaleGoodsByNumId(@Param("numId") Long numId);
+    List<Map> findAuctionDepositSumEPSaleGoodsByNumId(@Param("numId") Integer numId);
 
-    List<Map> findAuctionDepositListByNumId(@Param("numId") Long numId);
+    List<Map> findAuctionDepositListByNumId(@Param("numId") Integer numId);
 
     List<Map> findAuctionDepositById(@Param("Id") Integer Id);
 
@@ -24,7 +24,7 @@ public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<
 
     List<Map> findAuctionDepositListByConsumerId(@Param("consumerId") Integer consumerId);
 
-    Page<Object> queryPageDepositListByConsumerId(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Long consumerId);
+    Page<Object> queryPageDepositListByConsumerId(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Integer consumerId);
 
     Page<Object> queryPageDepositListByConsumerId2(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Integer consumerId);
     /*

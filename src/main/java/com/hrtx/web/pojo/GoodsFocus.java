@@ -5,15 +5,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Date;
 
 @Table(name = "tb_goods_focus")
 public class GoodsFocus extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
     private Integer id;
     @JsonSerialize(using = ToStringSerializer.class)
@@ -52,8 +51,6 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
         this.price = price;
         this.addDate = addDate;
         this.updateDate=updateDate;
-        this.consumerId = consumerId;
-        this.addIp = addIp;
         this.consumerId = consumerId;
         this.addIp = addIp;
         this.remark = remark;

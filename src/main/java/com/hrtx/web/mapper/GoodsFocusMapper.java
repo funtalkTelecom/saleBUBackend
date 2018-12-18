@@ -9,15 +9,15 @@ import java.util.Map;
 
 public interface GoodsFocusMapper extends Mapper<GoodsFocus>,BaseMapper<GoodsFocus>{
 
-    List<Map> findGoodsFocusListBydConsumerId(@Param("consumerId") Long consumerId);
+    List<Map> findGoodsFocusListBydConsumerId(@Param("consumerId") Integer consumerId);
 
-    List<Map> finGoodsFocusListByGIdAndNumIdAndConsumerId(@Param("gId") Long gId,@Param("numId") Long numId,@Param("consumerId") Long consumerId);
+    List<Map> finGoodsFocusListByGIdAndNumIdAndConsumerId(@Param("gId") Integer gId,@Param("numId") Integer numId,@Param("consumerId") Integer consumerId);
 
-    List<Map> finGoodsFocusListByGIdAndConsumerId(@Param("gId") Long gId,@Param("consumerId") Long consumerId);
+    List<Map> finGoodsFocusListByGIdAndConsumerId(@Param("gId") Integer gId,@Param("consumerId") Integer consumerId);
 
-    List<Map> findGoodsFocusListByConsumerId2(@Param("consumerId") Long consumerId);
+    List<Map> findGoodsFocusListByConsumerId2(@Param("consumerId") Integer consumerId);
 
-    List<Map> findGoodsFocusListByConsumerId3(@Param("consumerId") Long consumerId);
+    List<Map> findGoodsFocusListByConsumerId3(@Param("consumerId") Integer consumerId);
 
     void goodsFocusEdit(GoodsFocus goodsFocus);
 

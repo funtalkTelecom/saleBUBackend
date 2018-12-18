@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -13,8 +15,9 @@ import java.util.Date;
 public class EPSale extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
     private String  title ;//标题
     private String  epRule ;//竞拍规则
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
@@ -33,7 +36,7 @@ public class EPSale extends BasePojo implements java.io.Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date  updateDate;//修改日期
-    private Long  addUserId;//添加人ID
+    private Integer  addUserId;//添加人ID
     private int  isDel;//是否删除
     private String  note;//备注
 
@@ -42,8 +45,8 @@ public class EPSale extends BasePojo implements java.io.Serializable {
     public EPSale() {
 	}
 
-    public EPSale(Long id, String title, String epRule, Date startTime, Date endTime, Date lastPayTime, Date createDate, Date updateDate
-            , Long addUserId , int isDel , int isDefaultl, String note) {
+    public EPSale(Integer id, String title, String epRule, Date startTime, Date endTime, Date lastPayTime, Date createDate, Date updateDate
+            , Integer addUserId , int isDel , int isDefaultl, String note) {
         this.id = id;
         this.title = title;
         this.epRule = epRule;
@@ -57,11 +60,11 @@ public class EPSale extends BasePojo implements java.io.Serializable {
         this.note = note;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -127,11 +130,11 @@ public class EPSale extends BasePojo implements java.io.Serializable {
         this.updateDate = updateDate;
     }
 
-    public Long getAddUserId() {
+    public Integer getAddUserId() {
         return addUserId;
     }
 
-    public void setAddUserId(Long addUserId) {
+    public void setAddUserId(Integer addUserId) {
         this.addUserId = addUserId;
     }
 
