@@ -30,7 +30,7 @@ public class SystemService {
 		return new Result(Result.OK, pm);
 	}
 
-	public System findSystemById(Long id) {
+	public System findSystemById(Integer id) {
 		System system = systemMapper.findSystemInfo(id);
 		return system;
 	}

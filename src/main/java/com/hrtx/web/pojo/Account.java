@@ -19,7 +19,7 @@ public class Account extends BasePojo implements java.io.Serializable {
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Integer id;
 	private String bankAccount;
-	private Long cardBank;
+	private Integer cardBank;
 	private String cardBankName;
 	private String subbranchBank;
 	private String cardAccount;
@@ -31,7 +31,7 @@ public class Account extends BasePojo implements java.io.Serializable {
 	public Account() {
 	}
 
-	public Account(Integer id, String bankAccount, Long cardBank,String cardBankName, String subbranchBank, String cardAccount, Integer addUserId, Date addDate, Integer isDel) {
+	public Account(Integer id, String bankAccount, Integer cardBank,String cardBankName, String subbranchBank, String cardAccount, Integer addUserId, Date addDate, Integer isDel) {
 		this.id = id;
 		this.bankAccount = bankAccount;
 		this.cardBank = cardBank;
@@ -59,11 +59,11 @@ public class Account extends BasePojo implements java.io.Serializable {
 		this.bankAccount = bankAccount;
 	}
 
-	public Long getCardBank() {
+	public Integer getCardBank() {
 		return cardBank;
 	}
 
-	public void setCardBank(Long cardBank) {
+	public void setCardBank(Integer cardBank) {
 		this.cardBank = cardBank;
 	}
 

@@ -38,11 +38,11 @@ public class AuctionDepositService {
 	@Autowired private EPSaleNoticeMapper ePSaleNoticeMapper;
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
-	public List<Map> findAuctionDepositSumEPSaleGoodsByNumId(Long numId) {
+	public List<Map> findAuctionDepositSumEPSaleGoodsByNumId(Integer numId) {
 		return auctionDepositMapper.findAuctionDepositSumEPSaleGoodsByNumId(numId);
 	}
 
-	public List<Map> findAuctionDepositListByNumId(Long numId) {
+	public List<Map> findAuctionDepositListByNumId(Integer numId) {
 		return auctionDepositMapper.findAuctionDepositListByNumId(numId);
 	}
 

@@ -172,7 +172,7 @@ public class PermissionService {
 	}
 
 	public Result updatePermission(PermissionAllocateForm permissionAllocateForm) {
-		long roleId = permissionAllocateForm.getRoleId();
+		int roleId = permissionAllocateForm.getRoleId();
 		int property = permissionAllocateForm.getProperty();
 		if(roleId == 0l || (property != 1 && property != 2)) throw new ServiceException("参数异常");
 		if(property == 1){
@@ -183,7 +183,7 @@ public class PermissionService {
 				for(String id : ids) {
 					RolePermission rp = new RolePermission();
 					rp.setRoleId(roleId);
-					rp.setPermission(Long.valueOf(id));
+					rp.setPermission(NumberUtils.toInt(id));
 					permissionMapper.addRolePermission(rp);
 				}
 			}
@@ -195,7 +195,7 @@ public class PermissionService {
 				for(String id : ids) {
 					UserPermission up = new UserPermission();
 					up.setUserId(roleId);
-					up.setPermission(Long.valueOf(id));
+					up.setPermission(NumberUtils.toInt(id));
 					permissionMapper.addUserPermission(up);
 				}
 			}

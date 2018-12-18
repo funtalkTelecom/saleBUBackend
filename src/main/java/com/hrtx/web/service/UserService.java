@@ -143,17 +143,17 @@ public class UserService extends BaseService {
 //		u.setCompanyId();
 		
 		//加载权限和菜单
-		Map<Long, Object> permissionMap = new HashMap<Long, Object>();
-		Map<Long, List<Menu>> childMends = new HashMap<Long, List<Menu>>();
+		Map<Integer, Object> permissionMap = new HashMap<Integer, Object>();
+		Map<Integer, List<Menu>> childMends = new HashMap<Integer, List<Menu>>();
 		
 		List<Menu> mainMenus = new ArrayList<Menu>();
 		for (Map map : powers) {
-			long permission = NumberUtils.toLong(ObjectUtils.toString(map.get("id")));
+			int permission = NumberUtils.toInt(ObjectUtils.toString(map.get("id")));
 			permissionMap.put(permission, null);
 			int grade = NumberUtils.toInt(ObjectUtils.toString(map.get("grade")));
-			long pid = NumberUtils.toLong(ObjectUtils.toString(map.get("pid")));
+			int pid = NumberUtils.toInt(ObjectUtils.toString(map.get("pid")));
 			if(grade == 1 || grade == 2){
-				Menu m = new Menu(ObjectUtils.toString(map.get("name")), ObjectUtils.toString(map.get("url")), NumberUtils.toLong(ObjectUtils.toString(map.get("id"))), pid, grade);
+				Menu m = new Menu(ObjectUtils.toString(map.get("name")), ObjectUtils.toString(map.get("url")), NumberUtils.toInt(ObjectUtils.toString(map.get("id"))), pid, grade);
 				if(grade == 1) {
 					mainMenus.add(m);
 				}else{

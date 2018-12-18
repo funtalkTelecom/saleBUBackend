@@ -12,30 +12,30 @@ public class PermissionAllocateForm {
 	
 	private int limit;
 	
-	private long nodeId;
+	private int nodeId;
 	
 	private String nodeText;
 	private String remark;
 	private String nodeValue;
 	
-	private long roleId;
+	private int roleId;
 	
 	private String permissionIds;// 权限id串已（，）隔开
 	
 	private String loginName;
 	private String userName;
-	private long corpId;
+	private int corpId;
 	private String pwd;
 	private String passpwd;
 	private String phone;
-	private long id;
+	private int id;
 	private int property;
 	
     private File file;
     private String fileFileName;
     private String time;
-    private long city;
-	private long district;
+    private int city;
+	private int district;
 	
 	
 	private String firstName;
@@ -60,10 +60,10 @@ public class PermissionAllocateForm {
 	public void setLimit(int limit) {
 		this.limit = limit;
 	}
-	public long getNodeId() {
+	public int getNodeId() {
 		return nodeId;
 	}
-	public void setNodeId(long nodeId) {
+	public void setNodeId(int nodeId) {
 		this.nodeId = nodeId;
 	}
 	public String getNodeText() {
@@ -84,10 +84,10 @@ public class PermissionAllocateForm {
 	public void setNodeValue(String nodeValue) {
 		this.nodeValue = nodeValue;
 	}
-	public long getRoleId() {
+	public int getRoleId() {
 		return roleId;
 	}
-	public void setRoleId(long roleId) {
+	public void setRoleId(int roleId) {
 		this.roleId = roleId;
 	}
 	public String getPermissionIds() {
@@ -108,10 +108,10 @@ public class PermissionAllocateForm {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	public long getCorpId() {
+	public int getCorpId() {
 		return corpId;
 	}
-	public void setCorpId(long corpId) {
+	public void setCorpId(int corpId) {
 		this.corpId = corpId;
 	}
 	public String getPwd() {
@@ -132,10 +132,10 @@ public class PermissionAllocateForm {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	public long getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public int getProperty() {
@@ -162,16 +162,16 @@ public class PermissionAllocateForm {
 	public void setTime(String time) {
 		this.time = time;
 	}
-	public long getCity() {
+	public int getCity() {
 		return city;
 	}
-	public void setCity(long city) {
+	public void setCity(int city) {
 		this.city = city;
 	}
-	public long getDistrict() {
+	public int getDistrict() {
 		return district;
 	}
-	public void setDistrict(long district) {
+	public void setDistrict(int district) {
 		this.district = district;
 	}
 	public String getFirstName() {

@@ -14,20 +14,20 @@ public class Corporation extends BasePojo implements java.io.Serializable{
     private String name;
     private String principal;
     private String phone;
-    private Long district;
+    private Integer district;
     private String address;
     private String remark;
     private Byte status;
     private Date addDate;
     private String addUser;
     private boolean isDel;
-    private Long storageId;
-    private Long companyId;
+    private Integer storageId;
+    private Integer companyId;
 
     public Corporation() {
     }
 
-    public Corporation(Integer id, String name, String principal, String phone, Long district, String address, String remark, Byte status, Date addDate, String addUser, Boolean isDel) {
+    public Corporation(Integer id, String name, String principal, String phone, Integer district, String address, String remark, Byte status, Date addDate, String addUser, Boolean isDel) {
         this.id = id;
         this.name = name;
         this.principal = principal;
@@ -73,11 +73,11 @@ public class Corporation extends BasePojo implements java.io.Serializable{
         this.phone = phone;
     }
 
-    public Long getDistrict() {
+    public Integer getDistrict() {
         return district;
     }
 
-    public void setDistrict(Long district) {
+    public void setDistrict(Integer district) {
         this.district = district;
     }
 
@@ -129,19 +129,19 @@ public class Corporation extends BasePojo implements java.io.Serializable{
         isDel = del;
     }
 
-    public Long getStorageId() {
+    public Integer getStorageId() {
         return storageId;
     }
 
-    public void setStorageId(Long storageId) {
+    public void setStorageId(Integer storageId) {
         this.storageId = storageId;
     }
 
-    public Long getCompanyId() {
+    public Integer getCompanyId() {
         return companyId;
     }
 
-    public void setCompanyId(Long companyId) {
+    public void setCompanyId(Integer companyId) {
         this.companyId = companyId;
     }
 }

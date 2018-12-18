@@ -15,9 +15,9 @@ public class RolePermission extends BasePojo implements java.io.Serializable {
 
 	// Fields
 	@Id
-	private Long id;
-	private Long roleId;
-	private Long permission;
+	private int id;
+	private int roleId;
+	private int permission;
 
 	// Constructors
 
@@ -26,32 +26,32 @@ public class RolePermission extends BasePojo implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public RolePermission(Long roleId, Long permission) {
+	public RolePermission(int roleId, int permission) {
 		this.roleId = roleId;
 		this.permission = permission;
 	}
 
-	public Long getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public Long getRoleId() {
+	public int getRoleId() {
 		return roleId;
 	}
 
-	public void setRoleId(Long roleId) {
+	public void setRoleId(int roleId) {
 		this.roleId = roleId;
 	}
 
-	public Long getPermission() {
+	public int getPermission() {
 		return permission;
 	}
 
-	public void setPermission(Long permission) {
+	public void setPermission(int permission) {
 		this.permission = permission;
 	}
 

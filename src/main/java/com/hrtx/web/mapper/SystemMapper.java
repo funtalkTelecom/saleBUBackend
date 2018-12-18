@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface SystemMapper extends Mapper<System>,BaseMapper<System>{
-    System findSystemInfo(@Param("id") Long id);
+    System findSystemInfo(@Param("id") Integer id);
 
     int checkSystemKeyIdIsExist(System system);
 

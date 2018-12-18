@@ -105,6 +105,6 @@ public class DeliveryAddressController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result listDeliveryAddress(Account account, @PathVariable("addUserId") String addUserId){
-		return accountService.findAccountListByUserId(Long.valueOf(addUserId));
+		return accountService.findAccountListByUserId(NumberUtils.toInt(addUserId));
 	}
 }
