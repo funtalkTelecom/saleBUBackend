@@ -13,6 +13,7 @@ import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.TokenGenerator;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.User;
+import com.hrtx.web.service.ApiOrderService;
 import com.hrtx.web.service.ConsumerService;
 import net.sf.json.JSONObject;
 
@@ -57,6 +58,7 @@ public class TestController {
     @Autowired private EventService eventService;
     @Autowired private ApiSessionUtil apiSessionUtil;
     @Autowired private ConsumerService consumerService;
+    @Autowired private ApiOrderService apiOrderService;
 
     @RequestMapping("/")
     @Powers({PowerConsts.NOLOGINPOWER})
@@ -195,7 +197,7 @@ public class TestController {
         Consumer user= this.apiSessionUtil.getConsumer();
         System.out.println("获取用户  "+user);
         user=new Consumer();
-//        user.setId(1009758228466106368l);
+        user.setId(1222);
         user=consumerService.getConsumerById(user);
         String token=TokenGenerator.generateValue();
         this.apiSessionUtil.saveOrUpdate(token,user);
@@ -216,4 +218,20 @@ public class TestController {
 //        return "[]";
     }
 
+    @GetMapping("/api/submit-order")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld12() {
+        Integer sku_id=500;
+        Integer goods_id=498;
+        Integer num_id=11;
+        Integer mead_id=501;
+        Integer address_id=3889;
+        String conment="";
+//        Result result= this.apiOrderService.submitNormalOrder(sku_id,num_id,mead_id,address_id,conment);
+//        System.out.println(result.getData());
+        Result result= this.apiOrderService.submitCustomOrder(num_id,mead_id,"张先生","18965902602","福建福州仓山工农街36-91",conment,"20181218001","LYB8019","张进春","身份证","35222919112341");
+        System.out.println(result.getData());
+        return result;
+    }
 }
