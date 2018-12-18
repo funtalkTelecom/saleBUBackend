@@ -127,7 +127,7 @@ public class GoodsFocusService {
                 goodsFocusStr="取消成功";
             } else {
                 List<GoodsFocus> list = new ArrayList<GoodsFocus>();
-                goodsFocus.setId(goodsFocus.getGeneralId());
+                //goodsFocus.setId(goodsFocus.getGeneralId());
                 goodsFocus.setAddDate(new Date());
                 goodsFocus.setUpdateDate(new Date());
                 goodsFocus.setIsDel(0);//添加收藏 是0

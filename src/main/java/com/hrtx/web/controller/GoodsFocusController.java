@@ -43,10 +43,10 @@ public class GoodsFocusController extends BaseReturn{
 		}
 		if(erIsPack==0)//商品是否打包 erIsPack
 		{
-			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId)));
+			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByNumIdAndGId(Integer.valueOf(numId),Integer.valueOf(gId)));
 		}else if(erIsPack==1)
 		{
-			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByGId(Long.valueOf(gId)));
+			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByGId(Integer.valueOf(gId)));
 		}
 		return new Result(Result.ERROR,"记录为空");
 	}
