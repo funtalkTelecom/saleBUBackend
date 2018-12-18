@@ -3,6 +3,8 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -15,12 +17,13 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
     public static String ORDER_ACT_TYPE_REFUND = "REFUND";
 
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
-    private Long fundOrderId;
+	private Integer id;
+    private Integer fundOrderId;
     private String serial;
     private String reqIp;
-    private Long reqUser;
+    private Integer reqUser;
     private Date addDate;
     private String actType;
     private Integer status;
@@ -30,8 +33,7 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
     public FundDetail() {
 	}
 
-    public FundDetail(Long id, Long fundOrderId, String serial, String reqIp, Long reqUser, Date addDate, String actType, Integer status) {
-        this.id = id;
+    public FundDetail(Integer fundOrderId, String serial, String reqIp, Integer reqUser, Date addDate, String actType, Integer status) {
         this.fundOrderId = fundOrderId;
         this.serial = serial;
         this.reqIp = reqIp;
@@ -41,19 +43,19 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
         this.status = status;
     }
 
-    public Long getId() {
+    public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-    public Long getFundOrderId() {
+    public Integer getFundOrderId() {
         return fundOrderId;
     }
 
-    public void setFundOrderId(Long fundOrderId) {
+    public void setFundOrderId(Integer fundOrderId) {
         this.fundOrderId = fundOrderId;
     }
 
@@ -73,11 +75,11 @@ public class FundDetail extends BasePojo implements java.io.Serializable {
         this.reqIp = reqIp;
     }
 
-    public Long getReqUser() {
+    public Integer getReqUser() {
         return reqUser;
     }
 
-    public void setReqUser(Long reqUser) {
+    public void setReqUser(Integer reqUser) {
         this.reqUser = reqUser;
     }
 

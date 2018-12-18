@@ -114,11 +114,11 @@ public class FundOrderService extends BaseService {
             }
             String contractno = "PAY"+Utils.randomNoByDateTime();
             FundOrder fundOrder = new FundOrder(0l, busiType, amt, payee, payer, 1, orderName, contractno, third, amt, remark, sourceId);
-            fundOrder.setId(fundOrder.getGeneralId());
+//            fundOrder.setId(fundOrder.getGeneralId());
             fundOrderMapper.insert(fundOrder);
             Long req_user = apiSessionUtil.getConsumer() == null ? 0l:apiSessionUtil.getConsumer().getId();
             FundDetail fundDetail = new FundDetail(0l, fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_ADD, 1);
-            fundDetail.setId(fundDetail.getGeneralId());
+//            fundDetail.setId(fundDetail.getGeneralId());
             fundDetailMapper.insert(fundDetail);
 
             String notify_url = SystemParam.get("domain-full")+"/api/pingan-pay-result";
@@ -323,7 +323,7 @@ public class FundOrderService extends BaseService {
             Long req_user = apiSessionUtil.getConsumer() == null ? 0l:apiSessionUtil.getConsumer().getId();
             String contractno = "REFUND"+Utils.randomNoByDateTime();
             FundDetail fundDetail = new FundDetail(0l, fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_REFUND, 1);
-            fundDetail.setId(fundDetail.getGeneralId());
+//            fundDetail.setId(fundDetail.getGeneralId());
             fundDetailMapper.insert(fundDetail);
             Result result = null;
             try {

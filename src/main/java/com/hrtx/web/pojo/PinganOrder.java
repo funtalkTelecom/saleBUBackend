@@ -11,7 +11,7 @@ public class PinganOrder extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
 	private String open_id;
 	private String timestamp;
 	private String req_sign;

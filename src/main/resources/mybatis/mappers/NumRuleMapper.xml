@@ -2,11 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hrtx.web.mapper.NumRuleMapper">
     <insert id="batchInsert">
-        INSERT INTO `tb_num_rule`(`id`, `rule_type`, `num_id`, `num`, `value`)
+        INSERT INTO `tb_num_rule`(`rule_type`, `num_id`, `num`, `value`)
         VALUES
         <foreach collection ="list" item="item" separator =",">
             (
-            '${@com.hrtx.web.pojo.BasePojo@nextId()}',
             #{item.ruleType}, #{item.numId}, #{item.num}, #{item.value}
             )
         </foreach >
