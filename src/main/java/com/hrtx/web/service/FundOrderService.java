@@ -113,12 +113,12 @@ public class FundOrderService extends BaseService {
                 if(fundOrders.size()>0) return new Result(Result.ERROR, "订单已支付");
             }
             String contractno = "PAY"+Utils.randomNoByDateTime();
-            FundOrder fundOrder = new FundOrder(0l, busiType, amt, payee, payer, 1, orderName, contractno, third, amt, remark, sourceId);
-            fundOrder.setId(fundOrder.getGeneralId());
+            FundOrder fundOrder = new FundOrder(busiType, amt, payee, payer, 1, orderName, contractno, third, amt, remark, sourceId);
+//            fundOrder.setId(fundOrder.getGeneralId());
             fundOrderMapper.insert(fundOrder);
-            Long req_user = apiSessionUtil.getConsumer() == null ? 0l:apiSessionUtil.getConsumer().getId();
-            FundDetail fundDetail = new FundDetail(0l, fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_ADD, 1);
-            fundDetail.setId(fundDetail.getGeneralId());
+            Integer req_user = apiSessionUtil.getConsumer() == null ? 0:apiSessionUtil.getConsumer().getId();
+            FundDetail fundDetail = new FundDetail(fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_ADD, 1);
+//            fundDetail.setId(fundDetail.getGeneralId());
             fundDetailMapper.insert(fundDetail);
 
             String notify_url = SystemParam.get("domain-full")+"/api/pingan-pay-result";
@@ -260,7 +260,7 @@ public class FundOrderService extends BaseService {
         if(count != 1) throw new ServiceException("该状态订单不接受回调");
 //        String payTime = params.get("pay_time");
         String busiType = fundOrder.getBusi();
-        Long orderId = NumberUtils.toLong(fundOrder.getSourceId());
+        Integer orderId = NumberUtils.toInt(fundOrder.getSourceId());
         Result result = null;
         if(FundOrder.BUSI_TYPE_PAYORDER.equals(busiType)) {// 订单支付完成回调
             if(status == 3) {//支付成功
@@ -320,10 +320,10 @@ public class FundOrderService extends BaseService {
         String outNo = fundOrder.getContractno();
         if(!LockUtils.tryLock(outNo)) return new Result(Result.ERROR, "退款中，请稍后再试");
         try {
-            Long req_user = apiSessionUtil.getConsumer() == null ? 0l:apiSessionUtil.getConsumer().getId();
+            Integer req_user = apiSessionUtil.getConsumer() == null ? 0:apiSessionUtil.getConsumer().getId();
             String contractno = "REFUND"+Utils.randomNoByDateTime();
-            FundDetail fundDetail = new FundDetail(0l, fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_REFUND, 1);
-            fundDetail.setId(fundDetail.getGeneralId());
+            FundDetail fundDetail = new FundDetail(fundOrder.getId(), contractno, SessionUtil.getUserIp(), req_user, new Date(), FundDetail.ORDER_ACT_TYPE_REFUND, 1);
+//            fundDetail.setId(fundDetail.getGeneralId());
             fundDetailMapper.insert(fundDetail);
             Result result = null;
             try {

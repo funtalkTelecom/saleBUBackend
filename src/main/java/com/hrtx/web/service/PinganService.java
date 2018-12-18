@@ -255,7 +255,6 @@ public class PinganService {
 		log.info(String.format("实例化[%s]对象",bean_name.getName()));
 		try {
 			bean=bean_name.newInstance();
-			BeanUtils.setProperty(bean,"id",new PinganOrder().getGeneralId());
 		} catch (Exception e) {
 			log.error("对象无法实例化",e);
 			return new Result(Result.WARN,"无法实例化对象，保存失败");

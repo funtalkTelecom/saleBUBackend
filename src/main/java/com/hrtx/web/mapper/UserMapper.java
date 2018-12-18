@@ -16,18 +16,18 @@ public interface UserMapper extends Mapper<User>,BaseMapper<User>{
 	
 	public Page<Object> selectByPageAndSelections();
 
-	public List<Map> getPower(Long id);
+	public List<Map> getPower(Integer id);
 
-	public List<String> findRoles(Long id);
+	public List<String> findRoles(Integer id);
 
 
     void test();
 
 	void test1();
 
-    List<Map> finRolesByUserId(Long id);
+    List<Map> finRolesByUserId(Integer id);
 
-	void deleteRoleByUserId(@Param("userId") Long userId);
+	void deleteRoleByUserId(@Param("userId") Integer userId);
 
-	void insertUr(@Param("roleId") Long roleId, @Param("userId") Long userId);
+	void insertUr(@Param("roleId") Integer roleId, @Param("userId") Integer userId);
 }

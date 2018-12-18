@@ -110,13 +110,13 @@ public enum PowerConsts {
 	EPSALEMOUDULE_COMMON_DELETE(90704,"删除",90700,1,"",3,4),//竞拍活动删除
 	;
 	
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 	public String getPowerName() {
 		return powerName;
 	}
-	public long getPid() {
+	public int getPid() {
 		return pid;
 	}
 	public int getLeaf() {
@@ -132,14 +132,14 @@ public enum PowerConsts {
 		return seq;
 	}
 
-	private long id;                 //编号
+	private int id;                 //编号
 	private String powerName;       //权限名, 菜单名
-	private Long pid;                //父编号
+	private int pid;                //父编号
 	private int leaf;               //叶子，是否无子类(1表示是叶子，0表示不是)
 	private String url;             //菜单地址
 	private int grade;              //菜单等级
 	private int seq;
-	private PowerConsts(long id,String powerName,long pid,int leaf, String url, int grade, int seq){
+	private PowerConsts(int id,String powerName,int pid,int leaf, String url, int grade, int seq){
 		this.id = id;
 		this.powerName = powerName;
 		this.pid = pid;

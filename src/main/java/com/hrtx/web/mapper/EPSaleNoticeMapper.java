@@ -8,17 +8,17 @@ import java.util.Map;
 
 public interface EPSaleNoticeMapper extends Mapper<EPSaleNotice>,BaseMapper<EPSaleNotice>{
 
-    List<Map> findEPSaleNoticeListbyConsumerId(@Param("consumerId") Long consumerId);
+    List<Map> findEPSaleNoticeListbyConsumerId(@Param("consumerId") Integer consumerId);
 
-    List<Map> findEPSaleNoticeListByEPSaleId(@Param("epSaleId") Long epSaleId);
+    List<Map> findEPSaleNoticeListByEPSaleId(@Param("epSaleId") Integer epSaleId);
 
     List<Map> findStartEPSaleList();
 
-    List<Map> findEPSaleNoticeListByEPSaleIdAndConsumerId(@Param("epSaleId") Long epSaleId, @Param("consumerId") Long consumerId);
+    List<Map> findEPSaleNoticeListByEPSaleIdAndConsumerId(@Param("epSaleId") Integer epSaleId, @Param("consumerId") Integer consumerId);
 
-    List<Map> findEPSaleNoticeListByEPSaleIdAndConsumerId2(@Param("epSaleId") Long epSaleId, @Param("consumerId") Long consumerId);
+    List<Map> findEPSaleNoticeListByEPSaleIdAndConsumerId2(@Param("epSaleId") Integer epSaleId, @Param("consumerId") Integer consumerId);
 
-    List<Map> findEPSaleNoticeListByGIdAndConsumerId(@Param("gId") Long gId , @Param("consumerId") Long consumerId);
+    List<Map> findEPSaleNoticeListByGIdAndConsumerId(@Param("gId") Integer gId , @Param("consumerId") Integer consumerId);
 
     void ePSaleNoticeEdit(EPSaleNotice ePSaleNotice);
 

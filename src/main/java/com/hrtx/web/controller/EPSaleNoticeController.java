@@ -6,6 +6,7 @@ import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.web.pojo.EPSaleNotice;
 import com.hrtx.web.service.EPSaleNoticeService;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class EPSaleNoticeController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result findEPSaleNoticeListByEPSaleId( @PathVariable("epSaleId") String epSaleId) {
-		return new Result(Result.OK,ePSaleNoticeService.findEPSaleNoticeListByEPSaleId(Long.valueOf(epSaleId)));
+		return new Result(Result.OK,ePSaleNoticeService.findEPSaleNoticeListByEPSaleId(NumberUtils.toInt(epSaleId)));
 	}
 
 	/*

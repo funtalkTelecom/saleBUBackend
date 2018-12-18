@@ -3,10 +3,7 @@ package com.hrtx.web.service;
 import com.github.abel533.entity.Example;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
-import com.hrtx.global.FtpUtils;
-import com.hrtx.global.Messager;
-import com.hrtx.global.SystemParam;
-import com.hrtx.global.Utils;
+import com.hrtx.global.*;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
 import com.hrtx.webservice.crmsps.CrmSpsServiceLocator;
@@ -72,6 +69,7 @@ public class LyCrmService {
     @Autowired private DictService dictService;
     @Autowired private IccidMapper iccidMapper;
     @Autowired private NumRuleMapper numRuleMapper;
+    @Autowired private NumPriceMapper numPriceMapper;
 
     /**
      * 获取服务
@@ -187,8 +185,8 @@ public class LyCrmService {
         File file = new File(dir.getPath()+File.separator+fileName);
         if(file.exists()) file.delete();
         createFile(list, file.getPath());
-        Dict dict = new Dict(null, Utils.getDate(0-date_offset, "yyyyMMdd")+"-"+count, "opend_card_file_name", fileName, 0, "上传的开卡文件名", 0l, 0);
-        dict.setId(dict.getGeneralId());
+        Dict dict = new Dict(null, Utils.getDate(0-date_offset, "yyyyMMdd")+"-"+count, "opend_card_file_name", fileName, 0, "上传的开卡文件名", 0, 0);
+//        dict.setId(dict.getGeneralId());
         dictMapper.insert(dict);
         int ucount = this.batchUpdateSlz(fileName, snums);
         if(snums.size() != ucount) throw new ServiceException(String.valueOf("需上传号码与更新号码不一致"));
@@ -349,8 +347,8 @@ public class LyCrmService {
                     log.info("第["+j+"]行数据字段不足，异常");
                     continue;
                 }
-                NumBase numBase = new NumBase(0l,row[0],row[1],row[2],row[3],row[4],row[5],NumberUtils.toDouble(row[6]),new Date(), tFileName);
-                numBase.setId(numBase.getGeneralId());
+                NumBase numBase = new NumBase(row[0],row[1],row[2],row[3],row[4],row[5],NumberUtils.toDouble(row[6]),new Date(), tFileName);
+//                numBase.setId(numBase.getGeneralId());
                 batch.add(numBase);
                 if(batch.size() >= 1000 || j+1 >= len) {
                     numBaseMapper.batchInsert(batch);
@@ -373,48 +371,30 @@ public class LyCrmService {
         List<NumRule> batch = new ArrayList<>();
         for (int j = 0, len = nums.size(); j < len; j++) {
             Map num = nums.get(j);
-            long id = NumberUtils.toLong(String.valueOf(num.get("id")));
+            int id = NumberUtils.toInt(String.valueOf(num.get("id")));
             String num_resource = String.valueOf(num.get("num_resource"));
-            this.addNumFeature(id, num_resource, feathers, batch);
-            this.addNumPriceFeature(id, num_resource, priceFeathers, batch);
-            if(batch.size() >= 1000 || j+1 >= len) {
-                if(batch.size() > 0) numRuleMapper.batchInsert(batch);
+            this.addNumFeature(id, num_resource, feathers, batch, "FEATHER_TYPE");
+            this.addNumFeature(id, num_resource, priceFeathers, batch, "feather_price");
+            if(batch.size() >= 1000) {
+                numRuleMapper.batchInsert(batch);
                 batch = new ArrayList<>();
             }
         }
         if(batch.size() > 0)  numRuleMapper.batchInsert(batch);
     }
 
-    private void addNumFeature(long id, String num_resource, List<Map> feathers, List<NumRule> batch) {
+    private void addNumFeature(Integer id, String num_resource, List<Map> feathers, List<NumRule> batch, String type) {
         for (Map map: feathers) {
             String keyId = org.apache.commons.lang.ObjectUtils.toString(map.get("keyId"));
-//            String keyValue = org.apache.commons.lang.ObjectUtils.toString("keyValue");
             String note = org.apache.commons.lang.ObjectUtils.toString(map.get("note"));
             if(num_resource.matches(note)) {
                 NumRule numRule = new NumRule();
-                numRule.setId(numRule.getGeneralId());
+//                numRule.setId(numRule.getGeneralId());
                 numRule.setNum(num_resource);
                 numRule.setNumId(id);
-                numRule.setRuleType("FEATHER_TYPE");
+                numRule.setRuleType(type);
                 numRule.setValue(keyId);
                 batch.add(numRule);
-//                numRuleMapper.insert(numRule);
-            }
-        }
-    }
-    private void addNumPriceFeature(long id, String num_resource, List<Map> priceFeathers, List<NumRule> batch) {
-        for (Map map: priceFeathers) {
-            String keyId = org.apache.commons.lang.ObjectUtils.toString(map.get("keyId"));
-            String note = org.apache.commons.lang.ObjectUtils.toString(map.get("note"));
-            if(num_resource.matches(note)) {
-                NumRule numRule = new NumRule();
-                numRule.setId(numRule.getGeneralId());
-                numRule.setNum(num_resource);
-                numRule.setNumId(id);
-                numRule.setRuleType("feather_price");
-                numRule.setValue(keyId);
-                batch.add(numRule);
-//                numRuleMapper.insert(numRule);
             }
         }
     }
@@ -424,6 +404,47 @@ public class LyCrmService {
     private void matchNum() {
         numMapper.insertAcitveNum();
 //        numMapper.updateLoseNum();
+    }
+
+    public void addRuel(Dict dict){
+        List<Map> nums = numMapper.queryInNum();
+        List<Map> feathers = new ArrayList<>();
+        feathers.add(CommonMap.create().put("keyId",dict.getKeyId()).put("note",dict.getNote()).getData());
+        String type = dict.getKeyGroup();
+        List<NumRule> batch = new ArrayList<>();
+        for (int j = 0, len = nums.size(); j < len; j++) {
+            Map num = nums.get(j);
+            int id = NumberUtils.toInt(String.valueOf(num.get("id")));
+            String num_resource = String.valueOf(num.get("num_resource"));
+            this.addNumFeature(id, num_resource, feathers, batch, type);
+            if(batch.size() >= 1000) {
+                this.insertNumRule(batch, dict);
+                batch = new ArrayList<>();
+            }
+        }
+        if(batch.size() > 0) this.insertNumRule(batch, dict);
+
+        if("feather_price".equals(type)) numPriceMapper.matchNumPrice();
+    }
+
+    private void insertNumRule(List<NumRule> batch, Dict dict) {
+        numRuleMapper.batchInsert(batch);
+        if("FEATHER_TYPE".equals(dict.getKeyGroup())) {//同步Numprice feature
+            numPriceMapper.batchUpateFeature(batch, dict.getKeyValue()+",");
+        }
+    }
+
+    public void delRuel(Dict dict){
+        String type = dict.getKeyGroup();
+        NumRule numRule = new NumRule();
+        numRule.setValue(dict.getKeyId());
+        numRule.setRuleType(dict.getKeyGroup());
+        numRuleMapper.delete(numRule);
+
+        if("feather_price".equals(type)) numPriceMapper.matchNumPrice();
+        if("FEATHER_TYPE".equals(type)) {
+            numPriceMapper.updateFeature(","+dict.getKeyValue()+",");
+        }
     }
 
     public void praseLyCorpData(int date_offset) {

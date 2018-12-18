@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hrtx.web.mapper.NumMapper" >
+    <select id="queryInNum" resultType="java.util.HashMap">
+        select nun.id, nun.num_resource from tb_num nun where nun.`status` in (1,2)
+    </select>
+
     <select id="queryActiveNum" resultType="java.util.HashMap">
         select b.id, b.num_resource
          from tb_num_base b, tb_city c

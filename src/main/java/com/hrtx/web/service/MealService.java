@@ -35,7 +35,7 @@ public class MealService {
 		this.mealMapper.insertBatch(mealList);
 	}
 
-	public Meal findMealById(Long id) {
+	public Meal findMealById(Integer id) {
 		Meal meal = mealMapper.findMealById(id);
 		return meal;
 	}

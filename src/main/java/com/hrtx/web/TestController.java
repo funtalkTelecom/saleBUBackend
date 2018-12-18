@@ -195,7 +195,7 @@ public class TestController {
         Consumer user= this.apiSessionUtil.getConsumer();
         System.out.println("获取用户  "+user);
         user=new Consumer();
-        user.setId(1009758228466106368l);
+//        user.setId(1009758228466106368l);
         user=consumerService.getConsumerById(user);
         String token=TokenGenerator.generateValue();
         this.apiSessionUtil.saveOrUpdate(token,user);

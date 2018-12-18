@@ -35,7 +35,7 @@ public class DictService {
 		return new Result(Result.OK, pm);
 	}
 
-	public Dict findDictById(Long id) {
+	public Dict findDictById(Integer id) {
 		Dict dict = dictMapper.findDictInfo(id);
 		return dict;
 	}
@@ -49,7 +49,6 @@ public class DictService {
 			}
 		} else {
 			List<Dict> list = new ArrayList<Dict>();
-			dict.setId(dict.getGeneralId());
 			list.add(dict);
 			dictMapper.insertBatch(list);
 		}

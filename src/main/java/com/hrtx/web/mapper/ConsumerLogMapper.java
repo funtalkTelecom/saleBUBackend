@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public interface ConsumerLogMapper extends Mapper<ConsumerLog>,BaseMapper<ConsumerLog>{
 
 
-    void insertConsumerLog(@Param("userid") Long userid, @Param("loginName") String loginName,
+    void insertConsumerLog(@Param("userid") Integer userid, @Param("loginName") String loginName,
                              @Param("livePhone") String livePhone, @Param("nickName") String nickName,
                              @Param("sex") long sex);
 }

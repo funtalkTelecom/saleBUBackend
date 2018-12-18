@@ -13,6 +13,7 @@ import com.hrtx.web.pojo.Dict;
 import com.hrtx.web.pojo.File;
 import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.pojo.Sku;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +75,7 @@ public class ApiGoodsService {
 					Map g = (Map) ob.get(i);
 					g.put("fileName", SystemParam.get("domain-full") + "get-img"+SystemParam.get("goodsPics") +g.get("gId")+"/"+ g.get("fileName"));
 					//获取sku的属性,追加到名称中
-					List prolist = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(String.valueOf(g.get("skuId"))));
+					List prolist = skuPropertyMapper.findSkuPropertyBySkuidForOrder( NumberUtils.toInt(String.valueOf(g.get("skuId"))));
 					if(prolist!=null && prolist.size()>0){
 						StringBuffer pro = new StringBuffer();
 						for(int j=0; j<prolist.size(); j++){
@@ -105,7 +106,7 @@ public class ApiGoodsService {
 	 * @param request
 	 * @return
 	 */
-	public Result goodsDetail(String id, HttpServletRequest request){
+	public Result goodsDetail(Integer id, HttpServletRequest request){
 		Map returnMap = new HashMap();
 		Goods goods = new Goods();
 		Sku sku = new Sku();
@@ -114,9 +115,9 @@ public class ApiGoodsService {
 		try {
 			goods = goodsMapper.findGoodsInfoBySkuid(id);
 
-			sku = skuMapper.getSkuBySkuid(Long.parseLong(id));
+			sku = skuMapper.getSkuBySkuid(id);
 			//获取sku的属性,追加到名称中
-			List prolist = skuPropertyMapper.findSkuPropertyBySkuidForOrder(Long.parseLong(id));
+			List prolist = skuPropertyMapper.findSkuPropertyBySkuidForOrder(id);
 			if(prolist!=null && prolist.size()>0){
 				StringBuffer pro = new StringBuffer();
 				for(int j=0; j<prolist.size(); j++){

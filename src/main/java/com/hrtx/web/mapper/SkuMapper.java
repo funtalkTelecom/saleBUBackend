@@ -13,11 +13,11 @@ public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
 
     void insertBatch(@Param("skuList") List<Sku> skuList);
 
-    List<Sku> findSkuInfo(@Param("gId") Long gId);
+    List<Sku> findSkuInfo(@Param("gId") Integer gId);
 
     List getSkuListBySkuids(@Param("skuids") String skuids);
 
-    Sku getSkuBySkuid(@Param("skuid") Long skuId);
+    Sku getSkuBySkuid(@Param("skuid") Integer skuId);
 
     void updateSkuNum(Sku nowSku);
 
@@ -29,5 +29,5 @@ public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
 
     List findNumStatus(@Param("gId") Long gId);
 
-    List queryStatusList(@Param("gId") Long gId,@Param("statusArry") String statusArry);
+    List queryStatusList(@Param("gId") Integer gId,@Param("statusArry") String statusArry);
 }

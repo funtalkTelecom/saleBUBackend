@@ -37,7 +37,7 @@ public class AgentController {
 	SessionUtil sessionUtil;
     @PostMapping(value = "/api/save-or-update-agent")
     @Powers({PowerConsts.NOPOWER})
-	public Result SaveOrUpdateAgent(@RequestParam(value="id",required=false) Long id,
+	public Result SaveOrUpdateAgent(@RequestParam(value="id",required=false) Integer id,
 								   @RequestParam(value="commpayName",required=false) String commpayName,
 								   @RequestParam(value="person",required=false) String person,
 								   @RequestParam(value="phone",required=false) String phone,
@@ -61,7 +61,7 @@ public class AgentController {
 	@ResponseBody
 	public Result listAgent(){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
-		long consumerId =consumer.getId();
+		int consumerId =consumer.getId();
 //		String  a = "1006420771322462209";
 //		long consumerId =Long.valueOf(a);
 		Map map = new HashMap();

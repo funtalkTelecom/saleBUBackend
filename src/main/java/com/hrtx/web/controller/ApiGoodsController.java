@@ -20,6 +20,7 @@ import com.hrtx.web.pojo.Sku;
 import com.hrtx.web.service.ApiGoodsService;
 import com.hrtx.web.service.GoodsService;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class ApiGoodsController extends BaseReturn{
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Result goodsDetail(@PathVariable("id") String id, HttpServletRequest request){
-		return apiGoodsService.goodsDetail(id, request);
+		return apiGoodsService.goodsDetail(NumberUtils.toInt(id), request);
 	}
 
     @RequestMapping("/goods-info/{gId}")
@@ -78,7 +79,7 @@ public class ApiGoodsController extends BaseReturn{
         Goods goods = new Goods();
         Map<String, Object> map = new HashMap<String, Object>();
         try {
-            goods.setgId(Long.parseLong(gId));
+            goods.setgId(NumberUtils.toInt(gId));
             map = new HashMap<String, Object>();
             map.put("code", Result.OK);
             map.put("data", goodsService.getKindeditorContent(goods));

@@ -37,17 +37,17 @@ public class PermissionService {
 	}
 
 	public List<Map> getTreeNode(PermissionAllocateForm permissionAllocateForm) {
-		long roleId = permissionAllocateForm.getNodeId();
+		int roleId = permissionAllocateForm.getNodeId();
 //		List<Permission> ps = permissionMapper.findPermission(1);
 		Permission permission = new Permission();
-		permission.setPid(1l);
+		permission.setPid(1);
 		List<Permission> ps = permissionMapper.select(permission);
 		return toTreeNode(ps, roleId, permissionAllocateForm.getNodeValue());
 	}
 	
 	//将对象转成树节点对象
 	@SuppressWarnings("unchecked")
-	private List<Map> toTreeNode(List<Permission> node, long roleId, String type ){
+	private List<Map> toTreeNode(List<Permission> node, int roleId, String type ){
 		Map permission = new HashMap();
 		for (Permission p : node) {
 			String permissionId = p.getId()+"";
@@ -135,7 +135,7 @@ public class PermissionService {
 		return permissionNodes;
 	}
 	
-	private String checkState(List nodes,long roleId, String type){
+	private String checkState(List nodes, int roleId, String type){
 		StringBuffer sb = new StringBuffer();
 		int len = nodes.size();
 		for (int i = 0; i < len; i++) {
@@ -172,7 +172,7 @@ public class PermissionService {
 	}
 
 	public Result updatePermission(PermissionAllocateForm permissionAllocateForm) {
-		long roleId = permissionAllocateForm.getRoleId();
+		int roleId = permissionAllocateForm.getRoleId();
 		int property = permissionAllocateForm.getProperty();
 		if(roleId == 0l || (property != 1 && property != 2)) throw new ServiceException("参数异常");
 		if(property == 1){
@@ -183,7 +183,7 @@ public class PermissionService {
 				for(String id : ids) {
 					RolePermission rp = new RolePermission();
 					rp.setRoleId(roleId);
-					rp.setPermission(Long.valueOf(id));
+					rp.setPermission(NumberUtils.toInt(id));
 					permissionMapper.addRolePermission(rp);
 				}
 			}
@@ -195,7 +195,7 @@ public class PermissionService {
 				for(String id : ids) {
 					UserPermission up = new UserPermission();
 					up.setUserId(roleId);
-					up.setPermission(Long.valueOf(id));
+					up.setPermission(NumberUtils.toInt(id));
 					permissionMapper.addUserPermission(up);
 				}
 			}
@@ -204,7 +204,7 @@ public class PermissionService {
 	}
 
 	public void checkOrInsertPermission() {
-		Map<Long, Object> map = new HashMap<Long, Object>();
+		Map<Integer, Object> map = new HashMap<Integer, Object>();
 		List<Permission> permissions = permissionMapper.select(null);
 		for (Permission permission : permissions) {
 			map.put(permission.getId(), null);
@@ -218,12 +218,12 @@ public class PermissionService {
 		}
 	}
 
-	public void distributeRole(long userId, String roles) {
+	public void distributeRole(int userId, String roles) {
 		userMapper.deleteRoleByUserId(userId);
 		String[] rolesArray=StringUtils.split(roles ,",");
 		if(rolesArray == null||rolesArray.length==0)return;
 		for(String s :rolesArray){
-			long roleId = NumberUtils.toLong(s.trim());
+			int roleId = NumberUtils.toInt(s.trim());
 			userMapper.insertUr(roleId, userId);
 		}
 	}

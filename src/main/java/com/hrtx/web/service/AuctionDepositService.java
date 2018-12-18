@@ -38,11 +38,11 @@ public class AuctionDepositService {
 	@Autowired private EPSaleNoticeMapper ePSaleNoticeMapper;
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
-	public List<Map> findAuctionDepositSumEPSaleGoodsByNumId(Long numId) {
+	public List<Map> findAuctionDepositSumEPSaleGoodsByNumId(Integer numId) {
 		return auctionDepositMapper.findAuctionDepositSumEPSaleGoodsByNumId(numId);
 	}
 
-	public List<Map> findAuctionDepositListByNumId(Long numId) {
+	public List<Map> findAuctionDepositListByNumId(Integer numId) {
 		return auctionDepositMapper.findAuctionDepositListByNumId(numId);
 	}
 
@@ -78,18 +78,18 @@ public class AuctionDepositService {
 	/*
 	   通过OrderId获取保证金记录
 	 */
-	public Map  findAuctionDepositListByOrderId(Long orderId)
+	public Map  findAuctionDepositListByOrderId(Integer orderId)
 	{
 		Map map=new HashMap();
 	    List<Map> auctionList=auctionMapper.findAuctionListByOrderId(orderId);
 		List<Map> auctionDepositList=null;
-	    Long numId=0L;//numId;
-		Long gId=0L;//gId
+		Integer numId=0;//numId;
+		Integer gId=0;//gId
 		double deposit=0.00;//保证金
 	    if(auctionList.size()>0)
 		{
-			numId=Long.valueOf(auctionList.get(0).get("numId").toString());
-			gId=Long.valueOf(auctionList.get(0).get("gId").toString());
+			numId=NumberUtils.toInt(auctionList.get(0).get("numId").toString());
+			gId=NumberUtils.toInt(auctionList.get(0).get("gId").toString());
 			AuctionDeposit auctionDeposit=new AuctionDeposit();
 			auctionDeposit.setStatus(2);
 			auctionDeposit.setgId(gId);
@@ -161,21 +161,21 @@ public class AuctionDepositService {
 		List<AuctionDeposit> list = new ArrayList<AuctionDeposit>();
 		auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
 		//auctionDeposit.setAddIp(apiSessionUtil.get);
-		auctionDeposit.setId(auctionDeposit.getGeneralId());
+//		auctionDeposit.setId(auctionDeposit.getGeneralId());
 		auctionDeposit.setAddDate(new Date());
 		list.add(auctionDeposit);
 		auctionDepositMapper.insertBatch(list);
 	}
 
-	public List<Map> findAuctionDepositListConsumerByNumId(Long numId) {
+	public List<Map> findAuctionDepositListConsumerByNumId(Integer numId) {
 		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerId(numId,apiSessionUtil.getConsumer().getId());
 	}
 
-	public List<Map> findAuctionDepositListConsumerByNumIdAndGId(Long numId,Long gId) {
+	public List<Map> findAuctionDepositListConsumerByNumIdAndGId(Integer numId,Integer gId) {
 		return auctionDepositMapper.findAuctionDepositListByNumIdAndConsumerIdAndGId(numId,apiSessionUtil.getConsumer().getId(),gId);
 	}
 
-	public List<Map> findAuctionDepositListConsumerByGId(Long gId) {
+	public List<Map> findAuctionDepositListConsumerByGId(Integer gId) {
 		return auctionDepositMapper.findAuctionDepositListByConsumerIdAndGId(apiSessionUtil.getConsumer().getId(),gId);
 	}
 
@@ -192,22 +192,22 @@ public class AuctionDepositService {
 	          注：新记录 status in(2,4)
 	     3）、本次出价出价状态status:1 调整status:2 成功
 	 */
-	public void newAuctionDepositPay(Long Id,boolean status,String payDate) {
+	public void newAuctionDepositPay(Integer Id,boolean status,String payDate) {
 
 		AuctionDeposit auctionDeposit=new AuctionDeposit();
 		List<Map> auctionDepositList=auctionDepositMapper.findAuctionDepositById(Id);
 				//auctionDepositMapper.findAuctionDepositListById(Id);
-		Long consumerId=0L;
-		Long numId=0L;
-		Long gId=0L;
-		Long epSaleId=0L;//竞拍活动Id
+		Integer consumerId=0;
+		Integer numId=0;
+		Integer gId=0;
+		Integer epSaleId=0;//竞拍活动Id
 		Integer erIsPack=0;//商品是否打包
 		int loopTime=0;//轮咨时间分钟
 		if(auctionDepositList.size()>0)
 		{
-			consumerId=Long.valueOf(auctionDepositList.get(0).get("consumer_id").toString());
-			numId=Long.valueOf(auctionDepositList.get(0).get("num_id").toString());
-			gId=Long.valueOf(auctionDepositList.get(0).get("g_id").toString());
+			consumerId=NumberUtils.toInt(auctionDepositList.get(0).get("consumer_id").toString());
+			numId=NumberUtils.toInt(auctionDepositList.get(0).get("num_id").toString());
+			gId=NumberUtils.toInt(auctionDepositList.get(0).get("g_id").toString());
 			Goods goods=goodsService.findGoodsById(gId);//上架商品信息
 			loopTime=Integer.valueOf(goods.getgLoopTime());
 			epSaleId=goods.getgActive();
@@ -232,9 +232,9 @@ public class AuctionDepositService {
 			//****************auction.status=1记录状态的记录状态调整************************
 			double price=0.00;//出价价格
 			double beforePrice=0.00;//前一次出价记录
-			Long autionId=0L;
-			Long  beforeAutionId=0L;//前一次出价记录Id
-			Long beforeConsumerId=0L;//前一次出价记录用户Id
+			Integer autionId=0;
+			Integer  beforeAutionId=0;//前一次出价记录Id
+			Integer beforeConsumerId=0;//前一次出价记录用户Id
 			String ePSaleNoticePhone="";//短信通知手机号
 			//auction.status=1记录状态调整
 			Auction auction=new Auction();
@@ -254,7 +254,7 @@ public class AuctionDepositService {
 			}
 			if(auctionList.size()>0)
 			{
-				autionId=Long.valueOf(auctionList.get(0).get("id").toString());
+				autionId=Integer.parseInt(auctionList.get(0).get("id").toString());
 				price=Double.valueOf(auctionList.get(0).get("price").toString());
 				auction.setConfirmDate(auctionDeposit.getPayDate());
 				auction.setId(autionId);
@@ -271,8 +271,8 @@ public class AuctionDepositService {
 				if(goodsAuctionList.size()>0)
 				{
 					beforePrice=Double.valueOf(goodsAuctionList.get(0).get("price").toString());//前一次出价记录
-					beforeAutionId=Long.valueOf(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
-					beforeConsumerId=Long.valueOf(goodsAuctionList.get(0).get("consumerId").toString());//前一次出价记录用户Id
+					beforeAutionId=NumberUtils.toInt(goodsAuctionList.get(0).get("id").toString());//前一次出价记录Id
+					beforeConsumerId=Integer.parseInt(goodsAuctionList.get(0).get("consumerId").toString());//前一次出价记录用户Id
 					//auctionMapper.freezeOneNum(numId);//锁行记录
 					//1、大于之前的最近出价记录，则前一次出价记录状态：4 落败,当前出价记录状态：2成功
 					if(price>beforePrice)
@@ -401,7 +401,7 @@ public class AuctionDepositService {
 	  保证金退款
 	  status true 成功 false失败
 	 */
-	public void auctionDepositRefund(Long Id,boolean status) {
+	public void auctionDepositRefund(Integer Id,boolean status) {
 		AuctionDeposit AuctionDeposit=new AuctionDeposit();
 		AuctionDeposit.setId(Id);
 		if(status)

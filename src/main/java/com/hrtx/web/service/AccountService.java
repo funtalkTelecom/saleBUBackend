@@ -35,7 +35,7 @@ public class AccountService {
 			this.accountMapper.accountEdit(account);
 		} else {
 			List<Account> list = new ArrayList<Account>();
-			account.setId(account.getGeneralId());
+//			account.setId(account.getGeneralId());
 			account.setAddDate(new Date());
 			account.setAddUserId(SessionUtil.getUserId());
 			list.add(account);
@@ -44,7 +44,7 @@ public class AccountService {
 		return new Result(Result.OK, "提交成功");
 	}
 
-	public Account findAcountById(Long id) {
+	public Account findAcountById(Integer id) {
 		Account account = accountMapper.findAccountInfo(id);
 		return account;
 	}
@@ -55,7 +55,7 @@ public class AccountService {
 	}
 
 
-	public Result findAccountListByUserId(Long userId) {
+	public Result findAccountListByUserId(Integer userId) {
 		return new Result(Result.OK,  accountMapper.findAccountListByUserId( userId));
 	}
 }

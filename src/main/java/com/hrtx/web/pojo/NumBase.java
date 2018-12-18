@@ -7,7 +7,7 @@ import java.util.Date;
 @Table(name = "tb_num_base")
 public class NumBase extends BasePojo {
     @Id
-    private Long id;
+    private Integer id;
 
     private String cityCode;
 
@@ -27,8 +27,7 @@ public class NumBase extends BasePojo {
 
     private String importFile;
 
-    public NumBase(Long id, String cityCode, String cityName, String netType, String numResource, String numType, String numLevel, Double lowConsume, Date importDate, String importFile) {
-        this.id = id;
+    public NumBase(String cityCode, String cityName, String netType, String numResource, String numType, String numLevel, Double lowConsume, Date importDate, String importFile) {
         this.cityCode = cityCode;
         this.cityName = cityName;
         this.netType = netType;
@@ -44,11 +43,11 @@ public class NumBase extends BasePojo {
         super();
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

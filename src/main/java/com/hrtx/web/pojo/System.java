@@ -13,7 +13,7 @@ public class System extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
     private String keyId;
     private String keyValue;
     private String tempKeyValue;
@@ -24,7 +24,7 @@ public class System extends BasePojo implements java.io.Serializable {
     public System() {
 	}
 
-    public System(Long id, String keyId, String keyValue, String tempKeyValue, String remark, String isAudit) {
+    public System(Integer id, String keyId, String keyValue, String tempKeyValue, String remark, String isAudit) {
         this.id = id;
         this.keyId = keyId;
         this.keyValue = keyValue;
@@ -33,11 +33,11 @@ public class System extends BasePojo implements java.io.Serializable {
         this.isAudit = isAudit;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

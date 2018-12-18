@@ -18,9 +18,10 @@ public class UserPermission extends BasePojo implements java.io.Serializable {
 
 	// Fields
 	@Id
-	private Long id;
-	private Long userId;
-	private Long permission;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	private Integer userId;
+	private Integer permission;
 
 	// Constructors
 
@@ -29,32 +30,32 @@ public class UserPermission extends BasePojo implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public UserPermission(Long userId, Long permission) {
+	public UserPermission(Integer userId, Integer permission) {
 		this.userId = userId;
 		this.permission = permission;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public Long getUserId() {
+	public Integer getUserId() {
 		return userId;
 	}
 
-	public void setUserId(Long userId) {
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
-	public Long getPermission() {
+	public Integer getPermission() {
 		return permission;
 	}
 
-	public void setPermission(Long permission) {
+	public void setPermission(Integer permission) {
 		this.permission = permission;
 	}
 

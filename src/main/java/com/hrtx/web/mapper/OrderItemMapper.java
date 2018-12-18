@@ -22,12 +22,12 @@ public interface OrderItemMapper extends Mapper<OrderItem>,BaseMapper<OrderItem>
      * @param orderId
      * @return
      */
-    List<Map> queryOrderNums(@Param("orderId") Long orderId);
+    List<Map> queryOrderNums(@Param("orderId") Integer orderId);
 
     /**
      * 更新套餐
      * @param orderId
      * @param mealId
      */
-    void updateMeal(@Param("orderId") Long orderId, @Param("mealId") Long mealId);
+    void updateMeal(@Param("orderId") Integer orderId, @Param("mealId") Integer mealId);
 }

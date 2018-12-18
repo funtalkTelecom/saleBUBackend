@@ -7,6 +7,7 @@ import com.hrtx.web.pojo.Meal;
 import com.hrtx.web.service.CityService;
 import com.hrtx.web.service.MealService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,13 +124,13 @@ public class MealController extends BaseReturn{
 			if(arr.get(3)==null || "".equals(arr.get(3))){
 				return returnError("数据错误，系统检测到第" + (i + 1) + "行的销售地市为空。");
 			}else if ("不区分".equals(arr.get(3))) {
-				m.setSaleCity(-99l);
+				m.setSaleCity(-99);
 			} else {
 				thirdCity = cityService.findCityByNameFromThird(arr.get(3));
 				if (Integer.parseInt(thirdCity.get("num").toString())!=1) {
 					return returnError("数据错误，系统检测到第"+(i+1)+"行的销售地市不正确。");
 				}
-				m.setSaleCity(Long.parseLong(thirdCity.get("city_id").toString()));
+				m.setSaleCity(NumberUtils.toInt(thirdCity.get("city_id").toString()));
 			}
 			Meal meal = mealService.findMealByMealId(arr.get(0));
 			if(meal != null) {
@@ -143,7 +144,6 @@ public class MealController extends BaseReturn{
 			m.setCreateDate(now);
 			m.setUpdateBy(SessionUtil.getUserId());
 			m.setUpdateDate(now);
-			m.setMid(m.getGeneralId());
 			mealList.add(m);
 		}
 //		recCardService.importRecCard(list, sourceServerFileName);

@@ -8,6 +8,7 @@ import com.hrtx.web.pojo.Goods;
 import com.hrtx.web.pojo.GoodsFocus;
 import com.hrtx.web.service.GoodsFocusService;
 import com.hrtx.web.service.GoodsService;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,17 +36,17 @@ public class GoodsFocusController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	@ResponseBody
 	public Result findGoodsFocus(@PathVariable("numId") String numId, @PathVariable("gId") String gId,@PathVariable("erIsPack") Integer erIsPack) {
-		Goods goods=goodsService.findGoodsById(Long.valueOf(gId));//上架商品信息gActive
+		Goods goods=goodsService.findGoodsById(NumberUtils.toInt(gId));//上架商品信息gActive
 		if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
 		{
 			return new Result(Result.ERROR,"是否打包传参不符，请核对");
 		}
 		if(erIsPack==0)//商品是否打包 erIsPack
 		{
-			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId)));
+			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByNumIdAndGId(Integer.valueOf(numId),Integer.valueOf(gId)));
 		}else if(erIsPack==1)
 		{
-			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByGId(Long.valueOf(gId)));
+			return new Result(Result.OK,goodsFocusService.findGoodsFocusListByGId(Integer.valueOf(gId)));
 		}
 		return new Result(Result.ERROR,"记录为空");
 	}

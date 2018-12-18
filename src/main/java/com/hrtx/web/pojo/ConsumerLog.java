@@ -1,5 +1,7 @@
 package com.hrtx.web.pojo;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -8,9 +10,10 @@ import java.util.Date;
 public class ConsumerLog extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
-	private Long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 	private Integer loginType;
-	private Long userId;
+	private Integer userId;
 	private String loginName;
 	private String livePhone;
 	private String openid;
@@ -21,10 +24,11 @@ public class ConsumerLog extends BasePojo implements java.io.Serializable {
 	private Integer status;
 	protected Date addDate;
 
+
 	public ConsumerLog() {
 	}
 
-	private ConsumerLog(Long id, Integer loginType, Long userId, String loginName, String livePhone, String openid,
+	private ConsumerLog(Integer id, Integer loginType, Integer userId, String loginName, String livePhone, String openid,
                         Integer subscribe, String nickName,
                         Integer sex, String  subTime, Integer status, Date addDate) {
 		super();
@@ -43,11 +47,11 @@ public class ConsumerLog extends BasePojo implements java.io.Serializable {
 		this.addDate = addDate;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -59,11 +63,11 @@ public class ConsumerLog extends BasePojo implements java.io.Serializable {
 		this.loginType = loginType;
 	}
 
-	public Long getUserId() {
+	public Integer getUserId() {
 		return userId;
 	}
 
-	public void setUserId(Long userId) {
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 

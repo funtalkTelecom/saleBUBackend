@@ -4,17 +4,16 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Date;
 
 @Table(name = "tb_agent")
 public class Agent extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
 	private String commpayName;
 	private String person;
 	private String phone;
@@ -25,7 +24,7 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	private String tradingImg;
 	private Integer status;
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long addConsumerId;
+	private Integer addConsumerId;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date addDate;
 	private Integer isDel;
@@ -47,9 +46,8 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	public Agent() {
 	}
 
-	public Agent(Long id, String commpayName, String person,String phone,Long province,Long city,Long district
-				 , String address,String tradingImg, Integer status, Long addConsumerId, Date addDate, Integer isDel,Integer type) {
-		this.id = id;
+	public Agent(String commpayName, String person,String phone,Long province,Long city,Long district
+				 , String address,String tradingImg, Integer status, Integer addConsumerId, Date addDate, Integer isDel,Integer type) {
 		this.commpayName = commpayName;
 		this.person = person;
 		this.phone =phone;
@@ -65,11 +63,11 @@ public class Agent extends BasePojo implements java.io.Serializable {
 		this.type = type;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -138,10 +136,10 @@ public class Agent extends BasePojo implements java.io.Serializable {
 		this.status = status;
 	}
 
-	public Long getAddConsumerId() {
+	public Integer getAddConsumerId() {
 		return addConsumerId;
 	}
-	public void setAddConsumerId(Long addConsumerId) {
+	public void setAddConsumerId(Integer addConsumerId) {
 		this.addConsumerId = addConsumerId;
 	}
 

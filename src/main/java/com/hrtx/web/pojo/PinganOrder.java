@@ -3,6 +3,8 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -10,8 +12,9 @@ import javax.persistence.Table;
 public class PinganOrder extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
 	private String open_id;
 	private String timestamp;
 	private String req_sign;
@@ -39,7 +42,7 @@ public class PinganOrder extends BasePojo implements java.io.Serializable {
 	public PinganOrder() {
 	}
 
-    public PinganOrder(Long id, String open_id, String timestamp, String req_sign, String out_no, String pmt_tag, String pmt_name, String ord_name, String original_amount, String discount_amount, String ignore_amount, String trade_amount, String trade_account, String trade_no, String remark, String tag, String notify_url, String auth_code, String jump_url, String wx_appid, String goods_tag, String limit_pay, String goods_detail, String extend_params) {
+    public PinganOrder(Integer id, String open_id, String timestamp, String req_sign, String out_no, String pmt_tag, String pmt_name, String ord_name, String original_amount, String discount_amount, String ignore_amount, String trade_amount, String trade_account, String trade_no, String remark, String tag, String notify_url, String auth_code, String jump_url, String wx_appid, String goods_tag, String limit_pay, String goods_detail, String extend_params) {
         this.id = id;
         this.open_id = open_id;
         this.timestamp = timestamp;
@@ -66,11 +69,11 @@ public class PinganOrder extends BasePojo implements java.io.Serializable {
         this.extend_params = extend_params;
     }
 
-    public Long getId() {
+    public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

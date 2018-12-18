@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -17,11 +15,12 @@ import java.util.Date;
 public class Order extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "订单不能为空", groups = {Groups.FundOrderPayOrder.class})
-    private Long orderId;//编号
+    private Integer orderId;//编号
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long consumer;//用户编码
+    private Integer consumer;//用户编码
     private String consumerName;//用户名称
     private int status;//状态 1待付款；2已付款待推送（已付款尚未推送到仓储期）；3待配货(仓储系统已收到)；4待签收(仓储物流已取件)；5完成
     private String reqUserAgent;//请求的user_agent
@@ -34,7 +33,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     private String shippingMenthod;//运输方式
     @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "地址不能为空", groups = {Groups.FundOrderPayOrder.class})
-    private Long addressId;//收货地址编码
+    private Integer addressId;//收货地址编码
     private String personName;//收货人
     private String personTel;//收货电话
     private String address;//收货地址 地区+街道
@@ -85,7 +84,12 @@ public class Order extends BasePojo implements java.io.Serializable {
     public Order() {
     }
 
-    public Order(Long orderId, Long consumer, String consumerName, int status, String reqUserAgent, String reqIp, Date addDate, int orderType, String shippingMenthodId, String shippingMenthod, Long addressId, String personName, String personTel, String address, Date noticeShipmentDate, String payMenthodId, String payMenthod, Date payDate, String expressId, String expressName, String expressNumber, Date deliverDate, Date pickupDate, int signType, Date signDate, double commission, double shippingTotal, double subTotal, double total, String conment, int isDel, String skuGoodsType) {
+    public Order(Integer orderId, Integer consumer, String consumerName, int status, String reqUserAgent, String reqIp, Date addDate,
+                 int orderType, String shippingMenthodId, String shippingMenthod, Integer addressId, String personName,
+                 String personTel, String address, Date noticeShipmentDate, String payMenthodId, String payMenthod, Date payDate,
+                 String expressId, String expressName, String expressNumber, Date deliverDate, Date pickupDate, int signType,
+                 Date signDate, double commission, double shippingTotal, double subTotal, double total, String conment,
+                 int isDel, String skuGoodsType) {
         this.orderId = orderId;
         this.consumer = consumer;
         this.consumerName = consumerName;
@@ -120,19 +124,19 @@ public class Order extends BasePojo implements java.io.Serializable {
         this.skuGoodsType = skuGoodsType;
     }
 
-    public Long getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 
-    public Long getConsumer() {
+    public Integer getConsumer() {
         return consumer;
     }
 
-    public void setConsumer(Long consumer) {
+    public void setConsumer(Integer consumer) {
         this.consumer = consumer;
     }
 
@@ -200,11 +204,11 @@ public class Order extends BasePojo implements java.io.Serializable {
         this.shippingMenthod = shippingMenthod;
     }
 
-    public Long getAddressId() {
+    public Integer getAddressId() {
         return addressId;
     }
 
-    public void setAddressId(Long addressId) {
+    public void setAddressId(Integer addressId) {
         this.addressId = addressId;
     }
 

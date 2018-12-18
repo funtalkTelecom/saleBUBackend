@@ -33,10 +33,10 @@ public class AgentService {
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private ConsumerMapper consumerMapper;
 
-	public Result SaveOrUpdateAgent(Long id,String commpayName,String person,String phone,long province,long city,long district,
+	public Result SaveOrUpdateAgent(Integer id,String commpayName,String person,String phone,long province,long city,long district,
 									String address, MultipartFile file){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
-		long consumerId = consumer.getId();
+		Integer consumerId = consumer.getId();
 		//图片保存
 		String tradingImg="";
 		try {
@@ -58,11 +58,10 @@ public class AgentService {
 			param.setAddConsumerId(consumerId);
 			Agent ap = agentMapper.selectOne(param);
 			if(ap !=null) return new Result(Result.ERROR, "已申请注册过代理商或已经绑定了乐语账号");
-			ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1);
-			ag.setId(param.getGeneralId());
+			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1);
 			agentMapper.insert(ag);
 		}else {  //修改
-			ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1);
+			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1);
 			agentMapper.updateAgent(ag);
 		}
 		return new Result(Result.OK, "提交成功");
@@ -71,7 +70,7 @@ public class AgentService {
 
 	public Result SaveAgentLeyu(String loginName,String pwd){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
-		long consumerId = consumer.getId();
+		Integer consumerId = consumer.getId();
 //		String a = "1014426510456520704";
 //		long consumerId = Long.valueOf(a);
 		Agent param = new Agent();
@@ -117,10 +116,10 @@ public class AgentService {
 
 		return new Result(Result.OK, "绑定成功");
 	}
-	public List<Map> findAgentListByaddConsumerId(Long ConsumerId) {
+	public List<Map> findAgentListByaddConsumerId(Integer ConsumerId) {
 		return this.agentMapper.findAgentListByConsumerId( ConsumerId);
 	}
-	public List<Map> findIsLyByConsumerId(Long ConsumerId) {
+	public List<Map> findIsLyByConsumerId(Integer ConsumerId) {
 		return this.agentMapper.findIsLyByConsumerId( ConsumerId);
 	}
 
@@ -136,7 +135,7 @@ public class AgentService {
 //		return  agentMapper.findAgentById(id);
 //	}
 
-	public Agent findAgentById(Long id) {
+	public Agent findAgentById(Integer id) {
 		Agent agent = agentMapper.findAgentById(id);
 		return agent;
 	}

@@ -12,28 +12,27 @@ public class NumRule extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private Integer id;
     private String ruleType;
-    private Long numId;
+    private Integer numId;
     private String num;
     private String value;
 
     public NumRule() {
     }
 
-    public NumRule(Long id, String ruleType, Long numId, String num, String value) {
-        this.id = id;
+    public NumRule(String ruleType, Integer numId, String num, String value) {
         this.ruleType = ruleType;
         this.numId = numId;
         this.num = num;
         this.value = value;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -45,11 +44,11 @@ public class NumRule extends BasePojo implements java.io.Serializable {
         this.ruleType = ruleType;
     }
 
-    public Long getNumId() {
+    public Integer getNumId() {
         return numId;
     }
 
-    public void setNumId(Long numId) {
+    public void setNumId(Integer numId) {
         this.numId = numId;
     }
 

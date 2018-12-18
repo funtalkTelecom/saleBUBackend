@@ -39,7 +39,7 @@ public class DeliveryAddressService {
 		return new Result(Result.OK, pm);
 	}
 
-	public Result findDeliveryAddressListByUserId(Long userId) {
+	public Result findDeliveryAddressListByUserId(Integer userId) {
 		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressListByUserId( userId));
 	}
 
@@ -47,11 +47,11 @@ public class DeliveryAddressService {
 		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressListByUserId(this.apiSessionUtil.getConsumer().getId()));
 	}
 
-	public Result findDeliveryAddressDefault(Long cunsumerId) {
+	public Result findDeliveryAddressDefault(Integer cunsumerId) {
 		return new Result(Result.OK,  deliveryAddressMapper.findDeliveryAddressDefaultByUserId(cunsumerId));
 	}
 
-	public  List<Map> findDeliveryAddressById(Long id) {
+	public  List<Map> findDeliveryAddressById(Integer id) {
 		return  deliveryAddressMapper.findDeliveryAddressById(id);
 	}
 
@@ -60,7 +60,7 @@ public class DeliveryAddressService {
 			deliveryAddress.setUpdateDate(new Date());
 			deliveryAddressMapper.deliveryAddressEdit(deliveryAddress);
 		} else {
-			Long kk=this.apiSessionUtil.getConsumer().getId();
+			Integer kk=this.apiSessionUtil.getConsumer().getId();
 			//List<Map> defaultMap= deliveryAddressMapper.findDeliveryAddressDefaultByUserId(this.apiSessionUtil.getConsumer().getId());
 			List<Map> listDeliveryAddress=deliveryAddressMapper.findDeliveryAddressListByUserId(this.apiSessionUtil.getConsumer().getId());
 			if(listDeliveryAddress.size()>0)
@@ -72,7 +72,7 @@ public class DeliveryAddressService {
 			}
 			List<DeliveryAddress> list = new ArrayList<DeliveryAddress>();
 			deliveryAddress.setAddUserId(apiSessionUtil.getConsumer().getId());
-			deliveryAddress.setId(deliveryAddress.getGeneralId());
+//			deliveryAddress.setId(deliveryAddress.getGeneralId());
 			deliveryAddress.setCreateDate(new Date());
 			deliveryAddress.setUpdateDate(new Date());
 			list.add(deliveryAddress);
@@ -86,7 +86,7 @@ public class DeliveryAddressService {
 		if(deliveryAddressDefault.size()>0)
 		{
 			DeliveryAddress addressDefault=new DeliveryAddress();
-			addressDefault.setId(Long.valueOf(deliveryAddressDefault.get(0).get("id").toString()));
+			addressDefault.setId(Integer.valueOf(deliveryAddressDefault.get(0).get("id").toString()));
 			addressDefault.setIsDefaultl(0);
 			deliveryAddressMapper.deliveryAddressDefault(addressDefault);
 		}

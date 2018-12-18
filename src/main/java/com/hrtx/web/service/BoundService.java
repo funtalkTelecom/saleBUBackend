@@ -30,7 +30,7 @@ public class BoundService {
 	@Autowired
 	private OrderMapper orderMapper;
 
-	public Num findNumById(Long Id) {
+	public Num findNumById(Integer Id) {
 		return numMapper.selectByPrimaryKey(Id);
 	}
 

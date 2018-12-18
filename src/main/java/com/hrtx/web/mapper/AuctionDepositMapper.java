@@ -10,23 +10,23 @@ import java.util.Map;
 
 public interface AuctionDepositMapper extends Mapper<AuctionDeposit>,BaseMapper<AuctionDeposit>{
 
-    List<Map> findAuctionDepositSumEPSaleGoodsByNumId(@Param("numId") Long numId);
+    List<Map> findAuctionDepositSumEPSaleGoodsByNumId(@Param("numId") Integer numId);
 
-    List<Map> findAuctionDepositListByNumId(@Param("numId") Long numId);
+    List<Map> findAuctionDepositListByNumId(@Param("numId") Integer numId);
 
-    List<Map> findAuctionDepositById(@Param("Id") Long Id);
+    List<Map> findAuctionDepositById(@Param("Id") Integer Id);
 
-    List<Map> findAuctionDepositListByNumIdAndConsumerId(@Param("numId") Long numId,@Param("consumerId") Long consumerId);
+    List<Map> findAuctionDepositListByNumIdAndConsumerId(@Param("numId") Integer numId,@Param("consumerId") Integer consumerId);
 
-    List<Map> findAuctionDepositListByNumIdAndConsumerIdAndGId(@Param("numId") Long numId,@Param("consumerId") Long consumerId,@Param("gId") Long gId);
+    List<Map> findAuctionDepositListByNumIdAndConsumerIdAndGId(@Param("numId") Integer numId,@Param("consumerId") Integer consumerId,@Param("gId") Integer gId);
 
-    List<Map> findAuctionDepositListByConsumerIdAndGId(@Param("consumerId") Long consumerId,@Param("gId") Long gId);
+    List<Map> findAuctionDepositListByConsumerIdAndGId(@Param("consumerId") Integer consumerId,@Param("gId") Integer gId);
 
-    List<Map> findAuctionDepositListByConsumerId(@Param("consumerId") Long consumerId);
+    List<Map> findAuctionDepositListByConsumerId(@Param("consumerId") Integer consumerId);
 
-    Page<Object> queryPageDepositListByConsumerId(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Long consumerId);
+    Page<Object> queryPageDepositListByConsumerId(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Integer consumerId);
 
-    Page<Object> queryPageDepositListByConsumerId2(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Long consumerId);
+    Page<Object> queryPageDepositListByConsumerId2(@Param("auctionDeposit") AuctionDeposit auctionDeposit,@Param("consumerId") Integer consumerId);
     /*
         通过NumId、ConsumerId、Status查询对应AuctionDepositList
      */

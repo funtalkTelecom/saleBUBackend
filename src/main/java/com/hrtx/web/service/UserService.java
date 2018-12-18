@@ -44,12 +44,12 @@ public class UserService extends BaseService {
 	@Autowired private PermissionService permissionService;
 
 	public void test1(int i) {
-		User u = new User(((Integer)i).longValue());
+		User u = new User(i);
 		userMapper.insert(u);
 //		if(i==16) throw  new ServiceException("test");
 	}
 	public void test() {
-		User u = new User(100l);
+		User u = new User(100);
 		userMapper.insert(u);
 //		try{
 //			userService.paytest();
@@ -90,7 +90,7 @@ public class UserService extends BaseService {
 //		userMapper.insert(u);
 //		if(1==1) throw new ServiceException("手动异常");
 		for (int i = 15; i <17 ; i++) {
-			User u = new User(((Integer)(i+10)).longValue());
+			User u = new User(10);
 			userMapper.insert(u);
 			userService.newtest(i);
 			if(i == 15) throw new ServiceException("test");
@@ -143,17 +143,17 @@ public class UserService extends BaseService {
 //		u.setCompanyId();
 		
 		//加载权限和菜单
-		Map<Long, Object> permissionMap = new HashMap<Long, Object>();
-		Map<Long, List<Menu>> childMends = new HashMap<Long, List<Menu>>();
+		Map<Integer, Object> permissionMap = new HashMap<Integer, Object>();
+		Map<Integer, List<Menu>> childMends = new HashMap<Integer, List<Menu>>();
 		
 		List<Menu> mainMenus = new ArrayList<Menu>();
 		for (Map map : powers) {
-			long permission = NumberUtils.toLong(ObjectUtils.toString(map.get("id")));
+			int permission = NumberUtils.toInt(ObjectUtils.toString(map.get("id")));
 			permissionMap.put(permission, null);
 			int grade = NumberUtils.toInt(ObjectUtils.toString(map.get("grade")));
-			long pid = NumberUtils.toLong(ObjectUtils.toString(map.get("pid")));
+			int pid = NumberUtils.toInt(ObjectUtils.toString(map.get("pid")));
 			if(grade == 1 || grade == 2){
-				Menu m = new Menu(ObjectUtils.toString(map.get("name")), ObjectUtils.toString(map.get("url")), NumberUtils.toLong(ObjectUtils.toString(map.get("id"))), pid, grade);
+				Menu m = new Menu(ObjectUtils.toString(map.get("name")), ObjectUtils.toString(map.get("url")), NumberUtils.toInt(ObjectUtils.toString(map.get("id"))), pid, grade);
 				if(grade == 1) {
 					mainMenus.add(m);
 				}else{
@@ -175,7 +175,7 @@ public class UserService extends BaseService {
 		return info;
 	}
 
-    public User getUser(Long id) {
+    public User getUser(Integer id) {
 		User u = userMapper.selectByPrimaryKey(id);
 		List<Map> list = userMapper.finRolesByUserId(id);
 		String roles="";
@@ -189,7 +189,7 @@ public class UserService extends BaseService {
 
 	public Result saveUser(User user) {
         String loginName =ObjectUtils.toString(user.getLoginName(), " ");
-        long id = NumberUtils.toLong(String.valueOf(user.getId()));
+        int id = NumberUtils.toInt(String.valueOf(user.getId()));
         Example example = new Example(User.class);
         example.createCriteria().andEqualTo("loginName", loginName);
         List<User> list =  userMapper.selectByExample(example);
@@ -207,7 +207,7 @@ public class UserService extends BaseService {
                 log.error("",e);
                 return new Result(Result.ERROR,"加密异常");
             }
-            user.setId(user.getGeneralId());
+//            user.setId(user.getGeneralId());
             user.setAddUser(SessionUtil.getUserId());
             user.setAddDate(new Date());
             user.setIsDel(0);

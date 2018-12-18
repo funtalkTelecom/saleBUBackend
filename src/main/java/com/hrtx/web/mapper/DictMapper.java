@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Component
 public interface DictMapper extends Mapper<Dict>,BaseMapper<Dict>{
-    Dict findDictInfo(@Param("id") Long id);
+    Dict findDictInfo(@Param("id") Integer id);
 
     int checkDictKeyIdIsExist(Dict dict);
 

@@ -6,8 +6,8 @@ public class Menu implements Serializable {
 
 	private String name;
 	private String url;
-	private long id;
-	private long pid;
+	private int id;
+	private int pid;
 	private int grade;
 	
 	public String getName() {
@@ -26,19 +26,19 @@ public class Menu implements Serializable {
 		this.url = url;
 	}
 
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public long getPid() {
+	public int getPid() {
 		return pid;
 	}
 
-	public void setPid(long pid) {
+	public void setPid(int pid) {
 		this.pid = pid;
 	}
 
@@ -50,7 +50,7 @@ public class Menu implements Serializable {
 		this.grade = grade;
 	}
 
-	public Menu(String name, String url, long id, long pid, int grade) {
+	public Menu(String name, String url, int id, int pid, int grade) {
 		this.name = name;
 		this.url = url;
 		this.id = id;

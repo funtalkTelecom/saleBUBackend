@@ -1,5 +1,8 @@
 package com.hrtx.web.pojo;
 
+import org.hibernate.validator.constraints.URL;
+
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
@@ -14,8 +17,9 @@ public class Permission implements java.io.Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -6136522095088295888L;
-	private Long id;
-	private Long pid;
+	@Id
+	private Integer id;
+	private Integer pid;
 	private String name;
 	private String remark;
 	private Integer seq;
@@ -30,7 +34,7 @@ public class Permission implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Permission(Long id, Long pid, String name, String remark,
+	public Permission(Integer id, Integer pid, String name, String remark,
 			Integer seq, String code, Integer leaf, Integer grade, String url) {
 		this.id = id;
 		this.pid = pid;
@@ -43,19 +47,19 @@ public class Permission implements java.io.Serializable {
 		this.url = url;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public Long getPid() {
+	public Integer getPid() {
 		return pid;
 	}
 
-	public void setPid(Long pid) {
+	public void setPid(Integer pid) {
 		this.pid = pid;
 	}
 

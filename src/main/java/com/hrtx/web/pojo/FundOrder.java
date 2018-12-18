@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
@@ -19,8 +21,9 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
     public static String BUSI_TYPE_PAYORDER = "PAYORDER";
     public static String BUSI_TYPE_PAYDEPOSIT = "PAYDEPOSIT";
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
     private String busi;
 	@NotNull(message = "付款金额不能为空", groups = {Groups.FundOrderPayOrder.class})
 	@Min(value = 1, message = "付款金额必须大于0", groups = {Groups.FundOrderPayOrder.class})
@@ -41,8 +44,7 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
     public FundOrder() {
 	}
 
-    public FundOrder(Long id, String busi, Integer amt, String payee, String payer, Integer status, String orderName, String contractno, String third, Integer actual_amt, String remark, String sourceId) {
-        this.id = id;
+    public FundOrder(String busi, Integer amt, String payee, String payer, Integer status, String orderName, String contractno, String third, Integer actual_amt, String remark, String sourceId) {
         this.busi = busi;
         this.amt = amt;
         this.payee = payee;
@@ -56,11 +58,11 @@ public class FundOrder extends BasePojo implements java.io.Serializable {
         this.sourceId = sourceId;
     }
 
-    public Long getId() {
+    public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

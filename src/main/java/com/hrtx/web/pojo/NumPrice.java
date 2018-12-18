@@ -9,11 +9,11 @@ import java.util.Date;
 @Table(name = "tb_num_price")
 public class NumPrice extends BasePojo implements java.io.Serializable {
     @Id
-    private Long id;
+    private Integer id;
 
-    private Long skuId;
+    private Integer skuId;
 
-    private Long numId;
+    private Integer numId;
 
     private Integer provinceCode;
 
@@ -33,7 +33,7 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
 
     private BigDecimal lowConsume;
 
-    private Long corpId;
+    private Integer corpId;
 
     private Integer channel;
 
@@ -43,7 +43,7 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
 
     private String agent;
 
-    private Long agentId;
+    private Integer agentId;
 
     private Integer isDel;
 
@@ -52,7 +52,7 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     @Transient
     private String tag;
 
-    public NumPrice(Long id, Long skuId, Long numId, Integer provinceCode, String provinceName, Integer cityCode, String cityName, String resource, BigDecimal basePrice, String netType, String feature, BigDecimal lowConsume, Long corpId, Integer channel, BigDecimal ratioPrice, BigDecimal price, String agent, Long agentId, Integer isDel, Date addDate) {
+    public NumPrice(Integer id, Integer skuId, Integer numId, Integer provinceCode, String provinceName, Integer cityCode, String cityName, String resource, BigDecimal basePrice, String netType, String feature, BigDecimal lowConsume, Integer corpId, Integer channel, BigDecimal ratioPrice, BigDecimal price, String agent, Integer agentId, Integer isDel, Date addDate) {
         this.id = id;
         this.skuId = skuId;
         this.numId = numId;
@@ -79,27 +79,27 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
         super();
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getSkuId() {
+    public Integer getSkuId() {
         return skuId;
     }
 
-    public void setSkuId(Long skuId) {
+    public void setSkuId(Integer skuId) {
         this.skuId = skuId;
     }
 
-    public Long getNumId() {
+    public Integer getNumId() {
         return numId;
     }
 
-    public void setNumId(Long numId) {
+    public void setNumId(Integer numId) {
         this.numId = numId;
     }
 
@@ -175,11 +175,11 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
         this.lowConsume = lowConsume;
     }
 
-    public Long getCorpId() {
+    public Integer getCorpId() {
         return corpId;
     }
 
-    public void setCorpId(Long corpId) {
+    public void setCorpId(Integer corpId) {
         this.corpId = corpId;
     }
 
@@ -215,11 +215,11 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
         this.agent = agent == null ? null : agent.trim();
     }
 
-    public Long getAgentId() {
+    public Integer getAgentId() {
         return agentId;
     }
 
-    public void setAgentId(Long agentId) {
+    public void setAgentId(Integer agentId) {
         this.agentId = agentId;
     }
 

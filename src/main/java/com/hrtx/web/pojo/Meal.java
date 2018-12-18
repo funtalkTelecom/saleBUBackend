@@ -4,28 +4,27 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Date;
 
 @Table(name = "tb_meal")
 public class Meal extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long mid;
+	private Integer mid;
 	private String mealId;
 	private String mealName;
 	private String mealDesc;
-    private Long saleCity;
+    private Integer saleCity;
     @Transient
     private String saleCityName;
 	private String saleType;
-	private Long createBy;
+	private Integer createBy;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date createDate;
-	private Long updateBy;
+	private Integer updateBy;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date updateDate;
 	private String teleType;
@@ -34,7 +33,7 @@ public class Meal extends BasePojo implements java.io.Serializable {
 	public Meal() {
 	}
 
-    public Meal(Long mid, String mealId, String mealName, String mealDesc, Long saleCity, String saleCityName, String saleType, Long createBy, Date createDate, Long updateBy, Date updateDate, String teleType, Integer isDel) {
+    public Meal(Integer mid, String mealId, String mealName, String mealDesc, Integer saleCity, String saleCityName, String saleType, Integer createBy, Date createDate, Integer updateBy, Date updateDate, String teleType, Integer isDel) {
         this.mid = mid;
         this.mealId = mealId;
         this.mealName = mealName;
@@ -50,11 +49,11 @@ public class Meal extends BasePojo implements java.io.Serializable {
         this.isDel = isDel;
     }
 
-    public Long getMid() {
+    public Integer getMid() {
         return mid;
     }
 
-    public void setMid(Long mid) {
+    public void setMid(Integer mid) {
         this.mid = mid;
     }
 
@@ -82,11 +81,11 @@ public class Meal extends BasePojo implements java.io.Serializable {
         this.mealDesc = mealDesc;
     }
 
-    public Long getSaleCity() {
+    public Integer getSaleCity() {
         return saleCity;
     }
 
-    public void setSaleCity(Long saleCity) {
+    public void setSaleCity(Integer saleCity) {
         this.saleCity = saleCity;
     }
 
@@ -106,11 +105,11 @@ public class Meal extends BasePojo implements java.io.Serializable {
         this.saleType = saleType;
     }
 
-    public Long getCreateBy() {
+    public Integer getCreateBy() {
         return createBy;
     }
 
-    public void setCreateBy(Long createBy) {
+    public void setCreateBy(Integer createBy) {
         this.createBy = createBy;
     }
 
@@ -122,11 +121,11 @@ public class Meal extends BasePojo implements java.io.Serializable {
         this.createDate = createDate;
     }
 
-    public Long getUpdateBy() {
+    public Integer getUpdateBy() {
         return updateBy;
     }
 
-    public void setUpdateBy(Long updateBy) {
+    public void setUpdateBy(Integer updateBy) {
         this.updateBy = updateBy;
     }
 
