@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -13,8 +15,9 @@ import java.util.Date;
 public class DeliveryAddress extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
     private String  personName ;// 收货人
     private String  personTel; //收货人电话
     private String  provinceName;// 所属省份
@@ -30,7 +33,7 @@ public class DeliveryAddress extends BasePojo implements java.io.Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date  updateDate;//修改日期
-    private Long  addUserId;//添加人ID
+    private int  addUserId;//添加人ID
     private int  isDel;//是否删除
     private int   isDefaultl;//是否默认
     private String  note;//备注
@@ -40,8 +43,8 @@ public class DeliveryAddress extends BasePojo implements java.io.Serializable {
     public DeliveryAddress() {
 	}
 
-    public DeliveryAddress(Long id, String personName,String personTel,String provinceName,String cityName,String districtName,String address, Date createDate, Date updateDate
-            ,Long addUserId ,int isDel ,int isDefaultl,String note,int provinceId,int cityId,int districtId ) {
+    public DeliveryAddress(Integer id, String personName,String personTel,String provinceName,String cityName,String districtName,String address, Date createDate, Date updateDate
+            ,int addUserId ,int isDel ,int isDefaultl,String note,int provinceId,int cityId,int districtId ) {
         this.id = id;
         this.personName = personName;
         this.personTel = personTel;
@@ -60,11 +63,11 @@ public class DeliveryAddress extends BasePojo implements java.io.Serializable {
         this.note = note;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -156,11 +159,11 @@ public class DeliveryAddress extends BasePojo implements java.io.Serializable {
         this.updateDate = updateDate;
     }
 
-    public Long getAddUserId() {
+    public int getAddUserId() {
         return addUserId;
     }
 
-    public void setAddUserId(Long addUserId) {
+    public void setAddUserId(int addUserId) {
         this.addUserId = addUserId;
     }
 

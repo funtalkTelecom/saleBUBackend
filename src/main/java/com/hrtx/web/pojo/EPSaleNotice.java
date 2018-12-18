@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -12,8 +15,9 @@ import java.util.Date;
 public class EPSaleNotice extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private Integer id;
     @JsonSerialize(using = ToStringSerializer.class)
     private Long epSaleId;//竞拍活动ID  来自tb_ep_sale.id
     private String phone;//	短信通知号码
@@ -23,7 +27,7 @@ public class EPSaleNotice extends BasePojo implements java.io.Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateDate;//	关注时间  修改
-    private Long  consumerId;//	用户id  来自tb_consumer.id
+    private Integer  consumerId;//	用户id  来自tb_consumer.id
     private String addIp;//	用户ip
     private String  remark;//备注
     private boolean isDel;
@@ -34,7 +38,7 @@ public class EPSaleNotice extends BasePojo implements java.io.Serializable {
     public EPSaleNotice() {
     }
 
-    public EPSaleNotice(Long id, Long epSaleId, String phone, Date addDate, Date updateDate, Long consumerId,
+    public EPSaleNotice(Integer id, Long epSaleId, String phone, Date addDate, Date updateDate, Integer consumerId,
                        String addIp, String remark, Boolean isDel, Integer isNotice) {
         this.id = id;
         this.epSaleId = epSaleId;
@@ -43,16 +47,14 @@ public class EPSaleNotice extends BasePojo implements java.io.Serializable {
         this.updateDate=updateDate;
         this.consumerId = consumerId;
         this.addIp = addIp;
-        this.consumerId = consumerId;
-        this.addIp = addIp;
         this.remark = remark;
         this.isDel = isDel;
         this.isNotice = isNotice;
     }
 
-    public Long getId() { return id; }
+    public Integer getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getPhone() { return phone; }
 
@@ -78,11 +80,11 @@ public class EPSaleNotice extends BasePojo implements java.io.Serializable {
 
     public void setUpdateDate(Date updateDate) { this.updateDate = updateDate; }
 
-    public Long getConsumerId() {
+    public Integer getConsumerId() {
         return consumerId;
     }
 
-    public void setConsumerId(Long consumerId) {
+    public void setConsumerId(Integer consumerId) {
         this.consumerId = consumerId;
     }
 
