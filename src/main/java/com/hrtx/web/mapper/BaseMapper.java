@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.github.pagehelper.Page;
+import org.apache.ibatis.annotations.Select;
 
 public interface BaseMapper<T> {
 	
@@ -15,5 +16,6 @@ public interface BaseMapper<T> {
 	
 	public Page<Object> queryPageList(@Param("param")Map<String, Object> map);
 
+	@Select("select `nextval`('hk') ")
 	public int getId();
 }
