@@ -27,6 +27,7 @@ public class DictService {
 	@Autowired
 	private DictMapper dictMapper;
 	@Autowired private NumPriceMapper numPriceMapper;
+	@Autowired private LyCrmService lyCrmService;
 
 	public Result pageDict(Dict dict) {
 		PageHelper.startPage(dict.startToPageNum(),dict.getLimit());
@@ -69,6 +70,13 @@ public class DictService {
 		return new Result(Result.OK, "删除成功");
 	}
 
+	public Result featherDelete(Dict dict) {
+		Dict dict1 = dictMapper.selectByPrimaryKey(dict.getId());
+		dictMapper.dictDelete(dict);
+		lyCrmService.delRuel(dict1);
+		return new Result(Result.OK, "删除成功");
+	}
+
 	public Dict findGroupMaxInfo(String keyGroup) {
 		return dictMapper.findGroupMaxInfo(keyGroup);
 	}
@@ -97,6 +105,7 @@ public class DictService {
 			dict.setKeyId(String.valueOf(NumberUtils.toInt(String.valueOf(map.get("keyId")))+1));
 			dict.setSeq(NumberUtils.toInt(String.valueOf(map.get("seq")))+1);
 			dictMapper.insert(dict);
+			lyCrmService.addRuel(dict);
 		}else {
 			Dict dict1 = dictMapper.selectByPrimaryKey(dict.getId());
 			if(dict1==null) return new Result(Result.OK, "数据不存在");
@@ -104,8 +113,8 @@ public class DictService {
 			dict1.setExt2(dict.getExt2());
 			dictMapper.updateByPrimaryKey(dict1);
 			log.info("号码规则["+dict1.getKeyValue()+"]更改后的不带4价为["+dict.getExt1()+"],带4价为["+dict.getExt2()+"]");
+			numPriceMapper.matchNumPrice();
 		}
-		numPriceMapper.matchNumPrice();
 		return new Result(Result.OK, "成功");
 	}
 
@@ -123,6 +132,7 @@ public class DictService {
 		dict.setKeyId(String.valueOf(NumberUtils.toInt(String.valueOf(map.get("keyId")))+1));
 		dict.setSeq(NumberUtils.toInt(String.valueOf(map.get("seq")))+1);
 		dictMapper.insert(dict);
+		lyCrmService.addRuel(dict);
 		return new Result(Result.OK, "成功");
 	}
 }

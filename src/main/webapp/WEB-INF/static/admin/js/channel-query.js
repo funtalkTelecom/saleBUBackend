@@ -146,7 +146,7 @@ $(function() {
                     }
                 });
                 $operate.find(".del").click(function () {
-                    if (confirm("确认删除？")) {
+                    if (confirm("提交后将按最新的价格规则同步更新当前在售的号码价格，请确认是否删除？")) {
                         $.post("channel/feather-delete", {id:  record.id}, function (data) {
                             dataList.reload();
                             alert(data.data);
@@ -182,7 +182,7 @@ $(function() {
             return false}
         var re = /^\d+(?=\.{0,1}\d+$|$)/
         var ext1 = $("#myModal form input[name=ext1]").val()
-        var ext2 =  $("#myModal form textarea[name=ext2]").val()
+        var ext2 =  $("#myModal form input[name=ext2]").val()
         if(!ext1||!ext2) {
             alert("请填写价格")
             return false
@@ -197,10 +197,12 @@ $(function() {
             alert('请输入大于0的数');
             return false
         }
-        $.post("channel/feather-price-edit",$("#myModal form").serialize(),function(data){
-            dataList.reload();
-            $('#myModal').modal('hide');
-        },"json");
+        if (confirm("提交后将按最新的价格规则同步更新当前在售的号码价格，请确认是否提交")) {
+            $.post("channel/feather-price-edit", $("#myModal form").serialize(), function (data) {
+                dataList.reload();
+                $('#myModal').modal('hide');
+            }, "json");
+        }
     });
 
     featherTypeList = new $.DSTable({

@@ -84,7 +84,7 @@ public class ChannelController extends BaseReturn{
     @RequestMapping("/feather-delete")
     @Powers({PowerConsts.CHANNELMOUDULE_COMMON_EDIT})
     public Result featherDelete(Dict dict){
-        return dictService.dictDelete(dict);
+        return dictService.featherDelete(dict);
     }
 
 }

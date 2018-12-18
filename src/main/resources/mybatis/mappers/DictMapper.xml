@@ -25,7 +25,7 @@
         from tb_dict a
         where 1=1 and a.is_del=0
         <if test="param.isDel==0">
-            and a.key_group!='feather_price'
+            and a.key_group!='feather_price' and a.key_group!='FEATHER_TYPE'
         </if>
         <if test="param.keyId!=null and param.keyId!=''">
             and a.key_id like "%"#{param.keyId}"%"
