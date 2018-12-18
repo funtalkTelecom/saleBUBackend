@@ -19,6 +19,6 @@ public interface BaseMapper<T> {
 	public Page<Object> queryPageList(@Param("param")Map<String, Object> map);
 
 	@Select("select `nextval`('hk') ")
-	@Options(useCache =false)
+	@Options(useCache =false,flushCache=true)
 	public int getId();
 }
