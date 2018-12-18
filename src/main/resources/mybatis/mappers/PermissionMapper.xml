@@ -23,7 +23,7 @@
   	select * from tb_role r where r.name = #{name} and r.is_del = 0
   </select>
   <insert id="addRole">
-  	insert into tb_role(id, name, status, is_del) values (#{role.generalId}, #{role.name}, #{role.status}, #{role.isDel})
+  	insert into tb_role(id, name, status, is_del) values (`nextval`('hk'), #{role.name}, #{role.status}, #{role.isDel})
   </insert>
   <delete id="deleByRoleId">
   	delete rp from tb_role_permission rp where rp.role_id=#{roleId}
@@ -32,9 +32,9 @@
   	delete up from tb_user_permission up where up.user_id=#{userId}
   </delete>
   <insert id="addRolePermission">
-  	insert into tb_role_permission(id, role_id, permission) values (#{param.generalId}, #{param.roleId}, #{param.permission})
+  	insert into tb_role_permission(id, role_id, permission) values (`nextval`('hk'), #{param.roleId}, #{param.permission})
   </insert>
   <insert id="addUserPermission">
-  	insert into tb_user_permission(id, user_id, permission) values (#{param.generalId}, #{param.userId}, #{param.permission})
+  	insert into tb_user_permission(id, user_id, permission) values (`nextval`('hk'), #{param.userId}, #{param.permission})
   </insert>
 </mapper>

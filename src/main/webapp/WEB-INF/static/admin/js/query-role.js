@@ -24,7 +24,7 @@
 		"ct" : "#userresult",
 		"cm" : [{
 			"header" : "登录帐号",
-			"dataIndex" : "loginName"
+			"dataIndex" : "login_name"
 		},{
 			"header" : "用户名",
 			"dataIndex" : "name"
@@ -32,8 +32,8 @@
 		"onSelected" : function(row,record){
 			$("#roleId").val(record.id);
 			$("#property").val("2");
-			$("#tlabel").html("用户："+record.name+"-"+record.loginName);
-			loadStorageAllocate(record.id+'','杰生旗帜交易平台');
+			$("#tlabel").html("用户："+record.name+"-"+record.login_name);
+			loadStorageAllocate(record.id+'','号卡平台');
 		},
 		
         "getParam" : function(){
@@ -89,7 +89,7 @@
 				"property" : $("#property").val(),
 				"permissionIds" : selected.join(",")
 			};
-			$.getJSON("update-permission",param,function(data){
+			$.post("update-permission",param,function(data){
 				$("#submit").attr("disabled",false);
 				$("#sendTip").hide();
 				alert("授权成功");
