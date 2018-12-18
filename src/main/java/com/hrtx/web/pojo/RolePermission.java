@@ -15,6 +15,7 @@ public class RolePermission extends BasePojo implements java.io.Serializable {
 
 	// Fields
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	private int roleId;
 	private int permission;

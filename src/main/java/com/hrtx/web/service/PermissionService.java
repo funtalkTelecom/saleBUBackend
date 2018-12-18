@@ -37,17 +37,17 @@ public class PermissionService {
 	}
 
 	public List<Map> getTreeNode(PermissionAllocateForm permissionAllocateForm) {
-		long roleId = permissionAllocateForm.getNodeId();
+		int roleId = permissionAllocateForm.getNodeId();
 //		List<Permission> ps = permissionMapper.findPermission(1);
 		Permission permission = new Permission();
-		permission.setPid(1l);
+		permission.setPid(1);
 		List<Permission> ps = permissionMapper.select(permission);
 		return toTreeNode(ps, roleId, permissionAllocateForm.getNodeValue());
 	}
 	
 	//将对象转成树节点对象
 	@SuppressWarnings("unchecked")
-	private List<Map> toTreeNode(List<Permission> node, long roleId, String type ){
+	private List<Map> toTreeNode(List<Permission> node, int roleId, String type ){
 		Map permission = new HashMap();
 		for (Permission p : node) {
 			String permissionId = p.getId()+"";
@@ -135,7 +135,7 @@ public class PermissionService {
 		return permissionNodes;
 	}
 	
-	private String checkState(List nodes,long roleId, String type){
+	private String checkState(List nodes, int roleId, String type){
 		StringBuffer sb = new StringBuffer();
 		int len = nodes.size();
 		for (int i = 0; i < len; i++) {
@@ -204,7 +204,7 @@ public class PermissionService {
 	}
 
 	public void checkOrInsertPermission() {
-		Map<Long, Object> map = new HashMap<Long, Object>();
+		Map<Integer, Object> map = new HashMap<Integer, Object>();
 		List<Permission> permissions = permissionMapper.select(null);
 		for (Permission permission : permissions) {
 			map.put(permission.getId(), null);
