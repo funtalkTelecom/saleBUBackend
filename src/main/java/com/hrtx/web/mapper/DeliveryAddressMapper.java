@@ -10,11 +10,11 @@ import java.util.Map;
 @Component
 public interface DeliveryAddressMapper extends Mapper<DeliveryAddress>,BaseMapper<DeliveryAddress>{
 
-    List<Map> findDeliveryAddressById(@Param("id") Long id);
+    List<Map> findDeliveryAddressById(@Param("id") Integer id);
 
-    List<Map> findDeliveryAddressListByUserId(@Param("addUserId") Long addUserId);
+    List<Map> findDeliveryAddressListByUserId(@Param("addUserId") Integer addUserId);
 
-    List<Map> findDeliveryAddressDefaultByUserId(@Param("addUserId") Long addUserId);
+    List<Map> findDeliveryAddressDefaultByUserId(@Param("addUserId") Integer addUserId);
 
     int checkDeliveryAddressKeyIdIsExist(DeliveryAddress deliveryAddress);
 
@@ -26,5 +26,5 @@ public interface DeliveryAddressMapper extends Mapper<DeliveryAddress>,BaseMappe
 
     void insertBatch(@Param("deliveryAddressList") List<DeliveryAddress> list);
 
-    DeliveryAddress findDeliveryAddressByIdForOrder(@Param("id") Long id);
+    DeliveryAddress findDeliveryAddressByIdForOrder(@Param("id") Integer id);
 }

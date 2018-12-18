@@ -5,17 +5,16 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Date;
 
 @Table(name = "tb_goods")
 public class Goods extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-    private Long gId;
+    private Integer gId;
     private String gType1;
     private String gType2;
     private String gName;
@@ -29,14 +28,14 @@ public class Goods extends BasePojo implements java.io.Serializable {
     private String gSaleCity;
     private String gIsAuc;
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long gActive;
+    private Integer gActive;
     private String gIsPack;
     private String gLoopTime;
     private String gDeposit;
     private String gStartNum;
     private String gPriceUp;
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long gSellerId;
+    private Integer gSellerId;
     private String gSellerName;
     private String gIsSale;
     private Integer status;
@@ -47,9 +46,9 @@ public class Goods extends BasePojo implements java.io.Serializable {
     public Goods() {
     }
 
-    public Goods(Long gId, String gType1, String gType2, String gName, String gAd, Date gStartTime,
-                 Date gEndTime, String gSaleCity, String gIsAuc, Long gActive, String gIsPack, String gLoopTime,
-                 String gDeposit, String gStartNum, String gPriceUp, Long gSellerId, String gSellerName, String gIsSale,int status) {
+    public Goods(Integer gId, String gType1, String gType2, String gName, String gAd, Date gStartTime,
+                 Date gEndTime, String gSaleCity, String gIsAuc, Integer gActive, String gIsPack, String gLoopTime,
+                 String gDeposit, String gStartNum, String gPriceUp, Integer gSellerId, String gSellerName, String gIsSale,int status) {
         this.gId = gId;
         this.gType1 = gType1;
         this.gType2 = gType2;
@@ -71,11 +70,11 @@ public class Goods extends BasePojo implements java.io.Serializable {
         this.status = status;
     }
 
-    public Long getgId() {
+    public Integer getgId() {
         return gId;
     }
 
-    public void setgId(Long gId) {
+    public void setgId(Integer gId) {
         this.gId = gId;
     }
 
@@ -143,11 +142,11 @@ public class Goods extends BasePojo implements java.io.Serializable {
         this.gIsAuc = gIsAuc;
     }
 
-    public Long getgActive() {
+    public Integer getgActive() {
         return gActive;
     }
 
-    public void setgActive(Long gActive) {
+    public void setgActive(Integer gActive) {
         this.gActive = gActive;
     }
 
@@ -191,11 +190,11 @@ public class Goods extends BasePojo implements java.io.Serializable {
         this.gPriceUp = gPriceUp;
     }
 
-    public Long getgSellerId() {
+    public Integer getgSellerId() {
         return gSellerId;
     }
 
-    public void setgSellerId(Long gSellerId) {
+    public void setgSellerId(Integer gSellerId) {
         this.gSellerId = gSellerId;
     }
 

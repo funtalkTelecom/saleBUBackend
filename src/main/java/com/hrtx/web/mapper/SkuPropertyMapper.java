@@ -11,11 +11,11 @@ public interface SkuPropertyMapper extends Mapper<SkuProperty>,BaseMapper<SkuPro
 
     void insertBatch(@Param("skuPropertyList") List<SkuProperty> skuPropertyList);
 
-    List<SkuProperty> findSkuPropertyByGid(@Param("gId") Long gId);
+    List<SkuProperty> findSkuPropertyByGid(@Param("gId") Integer gId);
 
     void deleteSkuPropertyByGid(SkuProperty skuProperty);
 
-    List findSkuPropertyBySkuid(@Param("skuid") Long skuid);
+    List findSkuPropertyBySkuid(@Param("skuid") Integer skuid);
 
-    List findSkuPropertyBySkuidForOrder(@Param("skuid") Long skuid);
+    List findSkuPropertyBySkuidForOrder(@Param("skuid") Integer skuid);
 }

@@ -44,7 +44,7 @@ public class DictService {
 			}
 		} else {
 			List<Dict> list = new ArrayList<Dict>();
-			long id = dict.getGeneralId();
+//			long id = dict.getGeneralId();
 //			dict.setId(dict.getGeneralId());
 			list.add(dict);
 			dictMapper.insertBatch(list);

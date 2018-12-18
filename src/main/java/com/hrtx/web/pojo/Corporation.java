@@ -1,5 +1,7 @@
 package com.hrtx.web.pojo;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -7,7 +9,8 @@ import java.util.Date;
 public class Corporation extends BasePojo implements java.io.Serializable{
     private static final long serialVersionUID = 1L;
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String name;
     private String principal;
     private String phone;
@@ -24,7 +27,7 @@ public class Corporation extends BasePojo implements java.io.Serializable{
     public Corporation() {
     }
 
-    public Corporation(Long id, String name, String principal, String phone, Long district, String address, String remark, Byte status, Date addDate, String addUser, Boolean isDel) {
+    public Corporation(Integer id, String name, String principal, String phone, Long district, String address, String remark, Byte status, Date addDate, String addUser, Boolean isDel) {
         this.id = id;
         this.name = name;
         this.principal = principal;
@@ -38,11 +41,11 @@ public class Corporation extends BasePojo implements java.io.Serializable{
         this.isDel = isDel;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

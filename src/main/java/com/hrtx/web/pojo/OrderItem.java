@@ -3,6 +3,8 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -10,17 +12,18 @@ import javax.persistence.Table;
 public class OrderItem extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-    private Long itemId;
-    private Long pItemId;
-    private Long orderId;
-    private Long goodsId;
-    private Long skuId;
+    private Integer itemId;
+    private Integer pItemId;
+    private Integer orderId;
+    private Integer goodsId;
+    private Integer skuId;
     private String skuProperty;
-    private Long numId;
+    private Integer numId;
     private String num;
     private int isShipment;
-    private Long sellerId;
+    private Integer sellerId;
     private String sellerName;
     private String shipmentApi;
     private Long companystockId;
@@ -33,7 +36,7 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
     public OrderItem() {
     }
 
-    public OrderItem(Long itemId, Long pItemId, Long orderId, Long goodsId, Long skuId, String skuProperty, Long numId, String num, int isShipment, Long sellerId, String sellerName, String shipmentApi, Long companystockId, int quantity, double price, double total, Long mealId, String iccid) {
+    public OrderItem(Integer itemId, Integer pItemId, Integer orderId, Integer goodsId, Integer skuId, String skuProperty, Integer numId, String num, int isShipment, Integer sellerId, String sellerName, String shipmentApi, Long companystockId, int quantity, double price, double total, Long mealId, String iccid) {
         this.itemId = itemId;
         this.pItemId = pItemId;
         this.orderId = orderId;
@@ -54,43 +57,43 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
         this.iccid = iccid;
     }
 
-    public Long getItemId() {
+    public Integer getItemId() {
         return itemId;
     }
 
-    public void setItemId(Long itemId) {
+    public void setItemId(Integer itemId) {
         this.itemId = itemId;
     }
 
-    public Long getpItemId() {
+    public Integer getpItemId() {
         return pItemId;
     }
 
-    public void setpItemId(Long pItemId) {
+    public void setpItemId(Integer pItemId) {
         this.pItemId = pItemId;
     }
 
-    public Long getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 
-    public Long getGoodsId() {
+    public Integer getGoodsId() {
         return goodsId;
     }
 
-    public void setGoodsId(Long goodsId) {
+    public void setGoodsId(Integer goodsId) {
         this.goodsId = goodsId;
     }
 
-    public Long getSkuId() {
+    public Integer getSkuId() {
         return skuId;
     }
 
-    public void setSkuId(Long skuId) {
+    public void setSkuId(Integer skuId) {
         this.skuId = skuId;
     }
 
@@ -102,11 +105,11 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
         this.skuProperty = skuProperty;
     }
 
-    public Long getNumId() {
+    public Integer getNumId() {
         return numId;
     }
 
-    public void setNumId(Long numId) {
+    public void setNumId(Integer numId) {
         this.numId = numId;
     }
 
@@ -126,11 +129,11 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
         this.isShipment = isShipment;
     }
 
-    public Long getSellerId() {
+    public Integer getSellerId() {
         return sellerId;
     }
 
-    public void setSellerId(Long sellerId) {
+    public void setSellerId(Integer sellerId) {
         this.sellerId = sellerId;
     }
 

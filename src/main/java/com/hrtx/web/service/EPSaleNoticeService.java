@@ -56,7 +56,7 @@ public class EPSaleNoticeService {
         if(list.isEmpty()){
             log.info(String.format("暂无竞拍活动开始........"));return;
         }
-        Long epSaleId=0L;//竞拍活动id
+        Integer epSaleId=0;//竞拍活动id
         String goodsNoticePhone="";//短信通知手机号
         String epSaleTitle="";//竞拍活动标题
         Order order=new Order();
@@ -64,7 +64,7 @@ public class EPSaleNoticeService {
         {
             for(Map map :list)
             {
-                epSaleId=Long.valueOf(map.get("epSaleId").toString());
+                epSaleId=Integer.valueOf(map.get("epSaleId").toString());
                 epSaleTitle=map.get("title").toString();
                 List<Map> ePSaleNoticeList=this.ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleId(epSaleId);
                 if(!ePSaleNoticeList.isEmpty()&&ePSaleNoticeList.size()>0)
@@ -90,8 +90,8 @@ public class EPSaleNoticeService {
     public Result findEPSaleNoticeList()
     {
         List<Map> list=ePSaleNoticeMapper.findEPSaleNoticeListbyConsumerId(apiSessionUtil.getConsumer().getId());
-        Long numId=0L;
-        Long gId=0L;
+        Integer numId=0;
+        Integer gId=0;
         int numStatus=0;//状态 号码记录
         String urlImg="";
         int gStatus=0;//0 未上架，1上架，2 失效 tb_num.stauts<>2
@@ -100,8 +100,8 @@ public class EPSaleNoticeService {
         {
             urlImg=SystemParam.get("domain-full") +map.get("gImg").toString();
             map.put("gImg",urlImg);
-            numId=Long.valueOf(map.get("numId").toString());
-            gId=Long.valueOf(map.get("gId").toString());
+            numId=Integer.valueOf(map.get("numId").toString());
+            gId=Integer.valueOf(map.get("gId").toString());
             if(gId>0)
             {
                 Goods goods = goodsMapper.findGoodsInfo(gId);
@@ -134,7 +134,7 @@ public class EPSaleNoticeService {
     /*
       获取consumerId的设置提醒列表
      */
-    public List<Map> findEPSaleNoticeListByEPSaleId(Long epSaleId) {
+    public List<Map> findEPSaleNoticeListByEPSaleId(Integer epSaleId) {
         //return ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,this.apiSessionUtil.getConsumer().getId());
         return ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId(epSaleId,this.apiSessionUtil.getConsumer().getId());
     }
@@ -142,7 +142,7 @@ public class EPSaleNoticeService {
     /*
          获取consumerId对竞拍活动ID的已设置提醒列表
         */
-    public List<Map> findEPSaleNoticeListByEPSaleIdAndConsumerId(Long epSaleId,Long consumerId) {
+    public List<Map> findEPSaleNoticeListByEPSaleIdAndConsumerId(Integer epSaleId,Integer consumerId) {
         return ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId2(epSaleId,consumerId);
     }
 
@@ -153,7 +153,7 @@ public class EPSaleNoticeService {
             ePSaleNotice.setConsumerId(apiSessionUtil.getConsumer().getId());
             List<Map> ePSaleNoticeList=ePSaleNoticeMapper.findEPSaleNoticeListByEPSaleIdAndConsumerId (ePSaleNotice.getEpSaleId(),this.apiSessionUtil.getConsumer().getId());
             if (!ePSaleNoticeList.isEmpty()&&ePSaleNoticeList.size()>0) {
-                ePSaleNotice.setId(Long.valueOf(String.valueOf(ePSaleNoticeList.get(0).get("id"))));
+                ePSaleNotice.setId(Integer.valueOf(String.valueOf(ePSaleNoticeList.get(0).get("id"))));
                 isNotice=NumberUtils.toInt(ObjectUtils.toString(ePSaleNoticeList.get(0).get("isNotice")));
                 ePSaleNotice.setIsNotice(isNotice==1?0:1);//是否设置提醒
                 noticeStr=isNotice==1?"取消提醒成功":"设置提醒成功";
@@ -161,7 +161,7 @@ public class EPSaleNoticeService {
                 ePSaleNoticeMapper.ePSaleNoticeEdit(ePSaleNotice);
             } else {
                 List<EPSaleNotice> list = new ArrayList<EPSaleNotice>();
-                ePSaleNotice.setId(ePSaleNotice.getGeneralId());
+//                ePSaleNotice.setId(ePSaleNotice.getGeneralId());
                 ePSaleNotice.setAddDate(new Date());
                 ePSaleNotice.setUpdateDate(new Date());
                 ePSaleNotice.setIsNotice(1);//设置提醒成功

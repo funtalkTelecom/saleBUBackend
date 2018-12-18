@@ -41,7 +41,7 @@ public class ChannelService {
         Channel c = channelMapper.selectByPrimaryKey(channel.getId());
         if(c==null) return new Result(Result.OK, "数据不存在");
         Channel cl = new Channel();
-        cl.setId(cl.getGeneralId());
+//        cl.setId(cl.getGeneralId());
         cl.setChannel(c.getChannel());
         cl.setChannelId(c.getChannelId());
         cl.setIsDel(0);

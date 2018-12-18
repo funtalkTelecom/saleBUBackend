@@ -67,15 +67,14 @@ public class ConsumerService extends BaseService {
 		if(consumerLog == null){
 			//向userclient，userclientlog存数据
 			Consumer userC = new Consumer();
-			userC.setId(userC.getGeneralId());
+//			userC.setId(userC.getGeneralId());
 			userC.setStatus(1);
 			userC.setIsAgent(1);
 			userC.setRegDate(new Date());
 			consumerMapper.insert(userC);
-			Long userid = userC.getId();
+			Integer userid = userC.getId();
 
 			ConsumerLog log = new ConsumerLog();
-			log.setId(log.getGeneralId());
 			log.setUserId(userid);
 			log.setOpenid(openid);
 			log.setStatus(1);
@@ -88,7 +87,7 @@ public class ConsumerService extends BaseService {
 			_map.put("consumer_id",String.valueOf(userC.getId()));
 		}else {
 			Consumer Cparam = new Consumer();
-			Long id = consumerLog.getUserId();
+			Integer id = consumerLog.getUserId();
 			Cparam.setId(id);
 			Consumer consumer = consumerMapper.selectOne(Cparam);
 			this.apiSessionUtil.saveOrUpdate(token,consumer);
@@ -102,7 +101,7 @@ public class ConsumerService extends BaseService {
 	public Result insertConsumer(String loginName,String livePhone,String nickName,long sex,String img,String province,String city){
 		//姓名,电话,昵称,性别 1男2女0未知,// 头像,//省份,//地市
 		Consumer consumer= this.apiSessionUtil.getConsumer();
-		long userid = consumer.getId();
+		Integer userid = consumer.getId();
 		ConsumerLog param = new ConsumerLog();
 		param.setUserId(userid);
 		ConsumerLog log = consumerLogMapper.selectOne(param);

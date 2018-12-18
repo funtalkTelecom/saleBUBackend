@@ -35,7 +35,7 @@ public class AccountService {
 			this.accountMapper.accountEdit(account);
 		} else {
 			List<Account> list = new ArrayList<Account>();
-			account.setId(account.getGeneralId());
+//			account.setId(account.getGeneralId());
 			account.setAddDate(new Date());
 			account.setAddUserId(SessionUtil.getUserId());
 			list.add(account);

@@ -46,7 +46,7 @@ public class NumService {
      * @param orderId
      * @return
      */
-    public Result blindNum(Long orderId) {
+    public Result blindNum(Integer orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "绑卡订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 4) return new Result(Result.ERROR, "订单状态异常");
@@ -68,7 +68,7 @@ public class NumService {
             //绑卡
             for (Map item:items) {
                 int count = NumberUtils.toInt(ObjectUtils.toString(item.get("count")));
-                long item_id = NumberUtils.toLong(ObjectUtils.toString(item.get("itemId")));
+                Integer item_id = Integer.parseInt(ObjectUtils.toString(item.get("itemId")));
                 OrderItem orderItem = orderItemMapper.selectByPrimaryKey(item_id);
                 if(orderItem == null) throw new ServiceException("未找到仓库回调的itemId["+item_id+"]");
                 if(orderItem.getIsShipment() != 1) throw new ServiceException("仓库回调的itemId["+item_id+"]在平台为不需发货，数据异常");
@@ -148,7 +148,7 @@ public class NumService {
             }
         }
         NumFreeze numFreeze = new NumFreeze();
-        numFreeze.setId(numFreeze.getGeneralId());
+//        numFreeze.setId(numFreeze.getGeneralId());
         numFreeze.setAddDate(new Date());
         numFreeze.setAddUser(SessionUtil.getUserId());
         numFreeze.setNumId(num1.getId());
@@ -167,8 +167,8 @@ public class NumService {
             JSONObject m = JSONObject.fromObject(list.get(i));
             Integer integer = NumberUtils.toInt(String.valueOf(m.get("is_freeze")));
             if(integer==1){
-                long numId = NumberUtils.toLong(String.valueOf(m.get("id")));
-                Long addUser=numFreezeMapper.queryFreeze(numId);
+                Integer numId = NumberUtils.toInt(String.valueOf(m.get("id")));
+                Integer addUser=numFreezeMapper.queryFreeze(numId);
                 m.put("addUser",addUser );
                 list.set(i, m);
             }
@@ -191,7 +191,7 @@ public class NumService {
                 long id = NumberUtils.toLong(String.valueOf(map.get("id")));
                 Num num = numMapper.selectByPrimaryKey(id);
                 NumFreeze numFreeze = new NumFreeze();
-                numFreeze.setId(numFreeze.getGeneralId());
+//                numFreeze.setId(numFreeze.getGeneralId());
                 numFreeze.setAddDate(new Date());
                 numFreeze.setNumId(num.getId());
                 numFreeze.setNumResource(num.getNumResource());
@@ -208,7 +208,7 @@ public class NumService {
         return numPriceMapper.selectByPrimaryKey(id);
     }
 
-    public Long queryFreeze(Long numId) {
+    public Integer queryFreeze(Integer numId) {
         return numFreezeMapper.queryFreeze(numId);
     }
 

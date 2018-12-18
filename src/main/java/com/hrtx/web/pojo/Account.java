@@ -3,22 +3,27 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.awt.*;
 import java.util.Date;
 
 @Table(name = "tb_account")
 public class Account extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
 	private String bankAccount;
 	private Long cardBank;
 	private String cardBankName;
 	private String subbranchBank;
 	private String cardAccount;
-	private Long addUserId;
+	private Integer addUserId;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date addDate;
 	private Integer isDel;
@@ -26,7 +31,7 @@ public class Account extends BasePojo implements java.io.Serializable {
 	public Account() {
 	}
 
-	public Account(Long id, String bankAccount, Long cardBank,String cardBankName, String subbranchBank, String cardAccount, Long addUserId, Date addDate, Integer isDel) {
+	public Account(Integer id, String bankAccount, Long cardBank,String cardBankName, String subbranchBank, String cardAccount, Integer addUserId, Date addDate, Integer isDel) {
 		this.id = id;
 		this.bankAccount = bankAccount;
 		this.cardBank = cardBank;
@@ -38,11 +43,11 @@ public class Account extends BasePojo implements java.io.Serializable {
 		this.isDel = isDel;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -78,11 +83,11 @@ public class Account extends BasePojo implements java.io.Serializable {
 		this.cardAccount = cardAccount;
 	}
 
-	public Long getAddUserId() {
+	public Integer getAddUserId() {
 		return addUserId;
 	}
 
-	public void setAddUserId(Long addUserId) {
+	public void setAddUserId(Integer addUserId) {
 		this.addUserId = addUserId;
 	}
 

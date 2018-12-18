@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -15,8 +13,9 @@ import java.util.Date;
 public class Number extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private Integer id;
     private Long cityId;
     private String cityName;
     private String netType;
@@ -34,7 +33,7 @@ public class Number extends BasePojo implements java.io.Serializable {
     private String buyer;
     private String iccid;
     private int status;
-    private Long skuId;
+    private Integer skuId;
     private String teleType;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -47,7 +46,7 @@ public class Number extends BasePojo implements java.io.Serializable {
     public Number() {
     }
 
-    public Number(Long id, Long cityId, String cityName, String netType, String numResource, String numType, String numLevel, BigDecimal lowConsume, int with4, String feature, String sectionNo, String moreDigit, Long sellerId, String seller, Long buyerId, String buyer, String iccid, int status, Long skuId, String teleType, Date startTime, Date endTime) {
+    public Number(Integer id, Long cityId, String cityName, String netType, String numResource, String numType, String numLevel, BigDecimal lowConsume, int with4, String feature, String sectionNo, String moreDigit, Long sellerId, String seller, Long buyerId, String buyer, String iccid, int status, Integer skuId, String teleType, Date startTime, Date endTime) {
         this.id = id;
         this.cityId = cityId;
         this.cityName = cityName;
@@ -72,11 +71,11 @@ public class Number extends BasePojo implements java.io.Serializable {
         this.endTime = endTime;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -216,11 +215,11 @@ public class Number extends BasePojo implements java.io.Serializable {
         this.status = status;
     }
 
-    public Long getSkuId() {
+    public Integer getSkuId() {
         return skuId;
     }
 
-    public void setSkuId(Long skuId) {
+    public void setSkuId(Integer skuId) {
         this.skuId = skuId;
     }
 

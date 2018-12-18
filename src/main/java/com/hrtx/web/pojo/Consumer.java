@@ -3,17 +3,16 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Date;
 
 @Table(name = "tb_consumer")
 public class Consumer extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+	private Integer id;
 	private String name;
 	private String phone;
 	private String nickName;
@@ -34,12 +33,12 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 	public Consumer() {
 	}
 
-	private Consumer(Long id, Date regDate){
+	private Consumer(Integer id, Date regDate){
 		super();
 		this.id = id;
 		this.regDate = regDate;
 	}
-	private Consumer(Long id, String name, String phone, String nickName,
+	private Consumer(Integer id, String name, String phone, String nickName,
 					 String img, String province, String city, Integer status, Date regDate,Integer isAgent) {
 		super();
 		this.id = id;
@@ -55,11 +54,11 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 		this.isAgent = isAgent;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

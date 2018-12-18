@@ -7,31 +7,31 @@ import java.util.Date;
 @Table(name = "tb_num_freeze")
 public class NumFreeze extends BasePojo{
     @Id
-    private Long id;
+    private Integer id;
 
-    private Long numId;
+    private Integer numId;
 
     private String numResource;
 
     private Date addDate;
 
-    private Long addUser;
+    private Integer addUser;
 
     private Integer isFreeze;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getNumId() {
+    public Integer getNumId() {
         return numId;
     }
 
-    public void setNumId(Long numId) {
+    public void setNumId(Integer numId) {
         this.numId = numId;
     }
 
@@ -51,11 +51,11 @@ public class NumFreeze extends BasePojo{
         this.addDate = addDate;
     }
 
-    public Long getAddUser() {
+    public Integer getAddUser() {
         return addUser;
     }
 
-    public void setAddUser(Long addUser) {
+    public void setAddUser(Integer addUser) {
         this.addUser = addUser;
     }
 

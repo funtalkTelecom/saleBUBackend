@@ -115,7 +115,7 @@ public class NumberService {
                                 continue;
                             }else{//标签不存在,新增相应号码的相应标签
                                 NumRule nnr = new NumRule();
-                                nnr.setId(nnr.getGeneralId());
+//                                nnr.setId(nnr.getGeneralId());
                                 nnr.setRuleType("tag");
                                 nnr.setNumId(nr.getNumId());
                                 nnr.setNum(num);
