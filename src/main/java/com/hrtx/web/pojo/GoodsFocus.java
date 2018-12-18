@@ -53,8 +53,6 @@ public class GoodsFocus extends BasePojo implements java.io.Serializable {
         this.updateDate=updateDate;
         this.consumerId = consumerId;
         this.addIp = addIp;
-        this.consumerId = consumerId;
-        this.addIp = addIp;
         this.remark = remark;
         this.isDel = isDel;
     }

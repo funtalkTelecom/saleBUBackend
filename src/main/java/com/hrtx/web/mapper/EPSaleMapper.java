@@ -12,39 +12,39 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     Page<Object> queryPageList(@Param("param") EPSale epSale);
 
-    EPSale findEPSaleById(@Param("id") Long id);
+    EPSale findEPSaleById(@Param("id") Integer id);
 
     List<Map> findNumById(@Param("id") Integer id);
 
-    List<Map> findGoodsByGId(@Param("gId") Long gId);
+    List<Map> findGoodsByGId(@Param("gId") Integer gId);
 
     void numLoopEdit(@Param("endTime")String endTime, @Param("id") Integer id);
 
-    List<Map> findEPSaleListByUserId(@Param("addUserId") Long addUserId);
+    List<Map> findEPSaleListByUserId(@Param("addUserId") Integer addUserId);
 
-    List<Map> findEPSaleGoodsListByEPSaleId(Long epSaleId);
+    List<Map> findEPSaleGoodsListByEPSaleId(Integer epSaleId);
 
-    List<Map> findEPSaleGoodsListByEPSaleId2(Long epSaleId);
+    List<Map> findEPSaleGoodsListByEPSaleId2(Integer epSaleId);
 
-    List<Map> findEPSaleGoodsListByEPSaleId3(Long epSaleId);
+    List<Map> findEPSaleGoodsListByEPSaleId3(Integer epSaleId);
 
-    List<Map> findEPSaleGoodsByGoodsId(Long goodsId);
+    List<Map> findEPSaleGoodsByGoodsId(Integer goodsId);
 
     List<Map> findEPSaleGoods();
 
     List<Map> findEPSaleGoods2();
 
-    List<Map> findEPSaleGoodsByGoodsId2(Long goodsId);
+    List<Map> findEPSaleGoodsByGoodsId2(Integer goodsId);
 
-    List<Map> findEPSaleGoodsByNumId(Long numId);
+    List<Map> findEPSaleGoodsByNumId(Integer numId);
 
-    List<Map> findEPSaleGoodsByNumIdAndGId(Long numId,Long gId);
+    List<Map> findEPSaleGoodsByNumIdAndGId(Integer numId,Integer gId);
 
-    List<Map> findEPSaleGoodsByGId(Long gId);
+    List<Map> findEPSaleGoodsByGId(Integer gId);
 
-    List<Map> findEPSaleGoodsImgByNumIdAndGId(Long numId,Long gId);
+    List<Map> findEPSaleGoodsImgByNumIdAndGId(Integer numId,Integer gId);
 
-    List<Map> findEPSaleGoodsImgByGId(Long gId);
+    List<Map> findEPSaleGoodsImgByGId(Integer gId);
 
     List<Map> findEPSaleList();
 
@@ -54,13 +54,13 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     List<Map> findEPSaleList4();
 
-    List<Map>  findEPSaleByEPSaleId(Long epSaleId);
+    List<Map>  findEPSaleByEPSaleId(Integer epSaleId);
 
-    List<Map>  findEPSaleByEPSaleId2(Long epSaleId);
+    List<Map>  findEPSaleByEPSaleId2(Integer epSaleId);
 
-    List<Map>  findEPSaleByEPSaleId3(Long epSaleId);
+    List<Map>  findEPSaleByEPSaleId3(Integer epSaleId);
 
-    List<Map>  findEPSalePriceCountByEPSaleId(Long epSaleId);
+    List<Map>  findEPSalePriceCountByEPSaleId(Integer epSaleId);
 
     int checkEPSaleKeyIdIsExist(EPSale epSale);
 
@@ -77,19 +77,19 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     List<Map> freezeOneRecord();
 
-    List<Map> queryActiveAuction(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
+    List<Map> queryActiveAuction(@Param("num_id") Integer num_id,@Param("g_id") Integer g_id);
 
     List<Map> queryActiveAuctionByNumIdAndGId(@Param("num_id") Integer num_id,@Param("g_id") Integer g_id);
 
     List<Map> queryActiveAuctionByGId(@Param("g_id") Integer g_id);
 
-    List<Map> countAuctions(@Param("num_id") Long num_id,@Param("g_id") Long g_id);
+    List<Map> countAuctions(@Param("num_id") Integer num_id,@Param("g_id") Integer g_id);
 
     List<Map> countAuctionsByNumIdAndGId(@Param("num_id") Integer num_id,@Param("g_id") Integer g_id);
 
     List<Map> countAuctionsByGId(@Param("g_id") Integer g_id);
 
-    List<Map> queryNeedReturn(@Param("num_id") Long num_id,@Param("g_id") Long g_id,@Param("consumer_id") Long consumer_id);
+    List<Map> queryNeedReturn(@Param("num_id") Integer num_id,@Param("g_id") Integer g_id,@Param("consumer_id") Integer consumer_id);
 
     List<Map> queryNeedReturnByNumIdAndGIdAndComsumerId(@Param("num_id") Integer num_id,@Param("g_id") Integer g_id,@Param("consumer_id") Integer consumer_id);
 
@@ -100,7 +100,7 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     List<Map> queryGoodsEndTime(@Param("g_id") Integer g_id);
 
-    void updateNumDelayed(@Param("num_id") Long num_id,@Param("loop_time") Integer loop_time);
+    void updateNumDelayed(@Param("num_id") Integer num_id,@Param("loop_time") Integer loop_time);
 
-    void updateGoodsDelayed(@Param("g_id") Long g_id,@Param("loop_time") Integer loop_time);
+    void updateGoodsDelayed(@Param("g_id") Integer g_id,@Param("loop_time") Integer loop_time);
 }
