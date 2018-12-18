@@ -5,7 +5,6 @@
 		<title>渠道和价格规则管理</title>
 		<%@ include file="../common/basecss.jsp" %>
 		<script type="text/javascript" src="<%=basePath %>admin/js/channel-query.js"></script>
-		<script src=http://localhost:8080/zjc/lff/feedback.js?idHash=29j></script>
         <%--<script type="text/javascript" src="<%=basePath %>project/js/chosen.jquery.min.js"></script>--%>
 	</head>
 	<body class="no-skin">
