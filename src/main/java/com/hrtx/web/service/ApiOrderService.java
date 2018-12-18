@@ -10,7 +10,10 @@ import com.hrtx.global.*;
 import com.hrtx.web.dto.StorageInterfaceResponse;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
+import com.hrtx.web.pojo.Number;
 import net.sf.json.JSONArray;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -22,6 +25,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
+import java.lang.System;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -31,34 +35,25 @@ import java.util.List;
 @Service
 public class ApiOrderService {
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
-	@Autowired
-	private ApiSessionUtil apiSessionUtil;
-	@Autowired
-	private GoodsMapper goodsMapper;
-	@Autowired
-	private SkuMapper skuMapper;
-	@Autowired
-	private SkuPropertyMapper skuPropertyMapper;
-	@Autowired
-	private OrderMapper orderMapper;
-	@Autowired
-	private NumberMapper numberMapper;
-	@Autowired
-	private OrderItemMapper orderItemMapper;
-	@Autowired
-	private DeliveryAddressMapper deliveryAddressMapper;
-	@Autowired
-	private AuctionMapper auctionMapper;
-	@Autowired
-	private RedisUtil redisUtil;
-	@Autowired
-	private FileMapper fileMapper;
-	@Autowired
-	FundOrderService fundOrderService;
-	@Autowired
-	EPSaleService ePSaleService;
+	@Autowired private ApiSessionUtil apiSessionUtil;
+	@Autowired private GoodsMapper goodsMapper;
+	@Autowired private SkuMapper skuMapper;
+	@Autowired private SkuPropertyMapper skuPropertyMapper;
+	@Autowired private OrderMapper orderMapper;
+	@Autowired private NumberMapper numberMapper;
+	@Autowired private OrderItemMapper orderItemMapper;
+	@Autowired private DeliveryAddressMapper deliveryAddressMapper;
+	@Autowired private AuctionMapper auctionMapper;
+	@Autowired private RedisUtil redisUtil;
+	@Autowired private FileMapper fileMapper;
+	@Autowired FundOrderService fundOrderService;
+	@Autowired EPSaleService ePSaleService;
 	@Autowired private NumPriceMapper numPriceMapper;
 	@Autowired private AgentMapper agentMapper;
+	@Autowired private CityMapper cityMapper;
+	@Autowired private MealMapper mealMapper;
+
+	@Autowired private ApiOrderService apiOrderService;
 
 	public  List<Map> findOrderListByNumId(Integer numId)
 	{
@@ -133,7 +128,306 @@ public class ApiOrderService {
 			}
 		}
 	}
+//////////////////////////////////////////////////////////////////////////////////////
+	public Result submitEpOrderEP(Integer sku_id,Integer num_id,double ep_price,Integer mead_id,Integer address_id,String conment){
+		Consumer user = apiSessionUtil.getConsumer();
+		Result adresult=this.checkAddress(address_id,user.getId());
+		if(adresult.getCode()!=Result.OK)return adresult;
+		DeliveryAddress address=(DeliveryAddress)adresult.getData();
+		String shippingMenthodId="";
+		return this.submitOrder("3",sku_id,num_id,1,ep_price,user,address,shippingMenthodId,mead_id,conment,"","",null);
+	}
 
+	public Result submitNormalOrder(Integer sku_id,Integer num_id,Integer mead_id,Integer address_id,String conment){
+		Consumer user = apiSessionUtil.getConsumer();
+		Result adresult=this.checkAddress(address_id,user.getId());
+		if(adresult.getCode()!=Result.OK)return adresult;
+		DeliveryAddress address=(DeliveryAddress)adresult.getData();
+		String shippingMenthodId="";
+		return this.submitOrder("2",sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",null);
+	}
+	/**
+	 *客服下单
+	 */
+	public Result submitCustomOrder(Integer num_id,Integer mead_id,String addr_name,String addr_phone,String addr,String conment,String thirdOrder,String bossNum,String phoneConsumer,String phoneConsumerIdType,String phoneConsumerIdNum){
+		Number number=this.numberMapper.selectByPrimaryKey(num_id);
+		if(number==null)new Result(Result.OTHER,"抱歉，尚未找到您提交的号码");
+		Integer sku_id=number.getSkuId();
+		User u = SessionUtil.getUser();
+		Consumer user =new Consumer();
+		user.setId(u.getId());
+		user.setName(u.getName());
+		user.setIsAgent(0);
+		DeliveryAddress address=new DeliveryAddress();
+		address.setId(-1);
+		address.setPersonName(addr_name);
+		address.setPersonTel(addr_phone);
+		address.setAddress(addr);
+		String shippingMenthodId="";
+		Map<String,Object> order_ext_param=new HashMap<>();
+		order_ext_param.put("thirdOrder",thirdOrder);
+		order_ext_param.put("bossNum",bossNum);
+		order_ext_param.put("phoneConsumer",phoneConsumer);
+		order_ext_param.put("phoneConsumerIdType",phoneConsumerIdType);
+		order_ext_param.put("phoneConsumerIdNum",phoneConsumerIdNum);
+		return this.submitOrder("2",sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);
+	}
+	/**
+	 *
+	 *
+	 * 返回result code=200成功；=888订单已生成，仓储异常；=500失败
+	 * */
+	public Result submitOrder(String order_type,Integer sku_id,Integer num_id,int order_amount,double ep_price,Consumer user,DeliveryAddress address,String shippingMenthodId,Integer mead_id,String conment,String user_agent,String req_id,Map<String,Object> order_ext_param){
+		Result result=this.apiOrderService.newCreateOrder(order_type,sku_id,num_id,order_amount,ep_price,user,address,shippingMenthodId,mead_id,conment,user_agent,req_id,order_ext_param);
+		if(result.getCode()!=Result.OK)return result;
+		Integer order_id=NumberUtils.toInt(ObjectUtils.toString(result.getData()));
+		this.apiOrderService.payPushOrderToStorage(order_id);
+		if(result.getCode()==Result.OK)return result;
+		log.info("冻结仓储库存失败，5分钟后再次调用");
+		new Thread(){
+			public void run() {
+				try{
+					Thread.sleep(5*60*1000);
+				}catch (Exception e){
+					log.error("",e);
+				}
+				apiOrderService.payPushOrderToStorage(order_id);
+			}
+		}.start();
+		return new Result(Result.OTHER,result.getData());
+	}
+	public Result payPushOrderToStorage(Integer order_id){
+		Order order=this.orderMapper.selectByPrimaryKey(order_id);
+		order.setStatus(99);
+		this.orderMapper.updateByPrimaryKey(order);
+		Example example = new Example(OrderItem.class);
+		example.createCriteria().andEqualTo("orderId",order.getOrderId());
+		List<OrderItem> orderItems=this.orderItemMapper.selectByExample(example);
+
+		Map iparam = new HashMap();
+		List items = new ArrayList();
+		iparam.put("order_id",order.getOrderId());
+		for (OrderItem i : orderItems) {
+			if(i.getIsShipment()==0) continue;
+			Map<String,Object> item = new HashMap<String,Object>();
+			item.put("item_id", i.getItemId());
+			item.put("companystock_id", i.getCompanystockId());
+			item.put("quantity", i.getQuantity());
+			items.add(item);
+		}
+		iparam.put("commodities",items);
+
+		log.info("准备调用存储，冻结订单库存");
+		Result res = StorageApiCallUtil.storageApiCall(iparam, "HK0003");
+		log.info(String.format("仓储库存返回结果[%s]",ObjectUtils.toString(res.getData())));
+		if(!StringUtils.equals("200",String.valueOf(res.getCode())))return new Result(Result.ERROR, "调用冻结库存失败");
+		StorageInterfaceResponse sir = StorageInterfaceResponse.create(ObjectUtils.toString(res.getData()), SystemParam.get("key"));
+		if(!StringUtils.equals("00000",String.valueOf(sir.getCode())))return new Result(Result.ERROR, sir.getDesc());
+		order.setStatus(1);
+		this.orderMapper.updateByPrimaryKey(order);
+		return new Result(Result.OK,"冻结成功");
+	}
+
+	public Result newCreateOrder(String order_type,Integer sku_id,Integer num_id,int order_amount,double ep_price,Consumer user,DeliveryAddress address,String shippingMenthodId,Integer mead_id,String conment,String user_agent,String req_ip,Map<String,Object> order_ext_param){
+		/*int order_amount=2;
+		String order_type="2";//订单类型
+		Long sku_id=1073428441224708096l;
+		Long num_id=1073423228233318403l;
+		Long address_id=1002389937389043713l;
+		Long mead_id=1002389937389043713l;
+		double ep_price=2d;
+		String user_agent="";
+		String req_ip="";
+		String shippingMenthodId="";
+		String conment="";*/
+		/*Consumer user = apiSessionUtil.getConsumer();
+		DeliveryAddress address = deliveryAddressMapper.findDeliveryAddressByIdForOrder(address_id);
+		if(address==null)return new Result(Result.ERROR, "抱歉，您选择的地址不存在");
+		if(!StringUtils.equals(String.valueOf(address.getAddUserId()),String.valueOf(user.getId())))return new Result(Result.ERROR, "抱歉，您选择的地址不存在");
+*/
+		String shippingMenthod="";
+
+		Sku sku=this.skuMapper.selectByPrimaryKey(sku_id);//TODO 需要加锁
+		if(sku==null) return new Result(Result.ERROR, "抱歉，尚未找到您所需商品");
+		if(sku.getSkuNum()<=0) return new Result(Result.ERROR, "抱歉，您购买的商品已售罄");
+		if(sku.getSkuNum()<order_amount) return new Result(Result.ERROR, "抱歉，您购买的商品库存不足，请减少下单量再试");
+
+		boolean low_num=StringUtils.equals(order_type,"1");//白卡或普号
+		boolean ordinary_num=(StringUtils.equals(order_type,"2")&&StringUtils.equals(sku.getSkuGoodsType(),"3"));//普靓
+		boolean ep_num=StringUtils.equals(order_type,"3");//竞拍
+		boolean super_num=(StringUtils.equals(order_type,"2")&&StringUtils.equals(sku.getSkuGoodsType(),"4"));//超靓
+		boolean is_agent=user.getIsAgent() == 2;
+		String agent_city=String.valueOf(user.getAgentCity());
+
+		Goods goods=this.goodsMapper.selectByPrimaryKey(sku.getgId());
+		if(goods.getStatus()==null||goods.getStatus()!=1)return new Result(Result.ERROR,"抱歉，您购买的商品并非在售中");
+		if(System.currentTimeMillis()<goods.getgStartTime().getTime())return new Result(Result.ERROR,"抱歉，您购买的商品尚未开始销售");
+		//竞拍不考虑过期
+		if(System.currentTimeMillis()>goods.getgEndTime().getTime()&&!ep_num)return new Result(Result.ERROR,"抱歉，您购买的商品已过期");
+
+		double commission=0d;
+		double shippingTotal=0d;
+		double subTotal=0d;
+		List<OrderItem> itemNums=new ArrayList<>();
+		Order order=this.createOrderBean(NumberUtils.toInt(order_type),sku.getSkuGoodsType(),user,user_agent,req_ip,address,shippingMenthodId,shippingMenthod,commission,shippingTotal,subTotal,conment);
+		try {
+			if(order_ext_param!=null){
+				log.info("存储订单额外参数信息");
+				Iterator<String> iterator=order_ext_param.keySet().iterator();
+				while (iterator.hasNext()){
+					String key=iterator.next();
+					BeanUtils.copyProperty(order,key,order_ext_param.get(key));
+				}
+			}
+		}catch (Exception e){
+			log.error("存储订单额外参数信息异常",e);
+		}
+
+		Meal meal= mealMapper.selectByPrimaryKey(mead_id);
+		if(meal==null)return new Result(Result.ERROR, "抱歉，尚未找到您提交的套餐");
+
+		if(ordinary_num||super_num||ep_num)order_amount=1;//此类情况只会出库一个
+
+		if(low_num||ordinary_num){
+			if(!is_agent) return new Result(Result.ERROR, "抱歉，您权限不足，无法订购当前商品");
+			//goods.getgSaleCity()的格式为:,地市ID,地市ID,
+			//普号或白卡时检验商品上架的地市是否与代理商地市一致
+			if(low_num && !StringUtils.contains(goods.getgSaleCity(),agent_city))  return new Result(Result.ERROR, "抱歉，您权限不足，无法订购此地市商品");
+			//普靓时检验号码的地市是否与代理商地市一致
+			if(ordinary_num){
+				Number number=this.numberMapper.selectByPrimaryKey(num_id);
+				if(!StringUtils.equals(String.valueOf(number),agent_city))return new Result(Result.ERROR, "抱歉，您权限不足，无法订购此地市商品");
+				Result result=this.checkNumCondition(number);
+				if(result.getCode()!=Result.OK)return result;
+
+				OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),0,goods,sku,number,1,sku.getSkuTobPrice());
+				itemNums.add(itemNum);
+				return this.saveOrderInfo(sku,order_amount,order,null,itemNums);
+			}
+			//购买白卡时只需要发相应数量的白卡即可
+			if(low_num&&StringUtils.equals(sku.getSkuGoodsType(),"1")){
+				OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,goods,sku,null,order_amount,sku.getSkuTobPrice());
+				return this.saveOrderInfo(sku,order_amount,order,itemIccid,itemNums);
+			}
+
+			//购买普号时需要获取一批相应数量的号码
+			if(low_num&&StringUtils.equals(sku.getSkuGoodsType(),"2")){
+				Example example = new Example(Number.class);
+				example.createCriteria().andEqualTo("status",2)
+						.andEqualTo("is_freeze",0)
+						.andEqualTo("skuId", sku.getSkuId());
+				List<Number> number_list=this.numberMapper.selectByExample(example);
+				if(number_list.size()<order_amount)return new Result(Result.ERROR, "抱歉，号码库存不足，无法订购");
+				OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,goods,sku,null,order_amount,sku.getSkuTobPrice());
+				for (int i=0;i<order_amount;i++){
+					Number number=number_list.get(i);
+					OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),itemIccid.getItemId(),goods,sku,number,1,0d);
+					itemNums.add(itemNum);
+				}
+				return this.saveOrderInfo(sku,order_amount,order,itemIccid,itemNums);
+			}
+		}
+
+		if(super_num||ep_num){
+			Number number=this.numberMapper.selectByPrimaryKey(num_id);
+			Result result=this.checkNumCondition(number);
+			if(result.getCode()!=Result.OK)return result;
+			double num_price=ep_num?ep_price:sku.getSkuTobPrice();
+			int channel=3;//TODO 待处理 use.getchannel
+//			if(channel==3)return new Result(Result.ERROR, "未知代理渠道，无法订购");
+			if(order.getOrderType()==2&&StringUtils.equals(order.getSkuGoodsType(),"4")){
+				NumPrice numPrice=new NumPrice();
+				numPrice.setAgentId(user.getId());
+				numPrice.setChannel(channel);
+				numPrice.setNumId(number.getId());
+				List aplist=this.numPriceMapper.queryList(numPrice);
+				if(aplist.size()==0||aplist.size()>1)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
+				Map numPrice1=(Map)aplist.get(0);
+				num_price=NumberUtils.toDouble(ObjectUtils.toString(numPrice1.get("price")));// numPrice1.getPrice().doubleValue();
+			}
+
+			OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,goods,sku,null,1,0d);
+
+			OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),0/*itemIccid.getItemId()*/,goods,sku,number,1,num_price);
+			itemNums.add(itemNum);
+			return this.saveOrderInfo(sku,order_amount,order,itemIccid,itemNums);
+		}
+//		throw new ServiceException("未知订单类型");
+		return new Result(Result.ERROR, "未知订单类型");
+	}
+
+	private Result saveOrderInfo(Sku sku,int order_amount,Order order,OrderItem itemIccid,List<OrderItem> itemNums){
+
+		/*order.setOrderId(order.getGeneralId());
+		if(itemIccid!=null)itemIccid.setItemId(itemIccid.getGeneralId());
+		for (int i=0;itemNums!=null&&i<itemNums.size();i++){
+			itemNums.get(i).setItemId(itemNums.get(i).getGeneralId());
+		}*/
+
+		this.orderMapper.insert(order);
+		double subTotal=0d;
+		if(itemIccid!=null){
+			itemIccid.setOrderId(order.getOrderId());
+			this.orderItemMapper.insert(itemIccid);
+			Utils.sum(subTotal,itemIccid.getTotal());
+		}
+		for (int i=0;itemNums!=null&&i<itemNums.size();i++){
+			OrderItem itemNum=itemNums.get(i);
+			itemNum.setOrderId(order.getOrderId());
+			if(itemIccid!=null)itemNum.setpItemId(itemIccid.getItemId());
+			this.orderItemMapper.insert(itemNum);
+			subTotal=Utils.sum(subTotal,itemNum.getTotal());
+			Number number=this.numberMapper.selectByPrimaryKey(itemNum.getNumId());
+			number.setStatus(3);
+			this.numberMapper.updateByPrimaryKey(number);
+		}
+		order.setSubTotal(subTotal);
+		order.setTotal(Order.calculateTotal(order));
+		this.orderMapper.updateByPrimaryKey(order);
+		sku.setSkuNum(sku.getSkuNum()-order_amount);
+		this.skuMapper.updateByPrimaryKey(sku);
+		return new Result(Result.OK, order.getOrderId());
+	}
+	private Result checkAddress(Integer address_id,Integer consumer_id){
+		DeliveryAddress address = deliveryAddressMapper.findDeliveryAddressByIdForOrder(address_id);
+		if(address==null)return new Result(Result.ERROR, "抱歉，您选择的地址不存在");
+		if(!StringUtils.equals(String.valueOf(address.getAddUserId()),String.valueOf(consumer_id)))return new Result(Result.ERROR, "抱歉，您选择的地址不存在");
+		return new Result(Result.OK,address);
+	}
+
+
+	private Result checkNumCondition(Number number){//TODO 还需要验证sku是否一致
+		if(number==null)return new Result(Result.ERROR, "抱歉，您购买的号码并非在售中");
+		if(!StringUtils.equals(String.valueOf(number.getStatus()),"2"))return new Result(Result.ERROR, "抱歉，您购买的号码并非在售中");
+		//TODO 冻结处理
+//			if(!StringUtils.equals(String.valueOf(number.getStatus()),"2"))return new Result(Result.ERROR, "抱歉，您购买的号码已冻结");
+		return new Result(Result.OK,null);
+	}
+	private OrderItem createOrderItemBean(Integer orderId,Integer parent_item_id,Goods goods,Sku sku,Number number,int quantity,double goods_price){
+		Integer num_id=number==null?null:number.getId();
+		String num=number==null?null:number.getNumResource();
+		int isShipment=number==null?1:0;//是否需要发货 1=发货
+		String skuProperty="";//商品属性
+		Integer skuRepoGoods=NumberUtils.toInt(sku.getSkuRepoGoods());/*可能存在问题*/
+		OrderItem bean = new OrderItem(orderId,goods.getgId(),sku.getSkuId(),skuProperty,num_id,num,
+				isShipment,goods.getgSellerId(),goods.getgSellerName(),"egt",skuRepoGoods,
+				quantity,goods_price,Utils.mul(quantity,goods_price),parent_item_id);
+		return bean;
+	}
+
+	private Order createOrderBean(int orderType,String skuGoodsType,Consumer user,String user_agent,String req_ip,DeliveryAddress address,String shippingMenthodId,String shippingMenthod,double commission, double shippingTotal, double subTotal,String conment){
+		int status=0;
+		String address1=address.getAddress();
+		if(address.getDistrictId()>0){
+			City city=cityMapper.selectByPrimaryKey(address.getDistrictId());
+			address1=city.getFullName()+address1;
+		}
+		Order order=new Order(user.getId(),user.getName(),status,StringUtils.substring(user_agent,0,300),req_ip,
+				orderType,shippingMenthodId,shippingMenthod,address.getId(),address.getPersonName(),address.getPersonTel(),
+				address1, commission, shippingTotal, subTotal,conment,skuGoodsType);
+		return order;
+	}
+//////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * 根据商品id创建订单
 	 * @param :普靓和超靓:skuid, numid, 地址id, 支付方式, 套餐id

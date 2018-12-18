@@ -27,7 +27,7 @@
     <if test="param.feature!=null and param.feature != ''"> and b.feature REGEXP ".*,"#{param.feature}",.*"</if>
     <if test="param.temp!=null and param.temp!=''"> and b.resource like #{param.temp}</if>
     <if test="param.resource!=null and param.resource!=''"> and b.resource like "%"#{param.resource}"%"</if>
-    <if test="param.numId!=null and param.numId > 0"> and b.num_id = ${param.numId}</if>
+    <if test="param.numId!=null and param.numId > 0"> and b.num_id = #{param.numId}</if>
 
     ORDER BY b.agent_id desc ) a where a.rn = 1
     <choose>
@@ -59,7 +59,7 @@
     <if test="param.feature!=null and param.feature != ''"> and b.feature REGEXP ".*,"#{param.feature}",.*"</if>
     <if test="param.temp!=null and param.temp!=''"> and b.resource like #{param.temp}</if>
     <if test="param.resource!=null and param.resource!=''"> and b.resource like "%"#{param.resource}"%"</if>
-    <if test="param.numId!=null and param.numId > 0"> and b.num_id = ${param.numId}</if>
+    <if test="param.numId!=null and param.numId > 0"> and b.num_id = #{param.numId}</if>
 
   </select>
 

@@ -35,7 +35,23 @@ public class OrderItem extends BasePojo implements java.io.Serializable {
 
     public OrderItem() {
     }
-
+    public OrderItem(Integer orderId, Integer goodsId, Integer skuId, String skuProperty, Integer numId, String num, int isShipment, Integer sellerId, String sellerName, String shipmentApi, Integer companystockId, int quantity, double price, double total,Integer pItemId) {
+        this.orderId = orderId;
+        this.goodsId = goodsId;
+        this.skuId = skuId;
+        this.skuProperty = skuProperty;
+        this.numId = numId;
+        this.num = num;
+        this.isShipment = isShipment;
+        this.sellerId = sellerId;
+        this.sellerName = sellerName;
+        this.shipmentApi = shipmentApi;
+        this.companystockId = companystockId;
+        this.quantity = quantity;
+        this.price = price;
+        this.total = total;
+        this.pItemId=pItemId;
+    }
     public OrderItem(Integer itemId, Integer pItemId, Integer orderId, Integer goodsId, Integer skuId, String skuProperty, Integer numId, String num, int isShipment, Integer sellerId, String sellerName, String shipmentApi, Integer companystockId, int quantity, double price, double total, Integer mealId, String iccid) {
         this.itemId = itemId;
         this.pItemId = pItemId;

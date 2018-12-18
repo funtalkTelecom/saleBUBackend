@@ -3,6 +3,7 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.hrtx.global.Utils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -83,7 +84,32 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public Order() {
     }
+    public Order(Integer consumer, String consumerName, int status, String reqUserAgent, String reqIp,int orderType, String shippingMenthodId, String shippingMenthod, Integer addressId, String personName, String personTel, String address, double commission, double shippingTotal, double subTotal,String conment, String skuGoodsType) {
+        this.consumer = consumer;
+        this.consumerName = consumerName;
+        this.status = status;
+        this.reqUserAgent = reqUserAgent;
+        this.reqIp = reqIp;
+        this.addDate = new Date();
+        this.orderType = orderType;
+        this.shippingMenthodId = shippingMenthodId;
+        this.shippingMenthod = shippingMenthod;
+        this.addressId = addressId;
+        this.personName = personName;
+        this.personTel = personTel;
+        this.address = address;
+        this.commission = commission;
+        this.shippingTotal = shippingTotal;
+        this.subTotal = subTotal;
+        this.total =calculateTotal(this);
+        this.conment = conment;
+        this.isDel =0;
+        this.skuGoodsType = skuGoodsType;
+    }
 
+    public static double calculateTotal(Order order) {
+        return Utils.sub(Utils.sum(order.getSubTotal(),order.getShippingTotal()),order.getCommission());
+    }
     public Order(Integer orderId, Integer consumer, String consumerName, int status, String reqUserAgent, String reqIp, Date addDate,
                  int orderType, String shippingMenthodId, String shippingMenthod, Integer addressId, String personName,
                  String personTel, String address, Date noticeShipmentDate, String payMenthodId, String payMenthod, Date payDate,

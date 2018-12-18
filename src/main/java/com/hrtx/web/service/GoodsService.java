@@ -93,7 +93,7 @@ public class GoodsService {
 //            goods = goodsMapper.findGoodsInfo(goods.getgId());
         } else { //添加
             Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");
-//            goods.setgId(goods.getGeneralId());
+            goods.setgId(goodsMapper.getId());
             goods.setStatus(0);  //商品上架初始值0
             goods.setgSellerId(corporation.getId());
             goods.setgSellerName(corporation.getName());
@@ -119,7 +119,7 @@ public class GoodsService {
                 for (int i=0; i<files.length; i++) {
                     MultipartFile file = files[i];
                     File f = new File();
-//                    f.setFileId(f.getGeneralId());
+                    f.setFileId(fileMapper.getId());
                     f.setFileGroup("goodsPic");
                     result = BaseReturn.uploadFile(SystemParam.get("goodsPics")+goods.getgId()+java.io.File.separator, "jpg,png,gif", file, true, false);
                     f.setFileName(((Map)result.getData()).get("sourceServerFileName").toString());
@@ -197,7 +197,7 @@ public class GoodsService {
                     }
                     skuProperty.setgId(sku.getgId());
                     skuProperty.setSkuId(sku.getSkuId());
-//                    skuProperty.setSkupId(skuProperty.getGeneralId());
+                    skuProperty.setSkupId(skuMapper.getId());
                     skuProperty.setSkupKey(key);
                     skuProperty.setSkupValue((String) (col.get("value")==null||col.get("value").equals("null")?"":col.get("value")));
                     skuProperty.setSeq(Integer.parseInt((String) ((col.get("seq").equals(""))?"0":col.get("seq"))));

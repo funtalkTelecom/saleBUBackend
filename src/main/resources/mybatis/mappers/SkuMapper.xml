@@ -147,10 +147,10 @@
     </foreach>
     )
     </select>
-
+    <!--
     <select id="getId" resultType="java.lang.Integer">
       select `nextval`('hk')
-    </select>
+    </select>-->
 
 
 </mapper>
