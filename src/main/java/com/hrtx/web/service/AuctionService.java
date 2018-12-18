@@ -28,19 +28,19 @@ public class AuctionService {
 	@Autowired
 	private ApiSessionUtil apiSessionUtil;
 
-	public List<Map> findAuctionSumEPSaleGoodsByNumId(Long numId) {
+	public List<Map> findAuctionSumEPSaleGoodsByNumId(Integer numId) {
 		return auctionMapper.findAuctionSumEPSaleGoodsByNumId(numId);
 	}
 
-	public List<Map> findAuctionSumEPSaleGoodsByNumIdAndGId(Long numId,Long gId) {
+	public List<Map> findAuctionSumEPSaleGoodsByNumIdAndGId(Integer numId,Integer gId) {
 		return auctionMapper.findAuctionSumEPSaleGoodsByNumIdAndGId(numId,gId);
 	}
 
-	public List<Map> findAuctionSumEPSaleGoodsByGId(Long gId) {
+	public List<Map> findAuctionSumEPSaleGoodsByGId(Integer gId) {
 		return auctionMapper.findAuctionSumEPSaleGoodsByGId(gId);
 	}
 
-	public List<Map> findAuctionListByNumId(Long numId) {
+	public List<Map> findAuctionListByNumId(Integer numId) {
 		return auctionMapper.findAuctionListByNumId(numId);
 	}
 
@@ -72,11 +72,11 @@ public class AuctionService {
 		return auctionMapper.findAuctionListByNumIdAndGId2(numId,gId);
 	}
 
-	public List<Map> findAuctionListByGId3(Long gId) {
+	public List<Map> findAuctionListByGId3(Integer gId) {
 		return auctionMapper.findAuctionListByGId2(gId);
 	}
 
-	public List<Map> findAuctionGoodsByNumId(Long numId) {
+	public List<Map> findAuctionGoodsByNumId(Integer numId) {
 		return auctionMapper.findAuctionGoodsByNumId(numId);
 	}
 

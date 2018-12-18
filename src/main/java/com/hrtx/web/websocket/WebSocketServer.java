@@ -53,7 +53,7 @@ public class WebSocketServer {
     @OnOpen
     public void onOpen(Session session,EndpointConfig config,@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack) {
         GoodsMapper goodsMapper2=(GoodsMapper) ContextUtils.getContext().getBean("goodsMapper");
-        Goods goods=goodsMapper2.findGoodsInfo(Long.valueOf(gId));//上架商品信息gActive
+        Goods goods=goodsMapper2.findGoodsInfo(Integer.valueOf(gId));//上架商品信息gActive
         if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
         {
             log.info("是否打包传参不符，请核对");
@@ -112,7 +112,7 @@ public class WebSocketServer {
     @OnClose
     public void onClose(@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack) {
         GoodsMapper goodsMapper2=(GoodsMapper) ContextUtils.getContext().getBean("goodsMapper");
-        Goods goods=goodsMapper2.findGoodsInfo(Long.valueOf(gId));//上架商品信息gActive
+        Goods goods=goodsMapper2.findGoodsInfo(Integer.valueOf(gId));//上架商品信息gActive
         if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
         {
             log.info("是否打包传参不符，请核对");
@@ -165,7 +165,7 @@ public class WebSocketServer {
     @OnMessage
     public void onMessage(String message,@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack, Session session) {
         GoodsMapper goodsMapper2=(GoodsMapper) ContextUtils.getContext().getBean("goodsMapper");
-        Goods goods=goodsMapper2.findGoodsInfo(Long.valueOf(gId));//上架商品信息gActive
+        Goods goods=goodsMapper2.findGoodsInfo(Integer.valueOf(gId));//上架商品信息gActive
         if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
         {
             log.info("是否打包传参不符，请核对");
@@ -197,15 +197,15 @@ public class WebSocketServer {
             List<Map> goodsAuctionList=new ArrayList<Map>();
             if(erIsPack==0)//商品是否打包 erIsPack
             {
-                goodsAuctionList=auctionMapper2.findAuctionListByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
+                goodsAuctionList=auctionMapper2.findAuctionListByNumIdAndGId(Integer.valueOf(numId),Integer.valueOf(gId));
             }else if(erIsPack==1)
             {
-                goodsAuctionList=auctionMapper2.findAuctionListByGId(Long.valueOf(gId));
+                goodsAuctionList=auctionMapper2.findAuctionListByGId(Integer.valueOf(gId));
             }
             AuctionDeposit auctionDeposit=new AuctionDeposit();
             auctionDeposit.setStatus(2);
-            auctionDeposit.setgId(NumberUtils.toLong(gId,0L));
-            auctionDeposit.setNumId(NumberUtils.toLong(numId,0L));
+            auctionDeposit.setgId(NumberUtils.toInt(gId,0));
+            auctionDeposit.setNumId(NumberUtils.toInt(numId,0));
             //对应的状态：2支付成功保证金列表
             List<Map> auctionDepositList=new ArrayList<Map>();
             if(erIsPack==0)//商品是否打包 erIsPack
@@ -219,10 +219,10 @@ public class WebSocketServer {
             List<Map> epSaleGoodsAuctionPriceInfo=new ArrayList<Map>();
             if(erIsPack==0)//商品是否打包 erIsPack
             {
-                epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByNumIdAndGId(Long.valueOf(numId),Long.valueOf(gId));
+                epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByNumIdAndGId(Integer.valueOf(numId),Integer.valueOf(gId));
             }else if(erIsPack==1)
             {
-                epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByGId(Long.valueOf(gId));
+                epSaleGoodsAuctionPriceInfo=auctionMapper2.findAuctionSumEPSaleGoodsByGId(Integer.valueOf(gId));
             }
             if(epSaleGoodsAuctionPriceInfo!=null&&epSaleGoodsAuctionPriceInfo.size()>0) {
                 priceCount = NumberUtils.toInt(String.valueOf(epSaleGoodsAuctionPriceInfo.get(0).get("priceCount")));
@@ -305,7 +305,7 @@ public class WebSocketServer {
      * */
     public static void sendInfo(@PathParam("numId") String numId,@PathParam("gId") String gId,@PathParam("erIsPack") Integer erIsPack) throws IOException {
         GoodsMapper goodsMapper2=(GoodsMapper) ContextUtils.getContext().getBean("goodsMapper");
-        Goods goods=goodsMapper2.findGoodsInfo(Long.valueOf(gId));//上架商品信息gActive
+        Goods goods=goodsMapper2.findGoodsInfo(Integer.valueOf(gId));//上架商品信息gActive
         if(erIsPack!=Integer.valueOf(goods.getgIsPack()))
         {
             log.info("是否打包传参不符，请核对");
@@ -324,7 +324,7 @@ public class WebSocketServer {
             keyStr="gId:"+gId;
             keyStr2="打包竟拍 _gId";
         }
-        String msg=auctionAfterInfo(Long.valueOf(numId),Long.valueOf(gId),erIsPack);
+        String msg=auctionAfterInfo(Integer.valueOf(numId),Integer.valueOf(gId),erIsPack);
         // 群发消息
         if(webSocketSet.size()>0&&msg.trim().length()>0)
         {
@@ -359,7 +359,7 @@ public class WebSocketServer {
 	  出价成功后或保证金支付成功后
 	  返回广播信息
 	 */
-    public static String auctionAfterInfo(Long numId,Long gId,Integer erIsPack) {
+    public static String auctionAfterInfo(Integer numId,Integer gId,Integer erIsPack) {
         AuctionMapper auctionMapper2=(AuctionMapper) ContextUtils.getContext().getBean("auctionMapper");
         AuctionDepositMapper auctionDepositMapper2=(AuctionDepositMapper) ContextUtils.getContext().getBean("auctionDepositMapper");
         Map goodsAuctionMap=new HashMap();
