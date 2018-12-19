@@ -19,7 +19,7 @@ public class Result {
 	
 	public Result(int code, Object data) {
 		super();
-		log.info("-------------------(返回结果："+ObjectUtils.toString(data)+")");
+		log.info("-------------------(返回结果：code:"+code+",data:"+ObjectUtils.toString(data)+")");
 		this.code = code;
 		this.data = data;
 	}

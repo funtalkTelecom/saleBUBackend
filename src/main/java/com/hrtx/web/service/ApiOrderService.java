@@ -224,6 +224,7 @@ public class ApiOrderService {
 		Consumer user =apiSessionUtil.getConsumer();
 		if(u==null&&user==null)return new Result(Result.OTHER,"您尚未登陆，请登陆后再提交订单");
 		if(user==null){
+			user = new Consumer();
 			user.setId(u.getId());
 			user.setName(u.getName());
 			user.setIsAgent(0);
@@ -263,7 +264,7 @@ public class ApiOrderService {
 		Result result=this.apiOrderService.newCreateOrder(order_type,sku_id,num_id,order_amount,ep_price,user,address,shippingMenthodId,mead_id,conment,user_agent,req_id,order_ext_param);
 		if(result.getCode()!=Result.OK)return result;
 		Integer order_id=NumberUtils.toInt(ObjectUtils.toString(result.getData()));
-		this.apiOrderService.payPushOrderToStorage(order_id);
+		result = this.apiOrderService.payPushOrderToStorage(order_id);
 		if(result.getCode()==Result.OK)return result;
 		log.info("冻结仓储库存失败，5分钟后再次调用");
 		new Thread(){
