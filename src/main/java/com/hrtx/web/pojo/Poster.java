@@ -20,7 +20,7 @@ public class Poster extends BasePojo implements java.io.Serializable {
 	private Integer id;
 	private String title;
     private String position;
-    private String positionName;
+//    private String positionName;
     private String pic;
     private String url;
     private String remark;
@@ -34,11 +34,10 @@ public class Poster extends BasePojo implements java.io.Serializable {
     public Poster() {
 	}
 
-    public Poster(Integer id, String title, String position, String positionName, String pic, String url, String remark, Date startTime, Date endTime) {
+    public Poster(Integer id, String title, String position,  String pic, String url, String remark, Date startTime, Date endTime) {
         this.id = id;
         this.title = title;
         this.position = position;
-        this.positionName = positionName;
         this.pic = pic;
         this.url = url;
         this.remark = remark;
@@ -70,13 +69,6 @@ public class Poster extends BasePojo implements java.io.Serializable {
         this.position = position;
     }
 
-    public String getPositionName() {
-        return positionName;
-    }
-
-    public void setPositionName(String positionName) {
-        this.positionName = positionName;
-    }
 
     public String getPic() {
         return pic;

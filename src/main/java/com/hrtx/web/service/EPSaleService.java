@@ -1332,10 +1332,10 @@ public class EPSaleService {
 			epSaleMapper.epSaleEdit(epSale);
 		} else {
 			List<EPSale> list = new ArrayList<EPSale>();
-			//epSale.setId(epSale.getGeneralId());
+//			epSale.setId(epSaleMapper.getId());
 			epSale.setCreateDate(new Date());
 			epSale.setUpdateDate(new Date());
-			//epSale.setId(epSaleMapper.getId());
+			epSale.setId(epSaleMapper.getId());
 			list.add(epSale);
 			epSaleMapper.insertBatch(list);
 		}

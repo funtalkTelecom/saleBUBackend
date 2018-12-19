@@ -57,6 +57,7 @@ public class PosterService {
 		if (poster.getId() != null && poster.getId() > 0) {
 				posterMapper.posterEdit(poster);
 		} else {
+			poster.setId(posterMapper.getId());
 			posterMapper.insert(poster);
 		}
 		return new Result(Result.OK, "提交成功");
