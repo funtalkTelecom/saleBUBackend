@@ -678,7 +678,7 @@
         ) values
         <foreach collection="epSaleList" item="EPSale" separator=",">
             (
-            `nextval`('hk'),
+            #{EPSale.id},
             #{EPSale.title},
             #{EPSale.epRule},
             #{EPSale.startTime},
