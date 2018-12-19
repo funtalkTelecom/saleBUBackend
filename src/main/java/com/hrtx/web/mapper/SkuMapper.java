@@ -21,6 +21,8 @@ public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
 
     void updateSkuNum(Sku nowSku);
 
+    int updateSkuNumWithDataNum(@Param("order_amount") Integer order_amount,@Param("sku_id") Integer sku_id);
+
     void updateSku(Sku sku);
 
     void updateSkuStatus(Sku sku);
@@ -30,4 +32,6 @@ public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
     List findNumStatus(@Param("gId") Long gId);
 
     List queryStatusList(@Param("gId") Integer gId,@Param("statusArry") String statusArry);
+
+
 }

@@ -20,6 +20,31 @@ public enum Constants {
     PAY_MENTHOD_TYPE_3("3", "线下支付", "PAY_MENTHOD_TYPE"),
     PAY_MENTHOD_TYPE_4("4", "分期付款", "PAY_MENTHOD_TYPE"),
 
+    //订单状态
+    ORDER_STATUS_0(0, "创建订单", "ORDER_STATUS"),
+    ORDER_STATUS_20(20, "已创建待冻结", "ORDER_STATUS"),
+    ORDER_STATUS_1(1, "待付款", "ORDER_STATUS"),
+    ORDER_STATUS_2(2, "已付款待推送", "ORDER_STATUS"),
+    ORDER_STATUS_3(3, "待配货", "ORDER_STATUS"),
+    ORDER_STATUS_4(4, "待配卡", "ORDER_STATUS"),
+    ORDER_STATUS_5(5, "待签收", "ORDER_STATUS"),
+    ORDER_STATUS_6(6, "完成", "ORDER_STATUS"),
+    ORDER_STATUS_7(7, "已取消", "ORDER_STATUS"),
+    ORDER_STATUS_11(11, "待仓库撤销", "ORDER_STATUS"),
+    ORDER_STATUS_12(12, "退款中", "ORDER_STATUS"),
+    ORDER_STATUS_13(13, "退款失败", "ORDER_STATUS"),
+    ORDER_STATUS_14(14, "待财务退款", "ORDER_STATUS"),
+    //号码状态
+    NUM_STATUS_1(1, "在库", "NUM_STATUS"),
+    NUM_STATUS_2(2, "销售中", "NUM_STATUS"),
+    NUM_STATUS_3(3, "冻结", "NUM_STATUS"),
+    NUM_STATUS_4(4, "待配卡", "NUM_STATUS"),
+    NUM_STATUS_5(5, "待受理", "NUM_STATUS"),
+    NUM_STATUS_6(6, "已受理", "NUM_STATUS"),
+    NUM_STATUS_7(7, "受理失败", "NUM_STATUS"),
+    NUM_STATUS_8(8, "已失效", "NUM_STATUS"),
+
+
     ;
 
     private Object key;

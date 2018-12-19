@@ -35,7 +35,7 @@
 					<div class="page-content">
 						<div class="row">
 							<form role="form" class="form-horizontal" id="form">
-								<input name="id" type="hidden" value="${numPrice.numId}">
+								<input name="id" type="hidden" value="${numPrice.id}">
 								<div class="modal-body">
 									<div class="form-group">
 										<label class="col-xs-2 control-label">手机号码</label>

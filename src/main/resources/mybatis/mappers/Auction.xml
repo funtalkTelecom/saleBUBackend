@@ -344,7 +344,7 @@
 		) values
 		<foreach collection="auctionList" item="Auction" separator=",">
 			(
-			#{Auction.id},
+			`nextval`('hk'),
 			#{Auction.skuId},
 			#{Auction.numId},
 			#{Auction.num},

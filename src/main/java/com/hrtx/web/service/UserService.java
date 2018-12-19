@@ -1,34 +1,28 @@
 package com.hrtx.web.service;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.System;
-import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import com.github.abel533.entity.Example;
-import com.hrtx.config.advice.ServiceException;
-import com.hrtx.global.*;
-import com.hrtx.web.mapper.*;
-import com.hrtx.web.pojo.*;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Menu;
 import com.hrtx.dto.Result;
+import com.hrtx.global.*;
+import com.hrtx.web.mapper.ConsumerLogMapper;
+import com.hrtx.web.mapper.ConsumerMapper;
+import com.hrtx.web.mapper.IccidMapper;
+import com.hrtx.web.mapper.UserMapper;
+import com.hrtx.web.pojo.Corporation;
+import com.hrtx.web.pojo.User;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 @Service
 public class UserService extends BaseService {
