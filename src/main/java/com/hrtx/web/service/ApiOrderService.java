@@ -4,6 +4,7 @@ import com.github.abel533.entity.Example;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
 import com.hrtx.global.*;

@@ -86,27 +86,12 @@ public class LiangHaoController extends BaseReturn{
             NumPrice numPrice = numService.getNumPrice(NumberUtils.toInt(id));
             if(numPrice == null) return new Result(Result.ERROR, "未找到号码");
             //判断是否冻结
-            Integer fuser = numService.queryFreeze(numPrice.getNumId());
-            if(fuser != null && !fuser.equals(SessionUtil.getUserId())) return new Result(Result.ERROR, "此号码已冻结不可下单");
-
-            Map<String, String> param = new HashMap<>();
-            param.put("user-agent", request.getHeader("user-agent"));
-            param.put("type", "2");
-            param.put("skuid", numPrice.getSkuId()+"");
-            param.put("numid", numPrice.getNumId()+"");
-            param.put("numcount", "1");
-            param.put("mealid", request.getParameter("mealId"));
-            param.put("bossNum", request.getParameter("bossNum"));
-            param.put("phoneConsumer", request.getParameter("phoneConsumer"));
-            param.put("phoneConsumerIdType", request.getParameter("phoneConsumerIdType"));
-            param.put("phoneConsumerIdNum", request.getParameter("phoneConsumerIdNum"));
-            param.put("personName", request.getParameter("personName"));
-            param.put("personTel", request.getParameter("personTel"));
-            param.put("address", request.getParameter("address"));
-            param.put("thirdOrder", request.getParameter("thirdOrder"));
-            param.put("conment", request.getParameter("conment"));
-
-            return apiOrderService.createOrder(param, null);
+//            Integer fuser = numService.queryFreeze(numPrice.getNumId());
+//            if(fuser != null && !fuser.equals(SessionUtil.getUserId())) return new Result(Result.ERROR, "此号码已冻结不可下单");
+            int mealId = NumberUtils.toInt(request.getParameter("mealId"));
+            return apiOrderService.submitCustomOrder(numPrice.getNumId(), mealId,request.getParameter("personName"),request.getParameter("personTel"),
+                    request.getParameter("address"),request.getParameter("conment"),request.getParameter("thirdOrder"),request.getParameter("bossNum"),
+                    request.getParameter("phoneConsumer"),request.getParameter("phoneConsumerIdType"),request.getParameter("phoneConsumerIdNum"));
         }finally {
             LockUtils.unLock("kfadd"+id);
         }
@@ -116,9 +101,9 @@ public class LiangHaoController extends BaseReturn{
         if(NumberUtils.toLong(request.getParameter("mealId")) == 0) return new Result(Result.ERROR,"请选择套餐");
         if(StringUtils.isBlank(request.getParameter("thirdOrder"))) return new Result(Result.ERROR,"请填写第三方订单号");
         if(StringUtils.isBlank(request.getParameter("bossNum"))) return new Result(Result.ERROR,"请填写BOSS开户工号");
-        if(StringUtils.isBlank(request.getParameter("phoneConsumer"))) return new Result(Result.ERROR,"请填写客户名称");
-        if(NumberUtils.toInt(request.getParameter("phoneConsumerIdType")) == 0) return new Result(Result.ERROR,"请填写客户证件类型");
-        if(StringUtils.isBlank(request.getParameter("phoneConsumerIdNum"))) return new Result(Result.ERROR,"请填写客户证件编码");
+//        if(StringUtils.isBlank(request.getParameter("phoneConsumer"))) return new Result(Result.ERROR,"请填写客户名称");
+//        if(NumberUtils.toInt(request.getParameter("phoneConsumerIdType")) == 0) return new Result(Result.ERROR,"请填写客户证件类型");
+        if(StringUtils.isNotBlank(request.getParameter("phoneConsumerIdNum")) && !request.getParameter("phoneConsumerIdNum").matches(RegexConsts.REGEX_IC_CARD)) return new Result(Result.ERROR,"客户证件编码格式不正确");
         if(StringUtils.isBlank(request.getParameter("personName"))) return new Result(Result.ERROR,"请填写邮寄联系人");
         if(StringUtils.isBlank(request.getParameter("personTel"))) return new Result(Result.ERROR,"请填写邮寄联系电话");
         if(!request.getParameter("personTel").matches(RegexConsts.REGEX_MOBILE_COMMON)) return new Result(Result.ERROR,"邮寄联系电话格式不正确");
