@@ -197,7 +197,7 @@ public class GoodsService {
                     }
                     skuProperty.setgId(sku.getgId());
                     skuProperty.setSkuId(sku.getSkuId());
-                    skuProperty.setSkupId(skuMapper.getId());
+                    skuProperty.setSkupId(skuPropertyMapper.getId());
                     skuProperty.setSkupKey(key);
                     skuProperty.setSkupValue((String) (col.get("value")==null||col.get("value").equals("null")?"":col.get("value")));
                     skuProperty.setSeq(Integer.parseInt((String) ((col.get("seq").equals(""))?"0":col.get("seq"))));

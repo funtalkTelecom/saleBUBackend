@@ -58,10 +58,10 @@ public class AgentService {
 			param.setAddConsumerId(consumerId);
 			Agent ap = agentMapper.selectOne(param);
 			if(ap !=null) return new Result(Result.ERROR, "已申请注册过代理商或已经绑定了乐语账号");
-			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1);
+			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1,3);
 			agentMapper.insert(ag);
 		}else {  //修改
-			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1);
+			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1,3);
 			agentMapper.updateAgent(ag);
 		}
 		return new Result(Result.OK, "提交成功");
