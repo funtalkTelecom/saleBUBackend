@@ -268,6 +268,7 @@ public class ApiOrderService {
 		if(result.getCode()==Result.OK)return result;
 		log.info("冻结仓储库存失败，5分钟后再次调用");
 		new Thread(){
+			//TODO 到时调整到统一队列中
 			public void run() {
 				try{
 					Thread.sleep(5*60*1000);
@@ -279,8 +280,16 @@ public class ApiOrderService {
 		}.start();
 		return new Result(Result.OTHER,result.getData());
 	}
+
+	/**
+	 * 订单创建后需要冻结仓储的库存
+	 * @param order_id
+	 * @return
+	 */
 	public Result payPushOrderToStorage(Integer order_id){
 		Order order=this.orderMapper.selectByPrimaryKey(order_id);
+		if(order==null)return new Result(Result.ERROR, "抱歉，您提交的订单存在错误");
+		if(order.getStatus()!=0||order.getStatus()!=20)return new Result(Result.ERROR, "当前订单状态并非可冻结情况");
 		order.setStatus(Constants.ORDER_STATUS_20.getIntKey());
 		this.orderMapper.updateByPrimaryKey(order);
 		Example example = new Example(OrderItem.class);
@@ -303,12 +312,12 @@ public class ApiOrderService {
 		log.info("准备调用存储，冻结订单库存");
 		Result res = StorageApiCallUtil.storageApiCall(iparam, "HK0003");
 		log.info(String.format("仓储库存返回结果[%s]",ObjectUtils.toString(res.getData())));
-		if(!StringUtils.equals("200",String.valueOf(res.getCode())))return new Result(Result.ERROR, "调用冻结库存失败");
+		if(!StringUtils.equals("200",String.valueOf(res.getCode())))return new Result(Result.ERROR, "库存冻结接口失败");
 		StorageInterfaceResponse sir = StorageInterfaceResponse.create(ObjectUtils.toString(res.getData()), SystemParam.get("key"));
-		if(!StringUtils.equals("00000",String.valueOf(sir.getCode())))return new Result(Result.ERROR, sir.getDesc());
+		if(!StringUtils.equals("00000",String.valueOf(sir.getCode())))return new Result(Result.ERROR, "库存冻结由于["+sir.getDesc()+"]失败");
 		order.setStatus(Constants.ORDER_STATUS_1.getIntKey());
 		this.orderMapper.updateByPrimaryKey(order);
-		return new Result(Result.OK,"冻结成功");
+		return new Result(Result.OK,"库存推送成功");
 	}
 	public void test() {
 		String aa=Utils.randomNoByDateTime();
@@ -318,6 +327,24 @@ public class ApiOrderService {
 		log.info(aa+" 测试 "+a);
 	}
 
+	/**
+	 *
+	 * @param order_type	订单类型
+	 * @param sku_id		商品编码
+	 * @param num_id		订购的号码编码
+	 * @param order_amount	订购数量(若订购的是号码，则数量将会被强制设置为1)
+	 * @param ep_price		竞拍价格(order_type=3时有效)
+	 * @param user			订购用户
+	 * @param address		发货地址
+	 * @param shippingMenthodId	快递方法
+	 * @param mead_id			套餐id
+	 * @param conment			备注
+	 * @param user_agent		订购用户请求信息
+	 * @param req_ip			订购用户请求IP
+	 * @param order_ext_param	订单额外字段
+	 * @return 返回result code=200成功；=500失败
+	 * 可能会主动抛出ServiceException，message是具体抛出的原因
+	 */
 	public Result newCreateOrder(String order_type,Integer sku_id,Integer num_id,int order_amount,double ep_price,Consumer user,DeliveryAddress address,String shippingMenthodId,Integer mead_id,String conment,String user_agent,String req_ip,Map<String,Object> order_ext_param){
 		/*int order_amount=2;
 		String order_type="2";//订单类型
