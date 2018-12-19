@@ -1,5 +1,10 @@
 package com.hrtx.web.pojo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -7,6 +12,8 @@ import java.util.Date;
 @Table(name = "tb_channel")
 public class Channel extends BasePojo{
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer id;
 
     private Integer channelId;
