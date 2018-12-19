@@ -44,6 +44,9 @@ public enum Constants {
     NUM_STATUS_7(7, "受理失败", "NUM_STATUS"),
     NUM_STATUS_8(8, "已失效", "NUM_STATUS"),
 
+    CHANNEL_ID_1("1", "一级代理", "CHANNEL_ID"),
+    CHANNEL_ID_2("2", "二级代理", "CHANNEL_ID"),
+    CHANNEL_ID_3("3", "线上商超", "CHANNEL_ID"),
 
     ;
 

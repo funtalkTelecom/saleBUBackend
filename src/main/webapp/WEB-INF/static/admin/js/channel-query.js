@@ -108,7 +108,7 @@ $(function() {
 
                 if(channel_d)node.push('<a class="btn btn-warning btn-xs edit" href="javascript:void(0);">修改</a>');
                 if(channel_d)node.push('<a class="btn btn-success btn-xs save" href="javascript:void(0);" style="display: none">保存</a>');
-                if(channel_d)node.push('<a class="btn btn-danger btn-xs del" href="javascript:void(0);" >删除</a>');
+                if(channel_del)node.push('<a class="btn btn-danger btn-xs del" href="javascript:void(0);" >删除</a>');
 
 
                 $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
@@ -219,7 +219,7 @@ $(function() {
             "dataIndex" : "ratioPrice",
             "renderer":function(v,record){
                 var node = [];
-                if(channel_d) node.push('<a class="btn btn-danger btn-xs del" href="javascript:void(0);">删除</a>');
+                if(channel_del) node.push('<a class="btn btn-danger btn-xs del" href="javascript:void(0);">删除</a>');
                 $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
                 $operate.find(".del").click(function () {
                     if (confirm("确认删除？")) {

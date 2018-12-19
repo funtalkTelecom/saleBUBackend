@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public interface NumPriceMapper extends BaseMapper<NumPrice>,Mapper<NumPrice> {
@@ -17,4 +18,6 @@ public interface NumPriceMapper extends BaseMapper<NumPrice>,Mapper<NumPrice> {
     void batchUpateFeature(@Param("batch") List<NumRule> batch, @Param("feature") String feature);
 
     void updateFeature(@Param("feature") String feature);
+
+    Map queryAgentNumprice(@Param("param") NumPrice numPrice);
 }

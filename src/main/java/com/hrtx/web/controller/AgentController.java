@@ -114,4 +114,10 @@ public class AgentController {
 	public Result checkAgent(Agent agent){
 		return agentService.checkAgent(agent);
 	}
+
+	@PostMapping("/agent/query-agent-by-CName")
+	@Powers({PowerConsts.NOPOWER})
+	public Result queryAgentByCName(Agent agent){
+		return agentService.queryAgentByCName(agent);
+	}
 }

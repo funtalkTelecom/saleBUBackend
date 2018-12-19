@@ -25,4 +25,5 @@ public interface AgentMapper extends Mapper<Agent>,BaseMapper<Agent>{
 
     List findConsumenrIdCount(@Param("ConsumerId") Integer ConsumerId);
 
+    List queryAgentByCName(@Param("param")Agent agent);
 }

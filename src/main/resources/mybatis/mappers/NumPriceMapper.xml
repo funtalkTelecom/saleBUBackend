@@ -8,6 +8,17 @@
 
   <cache eviction="LRU" flushInterval="60000" readOnly="true" size="1024"></cache>
 
+
+  <select id="queryPageList" resultType="java.util.HashMap" useCache="false">
+    select np.id,np.city_name ,np.resource, np.net_type,ch.channel,np.price,a.commpay_name,DATE_FORMAT(np.add_date,'%Y-%m-%d %H:%i:%s') addDate
+    from tb_num_price np inner join  tb_num n on np.num_id = n.id left join tb_channel ch on np.channel=ch.channel_id left join tb_agent a on a.id= np.agent_id  and a.status=2 and a.is_del=0
+    where np.is_del=0 and ch.is_del=0 and n.status = 2
+    <if test="param.channel!=null and param.channel > 0"> and np.channel = #{param.channel}</if>
+    <if test="param.resource!=null and param.resource!=''"> and np.resource like "%"#{param.resource}"%"</if>
+    <if test="param.agentId!=null"> and (np.agent_id = -1 or np.agent_id = #{param.agentId})</if>
+    order by np.id
+  </select>
+
   <select id="queryList" resultType="java.util.HashMap">
     select a.numPriceId, a.resource, case when a.net_type = '电信' then 1 when a.net_type = '联通' then 2 when a.net_type = '移动' then 3 else 0 end net_type,
     a.province_name, a.city_name, a.feature, a.price, a.is_freeze,a.id, a.status, a.city_code,
@@ -96,4 +107,10 @@
   <update id="updateFeature">
       update tb_num_price p set p.feature = REPLACE(p.feature,#{feature},',') where p.is_del = 0 and p.feature REGEXP  ".*"#{feature}".*";
   </update>
+
+  <select id="queryAgentNumprice" resultType="java.util.Map">
+    select a.price ,ifnull(b.price,a.price) agentPrice from
+      (select np.price,np.resource from  tb_num_price np where np.resource=#{param.resource} and np.agent_id=-1 and np.is_del=0 and np.channel=#{param.channel}) a left join
+    (select np.price,np.resource from  tb_num_price np where np.resource=#{param.resource} and np.agent_id=#{param.agentId} and np.is_del=0 and np.channel=#{param.channel}) b on a.resource=b.resource
+  </select>
 </mapper>

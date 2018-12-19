@@ -174,4 +174,9 @@ public class AgentService {
 
 		return new Result(Result.OK, "提交成功");
 	}
+
+	public Result queryAgentByCName(Agent agent){
+		List list=agentMapper.queryAgentByCName(agent);
+		return new Result(Result.OK, list);
+	}
 }

@@ -173,6 +173,7 @@
 
 		<script type="text/javascript">
             var channel_d = <%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_EDIT)%>;
+            var channel_del = <%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_DELETE)%>;
 		</script>
 	</body>
 </html>
