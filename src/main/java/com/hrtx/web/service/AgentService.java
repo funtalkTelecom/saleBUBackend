@@ -61,7 +61,7 @@ public class AgentService {
 			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1,3);
 			agentMapper.insert(ag);
 		}else {  //修改
-			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1,3);
+			ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1,3);
 			agentMapper.updateAgent(ag);
 		}
 		return new Result(Result.OK, "提交成功");
@@ -173,5 +173,10 @@ public class AgentService {
 		agentMapper.updateAgentStatus(aa);
 
 		return new Result(Result.OK, "提交成功");
+	}
+
+	public  Result updateAgentChannel(Integer ids ,Integer channelId){
+		agentMapper.updateAgentChannel(ids,channelId);
+		return new Result(Result.OK, "修改成功");
 	}
 }

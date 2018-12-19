@@ -101,9 +101,13 @@
 				<input id="addConsumerId" name="addConsumerId" type="hidden">
 				<div class="modal-body">
 					<div class="form-group">
-						<label class="col-xs-2">公司名称</label>
-						<div class="col-xs-10">
-							<span class="scomm"></span>
+						<label  class="col-xs-2 ">公司名称:</label>
+						<div class="col-xs-3 ">
+							<span class="scomm text-left"></span>
+						</div>
+						<label  class="col-xs-2 ">渠道:</label>
+						<div class="col-xs-3 ">
+							<span class="channelName text-left"></span>
 						</div>
 					</div>
 					<div class="form-group">
@@ -155,6 +159,74 @@
 	</div><!-- /.modal -->
 </div>
 
+<div class="modal fade" id="channelModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title">
+					修改
+				</h4>
+			</div>
+			<form role="form" class="form-horizontal">
+				<input id="ids" name="ids" type="hidden">
+				<div class="modal-body">
+					<div class="form-group">
+						<label  class="col-xs-2 ">公司名称:</label>
+						<div class="col-xs-3 ">
+							<span class="scomm text-left"></span>
+						</div>
+						<label  class="col-xs-2 ">渠道:</label>
+						<div class="col-xs-3 ">
+							<span class="channelName text-left"></span>
+						</div>
+					</div>
+					<div class="form-group">
+
+						<label class="col-xs-2">法人</label>
+						<div class="col-xs-3">
+							<span class="person"></span>
+						</div>
+						<label class="col-xs-2 ">电话</label>
+						<div class="col-xs-3">
+							<span class="phone"></span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2">注册地址</label>
+						<div class="col-xs-8">
+							<span class="address"></span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2">营业执照</label>
+						<div class="col-xs-10">
+							<a id="chtradingImg" data-lightbox="tradingImg"><img id="ctradingImg" style="max-width: 80px;max-height: 80px;"></a>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 ">渠道</label>
+						<div class="col-xs-10">
+							<select name="channelId" class="channelId">
+								<option value="0">请选择</option>
+								<c:forEach items="${channelList}" var="channel">
+									<option value="${channel.channelId}" >${channel.channel}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success">提交</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</form>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
 <!-- 模态框（Modal） -->
 <div class="modal fade" id="DetailsModal" tabindex="-1">
 	<div class="modal-dialog">
@@ -171,8 +243,12 @@
 				<div class="modal-body">
 					<div class="form-group">
 						<label  class="col-xs-2 ">公司名称:</label>
-						<div class="col-xs-10 ">
+						<div class="col-xs-3 ">
 							<span class="scomm text-left"></span>
+						</div>
+						<label  class="col-xs-2 ">渠道:</label>
+						<div class="col-xs-3 ">
+							<span class="channelName text-left"></span>
 						</div>
 					</div>
 					<div class="form-group">
@@ -212,6 +288,7 @@
 
 <script type="text/javascript">
     var p_check = <%=SessionUtil.hasPower(PowerConsts.AGENTMOUDULE_COMMON_CHECK)%>;
+    var p_update = <%=SessionUtil.hasPower(PowerConsts.AGENTMOUDULE_COMMON_UPDATE)%>;
 </script>
 </body>
 </html>

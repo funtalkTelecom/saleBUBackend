@@ -29,6 +29,9 @@ $(function() {
             "header" : "注册人",
             "dataIndex" : "userName",
         },{
+            "header" : "渠道",
+            "dataIndex" : "channelName",
+        },{
             "header" : "状态",
             "dataIndex" : "statustext",
         },{
@@ -45,16 +48,20 @@ $(function() {
                 node.push('<a class="btn btn-success btn-xs deltails" href="javascript:void(0);">详情</a>')
                 if(record.status ==1){
                     if(p_check) {
-                        node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">审核</a>')
+                        node.push('<a class="btn btn-success btn-xs check" href="javascript:void(0);">审核</a>')
                     }
                 }
+                if(p_update) {
+                    node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">修改</a>')
+                }
                 $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
-                $operate.find(".update").click(function () {
+                $operate.find(".check").click(function () {
                     $.post("find-agent-by-id",{id:v},function(data){
                         var _data=data.data;
                         $(".scomm").html(_data.commpayName);
                         $(".person").html(_data.person);
                         $(".phone").html(_data.phone);
+                        $(".channelName").html(_data.channelName);
                         var addresss = _data.provinceName+_data.cityName+_data.districtName+_data.address;
                         $(".address").html(addresss);
                         $("#tradingImg").attr("src","get-img/trading_url/300/"+_data.tradingImg);
@@ -64,12 +71,29 @@ $(function() {
                         $('#checkModal').modal('show');
                     },"json");
                 })
+                $operate.find(".update").click(function () {
+                    $.post("find-agent-by-id",{id:v},function(data){
+                        var _data=data.data;
+                        $(".scomm").html(_data.commpayName);
+                        $(".person").html(_data.person);
+                        $(".phone").html(_data.phone);
+                        $(".channelName").html(_data.channelName);
+                        var addresss = _data.provinceName+_data.cityName+_data.districtName+_data.address;
+                        $(".address").html(addresss);
+                        $("#ctradingImg").attr("src","get-img/trading_url/300/"+_data.tradingImg);
+                        $("#chtradingImg").attr("href","get-img/trading_url/1000/"+_data.tradingImg);
+                        $("#ids").val(_data.id);
+                        $("#addConsumerId").val(_data.addConsumerId);
+                        $('#channelModal').modal('show');
+                    },"json");
+                })
                 $operate.find(".deltails").click(function () {
                     $.post("find-agent-by-id",{id:v},function(data){
                         var _data=data.data;
                         $(".scomm").html(_data.commpayName);
                         $(".person").html(_data.person);
                         $(".phone").html(_data.phone);
+                        $(".channelName").html(_data.channelName);
                         var addresss = _data.provinceName+_data.cityName+_data.districtName+_data.address;
                         $(".address").html(addresss);
                         $("#tradingImgs").attr("src","get-img/trading_url/300/"+_data.tradingImg);
@@ -130,6 +154,18 @@ $(function() {
             alert(data.data);
             dataList.load();
             $('#checkModal').modal('hide');
+        },"json");
+    });
+    $(document).on("click","#channelModal .modal-footer .btn-success",function() {
+        var channelId= parseInt($("#channelModal .channelId").val()) || 0;
+        if(channelId ==0){
+            alert("请选择渠道");
+            return;
+        }
+        $.post("update-agent",$("#channelModal form").serialize(),function(data){
+            alert(data.data);
+            dataList.load();
+            $('#channelModal').modal('hide');
         },"json");
     });
 });
