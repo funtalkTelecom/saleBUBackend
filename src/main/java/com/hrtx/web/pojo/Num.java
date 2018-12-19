@@ -1,54 +1,56 @@
 package com.hrtx.web.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
+import java.util.Date;
+
 @Table(name = "tb_num")
-public class Num extends BasePojo{
+public class Num extends BasePojo  implements java.io.Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer id;
-
     private Integer cityId;
-
     private String cityName;
-
     private String netType;
-
     private String numResource;
-
     private String numType;
-
     private String numLevel;
-
-    private Double lowConsume;
-
     private Boolean with4;
-
     private String feature;
-
     private String sectionNo;
-
     private String moreDigit;
-
     private Integer sellerId;
-
     private String seller;
-
     private Integer buyerId;
-
+    private BigDecimal lowConsume;
     private String buyer;
-
     private Integer iccidId;
     private String iccid;
     private Integer mealMid;
     private String slReason;
     private String uploadFileName;
     private Integer isFreeze;
-
-
+    private Integer skuId;
+    private String teleType;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
     private Integer status; //1在库、2销售中、3冻结(下单未付款)、4待配卡(已付款 针对2C或电销无需购买卡时、代理商买号而未指定白卡时)、5待受理(代理商已提交或仓库已发货，待提交乐语BOSS)、6已受理(乐语BOSS处理成功)、7受理失败(BOSS受理失败，需要人介入解决)、8已失效(乐语BOSS提示号码已非可用)
 
     public Num(Integer id, Integer cityId, String cityName, String netType, String numResource, String numType,
-               String numLevel, Double lowConsume, Boolean with4, String feature, String sectionNo, String moreDigit,
+               String numLevel, BigDecimal lowConsume, Boolean with4, String feature, String sectionNo, String moreDigit,
                Integer sellerId, String seller, Integer buyerId, String buyer, String iccid, Integer status,Integer mealMid) {
         this.id = id;
         this.cityId = cityId;
@@ -132,11 +134,7 @@ public class Num extends BasePojo{
     }
 
     public Double getLowConsume() {
-        return lowConsume;
-    }
-
-    public void setLowConsume(Double lowConsume) {
-        this.lowConsume = lowConsume;
+        return lowConsume==null?null:lowConsume.doubleValue();
     }
 
     public Boolean getWith4() {
@@ -253,5 +251,37 @@ public class Num extends BasePojo{
 
     public void setIsFreeze(Integer isFreeze) {
         this.isFreeze = isFreeze;
+    }
+
+    public void setLowConsume(BigDecimal lowConsume) {
+        this.lowConsume = lowConsume;
+    }
+    public Date getStartTime() {
+        return startTime;
+    }
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+    public Date getEndTime() {
+        return endTime;
+    }
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public Integer getSkuId() {
+        return skuId;
+    }
+
+    public void setSkuId(Integer skuId) {
+        this.skuId = skuId;
+    }
+
+    public String getTeleType() {
+        return teleType;
+    }
+
+    public void setTeleType(String teleType) {
+        this.teleType = teleType;
     }
 }
