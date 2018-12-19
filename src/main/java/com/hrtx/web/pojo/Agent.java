@@ -47,7 +47,7 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	@Transient
 	private String  channelName;//
 	@Transient
-	 private Integer ids;;//
+	 private Integer ids;//
 
 	public Agent() {
 	}
