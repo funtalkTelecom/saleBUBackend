@@ -16,7 +16,8 @@
             a.status= #{status},
             a.add_consumer_id=#{addConsumerId},
             a.add_date =#{addDate},
-            a.is_del=#{isDel}
+            a.is_del=#{isDel},
+            a.channel_id=#{channelId}
         where a.id = #{id}
     </update>
 
@@ -57,8 +58,10 @@
 				when t.status =2 then '审核通过'
                 when t.status =3 then '审核未通过'
 				else '未知'
-				end as statustext
-				from tb_agent t left join tb_city y on t.province = y.id
+				end as statustext,l.channel as channelName
+				from tb_agent t
+        left join tb_channel l on t.channel_id = l.channel_id
+        left join tb_city y on t.province = y.id
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
         left join tb_consumer u on t.add_consumer_id = u.id
@@ -85,8 +88,10 @@
         when t.status =2 then '审核通过'
         when t.status =3 then '审核未通过'
         else '未知'
-        end as statustext,t.check_remark as checkRemark
-        from tb_agent t left join tb_city y on t.province = y.id
+        end as statustext,t.check_remark as checkRemark,l.channel as channelName
+        from tb_agent t
+        left join tb_channel l on t.channel_id = l.channel_id
+        left join tb_city y on t.province = y.id
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
         left join tb_consumer u on t.add_consumer_id = u.id
@@ -97,6 +102,10 @@
             update tb_agent a set a.status=#{status},
             a.check_remark=#{checkRemark}
         where a.id = #{id}
+    </update>
+    <update id="updateAgentChannel">
+        update tb_agent a set a.channel_id=#{channelId}
+        where a.id = #{ids}
     </update>
     <update id="updateAgentStatusToLeyu">
             update tb_agent a set a.status=#{status},

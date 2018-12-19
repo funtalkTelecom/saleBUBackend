@@ -199,7 +199,7 @@
         else 0
         end as erSatus
     from tb_ep_sale ep
-    inner join
+    left join
     tb_file_info epImg
     on epImg.ref_id=ep.id
     left join
@@ -255,7 +255,7 @@
         end as erSatus,
     tb_goods.g_is_pack as erIsPack
     from tb_ep_sale ep
-    inner join
+    left join
     tb_file_info epImg
     on epImg.ref_id=ep.id
     left join
@@ -678,7 +678,7 @@
         ) values
         <foreach collection="epSaleList" item="EPSale" separator=",">
             (
-            #{EPSale.id},
+            `nextval`('hk'),
             #{EPSale.title},
             #{EPSale.epRule},
             #{EPSale.startTime},

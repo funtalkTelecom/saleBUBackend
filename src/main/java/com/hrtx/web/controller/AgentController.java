@@ -6,9 +6,11 @@ import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
+import com.hrtx.web.mapper.ChannelMapper;
 import com.hrtx.web.pojo.Agent;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.service.AgentService;
+import com.hrtx.web.service.ChannelService;
 import com.hrtx.web.service.ConsumerService;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,6 +35,8 @@ public class AgentController {
 
 	@Autowired
 	AgentService agentService;
+	@Autowired
+	ChannelService channelService;
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired
 	SessionUtil sessionUtil;
@@ -87,7 +92,8 @@ public class AgentController {
 
 	@RequestMapping("/agent/query-agent")
 	@Powers({PowerConsts.AGENTMOUDULE_COMMON_QUEYR})
-	public ModelAndView queryMeal(Agent agent){
+	public ModelAndView queryMeal(Agent agent,HttpServletRequest request){
+		request.setAttribute("channelList", channelService.listChannel());
 		return new ModelAndView("admin/agent/query-agent");
 	}
 
@@ -113,5 +119,12 @@ public class AgentController {
 	@Powers({PowerConsts.AGENTMOUDULE_COMMON_CHECK})
 	public Result checkAgent(Agent agent){
 		return agentService.checkAgent(agent);
+	}
+
+	@PostMapping("/update-agent")
+	@ResponseBody
+	@Powers({PowerConsts.AGENTMOUDULE_COMMON_UPDATE})
+	public Result updateAgent(Agent agent){
+		return agentService.updateAgentChannel(agent.getIds(),agent.getChannelId());
 	}
 }
