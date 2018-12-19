@@ -32,7 +32,7 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	private String loginName;
 	private String pwd;
 	private Integer type;
-	private Integer channelId;  //代理商ID
+	private Integer channelId;  //渠道ID
 
 	@Transient
 	private String  provinceName;// 所属省份
@@ -44,10 +44,32 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	private String  statustext;//
 	@Transient
 	private String  userName;//
+	@Transient
+	private String  channelName;//
+	@Transient
+	 private Integer ids;;//
 
 	public Agent() {
 	}
 
+	public Agent(Integer id,String commpayName, String person,String phone,Long province,Long city,Long district
+				 , String address,String tradingImg, Integer status, Integer addConsumerId, Date addDate, Integer isDel,Integer type,Integer channelId ) {
+		this.id = id;
+		this.commpayName = commpayName;
+		this.person = person;
+		this.phone =phone;
+		this.province = province;
+		this.city = city;
+		this.district = district;
+		this.address = address;
+		this.tradingImg =tradingImg;
+		this.status = status;
+		this.addConsumerId = addConsumerId;
+		this.addDate = addDate;
+		this.isDel = isDel;
+		this.type = type;
+		this.channelId = channelId;
+	}
 	public Agent(String commpayName, String person,String phone,Long province,Long city,Long district
 				 , String address,String tradingImg, Integer status, Integer addConsumerId, Date addDate, Integer isDel,Integer type,Integer channelId ) {
 		this.commpayName = commpayName;
@@ -238,5 +260,29 @@ public class Agent extends BasePojo implements java.io.Serializable {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public Integer getChannelId() {
+		return channelId;
+	}
+
+	public void setChannelId(Integer channelId) {
+		this.channelId = channelId;
+	}
+
+	public String getChannelName() {
+		return channelName;
+	}
+
+	public void setChannelName(String channelName) {
+		this.channelName = channelName;
+	}
+
+	public Integer getIds() {
+		return ids;
+	}
+
+	public void setIds(Integer ids) {
+		this.ids = ids;
 	}
 }
