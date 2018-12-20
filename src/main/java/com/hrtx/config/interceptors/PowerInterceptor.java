@@ -72,7 +72,6 @@ public class PowerInterceptor implements HandlerInterceptor {
     	if(handler == null)return false;
 		if(!(handler instanceof HandlerMethod))return false;
 		HandlerMethod m=(HandlerMethod) handler;
-		System.out.println(m.getMethod().getName()+"   ====");
 		Powers powers =m.getMethodAnnotation(Powers.class);
 		if(powers == null) return false;
 		PowerConsts[] powerConsts=powers.value();
