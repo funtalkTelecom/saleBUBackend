@@ -70,6 +70,7 @@
                                         </div>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus " id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus " id="reset">重置</button>
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus " id="export">导出</button>
                                         <c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMPRICEMOUDULE_COMMON_EDIT)%>">
                                             <button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#myModal">设置代理商价格</button>
                                         </c:if>
@@ -112,6 +113,7 @@
                                     <div class="col-xs-4 col-sm-4">
                                         <input type="text" class="form-control name" name="commpayName" placeholder="请输入代理商" id="commpayNameT">
                                         <input type="hidden" class="form-control" name="agentId" id="agentIdT">
+                                        <input type="hidden" class="form-control" name="agentCommpayName" id="agentCommpayName">
                                     </div>
                                 </div>
                                 <%--<div class="form-group">--%>

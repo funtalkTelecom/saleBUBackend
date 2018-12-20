@@ -86,9 +86,8 @@ $(document).on("focus","#commpayNameT",function(){
             });
         },
         select: function(e, ui) {
-            console.log(e)
-            console.log(ui)
             $("#agentIdT").val(ui.item.id);
+            $("#agentCommpayName").val(ui.item.value);
         },
         // open: function( event, ui ) {  //自己的想法是给前两个加change事件，直接清空价格
         //     console.log(1)
@@ -151,6 +150,10 @@ function queryAgentNumprice() {
         alert("请选择代理商");
         return ;
 	}
+    var agentCommpayName = $("#agentCommpayName").val();
+	if(agentCommpayName!=agentCommpayName){
+        return ;
+    }
     $.post("numprice/query-agent-numprice",{resource:resource,agentId:agentIdT,commpayName:commpayNameT},function(data){
         if(data.code==200){
             if(data.data){
