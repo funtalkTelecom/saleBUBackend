@@ -70,7 +70,7 @@ public class NumService {
                 List<OrderItem> list = orderItemMapper.selectByExample(example);
                 if(count != list.size()) throw new ServiceException("仓库回调的itemId["+item_id+"]数量["+count+"]与平台数量["+list.size()+"]不一致");
                 List errors = iccidMapper.matchOrderItem(item_id);
-                if(errors.size() > 0) throw new ServiceException("itemId["+item_id+"]回调匹配存在号段不一致或号码状态异常");
+                if(errors.size() > 0) throw new ServiceException("itemId["+item_id+"]回调匹配存在号段不匹配或号码状态异常");
                 //捆绑
                 example = new Example(Iccid.class);
                 example.createCriteria().andEqualTo("orderId", item_id);
