@@ -267,8 +267,8 @@ public class ApiOrderService {
 		Result result=this.apiOrderService.newCreateOrder(order_type,sku_id,num_id,order_amount,ep_price,user,address,shippingMenthodId,mead_id,conment,user_agent,req_id,order_ext_param);
 		if(result.getCode()!=Result.OK)return result;
 		Integer order_id=NumberUtils.toInt(ObjectUtils.toString(result.getData()));
-		result = this.apiOrderService.payPushOrderToStorage(order_id);
-		if(result.getCode()==Result.OK)return result;
+		Result result1 = this.apiOrderService.payPushOrderToStorage(order_id);
+		if(result1.getCode()==Result.OK)return result;//若成功,返回原生成订单的数据(主要含了订单号)
 		log.info("冻结仓储库存失败，5分钟后再次调用");
 		new Thread(){
 			//TODO 到时调整到统一队列中
@@ -281,7 +281,7 @@ public class ApiOrderService {
 				apiOrderService.payPushOrderToStorage(order_id);
 			}
 		}.start();
-		return new Result(Result.OTHER,result.getData());
+		return new Result(Result.OTHER,result1.getData());
 	}
 
 	/**
