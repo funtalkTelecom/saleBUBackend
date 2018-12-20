@@ -1,5 +1,6 @@
 package com.hrtx.web.service;
 
+import com.github.abel533.entity.Example;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -15,6 +16,7 @@ import com.hrtx.web.pojo.Account;
 import com.hrtx.web.pojo.Agent;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.ConsumerLog;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -178,5 +180,28 @@ public class AgentService {
 	public  Result updateAgentChannel(Integer ids ,Integer channelId){
 		agentMapper.updateAgentChannel(ids,channelId);
 		return new Result(Result.OK, "修改成功");
+	}
+
+	/**
+	 * 根据提交用户获取代理商信息，若一个用户存在多个代理商或用户存在一个代理商但无渠道信息 则说明数据异常，若用户不存在代理商则取默认的代理商
+	 * @param user	当前登录用户
+	 * @return Result.code=200时data=Agent,否则说明数据异常，data是错误的信息
+	 */
+	public Result queryCurrAgent(Consumer user){
+//        int channel=3;//一般用户无渠道，即默认是线上商城渠道，价格最高
+//        int agent_id=-1;
+		Example example = new Example(Agent.class);
+		example.createCriteria().andEqualTo("addConsumerId",user.getId())
+				.andEqualTo("isDel",0)
+				.andEqualTo("status",2);
+		List<Agent> agent_list=agentMapper.selectByExample(example);
+		if(agent_list.size()>1)return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
+		else if(agent_list.size()==1){//说明当前的用户有对应的渠道，取其渠道对应的价格
+			if(agent_list.get(0).getChannelId()==null)return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
+			else return new Result(Result.OK, agent_list.get(0));
+		}else{/*(agent_list.size()==0)*///若无代理渠道，则去默认
+			Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
+			return new Result(Result.OK, agent);
+		}
 	}
 }
