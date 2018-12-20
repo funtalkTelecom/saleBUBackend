@@ -14,4 +14,6 @@ public interface ChannelMapper extends Mapper<Channel>,BaseMapper<Channel>{
 
     Map getListbyNum(@Param("num_resource") String num_resource);
 
+    List listChannel();
+
 }

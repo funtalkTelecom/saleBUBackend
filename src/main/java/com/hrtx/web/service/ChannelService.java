@@ -52,4 +52,8 @@ public class ChannelService {
         numPriceMapper.matchNumPrice();
         return new Result(Result.OK, "成功");
     }
+
+    public  List listChannel(){
+        return  channelMapper.listChannel();
+    }
 }

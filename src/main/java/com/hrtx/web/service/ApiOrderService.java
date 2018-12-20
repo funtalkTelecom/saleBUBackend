@@ -14,6 +14,7 @@ import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
 import net.sf.json.JSONArray;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -289,7 +290,7 @@ public class ApiOrderService {
 	public Result payPushOrderToStorage(Integer order_id){
 		Order order=this.orderMapper.selectByPrimaryKey(order_id);
 		if(order==null)return new Result(Result.ERROR, "抱歉，您提交的订单存在错误");
-		if(order.getStatus()!=0||order.getStatus()!=20)return new Result(Result.ERROR, "当前订单状态并非可冻结情况");
+		if(!ArrayUtils.contains(new int[]{Constants.ORDER_STATUS_20.getIntKey(),Constants.ORDER_STATUS_0.getIntKey()},order.getStatus()))return new Result(Result.ERROR, "当前订单状态并非可冻结情况");
 		order.setStatus(Constants.ORDER_STATUS_20.getIntKey());
 		this.orderMapper.updateByPrimaryKey(order);
 		Example example = new Example(OrderItem.class);
@@ -401,7 +402,7 @@ public class ApiOrderService {
 		}
 
 		Meal meal= mealMapper.selectByPrimaryKey(mead_id);
-		if(meal==null)return new Result(Result.ERROR, "抱歉，尚未找到您提交的套餐");
+		if(meal==null && mead_id>0)return new Result(Result.ERROR, "抱歉，尚未找到您提交的套餐");
 
 		if(ordinary_num||super_num||ep_num)order_amount=1;//此类情况只会出库一个
 
@@ -431,7 +432,7 @@ public class ApiOrderService {
 			if(low_num&&StringUtils.equals(sku.getSkuGoodsType(),"2")){
 				Example example = new Example(Number.class);
 				example.createCriteria().andEqualTo("status",2)
-						.andEqualTo("is_freeze",0)
+						.andEqualTo("isFreeze",0)
 						.andEqualTo("skuId", sku.getSkuId());
 				List<Number> number_list=this.numberMapper.selectByExample(example);
 				if(number_list.size()<order_amount)return new Result(Result.ERROR, "抱歉，号码库存不足，无法订购");
@@ -498,7 +499,7 @@ public class ApiOrderService {
 		if(itemIccid!=null){
 			itemIccid.setOrderId(order.getOrderId());
 			this.orderItemMapper.insert(itemIccid);
-			Utils.sum(subTotal,itemIccid.getTotal());
+			subTotal=Utils.sum(subTotal,itemIccid.getTotal());
 		}
 		for (int i=0;itemNums!=null&&i<itemNums.size();i++){
 			OrderItem itemNum=itemNums.get(i);

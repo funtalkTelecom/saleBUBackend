@@ -111,7 +111,7 @@
 		) values
 		<foreach collection="goodsFocusList" item="GoodsFocus" separator=",">
 			(
-			#{GoodsFocus.id},
+			`nextval`('hk'),
 			#{GoodsFocus.skuId},
 			#{GoodsFocus.numId},
 			#{GoodsFocus.num},
