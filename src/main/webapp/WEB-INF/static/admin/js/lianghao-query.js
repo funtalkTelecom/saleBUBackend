@@ -18,6 +18,12 @@ $(function() {
 					"header" : "价格",
 					"dataIndex" : "price"
 				},{
+					"header" : "级别",
+					"dataIndex" : "numLevel"
+				},{
+					"header" : "最低消费",
+					"dataIndex" : "lowConsume"
+				},{
 					"header" : "运营商",
 					"dataIndex" : "net_type",
             		"renderer" : function(v, record) {
@@ -33,7 +39,7 @@ $(function() {
 					"dataIndex" : "is_freeze",
             		"renderer" : function(v, record) {
                         if (v == 0) return "未冻结";
-                        if (v == 1) return "已冻结";
+                        if (v == 1) return "<span style='color: red'>已冻结</span>";
                     }
 				},{
             		"header" : "操作",
@@ -86,5 +92,21 @@ $(function() {
 	window.reload = function(){
 		dataList.reload();
 	}
+
+    $(document).on("click","#batch-add .modal-footer .btn-success",function() {
+        // 准备好Options对象
+        var options = {
+            type : "post",
+            url: "lianghao/batch-add-order",
+            success : function(data) {
+                dataList.load();
+                $('#batch-add').modal('hide');
+                alert("数据已提交，详见稍后下载的excel表格");
+                window.location.href="get-file/batch_add_order/"+data.data;
+            }
+        };
+        // 将options传给ajaxForm
+        $('#batch-add form').ajaxSubmit(options);
+    });
 });
 

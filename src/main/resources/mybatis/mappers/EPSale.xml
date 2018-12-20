@@ -663,7 +663,7 @@
         and  tb_goods.g_id=#{0}
     </select>
 
-    <insert id="insertBatch">
+    <insert id="insertBatch" >
         insert into tb_ep_sale(
         id,
         title,
@@ -692,6 +692,38 @@
         </foreach>
     </insert>
 
+    <insert id="epSaleInsert" >
+        insert into tb_ep_sale(
+        id,
+        title,
+        ep_rule,
+        start_time,
+        end_time,
+        last_pay_time,
+        is_show,
+        create_date,
+        update_date,
+        add_user_id
+        ) values
+        (
+           #{id},
+           #{title},
+           #{epRule},
+           #{startTime},
+           #{endTime},
+           #{lastPayTime},
+           #{isShow},
+           now(),
+           now(),
+           #{addUserId}
+          )
+        <!--
+        <  <selectKey keyProperty="id" resultType="java.lang.Integer">
+              select last_insert_id() as id
+          </selectKey>
+        -->
+    </insert>
+
     <update id="epSaleEdit">
         update tb_ep_sale t set
          t.title=#{title},
@@ -700,7 +732,7 @@
          t.end_time=#{endTime} ,
          t.last_pay_time=#{lastPayTime} ,
          t.is_show=#{isShow} ,
-         t.update_date=#{updateDate}
+         t.update_date=now()
         where
             t.id = #{id}
     </update>

@@ -49,6 +49,8 @@ $(function() {
                         $operate.find(".update").click(function () {
                             $.post("poster/poster-info", {id: v}, function (data) {
                                 var _data = data.data;
+                                $("#dIdImg1").attr("src","get-img/posterImages/"+_data["pic"]);
+                                $("#dIdImg1").show();
                                 formInit($("#posterInfo form"), _data);
                                 $('#posterInfo').modal('show');
                             }, "json");
@@ -87,7 +89,17 @@ $(function() {
 		dataList.reload();
 	}
 
-    $(document).on("click","#posterInfo .modal-footer .btn-success",function() {
+    $("#goBtn").click(function(){
+        var title=$("#title").val();
+        if(title=="")
+        {
+            alert("标题不能为空!")
+            return false;
+        }
+        if(!$("#dIdImg1").attr("src") || $("#dIdImg1").attr("src")==""){
+            alert("请上传图片");
+            return;
+        }
         // 准备好Options对象
         var options = {
             // target:  null,
@@ -95,6 +107,7 @@ $(function() {
             url: "poster/poster-edit",
             success : function(data) {
                 dataList.load();
+                $("#dIdImg1").attr("src","");
                 $('#posterInfo').modal('hide');
                 alert(data.data);
             }
@@ -128,4 +141,27 @@ $(function() {
             }
         });
     });
+
+    $("#close").click(function(){
+        $("#dIdImg1").attr("src","");
+        $('#posterInfo').modal('hide');
+    });
+    $("#modColse").click(function(){
+        $("#dIdImg1").attr("src","");
+        $('#posterInfo').modal('hide');
+    });
 });
+
+
+
+function xmTanUploadImg1(obj) {
+    var file = obj.files[0];
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        // console.log("成功读取....");
+        var img = document.getElementById("dIdImg1");
+        img.src = e.target.result;
+        $("#dIdImg1").show();
+    }
+    reader.readAsDataURL(file)
+}

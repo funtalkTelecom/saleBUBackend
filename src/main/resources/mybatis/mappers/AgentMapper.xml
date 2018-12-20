@@ -65,7 +65,7 @@
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
         left join tb_consumer u on t.add_consumer_id = u.id
-        where t.is_del=0 and t.type=1
+        where t.is_del=0 and t.type=1 and l.is_del=0
         <if test="param.commpayName!=null and param.commpayName!=''">
             and  t.commpay_name  like "%"#{param.commpayName}"%"
         </if>
@@ -95,7 +95,7 @@
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
         left join tb_consumer u on t.add_consumer_id = u.id
-        where t.is_del=0 and t.id =#{id}
+        where t.is_del=0 and l.is_del=0 and t.id =#{id}
     </select>
 
     <update id="updateAgentStatus">

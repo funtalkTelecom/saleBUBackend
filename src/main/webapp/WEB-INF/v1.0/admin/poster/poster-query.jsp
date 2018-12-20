@@ -83,7 +83,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						<button type="button" class="close" id="close">
 							&times;
 						</button>
 						<h4 class="modal-title">
@@ -97,7 +97,7 @@
 							<div class="form-group">
 								<label class="col-xs-2 control-label">标题</label>
 								<div class="col-xs-4">
-									<input type="text" class="form-control" name="title">
+									<input type="text" class="form-control" name="title" id="title">
 								</div>
 								<label class="col-xs-2 control-label">位置</label>
 								<div class="col-xs-4">
@@ -109,10 +109,8 @@
 							<div class="form-group">
 								<label class="col-xs-2 control-label">图片${bean.pic}</label>
 								<div class="col-xs-10">
-									<input type="file" name="file" id="file">
-									<c:if test="bean.pic!=null and bean.pic!=''">
-										<img src="<%=basePath%>admin/posterImages/${bean.pic}"/>
-									</c:if>
+									<input type="file" id="file" name="file" onchange="xmTanUploadImg1(this)" accept="image/*" ></input>
+									<img id="dIdImg1" style="max-width: 80px;max-height: 80px; display: none;" >
 								</div>
 							</div>
 							<div class="form-group">
@@ -140,8 +138,8 @@
 							</div>
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-success">提交</button>
-							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+							<button type="button" class="btn btn-success"  id="goBtn">提交</button>
+							<button type="button" class="btn btn-default" id="modColse">关闭</button>
 						</div>
 					</form>
 				</div><!-- /.modal-content -->

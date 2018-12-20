@@ -82,4 +82,10 @@ public class ApiMealService {
 
 		return new Result(Result.OK, mealList);
 	}
+
+	public List<Meal> mealList() {
+		Meal meal = new Meal();
+		meal.setIsDel(0);
+		return mealMapper.select(meal);
+	}
 }

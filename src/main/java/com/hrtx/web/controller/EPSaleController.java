@@ -526,7 +526,7 @@ public class EPSaleController extends BaseReturn{
 			mapData.put("auctionDepositList",pm);
 		}else
 		{
-			mapData.put("auctionDepositList","");
+			mapData.put("auctionDepositList",pm);
 		}
 		map.put("code", Result.OK);
 		map.put("data",mapData);

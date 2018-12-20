@@ -154,9 +154,6 @@
         <if test="param.personName!=null and param.personName!=''">
             and a.person_name like "%"#{param.personName}"%"
         </if>
-        <if test="param.num!=null and param.num!=''">
-            and m.num =#{param.num}
-        </if>
         <if test="param.startTime!=null and param.startTime!=''">
             and  str_to_date(a.add_date,'%Y-%m-%d') &gt;= #{param.startTime}
         </if>
@@ -166,6 +163,10 @@
         <if test="param.status!=null and param.status!='' and param.status!='-1'">
             and a.status = #{param.status}
         </if>
+        <if test="sellerId!=null and sellerId > 0">
+            and m.seller_id = #{sellerId}
+        </if>
+
         order by a.add_date desc
     </select>
 

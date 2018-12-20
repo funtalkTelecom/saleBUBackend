@@ -427,6 +427,22 @@ public class Utils {
 		return NumberUtils.toDouble(convertFormat(v, 0));
 	}
 
+	public static void createExportFile(String fileName, List<List<?>> list, List<List<Integer>> li, List<Integer[]> intes, String[] title) throws Exception {
+		FileOutputStream out = null;
+		try{
+			out = new FileOutputStream(new File(fileName));
+			OrderToExcel.SQLwriteExcel(out, list, li, intes, title);
+		}finally{
+			if(out != null){
+				try {
+					out.close();
+					out = null;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
 	public static void export(String fileName, List<List<?>> list, List<List<Integer>> li, List<Integer[]> intes, String[] title) throws Exception {
 

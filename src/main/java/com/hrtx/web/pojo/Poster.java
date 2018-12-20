@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Table(name = "tb_poster")
@@ -20,7 +17,7 @@ public class Poster extends BasePojo implements java.io.Serializable {
 	private Integer id;
 	private String title;
     private String position;
-    private String positionName;
+
     private String pic;
     private String url;
     private String remark;
@@ -31,14 +28,16 @@ public class Poster extends BasePojo implements java.io.Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
 
+    @Transient
+    private String positionName;
+
     public Poster() {
 	}
 
-    public Poster(Integer id, String title, String position, String positionName, String pic, String url, String remark, Date startTime, Date endTime) {
+    public Poster(Integer id, String title, String position,  String pic, String url, String remark, Date startTime, Date endTime) {
         this.id = id;
         this.title = title;
         this.position = position;
-        this.positionName = positionName;
         this.pic = pic;
         this.url = url;
         this.remark = remark;
@@ -70,13 +69,6 @@ public class Poster extends BasePojo implements java.io.Serializable {
         this.position = position;
     }
 
-    public String getPositionName() {
-        return positionName;
-    }
-
-    public void setPositionName(String positionName) {
-        this.positionName = positionName;
-    }
 
     public String getPic() {
         return pic;
@@ -116,5 +108,13 @@ public class Poster extends BasePojo implements java.io.Serializable {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
     }
 }

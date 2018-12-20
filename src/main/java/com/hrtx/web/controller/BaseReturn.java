@@ -116,6 +116,10 @@ public class BaseReturn {
 		return downLoadFile(path, "image/jpeg", response);
 	}
 
+	protected Result downLoadFile(String path, HttpServletResponse response) {
+		return downLoadFile(path, "application/x-msdownload", response);
+	}
+
 	/**
 	 * 现在文件
 	 * @param path 子路径
