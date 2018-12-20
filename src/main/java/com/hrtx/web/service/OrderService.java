@@ -547,7 +547,7 @@ public class OrderService extends BaseService {
     /**
      * 待付款订单120分钟后，系统自动取消，除竞拍订单
      */
-    @Scheduled(fixedRate=6000)
+//    @Scheduled(fixedRate=6000)update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void TowHoursCancelOrderStatusTimer(){
         if(!"true".equals(SystemParam.get("twoHours_timer"))) return;
         log.info("开始执行2个小时未付款订单期定时器");
@@ -571,7 +571,7 @@ public class OrderService extends BaseService {
     /***
      * 系统自动取消竞拍订单
      */
-    @Scheduled(fixedRate=6000)
+//    @Scheduled(fixedRate=6000)update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void LastPayTimeCancelOrderStatusTimer(){
         if(!"true".equals(SystemParam.get("lastPay_timer"))) return;
         log.info("开始执行竞拍订单未付款订单超过最迟付款期定时器");

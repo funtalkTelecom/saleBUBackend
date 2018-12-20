@@ -172,7 +172,7 @@ public class NumService {
     /*
 	 号码冻结>30分钟系统自动解冻
 	 */
-    @Scheduled(fixedRate=6000)
+//    @Scheduled(fixedRate=6000)update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void unFreezeSystem() {
         if(!"true".equals(SystemParam.get("numFreeze_timer"))) return;
         log.info("开始执行.....冻结号码>30分钟,系统自动解冻......定时器");

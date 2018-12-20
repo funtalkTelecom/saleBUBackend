@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.TokenGenerator;
+import com.hrtx.web.event.QueueService;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.User;
 import com.hrtx.web.service.ApiOrderService;
@@ -59,6 +60,7 @@ public class TestController {
     @Autowired private ApiSessionUtil apiSessionUtil;
     @Autowired private ConsumerService consumerService;
     @Autowired private ApiOrderService apiOrderService;
+    @Autowired private QueueService queueService;
 
     @RequestMapping("/")
     @Powers({PowerConsts.NOLOGINPOWER})
@@ -224,14 +226,36 @@ public class TestController {
     public Result helloworld12() {
         Integer sku_id=500;
         Integer goods_id=498;
-        Integer num_id=11;
+        Integer num_id=23;
         Integer mead_id=501;
         Integer address_id=3889;
         String conment="";
-//        Result result= this.apiOrderService.submitNormalOrder(sku_id,num_id,mead_id,address_id,conment);
+        Result result= this.apiOrderService.submitNumOrder(sku_id,num_id,mead_id,address_id,conment);
 //        System.out.println(result.getData());
-        Result result= this.apiOrderService.submitCustomOrder(num_id,mead_id,"张先生","18965902602","福建福州仓山工农街36-91",conment,"20181218001","LYB8019","张进春","身份证","35222919112341");
+//        Result result= this.apiOrderService.submitCustomOrder(num_id,mead_id,"张先生","18965902602","福建福州仓山工农街36-91",conment,"20181218001","LYB8019","张进春","身份证","35222919112341");
         System.out.println(result.getData());
         return result;
+//        this.apiOrderService.test();
+//        return null;
+    }
+
+
+    @GetMapping("/api/msg-test")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public Result helloworld13() {
+        Long long1 =System.currentTimeMillis();
+//        queueService.receiveMessage("============================");
+//        return new Result(Result.OK,"成功成功"+(System.currentTimeMillis()-long1));
+        return null;
+    }
+    @GetMapping("/api/msg-test1")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    @ResponseBody
+    public String helloworld14() {
+        Long long1 =System.currentTimeMillis();
+        queueService.receiveMessage("============================");
+//        return new Result(Result.OK,"成功成功"+(System.currentTimeMillis()-long1));
+        return "sssssss";
     }
 }

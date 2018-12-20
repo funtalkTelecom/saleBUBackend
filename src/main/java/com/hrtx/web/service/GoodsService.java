@@ -966,13 +966,13 @@ public class GoodsService {
     /***
      * 判断是否过期的上架商品
      */
-    @Scheduled(fixedRate=3000)
+//    @Scheduled(fixedRate=3000) update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void goodsTimer(){
         if(!"true".equals(SystemParam.get("goods_timer"))) return;
         log.info("开始执行判断商品是否过期定时器");
         List<Goods> list = goodsMapper.findGoodsIsSale();
         if(list.size()==0){
-            log.info(String.format("暂无过期的上架商品"));return;
+//            log.info(String.format("暂无过期的上架商品"));return;
         }else {
             for(Goods g : list){
                 try {

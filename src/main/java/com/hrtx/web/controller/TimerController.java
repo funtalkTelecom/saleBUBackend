@@ -23,6 +23,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/timer")
+/**
+ * 定时器处理类
+ */
 public class TimerController extends BaseReturn{
 	public static final Logger log = LoggerFactory.getLogger(TimerController.class);
 
@@ -32,6 +35,7 @@ public class TimerController extends BaseReturn{
 	@Autowired private EPSaleNoticeService epSaleNoticeService;
 	@Autowired private EPSaleService epSaleService;
 	@Autowired private OrderService orderService;
+	@Autowired private LyCrmService lyCrmService;
 	/**
 	 * unFreezeSystem 定时器
 	 *
@@ -45,25 +49,35 @@ public class TimerController extends BaseReturn{
 	 */
 	@GetMapping("/second")
 	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result accountDelete(HttpServletRequest request){
+	public Result second(HttpServletRequest request){
 		// /timer/second?task=goods-expire
 		String task=request.getParameter("task");
 		String req_ip=SessionUtil.getUserIp();
-		if(!SystemParam.contains("timer-ip",req_ip))return new Result(Result.OK,"非指定请求IP");
-		if(StringUtils.equals(task,"goods-expire")){//商品过期下架，平台有过期自动隐藏，所以不紧急 可每日12、23点执行
+		log.info(String.format("准备执行调用定时器，请求任务[%s],请求IP[%s]，限定ip[%s]",task,req_ip,SystemParam.get("timer_limit_ip")));
+		//INSERT INTO `tb_system`(`id`, `key_id`, `key_value`, `remark`, `is_audit`) VALUES (60, 'timer_limit_ip', '127.0.0.1', '定时器调用ip限定', '1')
+		if(!SystemParam.contains("timer_limit_ip",req_ip))return new Result(Result.ERROR,"非指定请求IP");
+		if(StringUtils.equals(task,"goods-expire")){//商品过期下架，平台有过期自动隐藏，所以不紧急 可23点执行一次
 			goodsService.goodsTimer();
 		}else if(StringUtils.equals(task,"order-expire-cancle")){//订单到期取消	可每分钟执行一次
 			orderService.TowHoursCancelOrderStatusTimer();
 		}else if(StringUtils.equals(task,"freeze-num")){//解冻客服号码	可每分钟执行一次
 			this.numService.unFreezeSystem();
-		}else if(StringUtils.equals(task,"order-sign")){//订单签收定时器	可每日12、23点执行
+		}else if(StringUtils.equals(task,"order-sign")){//订单签收定时器	可23点执行一次
 			this.apiOrderService.signOrderSystem();
 		}else if(StringUtils.equals(task,"ep-order-expire-cancle")){//订单到期取消	可每分钟执行一次
 			orderService.LastPayTimeCancelOrderStatusTimer();
-		}else if(StringUtils.equals(task,"ep-active-notice")){//竞拍活动开始通知定时器
+		}else if(StringUtils.equals(task,"ep-active-notice")){//TODO 竞拍活动开始通知定时器
 			this.epSaleNoticeService.startEPSaleListSystemNotice();
-		}else if(StringUtils.equals(task,"ep-create-order")){//竞拍创建订单，需要处理的及时，外部隔期调用视乎也不合适，应该是由外部指定时间调用
+		}else if(StringUtils.equals(task,"ep-create-order")){//TODO 竞拍创建订单，需要处理的及时，外部隔期调用视乎也不合适，应该是由外部指定时间调用
 			this.epSaleService.epsaleOrder();
+		}else if(StringUtils.equals(task,"ly-card")){//上传开卡文件 每日晚上23点执行
+			this.lyCrmService.createAgentCardFile();
+		}else if(StringUtils.equals(task,"ly-card-result")){//解析开卡结果  每日早上7点执行
+			this.lyCrmService.praseOpenCardFileResult();
+		}else if(StringUtils.equals(task,"ly-download-num")){//下载号码资源	每日早上7点执行
+			this.lyCrmService.praseLyPhoneData();
+		}else if(StringUtils.equals(task,"ly-upload-num")){//上传iccid资源 每日早上2点执行
+			this.lyCrmService.uploadLyIccidData();
 		}
 		return new Result(Result.OK,"执行成功");
 	}

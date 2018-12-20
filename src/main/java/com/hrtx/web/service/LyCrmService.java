@@ -136,7 +136,7 @@ public class LyCrmService {
     /**
      * 上传开卡文件
      */
-    @Scheduled(cron = "0 0 23 * * ?")
+//    @Scheduled(cron = "0 0 23 * * ?")update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void createAgentCardFile() {
         if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行上传开卡文件定时器");
@@ -214,7 +214,7 @@ public class LyCrmService {
     /**
      * 解析开卡结果
      */
-    @Scheduled(cron = "0 0 7 * * ?")
+//    @Scheduled(cron = "0 0 7 * * ?")update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void praseOpenCardFileResult() {
         if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行解析开卡结果定时器");
@@ -278,7 +278,7 @@ public class LyCrmService {
     /**
      * 下载号码资源
      */
-    @Scheduled(cron = "0 0 6 * * ?")
+//    @Scheduled(cron = "0 0 6 * * ?")update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void praseLyPhoneData() {//String type, int dateOffset
         if(!"true".equals(SystemParam.get("exe_timer"))) return;
 //        if("ly_corp".equals(type)) this.praseLyCorpData(dateOffset);
@@ -301,7 +301,7 @@ public class LyCrmService {
     /**
      * 上传iccid资源
      */
-    @Scheduled(cron = "0 0 2 * * ?")
+//    @Scheduled(cron = "0 0 2 * * ?")update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void uploadLyIccidData() {
         if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行上传iccid定时器");
