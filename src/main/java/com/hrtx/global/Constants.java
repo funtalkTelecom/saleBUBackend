@@ -23,6 +23,7 @@ public enum Constants {
     //订单状态
     ORDER_STATUS_0(0, "创建订单", "ORDER_STATUS"),
     ORDER_STATUS_20(20, "已创建待冻结", "ORDER_STATUS"),
+    ORDER_STATUS_21(21, "待审核", "ORDER_STATUS"),
     ORDER_STATUS_1(1, "待付款", "ORDER_STATUS"),
     ORDER_STATUS_2(2, "已付款待推送", "ORDER_STATUS"),
     ORDER_STATUS_3(3, "待配货", "ORDER_STATUS"),

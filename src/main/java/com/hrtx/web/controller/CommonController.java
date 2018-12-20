@@ -121,6 +121,12 @@ public class CommonController extends BaseReturn{
 		return "admin/"+str1+"/"+str2;
 	}
 
+    @RequestMapping("/get-file/{str}/{str1:.+}")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public void getImg(@PathVariable String str,  @PathVariable String str1, HttpServletResponse response) {
+        this.downLoadFile(str+"/"+str1, response);
+    }
+
     @RequestMapping("/get-img/{str:.+}")
     @Powers({PowerConsts.NOLOGINPOWER})
     public void getImg(@PathVariable String str, HttpServletResponse response) {

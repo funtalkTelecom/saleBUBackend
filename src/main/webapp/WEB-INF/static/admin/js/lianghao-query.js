@@ -86,5 +86,21 @@ $(function() {
 	window.reload = function(){
 		dataList.reload();
 	}
+
+    $(document).on("click","#batch-add .modal-footer .btn-success",function() {
+        // 准备好Options对象
+        var options = {
+            type : "post",
+            url: "lianghao/batch-add-order",
+            success : function(data) {
+                dataList.load();
+                $('#batch-add').modal('hide');
+                alert("数据已提交，详见稍后下载的excel表格");
+                window.location.href="get-file/batch_add_order/"+data.data;
+            }
+        };
+        // 将options传给ajaxForm
+        $('#batch-add form').ajaxSubmit(options);
+    });
 });
 

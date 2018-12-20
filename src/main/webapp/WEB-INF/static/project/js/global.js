@@ -5,7 +5,6 @@ $.extend(true, jQuery.ajaxSettings, {
     },
     beforeRequest : function (option){
         if(option && option.data && option.data.isMask) {
-            console.log(option.data.isMask);
             $("#"+option.data.isMask).mask();
         }
     },

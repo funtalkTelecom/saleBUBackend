@@ -11,7 +11,9 @@ var orderStatus = {
     "11":"待仓库撤销",
     "12":"退款中",
     "13":"退款失败",
-    "14":"待财务退款"
+    "14":"待财务退款",
+    "20":"已创建待冻结",
+    "21":"待审核",
 };
 var skuGoodsTypes = {
     "1":"白卡",
@@ -33,6 +35,16 @@ $(function() {
 		"url" : 'order/order-list',
 		"ct" : "#result",
 		"cm" : [{
+                    "header" : "<input type='checkbox' id='allCheckbox' />",
+                    "dataIndex" : "orderId",
+                    renderer : function(v,record) {
+                        if(p_check) {
+                            if(record.STATUS == 6) {//待经销商审核
+                                return "<input type='checkbox'  class='brandradio' name='radio' value='"+record.ID+"' />";
+                            }
+                        }
+                    }
+                },{
                     "header" : "编号",
                     "dataIndex" : "orderId"
                 }/*,{

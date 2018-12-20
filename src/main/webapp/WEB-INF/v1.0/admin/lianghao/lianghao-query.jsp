@@ -48,6 +48,9 @@
 										</div>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
+                                        <c:if test="<%=SessionUtil.hasPower(PowerConsts.LIANGHAOMOUDULE_COMMON_ADD)%>">
+                                            <button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#batch-add" >批量下单</button>
+                                        </c:if>
 									</form><!-- /form-panel -->
 								</div>
 
@@ -74,6 +77,35 @@
 			</div>
 			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse"><i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i></a>
 		</div><!-- /.main-container -->
+
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="batch-add" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            批量下单
+                        </h4>
+                    </div>
+                    <form role="form" class="form-inline" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="sr-only">文件输入</label>
+                                <input type="file" name="file" id="file" accept="application/vnd.ms-excel">
+                                <p class="help-block"><a href="lianghao/download-batch-add-template">下载模板</a></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </form>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
 
 		<script type="text/javascript">
             var lh_freeze = <%=SessionUtil.hasPower(PowerConsts.LIANGHAOMOUDULE_COMMON_FREEZE)%>;
