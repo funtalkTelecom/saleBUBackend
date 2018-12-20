@@ -55,6 +55,7 @@ public class ApiOrderService {
 	@Autowired private CityMapper cityMapper;
 	@Autowired private MealMapper mealMapper;
 	@Autowired private NumService numService;
+	@Autowired private AgentService agentService;
 	@Autowired private ApiOrderService apiOrderService;
 
 	public  List<Map> findOrderListByNumId(Integer numId)
@@ -106,7 +107,7 @@ public class ApiOrderService {
 	/*
 	 订单 已发货待签收>7天
 	 */
-	@Scheduled(fixedRate=3000)
+//	@Scheduled(fixedRate=3000)update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
 	public void signOrderSystem() {
 		if(!"true".equals(SystemParam.get("exe_timer"))) return;
 		log.info("开始执行.....已发货待签收的订单>7天时,系统自动签收......定时器");
@@ -459,21 +460,13 @@ public class ApiOrderService {
 			Result result=this.checkNumCondition(number,sku_id);
 			if(result.getCode()!=Result.OK)return result;
 			double num_price=ep_num?ep_price:sku.getSkuTobPrice();
-			int channel=3;//一般用户无渠道，即默认是线上商城渠道，价格最高
-			Example example = new Example(Agent.class);
-			example.createCriteria().andEqualTo("addConsumerId",user.getId());
-			List<Agent> agent_list=agentMapper.selectByExample(example);
-			if(agent_list.size()>1)return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
-			//说明当前的用户有对应的渠道，取其渠道对应的价格
-			if(agent_list.size()==1){
-				if(agent_list.get(0).getChannelId()==null)return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
-				else channel=NumberUtils.toInt(String.valueOf(agent_list.get(0).getChannelId()),3);
-			}
-//			if(channel==3)return new Result(Result.ERROR, "未知代理渠道，无法订购");
+            Result curr_agent=this.agentService.queryCurrAgent(user);
+            if(curr_agent.getCode()!=Result.OK)return curr_agent;
+            Agent agent=(Agent)curr_agent.getData();
 			if(order.getOrderType()==2&&StringUtils.equals(order.getSkuGoodsType(),"4")){
 				NumPrice numPrice=new NumPrice();
-				numPrice.setAgentId(user.getId());
-				numPrice.setChannel(channel);
+				numPrice.setAgentId(agent.getId());
+				numPrice.setChannel(agent.getChannelId());
 				numPrice.setNumId(number.getId());
 				List aplist=this.numPriceMapper.queryList(numPrice);
 				if(aplist.size()==0||aplist.size()>1)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");

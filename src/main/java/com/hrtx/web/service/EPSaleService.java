@@ -315,7 +315,7 @@ public class EPSaleService {
 		return new Result(Result.OK,"更新成功");
 	}
 
-    @Scheduled(fixedRate=1000)
+//    @Scheduled(fixedRate=1000)update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void epsaleOrder() {
 		if(!"true".equals(SystemParam.get("auction_timer")))return;
 	    this.epSaleMapper.freezeOneRecord();

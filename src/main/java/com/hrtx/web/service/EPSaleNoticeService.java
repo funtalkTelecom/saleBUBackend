@@ -47,7 +47,7 @@ public class EPSaleNoticeService {
     /*
      竞拍活动开始时系统自动提醒定时器
      */
-    @Scheduled(fixedRate=1000)
+//    @Scheduled(fixedRate=1000)update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void startEPSaleListSystemNotice() {
        // if("true".equals("true")) return;
         if(!"true".equals(SystemParam.get("exe_timer"))) return;
