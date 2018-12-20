@@ -96,7 +96,7 @@ public class IntefaceController extends BaseReturn{
 			return renderXml(resultxml);
 		}
 		try {
-			log.info("接口接收到调入参数["+xml+"]");
+//			log.info("接口接收到调入参数["+xml+"]");
 			InterfaceResult result = this.parseXmlParam(xml);
 			if(!"00000".equals(result.getCode())) {
 				resultxml = this.getResultXml(merid, appCode, serial, result.getCode(), result.getDesc(), "", key);
@@ -183,7 +183,7 @@ public class IntefaceController extends BaseReturn{
 			resultxml = this.getResultXml(merid, appCode, serial, "99999", "未知异常", "", key);
 			return renderXml(resultxml);
 		} finally {
-			log.info("接口返回结果["+resultxml+"]");
+//			log.info("接口返回结果["+resultxml+"]");
 			thirdRequestService.addThirdRequest(merid+serial, xml, resultxml, "xml", appCode, "interface");
 		}
 	}

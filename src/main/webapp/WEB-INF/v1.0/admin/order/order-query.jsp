@@ -72,7 +72,7 @@
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CHECK)%>">
-											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="batch-check" >批量审核</button>
+											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="batch-check" >审核发货</button>
 										</c:if>
 									</form><!-- /form-panel -->
 								</div>
@@ -322,7 +322,7 @@
 							&times;
 						</button>
 						<h4 class="modal-title">
-							批量审核
+							审核发货
 						</h4>
 					</div>
 					<form role="form" class="form-horizontal">
