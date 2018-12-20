@@ -38,7 +38,14 @@ public class UserController {
 	@Autowired private UserService userService;
 	@Autowired private PermissionService permissionService;
 	@Autowired private CorporationService corporationService;
-	
+
+	@GetMapping("/")
+	@Powers({PowerConsts.NOLOGINPOWER})
+	public ModelAndView redirectIndex(HttpServletRequest request) {
+		ModelAndView mv = new ModelAndView("redirect:/login-index");
+		return mv;
+	}
+
     @GetMapping("/index")
     @Powers({PowerConsts.NOLOGINPOWER})
     public ModelAndView index(HttpServletRequest request) {

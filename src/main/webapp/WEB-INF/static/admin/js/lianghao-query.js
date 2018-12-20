@@ -110,3 +110,7 @@ $(function() {
     });
 });
 
+$(document).on("blur","input[name=resource]",function(){
+    $(this).val($(this).val().split("-").join(""));
+});
+
