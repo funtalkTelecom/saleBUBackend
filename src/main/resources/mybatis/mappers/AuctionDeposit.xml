@@ -146,7 +146,7 @@
 		) values
 		<foreach collection="auctionDepositList" item="AuctionDeposit" separator=",">
 			(
-			#{AuctionDeposit.id},
+			`nextval`('hk'),
 			#{AuctionDeposit.skuId},
 			#{AuctionDeposit.numId},
 			#{AuctionDeposit.num},

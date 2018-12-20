@@ -1335,6 +1335,7 @@ public class EPSaleService {
 			//epSale.setId(epSale.getGeneralId());
 			epSale.setCreateDate(new Date());
 			epSale.setUpdateDate(new Date());
+			//epSale.setId(epSaleMapper.getId());
 			list.add(epSale);
 			epSaleMapper.insertBatch(list);
 		}
@@ -1345,11 +1346,14 @@ public class EPSaleService {
 		Result result = null;
 		String picSeqs = request.getParameter("picSeqs")==null?"":request.getParameter("picSeqs");
 		String delPicSeqs = request.getParameter("delPicSeqs")==null?"":request.getParameter("delPicSeqs");
-		if(!picSeqs.equals("")){
-			fileMapper.deleteFilesByRefid(epSale.getId().toString(), picSeqs.equals("")?"":picSeqs.substring(0, picSeqs.length()-1));
-		}
-		if(!delPicSeqs.equals("")){
-			fileMapper.deleteFilesByRefid(epSale.getId().toString(), delPicSeqs.equals("")?"":delPicSeqs.substring(0, delPicSeqs.length()-1));
+		if(epSale.getId()!=null&&epSale.getId()>0)
+		{
+			if(!picSeqs.equals("")){
+				fileMapper.deleteFilesByRefid(epSale.getId().toString(), picSeqs.equals("")?"":picSeqs.substring(0, picSeqs.length()-1));
+			}
+			if(!delPicSeqs.equals("")){
+				fileMapper.deleteFilesByRefid(epSale.getId().toString(), delPicSeqs.equals("")?"":delPicSeqs.substring(0, delPicSeqs.length()-1));
+			}
 		}
 		if(files!=null && files.length>0){
 			try {
@@ -1357,8 +1361,9 @@ public class EPSaleService {
 				for (int i=0; i<files.length; i++) {
 					MultipartFile file = files[i];
 					File f = new File();
-					//f.setFileId(f.getGeneralId());
+					f.setFileId(fileMapper.getId());
 					f.setFileGroup("epSalePics");
+
 					//String kk=SystemParam.get("epSalePics");
 					//result = BaseReturn.uploadFile(SystemParam.get("epSalePics")+epSale.getId()+"\\", "jpg,png,gif", file, false, false);
 					result = BaseReturn.uploadFile(SystemParam.get("epSalePics")+epSale.getId()+java.io.File.separator, "jpg,png,gif", file, false, false);

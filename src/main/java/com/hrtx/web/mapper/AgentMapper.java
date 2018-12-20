@@ -19,6 +19,9 @@ public interface AgentMapper extends Mapper<Agent>,BaseMapper<Agent>{
 
     void updateAgentStatus(Agent agent);
 
+
+    void updateAgentChannel(@Param("ids") Integer ids,@Param("channelId") Integer channelId);
+
     void updateAgentStatusToLeyu(Agent agent);
 
     List<Map> findIsLyByConsumerId(@Param("ConsumerId") Integer ConsumerId);
