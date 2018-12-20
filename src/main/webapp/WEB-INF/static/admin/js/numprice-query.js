@@ -57,25 +57,26 @@ $(function() {
 
 });
 
-$(document).on("focus","#commpayName",function(){
-    $(this).autocomplete({
-        source:function(query, process){
-            $.post("agent/query-agent-by-CName",{commpayName:query.term,t:new Date().getTime()},function (result) {
-            	if(result.code==200){
-                    return process(result.data);
-				}
-            });
-        },
-        select: function(e, ui) {
-            $("#agentId").val(ui.item.id);
-        },
-        disabled:false,
-        autoFocus:true,
-        delay:500,
-        isSelect:true,
-        minLength:2
-    });
-});
+// $(document).on("focus","#commpayName",function(){
+//     $(this).autocomplete({
+//         source:function(query, process){
+//             $.post("agent/query-agent-by-CName",{commpayName:query.term,t:new Date().getTime()},function (result) {
+//             	if(result.code==200){
+//                     return process(result.data);
+// 				}
+//             });
+//         },
+//         select: function(e, ui) {
+//             $("#agentId").val(ui.item.id);
+//             $("#agentCommpayName").val(ui.item.value);
+//         },
+//         disabled:false,
+//         autoFocus:true,
+//         delay:500,
+//         isSelect:true,
+//         minLength:2
+//     });
+// });
 $(document).on("focus","#commpayNameT",function(){
     $(this).autocomplete({
         source:function(query, process){
@@ -87,7 +88,7 @@ $(document).on("focus","#commpayNameT",function(){
         },
         select: function(e, ui) {
             $("#agentIdT").val(ui.item.id);
-            $("#agentCommpayName").val(ui.item.value);
+            $("#agentCommpayNameT").val(ui.item.value);
         },
         // open: function( event, ui ) {  //自己的想法是给前两个加change事件，直接清空价格
         //     console.log(1)
@@ -111,6 +112,31 @@ $(document).on("blur","#commpayNameT",function(){
 $(document).on("change","#commpayNameT",function(){
     clearPrice();
 });
+// $(document).on("change","#commpayName",function(){
+//     var commpayName=$("#commpayName").val();
+//     var agentCommpayName=$("#agentCommpayName").val();
+//     console.log(agentCommpayName)
+//     console.log(commpayName)
+//     if(commpayName==""){
+//         $("#channel").parent().show();
+//     }else if (agentCommpayName&&agentCommpayName!=commpayName){
+//         $("#channel").parent().show();
+//     } else {
+//         $("#channel").parent().hide();
+//         $("#channel").val("-1");
+//     }
+// });
+// $(document).on("change","#channel",function(){
+//     var channel = $("#channel").val();
+//     if (channel==-1){
+//         $("#commpayName").parent().show();
+//     }else {
+//         $("#commpayName").parent().hide();
+//         $("#commpayName").val("");
+//         $("#agentId").val("");
+//         $("#agentCommpayName").val("");
+//     }
+// });
 function clearPrice() {
     $("#price").val("");
     $("#agentPrice").val("");
@@ -150,8 +176,8 @@ function queryAgentNumprice() {
         alert("请选择代理商");
         return ;
 	}
-    var agentCommpayName = $("#agentCommpayName").val();
-	if(agentCommpayName!=agentCommpayName){
+    var agentCommpayName = $("#agentCommpayNameT").val();
+	if(agentCommpayName!=commpayNameT){
         return ;
     }
     $.post("numprice/query-agent-numprice",{resource:resource,agentId:agentIdT,commpayName:commpayNameT},function(data){

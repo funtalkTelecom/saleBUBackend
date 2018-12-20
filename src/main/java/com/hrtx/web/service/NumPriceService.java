@@ -26,10 +26,10 @@ public class NumPriceService {
 	@Autowired private AgentMapper agentMapper;
 
 	public Result queryNumPrice(NumPrice numPrice) {
-        if (numPrice.getAgentId()!=null&&numPrice.getChannel()==-1){
-            Agent agent = agentMapper.selectByPrimaryKey(numPrice.getAgentId());
-            numPrice.setChannel(agent.getChannelId());
-        }
+//        if (numPrice.getAgentId()!=null&&numPrice.getChannel()==-1){
+//            Agent agent = agentMapper.selectByPrimaryKey(numPrice.getAgentId());
+//            numPrice.setChannel(agent.getChannelId());
+//        }
 		PageHelper.startPage(numPrice.startToPageNum(),numPrice.getLimit());
 		Page<Object> ob=numPriceMapper.queryPageList(numPrice);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);

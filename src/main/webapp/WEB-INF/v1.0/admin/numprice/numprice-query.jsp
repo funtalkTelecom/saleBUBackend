@@ -54,14 +54,15 @@
 											<label class="control-label">号码</label>
 											<input type="text" class="form-control" style="width:130px;" name="resource">
 										</div>
-										<div class="form-group" style="">
-											<label class="control-label">代理商</label>
-											<input type="text" class="form-control" style="width:130px;"  id="commpayName">
-											<input type="hidden" class="form-control" style="width:130px;" name="agentId" id="agentId">
-										</div>
+										<%--<div class="form-group" style="">--%>
+											<%--<label class="control-label">代理商</label>--%>
+											<%--<input type="text" class="form-control" style="width:130px;"  id="commpayName">--%>
+											<%--<input type="hidden" class="form-control"  name="agentId" id="agentId">--%>
+											<%--<input type="hidden" class="form-control"  id="agentCommpayName">--%>
+										<%--</div>--%>
                                         <div class="form-group" style="">
                                             <label class="control-label">渠道</label>
-                                            <select name="channel" class="form-control">
+                                            <select name="channel" class="form-control" id="channel">
                                                 <option value="-1">请选择</option>
                                                 <c:forEach items="${channel}" var="item">
                                                     <option value="${item.key}">${item.value}</option>
@@ -113,7 +114,7 @@
                                     <div class="col-xs-4 col-sm-4">
                                         <input type="text" class="form-control name" name="commpayName" placeholder="请输入代理商" id="commpayNameT">
                                         <input type="hidden" class="form-control" name="agentId" id="agentIdT">
-                                        <input type="hidden" class="form-control" name="agentCommpayName" id="agentCommpayName">
+                                        <input type="hidden" class="form-control" name="agentCommpayName" id="agentCommpayNameT">
                                     </div>
                                 </div>
                                 <%--<div class="form-group">--%>
