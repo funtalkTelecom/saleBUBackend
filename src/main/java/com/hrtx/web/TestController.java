@@ -60,7 +60,7 @@ public class TestController {
     @Autowired private ApiSessionUtil apiSessionUtil;
     @Autowired private ConsumerService consumerService;
     @Autowired private ApiOrderService apiOrderService;
-    @Autowired private QueueService queueService;
+//    @Autowired private QueueService queueService;
 
     @RequestMapping("/")
     @Powers({PowerConsts.NOLOGINPOWER})
@@ -245,6 +245,8 @@ public class TestController {
     @ResponseBody
     public Result helloworld13() {
         Long long1 =System.currentTimeMillis();
+        this.apiOrderService.test();
+        //int aa=0;
 //        queueService.receiveMessage("============================");
 //        return new Result(Result.OK,"成功成功"+(System.currentTimeMillis()-long1));
         return null;
@@ -254,7 +256,7 @@ public class TestController {
     @ResponseBody
     public String helloworld14() {
         Long long1 =System.currentTimeMillis();
-        queueService.receiveMessage("============================");
+//        queueService.receiveMessage("============================");
 //        return new Result(Result.OK,"成功成功"+(System.currentTimeMillis()-long1));
         return "sssssss";
     }
