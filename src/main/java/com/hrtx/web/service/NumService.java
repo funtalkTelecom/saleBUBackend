@@ -137,7 +137,7 @@ public class NumService {
             return new Result(Result.ERROR, "被人抢先了");
         }
         if(isFreeze==0){
-            if(numFreezeMapper.queryFreeze(num1.getId())!=SessionUtil.getUserId()){
+            if(!numFreezeMapper.queryFreeze(num1.getId()).equals(SessionUtil.getUserId())){
                 return new Result(Result.ERROR, "非冻结人无法解冻");
             }
         }
