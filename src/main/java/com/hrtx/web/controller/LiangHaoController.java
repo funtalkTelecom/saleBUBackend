@@ -237,7 +237,7 @@ public class LiangHaoController extends BaseReturn{
                     String thirdOrder = arr.get(2);
                     String bossNum = arr.get(3);
                     String phoneConsumer = arr.get(4);
-                    String phoneConsumerIdType = arr.get(6);
+                    String phoneConsumerIdType = arr.get(5);
                     String phoneConsumerIdNum = arr.get(6);
                     String personName = arr.get(7);
                     String personTel = arr.get(8);
