@@ -18,13 +18,13 @@ $.extend(true, jQuery.ajaxSettings, {
             return false;
         }
         ajaxLock[key] = 1;
-        if(option && option.data && option.data.mask) $.showLoading(option.data.mask);
+        // if(option && option.data && option.data.mask) $.showLoading(option.data.mask);
         return true;
     },
     beforeLoad : function(jqXHR, callbackContext, options){
         if(!options && options.data instanceof FormData) options.data = formDataToMap(options.data);
         var key = options.url+JSON.stringify(options.data);
-        if(options && options.data && options.data.mask) $.hideLoading();
+        // if(options && options.data && options.data.mask) $.hideLoading();
         ajaxLock[key] = 0;
         var text = jqXHR.responseText;
         if(!text)return;
