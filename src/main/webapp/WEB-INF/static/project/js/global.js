@@ -1,17 +1,31 @@
 // 每个提交的ajax都会触发此方法
+function formDataToMap(formdata) {
+    var data = {};
+    for (var key of formdata.keys()) {
+        data[key] = formdata.getAll(key);
+    }
+    return data;
+}
+var ajaxLock = {};
 $.extend(true, jQuery.ajaxSettings, {
     data : {
         isAjax : true// 将连接请求标上ajax方式
     },
     beforeRequest : function (option){
-        if(option && option.data && option.data.isMask) {
-            $("#"+option.data.isMask).mask();
+        if(option.data instanceof FormData) option.data = formDataToMap(option.data);
+        var key = option.url+JSON.stringify(option.data);
+        if(ajaxLock[key] && ajaxLock[key] == 1){
+            return false;
         }
+        ajaxLock[key] = 1;
+        if(option && option.data && option.data.mask) $.showLoading(option.data.mask);
+        return true;
     },
     beforeLoad : function(jqXHR, callbackContext, options){
-        if(options && options.data && options.data.isMask) {
-			$("#"+options.data.isMask).unmask();
-        }
+        if(option.data instanceof FormData) option.data = formDataToMap(option.data);
+        var key = option.url+JSON.stringify(option.data);
+        if(option && option.data && option.data.mask) $.hideLoading();
+        ajaxLock[key] = 0;
         var text = jqXHR.responseText;
         if(!text)return;
         var json;

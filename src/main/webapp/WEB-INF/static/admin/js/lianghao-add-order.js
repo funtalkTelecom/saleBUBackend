@@ -7,7 +7,7 @@ $(function() {
 			}else {
 				alert(result.data);
 			}
-			// refresh("lianghao/lianghao-query");
+			refresh("lianghao/lianghao-query");
         })
     })
 });
