@@ -346,7 +346,7 @@ public class ApiOrderService {
 	 * @param user			订购用户
 	 * @param address		发货地址
 	 * @param shippingMenthodId	快递方法
-	 * @param mead_id			套餐id
+	 * @param meal_id			套餐id
 	 * @param conment			备注
 	 * @param user_agent		订购用户请求信息
 	 * @param req_ip			订购用户请求IP
@@ -354,7 +354,7 @@ public class ApiOrderService {
 	 * @return 返回result code=200成功；=500失败
 	 * 可能会主动抛出ServiceException，message是具体抛出的原因
 	 */
-	public Result newCreateOrder(int order_type,Integer sku_id,Integer num_id,int order_amount,double ep_price,Consumer user,DeliveryAddress address,String shippingMenthodId,Integer mead_id,String conment,String user_agent,String req_ip,Map<String,Object> order_ext_param){
+	public Result newCreateOrder(int order_type,Integer sku_id,Integer num_id,int order_amount,double ep_price,Consumer user,DeliveryAddress address,String shippingMenthodId,Integer meal_id,String conment,String user_agent,String req_ip,Map<String,Object> order_ext_param){
 		/*int order_amount=2;
 		String order_type="2";//订单类型
 		Long sku_id=1073428441224708096l;
@@ -410,8 +410,8 @@ public class ApiOrderService {
 			log.error("存储订单额外参数信息异常",e);
 		}
 
-		Meal meal= mealMapper.selectByPrimaryKey(mead_id);
-		if(meal==null && mead_id>0)return new Result(Result.ERROR, "抱歉，尚未找到您提交的套餐");
+		Meal meal= mealMapper.selectByPrimaryKey(meal_id);
+		if(meal==null && meal_id>0)return new Result(Result.ERROR, "抱歉，尚未找到您提交的套餐");
 
 		if(ordinary_num||super_num||ep_num)order_amount=1;//此类情况只会出库一个
 
@@ -427,13 +427,13 @@ public class ApiOrderService {
 				Result result=this.checkNumCondition(number,sku_id);
 				if(result.getCode()!=Result.OK)return result;
 
-				OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),0,goods,sku,number,1,sku.getSkuTobPrice());
+				OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),0,meal_id,goods,sku,number,1,sku.getSkuTobPrice());
 				itemNums.add(itemNum);
 				return this.saveOrderInfo(sku,order_amount,order,null,itemNums);
 			}
 			//购买白卡时只需要发相应数量的白卡即可
 			if(low_num&&StringUtils.equals(sku.getSkuGoodsType(),"1")){
-				OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,goods,sku,null,order_amount,sku.getSkuTobPrice());
+				OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,meal_id,goods,sku,null,order_amount,sku.getSkuTobPrice());
 				return this.saveOrderInfo(sku,order_amount,order,itemIccid,itemNums);
 			}
 
@@ -445,10 +445,10 @@ public class ApiOrderService {
 						.andEqualTo("skuId", sku.getSkuId());
 				List<Number> number_list=this.numberMapper.selectByExample(example);
 				if(number_list.size()<order_amount)return new Result(Result.ERROR, "抱歉，号码库存不足，无法订购");
-				OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,goods,sku,null,order_amount,sku.getSkuTobPrice());
+				OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,meal_id,goods,sku,null,order_amount,sku.getSkuTobPrice());
 				for (int i=0;i<order_amount;i++){
 					Number number=number_list.get(i);
-					OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),itemIccid.getItemId(),goods,sku,number,1,0d);
+					OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),itemIccid.getItemId(),meal_id,goods,sku,number,1,0d);
 					itemNums.add(itemNum);
 				}
 				return this.saveOrderInfo(sku,order_amount,order,itemIccid,itemNums);
@@ -463,7 +463,7 @@ public class ApiOrderService {
             Result curr_agent=this.agentService.queryCurrAgent(user);
             if(curr_agent.getCode()!=Result.OK)return curr_agent;
             Agent agent=(Agent)curr_agent.getData();
-			if(order.getOrderType()==2&&StringUtils.equals(order.getSkuGoodsType(),"4")){
+			if(super_num/*order.getOrderType()==2&&StringUtils.equals(order.getSkuGoodsType(),"4")*/){
 				NumPrice numPrice=new NumPrice();
 				numPrice.setAgentId(agent.getId());
 				numPrice.setChannel(agent.getChannelId());
@@ -474,9 +474,9 @@ public class ApiOrderService {
 				num_price=NumberUtils.toDouble(ObjectUtils.toString(numPrice1.get("price")));// numPrice1.getPrice().doubleValue();
 			}
 
-			OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,goods,sku,null,1,0d);
+			OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,meal_id,goods,sku,null,1,0d);
 
-			OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),0/*itemIccid.getItemId()*/,goods,sku,number,1,num_price);
+			OrderItem itemNum=this.createOrderItemBean(order.getOrderId(),0,meal_id/*itemIccid.getItemId()*/,goods,sku,number,1,num_price);
 			itemNums.add(itemNum);
 			return this.saveOrderInfo(sku,order_amount,order,itemIccid,itemNums);
 		}
@@ -535,7 +535,7 @@ public class ApiOrderService {
         if(fuser != null && !fuser.equals(SessionUtil.getUserId())) return new Result(Result.ERROR, "抱歉，您购买的号码已冻结");
 		return new Result(Result.OK,null);
 	}
-	private OrderItem createOrderItemBean(Integer orderId,Integer parent_item_id,Goods goods,Sku sku,Number number,int quantity,double goods_price){
+	private OrderItem createOrderItemBean(Integer orderId,Integer parent_item_id,Integer mead_id,Goods goods,Sku sku,Number number,int quantity,double goods_price){
 		Integer num_id=number==null?null:number.getId();
 		String num=number==null?null:number.getNumResource();
 		int isShipment=number==null?1:0;//是否需要发货 1=发货
@@ -545,6 +545,7 @@ public class ApiOrderService {
 		OrderItem bean = new OrderItem(orderId,goods.getgId(),sku.getSkuId(),skuProperty,num_id,num,
 				isShipment,goods.getgSellerId(),goods.getgSellerName(),"egt",skuRepoGoods,
 				quantity,goods_price,Utils.mul(quantity,goods_price),parent_item_id);
+		bean.setMealId(mead_id);
 		return bean;
 	}
 
