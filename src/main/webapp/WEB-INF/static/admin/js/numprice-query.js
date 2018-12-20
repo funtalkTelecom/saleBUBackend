@@ -119,6 +119,9 @@ $(document).on("blur","#commpayNameT",function(){
 $(document).on("change","#commpayNameT",function(){
     clearPrice();
 });
+$(document).on("blur","input[name=resource]",function(){
+    $(this).val($(this).val().split("-").join(""));
+});
 // $(document).on("change","#commpayName",function(){
 //     var commpayName=$("#commpayName").val();
 //     var agentCommpayName=$("#agentCommpayName").val();
@@ -164,7 +167,7 @@ function blurQueryAgentNumprice() {
     queryAgentNumprice();
 }
 function queryAgentNumprice() {
-	var resource = $("#resourceT").val();
+	var resource = $("#resourceT").val().trim();
 	if(resource.length<11){
         alert("请输入完整的号码");
         return ;
@@ -204,7 +207,7 @@ function queryAgentNumprice() {
     },"json");
 };
 $(document).on("click","#goBtn",function() {
-	var resource = $("#resourceT").val();
+	var resource = $("#resourceT").val().trim();
 	if(resource.length<11){
         alert("请输入完整的号码");
         return ;
