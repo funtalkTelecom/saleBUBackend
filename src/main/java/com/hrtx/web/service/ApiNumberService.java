@@ -9,6 +9,7 @@ import com.hrtx.global.SystemParam;
 import com.hrtx.web.mapper.AgentMapper;
 import com.hrtx.web.mapper.NumPriceMapper;
 import com.hrtx.web.mapper.NumberMapper;
+import com.hrtx.web.pojo.Agent;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.NumPrice;
 import com.hrtx.web.pojo.Number;
@@ -39,6 +40,8 @@ public class ApiNumberService {
 	private NumPriceMapper numPriceMapper;
 	@Autowired
 	private NumService numService;
+	@Autowired
+	private AgentService agentService;
 	/**
 	 * 根据tags获取号码
 	 * @param numPrice
@@ -54,16 +57,14 @@ public class ApiNumberService {
 		String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
 		tags = "'"+ tags.replaceAll(",", "','") +"'";
 		Consumer consumer= this.apiSessionUtil.getConsumer();
-		List _list = agentMapper.findConsumenrIdCount(consumer.getId());
-		int agentId;
-		if(_list.size()>0){
-			Map _map = (Map) _list.get(0);
-			agentId =NumberUtils.toInt(String.valueOf(_map.get("id"))) ;
-		}else{
-			agentId = NumberUtils.toInt(SystemParam.get("default_agent"));  //默认代理商id
+		//是否是代理商
+		Result reagent = agentService.queryCurrAgent(consumer);
+		if(reagent.getCode()!=Result.OK){
+			return new Result(reagent.ERROR, reagent.getData());
 		}
-		numPrice.setAgentId(agentId);
-		numPrice.setChannel(3);
+		Agent agent = (Agent) reagent.getData();
+		numPrice.setChannel(agent.getChannelId());
+		numPrice.setAgentId(agent.getId());
 		numPrice.setTag(tags);
 		pm = numService.queryNumPrice(numPrice);
 		//处理号码,生成号码块字段(numBlock)
@@ -176,7 +177,19 @@ public class ApiNumberService {
 		NumPrice numPrice = new NumPrice();
 		int unmId = NumberUtils.toInt(id);
 		numPrice.setNumId(unmId);
-		numPrice.setChannel(3);
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		List _list = agentMapper.findConsumenrIdCount(consumer.getId());
+		int agentId;
+
+		if(_list.size()>0){
+			Map _map = (Map) _list.get(0);
+			agentId =NumberUtils.toInt(String.valueOf(_map.get("id"))) ;
+			int channelId =NumberUtils.toInt(String.valueOf(_map.get("channel_id"))) ;
+			numPrice.setChannel(channelId);
+		}else{
+			agentId = NumberUtils.toInt(SystemParam.get("default_agent"));  //默认代理商id
+			numPrice.setChannel(3);
+		}
 		pm = numService.queryNumPrice(numPrice);
 		List ob = pm.getList();
 		if(ob.size()==0) return new Result(Result.ERROR, "未找到号码");
@@ -233,16 +246,13 @@ public class ApiNumberService {
 		numPrice.setPageNum(numPrice.startToPageNum());
 		String num = request.getParameter("num")==null?"": request.getParameter("num");
 		Consumer consumer= this.apiSessionUtil.getConsumer();
-		long consumerId = consumer.getId();
-		List _list = agentMapper.findConsumenrIdCount(consumer.getId());
-		int agentId;
-		if(_list.size()>0){
-			Map _map = (Map) _list.get(0);
-			agentId =NumberUtils.toInt(String.valueOf(_map.get("id"))) ;
-		}else{
-			agentId = NumberUtils.toInt((String.valueOf(SystemParam.get("default_agent"))));  //默认代理商id
+	    Result reagent = agentService.queryCurrAgent(consumer);
+	    if(reagent.getCode()!=Result.OK){
+			return new Result(reagent.ERROR, reagent.getData());
 		}
-		numPrice.setAgentId(agentId);
+		Agent agent = (Agent) reagent.getData();
+		numPrice.setChannel(agent.getChannelId());
+		numPrice.setAgentId(agent.getId());
 		numPrice.setResource(num);
 		pm = numService.queryNumPrice(numPrice);
 		List ob =pm.getList();

@@ -135,7 +135,7 @@
         and t.add_consumer_id=#{ConsumerId}
     </select>
     <select id="findConsumenrIdCount" resultType="java.util.HashMap">
-        select g.id,g.commpay_name,g.person,g.add_consumer_id,g.phone from tb_agent g where g.`status`=2 and g.is_del=0
+        select g.id,g.commpay_name,g.person,g.add_consumer_id,g.phone,g.channel_id  from tb_agent g where g.`status`=2 and g.is_del=0
         and g.add_consumer_id=#{ConsumerId}
     </select>
     <select id="queryAgentByCName" resultType="java.util.HashMap">
