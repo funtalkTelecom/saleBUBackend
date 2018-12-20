@@ -10,7 +10,7 @@
 
 
   <select id="queryPageList" resultType="java.util.HashMap" useCache="false">
-    select np.id,np.city_name ,np.resource, np.net_type,ch.channel,np.price,a.commpay_name,DATE_FORMAT(np.add_date,'%Y-%m-%d %H:%i:%s') addDate
+    select np.id,np.city_name ,np.resource, np.net_type,ch.channel,np.price,a.commpay_name,DATE_FORMAT(np.add_date,'%Y-%m-%d %H:%i:%s') addDate,np.low_consume lowConsume,n.num_level numLevel
     from tb_num_price np inner join  tb_num n on np.num_id = n.id left join tb_channel ch on np.channel=ch.channel_id left join tb_agent a on a.id= np.agent_id  and a.status=2 and a.is_del=0
     where np.is_del=0 and ch.is_del=0 and n.status = 2
     <if test="param.channel!=null and param.channel > 0"> and np.channel = #{param.channel}</if>

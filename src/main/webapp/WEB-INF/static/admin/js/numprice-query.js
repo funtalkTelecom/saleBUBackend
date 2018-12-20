@@ -21,6 +21,12 @@ $(function() {
 					"header" : "价格",
             		"dataIndex" : "price"
         		},{
+                    "header" : "级别",
+                    "dataIndex" : "numLevel"
+                },{
+                    "header" : "最低消费",
+                    "dataIndex" : "lowConsume"
+                },{
 					"header" : "代理商",
 					"dataIndex" : "commpay_name",
             		"renderer" : function(v, record) {
