@@ -71,6 +71,9 @@
 										</div>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
+										<c:if test="<%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CHECK)%>">
+											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="batch-check" >批量审核</button>
+										</c:if>
 									</form><!-- /form-panel -->
 								</div>
 
@@ -309,6 +312,48 @@
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal -->
 		</div>
+
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="check-modal" tabindex="-1" style="overflow: auto" >
+			<div class="modal-dialog" style="width:700px;">
+				<div class="modal-content" style="width: 700px; max-height:300px; overflow: auto">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title">
+							批量审核
+						</h4>
+					</div>
+					<form role="form" class="form-horizontal">
+						<input type="hidden" name="temp">
+						<div class="modal-body">
+							<div class="form-group">
+								<label  class="col-xs-2 control-label">操作<i style="color:red">*</i></label>
+								<div class="col-xs-8">
+									<select class="form-control" name="status" >
+										<option value="-1">请选择...</option>
+										<option value="2">审核通过</option>
+										<option value="7">审核不通过</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group" id="othernote">
+								<label  class="col-xs-2 control-label">备注<i style="color:red">*</i></label>
+								<div class="col-xs-8">
+									<input type="text" class="form-control" name="checkConment" placeholder="请输入备注">
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-success">确定</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+					</form>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
 		<script type="text/javascript">
             var basePath = "<%=basePath %>";
             var p_query = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_QUEYR)%>;

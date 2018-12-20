@@ -70,6 +70,8 @@ public interface EPSaleMapper extends Mapper<EPSale>,BaseMapper<EPSale>{
 
     void insertBatch(@Param("epSaleList") List<EPSale> list);
 
+    void epSaleInsert(EPSale epSale);
+
     //////////////////////////////////////////////////////
     List<Map> queryEndAuctionNum();
 

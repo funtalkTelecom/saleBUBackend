@@ -4,6 +4,7 @@ import com.hrtx.config.advice.ServiceException;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
+import com.hrtx.global.LockUtils;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.pojo.Order;
@@ -96,6 +97,12 @@ public class OrderController extends BaseReturn{
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_BINDCARD})
 	public Result payBindCard(Order order, HttpServletRequest request){
 		return orderService.bindCard(order/*, request*/);
+	}
+
+	@RequestMapping("/order-check")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_CHECK})
+	public Result payCheck(Order order){
+		return orderService.payCheck(order);
 	}
 
 	@RequestMapping("/item-list")

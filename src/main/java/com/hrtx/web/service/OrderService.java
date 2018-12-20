@@ -140,7 +140,7 @@ public class OrderService extends BaseService {
     public Result payOrderSuccess(Integer orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
-        if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
+        if(order.getIsDel() == 1 || (order.getStatus() != Constants.ORDER_STATUS_1.getIntKey() && order.getStatus() != Constants.ORDER_STATUS_21.getIntKey())) return new Result(Result.ERROR, "订单状态异常");
         order.setPayDate(new Date());
         order.setStatus(2);
         orderMapper.updateByPrimaryKey(order);
@@ -418,6 +418,60 @@ public class OrderService extends BaseService {
         }else{
             return new Result(Result.ERROR, "调用发货失败\n" + result.getData());
         }
+    }
+
+    @NoRepeat
+    public Result payCheck(Order order) {
+        String temp = ObjectUtils.toString(order.getTemp());
+        String[] ids = temp.split(",");
+        if(ids.length == 0) return new Result(Result.ERROR, "未找到订单");
+        int status = order.getStatus();
+        if(status != Constants.ORDER_STATUS_2.getIntKey() && status != Constants.ORDER_STATUS_7.getIntKey()) return new Result(Result.ERROR, "请选择操作");
+        String checkConment = order.getCheckConment();
+        if(StringUtils.isBlank(checkConment))  return new Result(Result.ERROR, "请填写审核备注");
+        List<String> list = new ArrayList<>();
+        for (String id:ids) {
+            if(!LockUtils.tryLock("check"+id)) {
+                list.add(id+"正在审核中");
+                continue;
+            };
+            int orderId = NumberUtils.toInt(id);
+            try{
+                order = orderMapper.selectByPrimaryKey(orderId);
+                if(order == null || order.getStatus() != Constants.ORDER_STATUS_21.getIntKey()) {
+                    list.add(id+"不存在或状态不对");
+                    continue;
+                }
+                order.setCheckConment(checkConment);
+                orderMapper.updateByPrimaryKey(order);
+                if(status == Constants.ORDER_STATUS_2.getIntKey()) {//审核通过
+                    Result result = this.payOrderSuccess(orderId);
+                    if(result.getCode() != Result.OK) {
+                        list.add(id+String.valueOf(result.getData()));
+                        continue;
+                    }
+                    result = this.payDeliverOrder(orderId);
+                    if(result.getCode() != Result.OK) {
+                        list.add(id+String.valueOf(result.getData()));
+                        continue;
+                    }
+                }
+                if(status == Constants.ORDER_STATUS_7.getIntKey()) {//审核不通过
+                    Result result = apiOrderService.CancelOrder(id,checkConment);
+                    if(result.getCode() != Result.OK) {
+                        list.add(id+String.valueOf(result.getData()));
+                        continue;
+                    }
+                }
+            }catch (Exception e) {
+                log.error("订单["+id+"]审核异常", e);
+                list.add(id+"审核异常");
+                continue;
+            }finally {
+                LockUtils.unLock("check"+id);
+            }
+        }
+        return new Result(Result.OK, list);
     }
 
     public Result bindCard(Order order/*, org.apache.catalina.servlet4preview.http.HttpServletRequest request*/) {

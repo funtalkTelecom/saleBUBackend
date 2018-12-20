@@ -66,7 +66,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     private double total;//合计
     private String conment;//摘要
     //ALTER TABLE `tb_order` ADD COLUMN `check_conment` varchar(100) NULL COMMENT '审核成功' AFTER `phone_consumer_id_num`;
-    private String check_conment;//审核摘要
+    private String checkConment;//审核摘要
     private int isDel;//
     private String skuGoodsType;
     private String reason;
@@ -488,10 +488,11 @@ public class Order extends BasePojo implements java.io.Serializable {
         this.phoneConsumerIdNum = phoneConsumerIdNum;
     }
 
-    public String getCheck_conment() {
-        return check_conment;
+    public String getCheckConment() {
+        return checkConment;
     }
-    public void setCheck_conment(String check_conment) {
-        this.check_conment = check_conment;
+
+    public void setCheckConment(String checkConment) {
+        this.checkConment = checkConment;
     }
 }

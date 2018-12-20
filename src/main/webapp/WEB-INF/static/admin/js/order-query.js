@@ -35,13 +35,11 @@ $(function() {
 		"url" : 'order/order-list',
 		"ct" : "#result",
 		"cm" : [{
-                    "header" : "<input type='checkbox' id='allCheckbox' />",
+                    "header" : "<input type='checkbox' id='all' />",
                     "dataIndex" : "orderId",
                     renderer : function(v,record) {
-                        if(p_check) {
-                            if(record.STATUS == 6) {//待经销商审核
-                                return "<input type='checkbox'  class='brandradio' name='radio' value='"+record.ID+"' />";
-                            }
+                        if(p_check &&　record.status == 21) {//待审核
+                            return "<input type='checkbox' class='single' value='"+record.orderId+"' />";
                         }
                     }
                 },{
@@ -358,4 +356,46 @@ $(function() {
         }
         $this.val(receipts);
     })
+
+    $("#all").click(function() {
+        var checked = $("#all")[0].checked;
+        if(checked){
+            $(".single").each(function (i, obj){
+                $(obj)[0].checked=true;
+            })
+        }else{
+            $(".single").each(function (i, obj){
+                $(obj)[0].checked=false;
+            })
+
+        }
+    })
+    $("#batch-check").click(function() {
+        var ischeckde = $(".single:checked").val();
+        if(ischeckde == undefined){
+            alert("请勾选需要审核的订单")
+            return false;
+        }
+        var check_val = [];
+        $(".single:checked").each(function (i, obj){
+            var id =$(obj).attr("value");
+            check_val.push(id);
+        })
+        $("#check-modal form input[name=temp]").val(check_val.join(","))
+        $('#check-modal').modal('show');
+    })
+
+
+    $(document).on("click","#check-modal .modal-footer .btn-success",function() {
+        // if(!validate_check($("#checkModal form"))) return;
+        $.post("order/order-check",$("#check-modal form").serialize(),function(result){
+            if(result.data.length == 0) {
+                alert("审核成功")
+            }else{
+                alert(result.data.join("\n"))
+            }
+            $('#check-modal').modal('hide');
+            dataList.reload();
+        },"json");
+    });
 });
