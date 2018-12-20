@@ -45,7 +45,11 @@ public enum Constants {
     NUM_STATUS_7(7, "受理失败", "NUM_STATUS"),
     NUM_STATUS_8(8, "已失效", "NUM_STATUS"),
 
-
+    //订单类型
+    ORDER_TYPE_1(1, "普通单", "NUM_STATUS"),
+    ORDER_TYPE_2(2, "靓号单", "NUM_STATUS"),
+    ORDER_TYPE_3(3, "竞拍单", "NUM_STATUS"),
+    ORDER_TYPE_4(4, "客服单", "NUM_STATUS"),
     ;
 
     private Object key;
