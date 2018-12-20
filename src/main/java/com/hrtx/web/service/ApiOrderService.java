@@ -1483,7 +1483,7 @@ public class ApiOrderService {
 					//获取目前sku信息
 					Sku nowSku = skuMapper.getSkuBySkuid(skuId);
 					if(!nowSku.getSkuGoodsType().equals("3")){
-						param.put("supply_id", nowSku.getSkuId());//供货单编码(sku_id)
+						param.put("supply_id", orderId);//供货单编码(sku_id)
 						Result res;
 						//再冻结新库存
 						param.put("type", "1");//处理类型1上架；2下架
