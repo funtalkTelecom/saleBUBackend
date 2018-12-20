@@ -428,6 +428,7 @@ public class OrderService extends BaseService {
         int status = order.getStatus();
         if(status != Constants.ORDER_STATUS_2.getIntKey() && status != Constants.ORDER_STATUS_7.getIntKey()) return new Result(Result.ERROR, "请选择操作");
         String checkConment = order.getCheckConment();
+        if(StringUtils.isBlank(checkConment))  return new Result(Result.ERROR, "请填写审核备注");
         List<String> list = new ArrayList<>();
         for (String id:ids) {
             if(!LockUtils.tryLock("check"+id)) {
