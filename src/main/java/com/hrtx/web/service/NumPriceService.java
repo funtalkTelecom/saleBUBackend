@@ -73,7 +73,7 @@ public class NumPriceService {
         numPrice2.setPrice(numPrice.getPrice());
         numPrice2.setId(null);
         numPriceMapper.insert(numPrice2);
-        return new Result(Result.ERROR,"成功");
+        return new Result(Result.OK,"成功");
     }
 
 

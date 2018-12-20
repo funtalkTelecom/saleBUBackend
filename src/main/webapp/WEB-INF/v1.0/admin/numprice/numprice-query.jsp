@@ -108,7 +108,7 @@
                                     <input type="hidden" class="form-control" name="id">
                                     <label class="col-xs-2 col-sm-2 control-label">号码</label>
                                     <div class="col-xs-4 col-sm-4">
-                                        <input type="text" maxlength="11" class="form-control resource" name="resource" id="resourceT" placeholder="请输入完整的号码">
+                                        <input type="text" class="form-control resource" name="resource" id="resourceT" placeholder="请输入完整的号码">
                                     </div>
                                     <label class="col-xs-2 col-sm-2 control-label">代理商</label>
                                     <div class="col-xs-4 col-sm-4">

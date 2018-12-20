@@ -69,7 +69,7 @@
 										</div>
 										<div class="form-group" style="">
 											<label class="control-label">状态</label>
-											<select class="chosen-select form-control" name="qstatus" id="qstatus">
+											<select class="form-control" name="qstatus" id="qstatus">
 											</select>
 										</div>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>">

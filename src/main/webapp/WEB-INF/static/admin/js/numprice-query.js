@@ -7,13 +7,13 @@ $(function() {
 		"ct" : "#result",
 		"cm" : [{
 					"header" : "地市名称",
-					"dataIndex" : "city_name"
+					"dataIndex" : "cityName"
 				},{
 					"header" : "号码",
 					"dataIndex" : "resource"
 				},{
 					"header" : "运营商",
-					"dataIndex" : "net_type"
+					"dataIndex" : "netType"
 				},{
 					"header" : "渠道",
 					"dataIndex" : "channel"
@@ -28,8 +28,9 @@ $(function() {
                     "dataIndex" : "lowConsume"
                 },{
 					"header" : "代理商",
-					"dataIndex" : "commpay_name",
+					"dataIndex" : "commpayName",
             		"renderer" : function(v, record) {
+                        start = dataList.pm.start;
             		    if (!v) return "默认";
             		    else  return v
             		}
@@ -118,6 +119,9 @@ $(document).on("blur","#commpayNameT",function(){
 $(document).on("change","#commpayNameT",function(){
     clearPrice();
 });
+$(document).on("blur","input[name=resource]",function(){
+    $(this).val($(this).val().split("-").join(""));
+});
 // $(document).on("change","#commpayName",function(){
 //     var commpayName=$("#commpayName").val();
 //     var agentCommpayName=$("#agentCommpayName").val();
@@ -163,7 +167,7 @@ function blurQueryAgentNumprice() {
     queryAgentNumprice();
 }
 function queryAgentNumprice() {
-	var resource = $("#resourceT").val();
+	var resource = $("#resourceT").val().trim();
 	if(resource.length<11){
         alert("请输入完整的号码");
         return ;
@@ -203,7 +207,7 @@ function queryAgentNumprice() {
     },"json");
 };
 $(document).on("click","#goBtn",function() {
-	var resource = $("#resourceT").val();
+	var resource = $("#resourceT").val().trim();
 	if(resource.length<11){
         alert("请输入完整的号码");
         return ;
@@ -252,3 +256,76 @@ $(document).on("click","#goBtn",function() {
         $('#myModal').modal('hide');
     },"json");
 });
+
+$(document).on("click","#export",function() {
+    var obj={};
+    $(".query input[type!=checkbox],.query select").each(function(index,v2){
+        var name=$(v2).attr("name");
+        obj[name]=$(v2).val();
+    });
+
+    bootbox.dialog({
+        boxCss:{"width":"400px"},
+        title: "<span class='bigger-110'>确认框</span>",
+        message: "请选择导出哪些数据?",
+        buttons:
+            {
+                "success" :
+                    {
+                        "label" : "<i class='ace-icon fa fa-check'></i> 当前页",
+                        "className" : "btn-sm btn-success",
+                        "callback": function() {
+                            $("#export").prop("disabled", true);
+                            obj["isCurrentPage"] = "1";
+                            var param = "start="+start+"&";
+                            for (key in obj) {
+                                param += key+"="+obj[key]+"&";
+                            }
+                            downloadFile("numprice/numprice-export", param, '号码价格列表.xlsx','$("#export").prop("disabled", false)');
+                        }
+                    },
+                "danger" :
+                    {
+                        "label" : "全部",
+                        "className" : "btn-sm btn-danger",
+                        "callback": function() {
+                            $("#export").prop("disabled", true);
+                            obj["isCurrentPage"] = "0";
+                            var param = "";
+                            for (key in obj) {
+                                param += key+"="+obj[key]+"&";
+                            }
+                            downloadFile("numprice/numprice-export", param, '号码价格列表.xlsx','$("#export").prop("disabled", false)');
+                        }
+                    }
+            }
+    });
+});
+function downloadFile(url, param, fileName, functionStr){
+    // url = 'number/number-export';
+    console.log(url)
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url+"?"+param, true);        // 也可以使用POST方式，根据接口
+    xhr.responseType = "blob";    // 返回类型blob
+    // 定义请求完成的处理函数，请求前也可以增加加载框/禁用下载按钮逻辑
+    xhr.onload = function () {
+        // 请求完成
+        if (this.status === 200) {
+            // 返回200
+            var blob = this.response;
+            var reader = new FileReader();
+            reader.readAsDataURL(blob);    // 转换为base64，可以直接放入a表情href
+            reader.onload = function (e) {
+                // 转换完成，创建一个a标签用于下载
+                var a = document.createElement('a');
+                a.download = fileName;
+                a.href = e.target.result;
+                $("body").append(a);    // 修复firefox中无法触发click
+                a.click();
+                $(a).remove();
+                eval(functionStr);
+            }
+        }
+    };
+    xhr.send(JSON.stringify(param));
+}
