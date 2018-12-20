@@ -108,7 +108,11 @@
       update tb_num_price p set p.feature = REPLACE(p.feature,#{feature},',') where p.is_del = 0 and p.feature REGEXP  ".*"#{feature}".*";
   </update>
 
-  <select id="queryAgentNumprice" resultType="java.util.Map">
+  <update id="freezeNum">
+      update tb_num n set n.is_freeze = #{param.isFreeze} where n.id=#{param.id}
+  </update>
+
+  <select id="queryAgentNumprice" resultType="java.util.Map" useCache="false">
     select a.price ,ifnull(b.price,a.price) agentPrice from
       (select np.price,np.resource from  tb_num_price np where np.resource=#{param.resource} and np.agent_id=-1 and np.is_del=0 and np.channel=#{param.channel}) a left join
     (select np.price,np.resource from  tb_num_price np where np.resource=#{param.resource} and np.agent_id=#{param.agentId} and np.is_del=0 and np.channel=#{param.channel}) b on a.resource=b.resource
