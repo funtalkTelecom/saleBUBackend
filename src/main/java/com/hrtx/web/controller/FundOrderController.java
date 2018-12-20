@@ -34,7 +34,7 @@ public class FundOrderController extends BaseReturn{
     @PostMapping("/pay-order")
     @Powers({PowerConsts.NOPOWER})
     public Result payOrder(String orderId, String payMenthodId){
-        return orderService.payOrder(NumberUtils.toLong(orderId), payMenthodId);
+        return orderService.payOrder(NumberUtils.toInt(orderId), payMenthodId);
     }
 
     @PostMapping("/pay-balance")

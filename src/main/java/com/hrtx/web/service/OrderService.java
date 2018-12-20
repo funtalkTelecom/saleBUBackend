@@ -191,7 +191,7 @@ public class OrderService extends BaseService {
      * @return
      */
     @NoRepeat
-    public Result payOrder(Long orderId, String payType) {
+    public Result payOrder(Integer orderId, String payType) {
         if(!ArrayUtils.contains(Constants.getKeyObject("PAY_MENTHOD_TYPE"), payType)) return new Result(Result.ERROR, "支付方式不存在");
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
