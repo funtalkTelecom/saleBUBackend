@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.TokenGenerator;
-import com.hrtx.web.event.QueueService;
+//import com.hrtx.web.event.QueueService;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.User;
 import com.hrtx.web.service.ApiOrderService;
