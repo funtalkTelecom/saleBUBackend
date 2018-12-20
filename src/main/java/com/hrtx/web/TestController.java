@@ -61,7 +61,6 @@ public class TestController {
     @Autowired private ConsumerService consumerService;
     @Autowired private ApiOrderService apiOrderService;
 //    @Autowired private QueueService queueService;
-
     @RequestMapping("/")
     @Powers({PowerConsts.NOLOGINPOWER})
     public String helloworld1(HttpServletRequest request) {
