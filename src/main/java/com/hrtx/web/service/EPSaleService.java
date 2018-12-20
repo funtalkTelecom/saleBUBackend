@@ -1327,32 +1327,38 @@ public class EPSaleService {
 	public Result epSaleEdit(EPSale epSale, HttpServletRequest request, MultipartFile[] files) {
 		epSale.setAddUserId(SessionUtil.getUserId());
 		epSale.setIsShow(0);
+		Integer  epSaleId=0;
 		if (epSale.getId() != null && epSale.getId() > 0) {
-			epSale.setUpdateDate(new Date());
+			//epSale.setUpdateDate(new Date());
+			epSaleId=epSale.getId();
 			epSaleMapper.epSaleEdit(epSale);
 		} else {
 			List<EPSale> list = new ArrayList<EPSale>();
 //			epSale.setId(epSaleMapper.getId());
-			epSale.setCreateDate(new Date());
-			epSale.setUpdateDate(new Date());
-			epSale.setId(epSaleMapper.getId());
+			//epSale.setCreateDate(new Date());
+			//epSale.setUpdateDate(new Date());
+			//epSale.setId(epSaleMapper.getId());
 			list.add(epSale);
-			epSaleMapper.insertBatch(list);
+			//epSaleMapper.insertBatch(list);
+			epSaleId=epSaleMapper.getId();
+			epSale.setId(epSaleId);
+			epSaleMapper.epSaleInsert(epSale);
 		}
+
 		//富文本信息获取
 		String kindeditorContent = request.getParameter("epRule");
-		Utils.kindeditorWriter(kindeditorContent, epSale.getId()+".txt", SystemParam.get("kindedtiorDir"));
+		Utils.kindeditorWriter(kindeditorContent, epSaleId+".txt", SystemParam.get("kindedtiorDir"));
 		//图片保存1
 		Result result = null;
 		String picSeqs = request.getParameter("picSeqs")==null?"":request.getParameter("picSeqs");
 		String delPicSeqs = request.getParameter("delPicSeqs")==null?"":request.getParameter("delPicSeqs");
-		if(epSale.getId()!=null&&epSale.getId()>0)
+		if(epSaleId!=null&&epSaleId>0)
 		{
 			if(!picSeqs.equals("")){
-				fileMapper.deleteFilesByRefid(epSale.getId().toString(), picSeqs.equals("")?"":picSeqs.substring(0, picSeqs.length()-1));
+				fileMapper.deleteFilesByRefid(epSaleId.toString(), picSeqs.equals("")?"":picSeqs.substring(0, picSeqs.length()-1));
 			}
 			if(!delPicSeqs.equals("")){
-				fileMapper.deleteFilesByRefid(epSale.getId().toString(), delPicSeqs.equals("")?"":delPicSeqs.substring(0, delPicSeqs.length()-1));
+				fileMapper.deleteFilesByRefid(epSaleId.toString(), delPicSeqs.equals("")?"":delPicSeqs.substring(0, delPicSeqs.length()-1));
 			}
 		}
 		if(files!=null && files.length>0){
@@ -1366,9 +1372,9 @@ public class EPSaleService {
 
 					//String kk=SystemParam.get("epSalePics");
 					//result = BaseReturn.uploadFile(SystemParam.get("epSalePics")+epSale.getId()+"\\", "jpg,png,gif", file, false, false);
-					result = BaseReturn.uploadFile(SystemParam.get("epSalePics")+epSale.getId()+java.io.File.separator, "jpg,png,gif", file, false, false);
+					result = BaseReturn.uploadFile(SystemParam.get("epSalePics")+epSaleId+java.io.File.separator, "jpg,png,gif", file, false, false);
 					f.setFileName(((Map)result.getData()).get("sourceServerFileName").toString());
-					f.setRefId(epSale.getId());
+					f.setRefId(epSaleId);
 					f.setSeq(Integer.parseInt(picSeqs.replaceAll("\"","").split(",")[i]));
 					fileList.add(f);
 				}

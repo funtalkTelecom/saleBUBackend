@@ -18,6 +18,12 @@ $(function() {
 					"header" : "价格",
 					"dataIndex" : "price"
 				},{
+					"header" : "级别",
+					"dataIndex" : "numLevel"
+				},{
+					"header" : "最低消费",
+					"dataIndex" : "lowConsume"
+				},{
 					"header" : "运营商",
 					"dataIndex" : "net_type",
             		"renderer" : function(v, record) {
@@ -33,7 +39,7 @@ $(function() {
 					"dataIndex" : "is_freeze",
             		"renderer" : function(v, record) {
                         if (v == 0) return "未冻结";
-                        if (v == 1) return "已冻结";
+                        if (v == 1) return "<span style='color: red'>已冻结</span>";
                     }
 				},{
             		"header" : "操作",
