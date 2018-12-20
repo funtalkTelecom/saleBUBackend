@@ -22,9 +22,9 @@ $.extend(true, jQuery.ajaxSettings, {
         return true;
     },
     beforeLoad : function(jqXHR, callbackContext, options){
-        if(option.data instanceof FormData) option.data = formDataToMap(option.data);
-        var key = option.url+JSON.stringify(option.data);
-        if(option && option.data && option.data.mask) $.hideLoading();
+        if(!options && options.data instanceof FormData) options.data = formDataToMap(options.data);
+        var key = options.url+JSON.stringify(options.data);
+        if(options && options.data && options.data.mask) $.hideLoading();
         ajaxLock[key] = 0;
         var text = jqXHR.responseText;
         if(!text)return;
