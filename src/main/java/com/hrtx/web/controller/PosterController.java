@@ -31,6 +31,7 @@ public class PosterController extends BaseReturn{
 	@RequestMapping("/poster-query")
 	@Powers({PowerConsts.POSTERMOUDULE_COMMON_QUEYR})
 	public ModelAndView posterQuery(Poster poster){
+		poster = posterService.findPosterById(poster.getId());
 		return new ModelAndView("admin/poster/poster-query");
 	}
 
@@ -48,7 +49,7 @@ public class PosterController extends BaseReturn{
 		poster = posterService.findPosterById(poster.getId());
 		map.put("code", Result.OK);
 		map.put("data", poster);
-		request.setAttribute("bean", poster);
+//		request.setAttribute("bean", poster);
 		return map;
 	}
 
@@ -57,6 +58,7 @@ public class PosterController extends BaseReturn{
 	public Result posterEdit(Poster poster, @RequestParam(name = "file",required = false) MultipartFile file, HttpServletRequest request){
         if(StringUtils.isBlank(poster.getTitle())) return new Result(Result.ERROR, "海报标题不能为空");
         if(StringUtils.isBlank(poster.getPosition())) return new Result(Result.ERROR, "海报位置不能为空");
+//		if(file==null) return new Result(Result.ERROR, "请上传图片");
         if(StringUtils.isBlank(poster.getUrl())) {
             return new Result(Result.ERROR, "海报url不能为空");
         }/*else{
