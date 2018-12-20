@@ -201,7 +201,8 @@ public class AgentService {
 			else return new Result(Result.OK, agent_list.get(0));
 		}else{/*(agent_list.size()==0)*///若无代理渠道，则去默认
 			Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
-			return new Result(Result.OK, agent);
+			if(agent==null) return new Result(Result.ERROR, "系统代理商不存在");
+			else return new Result(Result.OK, agent);
 		}
 	}
 }
