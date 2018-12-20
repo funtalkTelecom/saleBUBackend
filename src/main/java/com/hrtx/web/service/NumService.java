@@ -132,11 +132,12 @@ public class NumService {
         if((isFreeze !=1 && isFreeze != 0)) return new Result(Result.ERROR, "参数异常");
         Num num1 = numMapper.selectByPrimaryKey(num.getId());
         if (num1==null) return new Result(Result.ERROR, "靓号不存在");
+        if(num1.getStatus()!=2) return new Result(Result.ERROR, "靓号状态异常");
         if(num1.getIsFreeze()==isFreeze) {
             return new Result(Result.ERROR, "被人抢先了");
         }
         if(isFreeze==0){
-            if(numFreezeMapper.queryFreeze(num1.getId())!=SessionUtil.getUserId()){
+            if(!numFreezeMapper.queryFreeze(num1.getId()).equals(SessionUtil.getUserId())){
                 return new Result(Result.ERROR, "非冻结人无法解冻");
             }
         }
@@ -149,7 +150,7 @@ public class NumService {
         numFreeze.setIsFreeze(num.getIsFreeze());
         numFreezeMapper.insert(numFreeze);
         num1.setIsFreeze(num.getIsFreeze());
-        int count = numMapper.updateByPrimaryKey(num1);
+        int count = numPriceMapper.freezeNum(num1);  //凍結或解凍
         if(count != 1) return new Result(Result.ERROR, "提交失败");
         return new Result(Result.OK, "提交成功");
     }
@@ -191,7 +192,7 @@ public class NumService {
                 numFreeze.setIsFreeze(0);
                 numFreezeMapper.insert(numFreeze);
                 num.setIsFreeze(0);
-                numMapper.updateByPrimaryKey(num);
+                numPriceMapper.freezeNum(num);
                 log.info("号码冻结>30分钟系统自动解冻,numId:"+id);
             }
         }

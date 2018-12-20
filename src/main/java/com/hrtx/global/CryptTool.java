@@ -56,8 +56,8 @@ public class CryptTool {
             sign.append(mapParam.get(string));
         }
         sign.append(key);
-        System.out.println("获取到sign_key:["+StringUtils.join(platRequestKeys,"|")+"]");
-        System.out.println("获取到明文sign:["+sign.toString()+"]");
+//        System.out.println("获取到sign_key:["+StringUtils.join(platRequestKeys,"|")+"]");
+//        System.out.println("获取到明文sign:["+sign.toString()+"]");
         return CryptTool.MD5(sign.toString());
     }
 

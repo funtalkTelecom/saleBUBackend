@@ -2,7 +2,7 @@
 <%@page import="com.hrtx.global.SessionUtil,com.hrtx.global.PowerConsts" %>
 <!DOCTYPE html>
 	<head>
-		<title>号码管理</title>
+		<title>客服靓号</title>
 		<%@ include file="../common/basecss.jsp" %>
 		<script type="text/javascript" src="<%=basePath %>admin/js/lianghao-query.js"></script>
         <%--<script type="text/javascript" src="<%=basePath %>project/js/chosen.jquery.min.js"></script>--%>

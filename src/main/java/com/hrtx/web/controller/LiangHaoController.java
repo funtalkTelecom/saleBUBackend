@@ -32,6 +32,7 @@ public class LiangHaoController extends BaseReturn{
     @Resource private ApiMealService apiMealService;
     @Resource private ApiOrderService apiOrderService;
     @Resource private DictService dictService;
+    @Resource private AgentService agentService;
 
 
     @RequestMapping("/lianghao-query")
@@ -44,8 +45,16 @@ public class LiangHaoController extends BaseReturn{
     @Powers({PowerConsts.LIANGHAOMOUDULE_COMMON_QUEYR})
     public Result listNumber(NumPrice numPrice){
         numPrice.setPageNum(numPrice.startToPageNum());
-        numPrice.setChannel(NumberUtils.toInt(String.valueOf(SystemParam.get("lianghao_channel"))));
-        numPrice.setAgentId(NumberUtils.toInt(String.valueOf(SystemParam.get("lianghao_agent_id"))));
+        User u = SessionUtil.getUser();
+        Consumer user =new Consumer();
+        user.setId(u.getId());
+        user.setName(u.getName());
+        user.setIsAgent(0);
+        Result result = agentService.queryCurrAgent(user);
+        if(result.getCode()!=200) return result;
+        Agent data = (Agent) result.getData();
+        numPrice.setChannel(data.getChannelId());
+        numPrice.setAgentId(data.getId());
         PageInfo<Object> objectPageInfo = numService.queryNumPrice(numPrice);
         objectPageInfo =numService.queryFreeze(objectPageInfo);
         return new Result(Result.OK, objectPageInfo);
