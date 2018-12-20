@@ -49,7 +49,7 @@ public class BoundController extends BaseReturn{
         String iccidStr="";// iccid  iccid记录
         String iccidSectionNo="";//号段  iccid记录
         Long iccidConsumerId=0L;//用户Id  iccid记录
-        String iccidStatus="";//状态 iccid记录
+        int iccidStatus=0;//状态 iccid记录
         Integer mealMid=0;//mdelMid 套餐记录
         int orderStatus=0;//订单状态
         Integer orderId=0;//订单Id
@@ -84,7 +84,7 @@ public class BoundController extends BaseReturn{
             iccidSectionNo=iccid.getSections();
         }
         iccidConsumerId=NumberUtils.toLong(String.valueOf(iccid.getConsumerId()),0L);
-        if(StringUtils.isNotBlank(iccid.getDealStatus()))
+        if(NumberUtils.toInt(ObjectUtils.toString(iccid.getDealStatus())) > 0)
         {
             iccidStatus=iccid.getDealStatus();
         }
@@ -112,12 +112,12 @@ public class BoundController extends BaseReturn{
             isEdit=false;
             returnResult(new Result(Result.ERROR,"请待配卡的号码进行绑定，请核对！"));
         }
-        if(iccidStatus.equals("2"))//受理状态(1待绑定 2已绑定
+        if(iccidStatus == 2)//受理状态(1待绑定 2已绑定
         {
             isEdit=false;
             returnResult(new Result(Result.ERROR,"你所填写的iccid已被绑定，请重新填写！"));
         }
-        if(!iccidStatus.equals("1"))//受理状态(1待绑定
+        if(iccidStatus != 1)//受理状态(1待绑定
         {
             isEdit=false;
             returnResult(new Result(Result.ERROR,"请待绑定的iccid进行绑定，请核对！"));
@@ -135,7 +135,7 @@ public class BoundController extends BaseReturn{
             Iccid iccidEdit=new Iccid();
             boundService.bindNum(num);
             iccidEdit.setId(iccid.getId());
-            iccidEdit.setDealStatus("2");//受理状态(1待绑定=》2已绑定)
+            iccidEdit.setDealStatus(2);//受理状态(1待绑定=》2已绑定)
             boundService.iccidEditStatus(iccidEdit);
             returnResult(new Result(Result.OK,"号码绑定成功"));
         }

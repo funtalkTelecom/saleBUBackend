@@ -19,9 +19,9 @@
         </foreach >
     </insert>
     <insert id="batchInsertNoFund">
-        INSERT INTO `tb_iccid`(`id`, `city_code`, `city_name`, `sections`, `net_type`, `iccid`, `deal_status`, `order_id`, `consumer_id`, `stock_status`, `in_stock_date`, `out_stock_date`)
-        select it.id, null, null, '', null, it.iccid, 1, it.item_id, #{consumer}, 2, NOW(), NOW()
-        from tb_iccid_temp it left join tb_iccid i on it.iccid = i.iccid and i.stock_status = 1 and i.deal_status = '1' where it.order_id = #{orderId} and ifnull(i.id,99) = 99
+        INSERT INTO `tb_iccid`(`id`, `city_id`, `city_name`, `sections`, `net_type`, `iccid`, `deal_status`, `order_id`, `consumer_id`, `stock_status`, `in_stock_date`, `out_stock_date`)
+        select it.id, 0, null, '', null, it.iccid, 1, it.item_id, #{consumer}, 2, NOW(), NOW()
+        from tb_iccid_temp it left join tb_iccid i on it.iccid = i.iccid and i.stock_status = 1 and i.deal_status = 1 where it.order_id = #{orderId} and ifnull(i.id,99) = 99
     </insert>
     <update id="batchUpdate">
         update tb_iccid i set i.stock_status = 2, i.out_stock_date = NOW(), i.consumer_id = #{consumer}, i.order_id = (select it.item_id from tb_iccid_temp it where i.iccid = it.iccid and it.order_id = #{orderId})
@@ -34,9 +34,17 @@
         select it.item_id itemId, count(*) count from tb_iccid_temp it where it.order_id = #{orderId} group by it.item_id
     </select>
     <select id="matchOrderItem" resultType="java.util.Map">
-        select i.* from tb_iccid i, tb_order_item oi, tb_num n
+        select i.* from tb_iccid i left join tb_section_change_cofig scc on i.net_type = scc.net_type and i.city_id = scc.city_id and scc.is_del = 0,
+        tb_order_item oi, tb_num n
         where i.order_id = oi.p_item_id and oi.num_id = n.id
-        and (n.`status`  != 4  or i.sections != n.section_no or i.consumer_id != n.buyer_id)
+				and (
+				n.`status` != 4 /*号码状态不正确*/
+				or i.consumer_id != n.buyer_id  /*号码归属错误*/
+				/*-- or i.sections != n.section_no */
+				or scc.id is null /*未配置号段是否可串*/
+				or (scc.is_change = 0 and i.sections != n.section_no) /* 不可串时，号段不一致*/
+				or (scc.is_change = 1 and (i.city_id != n.city_id or i.net_type != n.net_type )) /* 可串时，制式地市不一致*/
+				)
         and i.order_id = #{item_id};
     </select>
 </mapper>

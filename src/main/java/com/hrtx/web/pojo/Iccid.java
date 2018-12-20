@@ -9,7 +9,7 @@ public class Iccid {
     @Id
     private Integer id;
 
-    private String cityCode;
+    private Integer cityId;
 
     private String cityName;
 
@@ -19,7 +19,7 @@ public class Iccid {
 
     private String iccid;
 
-    private String dealStatus;
+    private Integer dealStatus;
 
     private Integer orderId;
 
@@ -31,9 +31,9 @@ public class Iccid {
 
     private Date outStockDate;
 
-    public Iccid(Integer id, String cityCode, String cityName, String sections, String netType, String iccid, String dealStatus, Integer orderId, Integer consumerId, Integer stockStatus, Date inStockDate, Date outStockDate) {
+    public Iccid(Integer id, Integer cityId, String cityName, String sections, String netType, String iccid, Integer dealStatus, Integer orderId, Integer consumerId, Integer stockStatus, Date inStockDate, Date outStockDate) {
         this.id = id;
-        this.cityCode = cityCode;
+        this.cityId = cityId;
         this.cityName = cityName;
         this.sections = sections;
         this.netType = netType;
@@ -58,12 +58,12 @@ public class Iccid {
         this.id = id;
     }
 
-    public String getCityCode() {
-        return cityCode;
+    public Integer getCityId() {
+        return cityId;
     }
 
-    public void setCityCode(String cityCode) {
-        this.cityCode = cityCode == null ? null : cityCode.trim();
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
     }
 
     public String getCityName() {
@@ -98,12 +98,12 @@ public class Iccid {
         this.iccid = iccid == null ? null : iccid.trim();
     }
 
-    public String getDealStatus() {
+    public Integer getDealStatus() {
         return dealStatus;
     }
 
-    public void setDealStatus(String dealStatus) {
-        this.dealStatus = dealStatus == null ? null : dealStatus.trim();
+    public void setDealStatus(Integer dealStatus) {
+        this.dealStatus = dealStatus;
     }
 
     public Integer getOrderId() {

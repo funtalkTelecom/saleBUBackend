@@ -94,7 +94,7 @@ public class NumService {
                         num.setMealMid(meals.get(0).getMid());
                     }
                     numMapper.updateByPrimaryKeySelective(num);
-                    iccid.setDealStatus("2");
+                    iccid.setDealStatus(2);
                     iccidMapper.updateByPrimaryKeySelective(iccid);
                 }
             }
