@@ -296,7 +296,7 @@ public class ApiOrderService {
 		order.setStatus(Constants.ORDER_STATUS_20.getIntKey());
 		boolean ordinary_num=(order.getOrderType()==Constants.ORDER_TYPE_2.getIntKey()&&StringUtils.equals(order.getSkuGoodsType(),"3"));//普靓
         if(ordinary_num){
-            log.info(String.format("订单[%s]是普靓订单不需要发货，直接进入等待支付状态"));
+            log.info(String.format("订单[%s]是普靓订单不需要发货，直接进入等待支付状态",order.getOrderId()));
             order.setStatus(Constants.ORDER_STATUS_1.getIntKey());
         }
 		this.orderMapper.updateByPrimaryKey(order);
