@@ -876,6 +876,7 @@ public class EPSaleService {
 				{
 					AuctionDeposit auctionDeposit=new AuctionDeposit();
 					auctionDeposit.setStatus(1);
+					auctionDeposit.setId(auctionDepositMapper.getId());
 					auctionDeposit.setgId(auction.getgId());
 					auctionDeposit.setNum(auction.getNum());
 					auctionDeposit.setNumId(auction.getNumId());
@@ -897,6 +898,7 @@ public class EPSaleService {
 					auction.setAddDate(addDate);
 					auction.setConfirmDate(addDate);//status 2 确认时间
 					auction.setAddIp(SessionUtil.getUserIp());
+					auction.setId(auctionMapper.getId());
 					double newPrice=0.00;
 					Integer newAutionId=0;
 					Integer newConsumerId=0;
@@ -1011,6 +1013,7 @@ public class EPSaleService {
 					if(auctionListStatus1==null||auctionListStatus1.size()==0)
 					{
 						auction.setStatus(1);
+						auction.setId(auctionMapper.getId());
 						auction.setAddIp(SessionUtil.getUserIp());
 						auctionService.auctionEdit(auction);//出价记录 状态：1初始
 					}
@@ -1162,6 +1165,7 @@ public class EPSaleService {
 				{
 					AuctionDeposit auctionDeposit=new AuctionDeposit();
 					auctionDeposit.setStatus(1);
+					auctionDeposit.setId(auctionDepositMapper.getId());
 					auctionDeposit.setgId(auction.getgId());
 					auctionDeposit.setNum(auction.getNum());
 					auctionDeposit.setNumId(auction.getNumId());
@@ -1180,6 +1184,7 @@ public class EPSaleService {
 					//auctionDepositService.auctionDepositPay(auctionDepositId,true,"20180620112023");
 					Date addDate=new Date();
 					//auction.setStatus(2);
+					auction.setId(auctionMapper.getId());
 					auction.setAddDate(addDate);
 					auction.setConfirmDate(addDate);//status 2 确认时间
 					auction.setAddIp(SessionUtil.getUserIp());
