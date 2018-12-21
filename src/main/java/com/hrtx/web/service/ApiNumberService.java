@@ -174,30 +174,35 @@ public class ApiNumberService {
 
 	public Result numberInfo(String id, HttpServletRequest request){
 		PageInfo<Object> pm = null;
-		NumPrice numPrice = new NumPrice();
-		int unmId = NumberUtils.toInt(id);
-		numPrice.setNumId(unmId);
-		Consumer consumer= this.apiSessionUtil.getConsumer();
-		List _list = agentMapper.findConsumenrIdCount(consumer.getId());
-		int agentId;
 
-		if(_list.size()>0){
-			Map _map = (Map) _list.get(0);
-			agentId =NumberUtils.toInt(String.valueOf(_map.get("id"))) ;
-			int channelId =NumberUtils.toInt(String.valueOf(_map.get("channel_id"))) ;
-			numPrice.setChannel(channelId);
-		}else{
-			agentId = NumberUtils.toInt(SystemParam.get("default_agent"));  //默认代理商id
-			numPrice.setChannel(3);
-		}
-		pm = numService.queryNumPrice(numPrice);
-		List ob = pm.getList();
-		if(ob.size()==0) return new Result(Result.ERROR, "未找到号码");
-//		 numberMapper.getNumInfoById(id);
+		Map map = numberMapper.getNumSkuGoodsTypeById(id);
+		String skuGoodsType =String.valueOf(map.get("sku_goods_type"));
 		Map obj = new HashMap();
-		for (int i = 0; i < ob.size(); i++) {
-			 obj= (Map) ob.get(i);
-			obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+		if(map == null) return new Result(Result.ERROR, "未找到号码");
+		if( skuGoodsType.equals("4")){ //超靓
+			NumPrice numPrice = new NumPrice();
+			int unmId = NumberUtils.toInt(id);
+			numPrice.setNumId(unmId);
+			Consumer consumer= this.apiSessionUtil.getConsumer();
+			//是否是代理商
+			Result reagent = agentService.queryCurrAgent(consumer);
+			if(reagent.getCode()!=Result.OK){
+				return new Result(reagent.ERROR, reagent.getData());
+			}
+			Agent agent = (Agent) reagent.getData();
+			numPrice.setChannel(agent.getChannelId());
+			pm = numService.queryNumPrice(numPrice);
+			List ob = pm.getList();
+			if(ob.size()==0) return new Result(Result.ERROR, "未找到号码");
+
+			for (int i = 0; i < ob.size(); i++) {
+				obj= (Map) ob.get(i);
+				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+			}
+		}else if(skuGoodsType.equals("3")){  //普靓
+			obj = numberMapper.getNumInfoById(id);
+			if(obj==null) return new Result(Result.ERROR, "未找到号码");
+			obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
 		}
 		return new Result(Result.OK, obj);
 	}
