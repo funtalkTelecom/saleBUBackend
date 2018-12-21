@@ -30,7 +30,7 @@ public class ApiNumberController extends BaseReturn{
 	private ApiNumberService apiNumberService;
 
 	/**
-	 * 根据tags获取号码
+	 * 手机端超靓号码列表，根据tags获取号码
 	 * @param numPrice
 	 * @param request
 	 * @return
@@ -42,13 +42,6 @@ public class ApiNumberController extends BaseReturn{
 		return apiNumberService.numberList(numPrice, request);
 	}
 
-	@GetMapping("/numberTypeList")
-    @Powers(PowerConsts.NOLOGINPOWER)
-	@ResponseBody
-	public Result numberTypeList(Number number, HttpServletRequest request){
-		return apiNumberService.numberTypeList(number, request);
-	}
-
 	@GetMapping("/number/{id}")
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
@@ -56,6 +49,18 @@ public class ApiNumberController extends BaseReturn{
 		return apiNumberService.numberInfo(id, request);
 	}
 
+	/**
+	 * 手机端普靓号码列表
+	 * @param number
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/numberTypeList")
+    @Powers(PowerConsts.NOLOGINPOWER)
+	@ResponseBody
+	public Result numberTypeList(Number number, HttpServletRequest request){
+		return apiNumberService.numberTypeList(number, request);
+	}
 
 	/**
 	 * 根据号码模糊查询获取号码列表
@@ -69,4 +74,6 @@ public class ApiNumberController extends BaseReturn{
 	public Result numberListByNum(NumPrice numPrice, HttpServletRequest request){
 		return apiNumberService.numberListByNum(numPrice, request);
 	}
+
+
 }
