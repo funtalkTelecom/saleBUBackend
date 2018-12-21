@@ -8004,7 +8004,12 @@
                     }
                 };
 
-            if(s.beforeRequest && $.isFunction(s.beforeRequest) && s.beforeRequest(options));
+            // if(s.beforeRequest && $.isFunction(s.beforeRequest) && s.beforeRequest(options));
+            var isBeforePass = true;
+            if(s.beforeRequest && $.isFunction(s.beforeRequest)){
+                if(!s.beforeRequest(options)) isBeforePass = false;
+            };
+            if(!isBeforePass) return;
             // Attach deferreds
             deferred.promise( jqXHR ).complete = completeDeferred.add;
             jqXHR.success = jqXHR.done;
