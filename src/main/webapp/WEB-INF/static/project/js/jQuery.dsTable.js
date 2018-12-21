@@ -158,6 +158,7 @@
             load : function(param, callback, reInit){
                 if(reInit) this.init();
                 if(this.pm){
+                    this.pm.start = 0;
                     param = $.extend(true,param||{},{start:0,limit:this.pm.limit});
                 }
                 var option_param = {};
