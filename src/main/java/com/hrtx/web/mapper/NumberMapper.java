@@ -54,4 +54,6 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
 
     int updateNumStatusWithData(@Param("org_status")int org_status,@Param("new_status")int new_status,@Param("num_id")int num_id);
 
+    Map getNumSkuGoodsTypeById(@Param("id") String id);
+
 }
