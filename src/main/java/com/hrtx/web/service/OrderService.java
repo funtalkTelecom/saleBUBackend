@@ -99,7 +99,7 @@ public class OrderService extends BaseService {
             commodities.add(CommonMap.create("item_id",orderItem.getItemId()).put("companystock_id", orderItem.getCompanystockId()).put("quantity", orderItem.getQuantity()).getData());
         }
         Map param = CommonMap.create("receiver", order.getPersonName()).put("phone",order.getPersonTel()).put("address",order.getAddress())
-                .put("receiver_company", order.getConsumerName()).put("remark",order.getConment()).put("callback_url",SystemParam.get("domain-full")+"/order/deliver-order-callback")
+                .put("receiver_company", order.getOrderType() == 4 ? "jd乐语线上" : order.getConsumerName()).put("remark",order.getConment()).put("callback_url",SystemParam.get("domain-full")+"/order/deliver-order-callback")
                 .put("commodities", commodities).put("order_id",order.getOrderId()).getData();
         Result result = StorageApiCallUtil.storageApiCall(param, "HK0004");
         if(result.getCode() != Result.OK) return result;
