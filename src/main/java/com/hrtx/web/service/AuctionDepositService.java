@@ -161,7 +161,7 @@ public class AuctionDepositService {
 		List<AuctionDeposit> list = new ArrayList<AuctionDeposit>();
 		auctionDeposit.setConsumerId(apiSessionUtil.getConsumer().getId());
 		//auctionDeposit.setAddIp(apiSessionUtil.get);
-		auctionDeposit.setId(auctionDepositMapper.getId());
+		//auctionDeposit.setId(auctionDepositMapper.getId());
 		auctionDeposit.setAddDate(new Date());
 		list.add(auctionDeposit);
 		auctionDepositMapper.insertBatch(list);
