@@ -183,7 +183,7 @@ public class NumService {
         {
             for(Map map :list)
             {
-                long id = NumberUtils.toLong(String.valueOf(map.get("id")));
+                int id = NumberUtils.toInt(String.valueOf(map.get("id")));
                 Num num = numMapper.selectByPrimaryKey(id);
                 NumFreeze numFreeze = new NumFreeze();
 //                numFreeze.setId(numFreeze.getGeneralId());

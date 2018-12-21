@@ -531,6 +531,7 @@ public class ApiOrderService {
 		if(number==null)return new Result(Result.ERROR, "抱歉，您购买的号码并非在售中");
 		if(!StringUtils.equals(String.valueOf(number.getStatus()),"2"))return new Result(Result.ERROR, "抱歉，您购买的号码并非在售中");
 		if(!Integer.valueOf(sku_id).equals(number.getSkuId()) )return new Result(Result.ERROR, "抱歉，您购买的号码存在异常");
+		if(number.getIsFreeze()!=null&&number.getIsFreeze()==0)return new Result(Result.OK,null);
 		Integer fuser = numService.queryFreeze(number.getId());//判断是否冻结
         if(fuser != null && !fuser.equals(SessionUtil.getUserId())) return new Result(Result.ERROR, "抱歉，您购买的号码已冻结");
 		return new Result(Result.OK,null);
