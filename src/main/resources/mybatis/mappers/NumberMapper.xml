@@ -400,7 +400,7 @@
         and s.g_id = g.g_id
         and m.`status`=2
         and g.g_is_sale = '1'
-        and n.id= #{id}
+        and m.id= #{id}
     </select>
 
 </mapper>
