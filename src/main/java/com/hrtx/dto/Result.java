@@ -1,6 +1,7 @@
 package com.hrtx.dto;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ public class Result {
 	
 	public Result(int code, Object data) {
 		super();
-		log.info("-------------------(返回结果：code:"+code+",data:"+ObjectUtils.toString(data)+")");
+		log.info("-------------------(返回结果：code:"+code+",data:"+StringUtils.substring(ObjectUtils.toString(data), 0, 50)+")");
 		this.code = code;
 		this.data = data;
 	}
