@@ -145,6 +145,7 @@ public class LyCrmService {
             int count = 1;
             String order = "1000000009"+Utils.getDate(0, "yyyyMMddHHmmss")+StringUtils.leftPad(count+"", 4, "0");
 //          list.add(new Object[]{"190",order,"17003564498","8986031754351004498","LYHR_ZYQ1141","1370761","zhouyq","01","350782198706203512","29号","zhouyq11","18965902603"});
+//            n.id, c.third_id, n.num_resource, n.iccid, m.meal_id
             List<Map> nums = numMapper.queryDslNum();
             int start = 0;
             int len = nums.size();
@@ -156,9 +157,22 @@ public class LyCrmService {
                 end = end > len ? len : end;
                 for (int i = start; i < end ; i++) {
                     Map num = nums.get(i);
-                    list.add(new Object[]{num.get("third_id"), order, num.get("num_resource"), num.get("iccid"), SystemParam.get("ly_work_login_name"),
+//                    关于开卡接口字段说明：
+//                    1、代理商工号：根据号码归属地市找该地是京东门店下任一工号。（代理商同步接口BOSS2HR）
+//                    2、套餐编码：线下提供。京东套餐20181221.xlsx
+//                    3、客户名称：北京乐语通信科技有限公司
+//                    4、证件类型： 02（工商营业执照 ）
+//                    5、证件编码：91110105669113779Y
+//                    6、通讯地址：北京市朝阳区西大望路甲12号（国家广告产业园区）AB-012
+//                    7、联系人：京东下单联系人姓名
+//                    8、联系电话（手机号码）：京东下单联系人电话
+//                    n.id, c.third_id, n.num_resource, n.iccid, m.meal_id, o.boss_num, o.person_name, o.person_tel
+                    String boss_num = ObjectUtils.toString(num.get("boss_num"));
+                    if(StringUtils.isBlank(boss_num)) boss_num = SystemParam.get("ly_work_login_name");
+
+                    list.add(new Object[]{num.get("third_id"), order, num.get("num_resource"), num.get("iccid"), boss_num,
                             num.get("meal_id"), SystemParam.get("ly_work_name"), SystemParam.get("ly_work_card_type"), SystemParam.get("ly_work_card_code"),
-                            SystemParam.get("ly_work_address"), SystemParam.get("ly_work_contact"), SystemParam.get("ly_work_contact_phone")});
+                            SystemParam.get("ly_work_address"), num.get("person_name"),  num.get("person_tel")});
                     snums.add(NumberUtils.toLong(String.valueOf(num.get("id"))));
                 }
                 start = end;
