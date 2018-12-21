@@ -294,7 +294,13 @@ public class ApiOrderService {
 		if(order==null)return new Result(Result.ERROR, "抱歉，您提交的订单存在错误");
 		if(!ArrayUtils.contains(new int[]{Constants.ORDER_STATUS_20.getIntKey(),Constants.ORDER_STATUS_0.getIntKey()},order.getStatus()))return new Result(Result.ERROR, "当前订单状态并非可冻结情况");
 		order.setStatus(Constants.ORDER_STATUS_20.getIntKey());
+		boolean ordinary_num=(order.getOrderType()==Constants.ORDER_TYPE_2.getIntKey()&&StringUtils.equals(order.getSkuGoodsType(),"3"));//普靓
+        if(ordinary_num){
+            log.info(String.format("订单[%s]是普靓订单不需要发货，直接进入等待支付状态"));
+            order.setStatus(Constants.ORDER_STATUS_1.getIntKey());
+        }
 		this.orderMapper.updateByPrimaryKey(order);
+        if(ordinary_num)return new Result(Result.OK,"不需要发货");
 		Example example = new Example(OrderItem.class);
 		example.createCriteria().andEqualTo("orderId",order.getOrderId());
 		List<OrderItem> orderItems=this.orderItemMapper.selectByExample(example);
@@ -423,7 +429,7 @@ public class ApiOrderService {
 			//普靓时检验号码的地市是否与代理商地市一致
 			if(ordinary_num){
 				Number number=this.numberMapper.selectByPrimaryKey(num_id);
-				if(!StringUtils.equals(String.valueOf(number),agent_city))return new Result(Result.ERROR, "抱歉，您权限不足，无法订购此地市商品");
+				if(!StringUtils.equals(String.valueOf(number.getCityId()),agent_city))return new Result(Result.ERROR, "抱歉，您权限不足，无法订购此地市商品");
 				Result result=this.checkNumCondition(number,sku_id);
 				if(result.getCode()!=Result.OK)return result;
 
