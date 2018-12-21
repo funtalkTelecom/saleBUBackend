@@ -49,7 +49,8 @@ public class NumService {
             int count = NumberUtils.toInt(ObjectUtils.toString(item.get("count")));
             insertCount += count;
         }
-        int noFundCount = iccidMapper.batchInsertNoFund(order.getConsumer(), orderId);
+//        int noFundCount = iccidMapper.batchInsertNoFund(order.getConsumer(), orderId);
+        int noFundCount = iccidMapper.queryNoFund(order.getConsumer(), orderId).size();
         //回调卡中有["+noFundCount+"]个在卡库中未找到
         if(noFundCount != 0) throw new ServiceException("回调卡中有["+noFundCount+"]个在卡库中未找到");
 

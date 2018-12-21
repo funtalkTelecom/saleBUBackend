@@ -25,6 +25,8 @@ public interface IccidMapper extends Mapper<Iccid>,BaseMapper<Iccid>{
      */
     int batchInsertNoFund(@Param("consumer") Integer consumer, @Param("orderId") Integer orderId);
 
+    List queryNoFund(@Param("consumer") Integer consumer, @Param("orderId") Integer orderId);
+
     /**
      * 更新已找到的的iccid  客户订单归属
      * @param consumer
