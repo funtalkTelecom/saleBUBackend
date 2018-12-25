@@ -330,13 +330,20 @@ $(function() {
             type : "post",
             url: "goods/goods-edit",
             success : function(data) {
-                dataList.load();
-                $('#goodsInfo').modal('hide');
+                if(data.code==888){
+                    $("#btn").removeAttr("disabled");
+                }else{
+                    dataList.load();
+                    $('#goodsInfo').modal('hide');
+                    $("#btn").removeAttr("disabled");
+
+                }
                 alert(data.data);
             }
         };
         //提交前把需要传到后台的disabled去掉
         $("[disabledNeedSubmit]").prop("disabled", false);
+        $("#btn").attr({ disabled: "disabled" });
         // 将options传给ajaxForm
         $('#goodsInfo form').ajaxSubmit(options);
         //提交结束之后还原disabled
