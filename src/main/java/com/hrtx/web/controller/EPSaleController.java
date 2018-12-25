@@ -4,6 +4,8 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.*;
+import com.hrtx.web.mapper.AuctionDepositMapper;
+import com.hrtx.web.mapper.AuctionMapper;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.service.*;
 import com.hrtx.web.websocket.WebSocketServer;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -48,7 +51,8 @@ public class EPSaleController extends BaseReturn{
 	private ApiSessionUtil apiSessionUtil;
 	@Autowired
 	private EPSaleNoticeService ePSaleNoticeService;
-
+	@Autowired private AuctionMapper auctionMapper;
+	@Autowired private AuctionDepositMapper auctionDepositMapper;
 	@RequestMapping("/epSale/epSale-query")
 	@Powers({PowerConsts.EPSALEMOUDULE})
 	public ModelAndView epSaleQuery(EPSale epSale){
@@ -287,6 +291,7 @@ public class EPSaleController extends BaseReturn{
 					auctionDeposit.setSkuId(auction.getSkuId());
 					auctionDeposit.setAmt(Double.valueOf(goods.getgDeposit()));//保证金记录  状态：1初始
 					auctionDeposit.setAddIp(SessionUtil.getUserIp());
+					auctionDeposit.setId(auctionDepositMapper.getId());
 					auctionDepositService.auctionDepositEdit(auctionDeposit);
 					auctionDepositId=auctionDeposit.getId();
 					isDeposit=false;
@@ -309,6 +314,7 @@ public class EPSaleController extends BaseReturn{
 					auction.setAddDate(addDate);
 					auction.setConfirmDate(addDate);//status 2 确认时间
 					auction.setAddIp(SessionUtil.getUserIp());
+					auction.setId(auctionMapper.getId());
 					double newPrice=0.00;
 					Integer newAutionId=0;
 					Integer newConsumerId=0;
@@ -333,6 +339,7 @@ public class EPSaleController extends BaseReturn{
 							if(auction.getPrice()>newPrice) {
 								//auctonNew  状态：4 落败
 								auctonNew.setId(newAutionId);
+								//auctonNew.setId(auctionMapper.getId());
 								auctonNew.setStatus(4);//最新出价记录   状态：4 落败
 								auctionService.auctionEditStatusById2(auctonNew);//通知用户
 								//auction  状态：2成功
@@ -442,6 +449,7 @@ public class EPSaleController extends BaseReturn{
 						Date addDate=new Date();
 						auction.setAddDate(addDate);
 						auction.setStatus(1);
+						auction.setId(auctionMapper.getId());
 						auction.setAddIp(SessionUtil.getUserIp());
 						auctionService.auctionEdit(auction);//出价记录 状态：1初始
 					}

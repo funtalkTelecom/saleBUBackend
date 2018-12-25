@@ -344,7 +344,7 @@
 		) values
 		<foreach collection="auctionList" item="Auction" separator=",">
 			(
-			#{Auction.Id},
+			#{Auction.id},
 			#{Auction.skuId},
 			#{Auction.numId},
 			#{Auction.num},
