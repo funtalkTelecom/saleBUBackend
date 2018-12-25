@@ -89,7 +89,7 @@ public class AuctionService {
 	public void auctionEdit(Auction auction) {
 			List<Auction> list = new ArrayList<Auction>();
 			auction.setConsumerId(apiSessionUtil.getConsumer().getId());
-//		    auction.setId(auction.getGeneralId());
+		    //auction.setId(auctionMapper.getId());
 		    //auction.setAddDate(new Date());
 			list.add(auction);
 		   auctionMapper.insertBatch(list);

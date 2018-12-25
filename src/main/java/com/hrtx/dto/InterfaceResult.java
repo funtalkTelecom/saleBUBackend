@@ -1,6 +1,8 @@
 package com.hrtx.dto;
 
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,14 +21,14 @@ public class InterfaceResult implements java.io.Serializable {
         super();
         this.code = code;
         this.desc = desc;
-        log.info("---------------------------interfaceResult{code:"+code+",desc:"+desc+"}");
+        log.info("---------------------------interfaceResult{code:"+code+",desc:"+StringUtils.substring(ObjectUtils.toString(desc), 0, 50)+"}");
     }
     public InterfaceResult(String code, String desc, String platData) {
         super();
         this.code = code;
         this.desc = desc;
         this.platData = platData;
-        log.info("---------------------------interfaceResult{code:"+code+",desc:"+desc+",platData:"+platData+"}");
+        log.info("---------------------------interfaceResult{code:"+code+",desc:"+StringUtils.substring(ObjectUtils.toString(desc), 0, 50)+",platData:"+StringUtils.substring(ObjectUtils.toString(platData), 0, 50)+"}");
     }
     public InterfaceResult(String code, Object map) {
         super();
