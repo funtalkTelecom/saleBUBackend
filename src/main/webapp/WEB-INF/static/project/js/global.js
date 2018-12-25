@@ -21,7 +21,7 @@ $.extend(true, jQuery.ajaxSettings, {
         ajaxLock[key] = 1;
         var param =  option.data;
         if(typeof(param) == 'string') param = getRequest(option.data);
-        if(param.mask) {
+        if(param &&　param.mask) {
             $("body").mask(param.mask);
         }
         return true;
