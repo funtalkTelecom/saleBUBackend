@@ -2,7 +2,6 @@
 function getRequest(str) {
     var theRequest = new Object();
     var strs = str.split("&");
-    console.log(strs);
     for(var i = 0; i < strs.length; i ++) {
         theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
     }
@@ -14,22 +13,20 @@ $.extend(true, jQuery.ajaxSettings, {
         isAjax : true// 将连接请求标上ajax方式
     },
     beforeRequest : function (option){
-        var key = option.url;
-        if(ajaxLock[key] && ajaxLock[key] == 1){
-            return false;
-        }
-        ajaxLock[key] = 1;
-        var param =  option.data;
-        if(typeof(param) == 'string') param = getRequest(option.data);
-        if(param &&　param.mask) {
-            $("body").mask(param.mask);
-        }
+        // var param =  option.data;
+        // if(typeof(param) == 'string') param = getRequest(option.data);
+        // var key = option.url;
+        // if(param && param.noRepeat == 1 && ajaxLock[key] && ajaxLock[key] == 1){
+        //     return false;
+        // }
+        // ajaxLock[key] = 1;
+        // if(param &&　param.mask) $("body").mask(param.mask);
         return true;
     },
     beforeLoad : function(jqXHR, callbackContext, options){
-        $("body").unmask();
-        var key = options.url;
-        ajaxLock[key] = 0;
+        // $("body").unmask();
+        // var key = options.url;
+        // ajaxLock[key] = 0;
         var text = jqXHR.responseText;
         if(!text)return;
         var json;
