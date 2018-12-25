@@ -1,18 +1,51 @@
 var dataList = null;
+
+
 var with4s, numStatus, tags;
 var start;
-$.post("dict-to-map", {group: "with4"},function(data){
-    with4s = data;
-},"json");
 
-$.post("dict-to-map", {group: "num_status"},function(data){
-    numStatus = data;
-},"json");
+// $.post("dict-to-map", {group: "with4"},function(data){
+//     with4s = data;
+// },"json");
+//
+// $.post("dict-to-map", {group: "num_status"},function(data){
+//     numStatus = data;
+// },"json");
+//
+// $.post("dict-to-map", {group: "num_tags"},function(data){
+//     tags = data;
+// },"json");
 
-$.post("dict-to-map", {group: "num_tags"},function(data){
-    tags = data;
-},"json");
+$.ajax({
+    type: "post",
+    url: "dict-to-map",
+    data:{group: "with4"},
+    async:false,
+    success: function(data){
+        with4s = data;
+    }
+})
+$.ajax({
+    type: "post",
+    url: "dict-to-map",
+    data:{group: "num_status"},
+    async:false,
+    success: function(data){
+        numStatus = data;
+    }
+})
+$.ajax({
+    type: "post",
+    url: "dict-to-map",
+    data:{group: "num_tags"},
+    async:false,
+    success: function(data){
+        tags = data;
+    }
+})
+
 $(function() {
+
 	/* 初始化入库单列表数据 */
 	dataList = new $.DSTable({
 		"url" : 'number/number-list',

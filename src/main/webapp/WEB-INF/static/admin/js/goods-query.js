@@ -64,7 +64,7 @@ $(function() {
                                         var repoGoodsSelect = '<select class="chosen-select" onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
                                         repoGoodsSelect += "<option value=-1>请选择...</option>";
                                         for(var i=0; i<repoGoods.length; i++){
-                                            repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'</option>';
+                                            repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'['+repoGoods[i]["active_quantity"]+']</option>';
                                         }
                                         repoGoodsSelect += '</select>';
                                         titleStrObj.skuRepoGoods.type=repoGoodsSelect;
@@ -332,14 +332,12 @@ $(function() {
             success : function(data) {
                 dataList.load();
                 $('#goodsInfo').modal('hide');
-                // $("#btn").removeAttr("disabled");
                 alert(data.data);
             }
         };
         //提交前把需要传到后台的disabled去掉
         $("[disabledNeedSubmit]").prop("disabled", false);
         // 将options传给ajaxForm
-        // $("#btn").attr({ disabled: "disabled" });
         $('#goodsInfo form').ajaxSubmit(options);
         //提交结束之后还原disabled
         $("[disabledNeedSubmit]").prop("disabled", true);
