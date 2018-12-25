@@ -16,7 +16,7 @@ $.extend(true, jQuery.ajaxSettings, {
         var param =  option.data;
         if(typeof(param) == 'string') param = getRequest(option.data);
         var key = option.url;
-        if(param && param.noRepeat == 1 && ajaxLock[key] && ajaxLock[key] == 1){
+        if(param && (param.noRepeat == 1 || param.mask) && ajaxLock[key] && ajaxLock[key] == 1){
             return false;
         }
         ajaxLock[key] = 1;
