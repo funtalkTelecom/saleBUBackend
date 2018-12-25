@@ -30,10 +30,10 @@
     <update id="batchUpdate">
 
         update tb_iccid i, (
-        select i.id, it.order_id
+        select i.id, it.item_id
         from tb_iccid_temp it join tb_iccid i on it.iccid = i.iccid and i.stock_status = 1 and i.deal_status = 1
         where it.order_id = #{orderId} ) t
-        set i.stock_status = 2, i.out_stock_date = NOW(), i.consumer_id = #{consumer}, i.order_id = t.order_id where i.id = t.id
+        set i.stock_status = 2, i.out_stock_date = NOW(), i.consumer_id = #{consumer}, i.order_id = t.item_id where i.id = t.id
 
     </update>
     <delete id="deleteTempByBatchNum">
