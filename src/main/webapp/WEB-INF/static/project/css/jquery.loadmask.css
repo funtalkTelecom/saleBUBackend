@@ -1,5 +1,5 @@
 .loadmask {
-    z-index: 100;
+    z-index: 1100;
     position: absolute;
     top:0;
     left:0;
@@ -13,7 +13,8 @@
 }
 .loadmask-msg {
     z-index: 20001;
-    position: absolute;
+    /*position: absolute;*/
+    position: fixed;
     top: 0;
     left: 0;
     border:1px solid #6593cf;
@@ -28,6 +29,7 @@
     color:#222;
     font:normal 11px tahoma, arial, helvetica, sans-serif;
     cursor:wait;
+    background-size:16px;
 }
 .masked {
     overflow: hidden !important;

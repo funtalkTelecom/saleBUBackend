@@ -3,7 +3,7 @@ function getRequest(str) {
     var theRequest = new Object();
     var strs = str.split("&");
     for(var i = 0; i < strs.length; i ++) {
-        theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+        theRequest[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
     }
     return theRequest;
 }
@@ -13,20 +13,33 @@ $.extend(true, jQuery.ajaxSettings, {
         isAjax : true// 将连接请求标上ajax方式
     },
     beforeRequest : function (option){
-        // var param =  option.data;
-        // if(typeof(param) == 'string') param = getRequest(option.data);
-        // var key = option.url;
-        // if(param && param.noRepeat == 1 && ajaxLock[key] && ajaxLock[key] == 1){
-        //     return false;
-        // }
-        // ajaxLock[key] = 1;
-        // if(param &&　param.mask) $("body").mask(param.mask);
+        var param =  option.data;
+        if(typeof(param) == 'string') param = getRequest(option.data);
+        var key = option.url;
+        if(param && param.noRepeat == 1 && ajaxLock[key] && ajaxLock[key] == 1){
+            return false;
+        }
+        ajaxLock[key] = 1;
+        if(param &&　param.mask) {
+            if(param.maskId){
+                $("#"+param.maskId).mask(param.mask);
+            }else {
+                $("body").mask(param.mask);
+            }
+        }
         return true;
     },
-    beforeLoad : function(jqXHR, callbackContext, options){
-        // $("body").unmask();
-        // var key = options.url;
-        // ajaxLock[key] = 0;
+    beforeLoad : function(jqXHR, callbackContext, option){
+        var param =  option.data;
+        if(typeof(param) == 'string') param = getRequest(option.data);
+        if(param && param.mask) {
+            if(param.maskId){
+                $("#"+param.maskId).unmask();
+            }else {
+                $("body").unmask();
+            }
+        }
+        ajaxLock[option.url] = 0;
         var text = jqXHR.responseText;
         if(!text)return;
         var json;
@@ -36,7 +49,7 @@ $.extend(true, jQuery.ajaxSettings, {
             return;
         }
         var code = json.code;
-        if(!(options && options.data && options.data.isTable)) {
+        if(!(option && option.data && option.data.isTable)) {
             if(code == 400 || code == 500){
                 alert(json.data);
                 return false;

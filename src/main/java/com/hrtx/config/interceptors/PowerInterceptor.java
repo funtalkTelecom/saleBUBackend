@@ -7,6 +7,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.hrtx.dto.Result;
+import com.hrtx.global.SystemParam;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +31,17 @@ public class PowerInterceptor implements HandlerInterceptor {
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler)throws Exception {
     	request.setAttribute("_t_start_time",System.currentTimeMillis());
+		String path=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
+		boolean _bool=Utils.isAjax(request);
+		if(!this.isOpenStressTest(handler)) {
+			if(_bool)Utils.returnResult(new Result(Result.ERROR,"未开启压力测试"));
+			else {
+				response.sendRedirect(path+"error-page?errormsg=未开启压力测试");
+			}
+			return false;
+		}
     	boolean _need_login=hasNologin(handler);
 		if(_need_login) return true;//有非登陆注解      直接通过
-		boolean _bool=Utils.isAjax(request);
-		String path=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
 		String redirect = request.getRequestURL() + (request.getQueryString() == null ? "" : "?" + request.getQueryString());
 		redirect = URLEncoder.encode(redirect, "utf-8");
 		String no_login="{code:'401',msg:'登录超时或未登录，请登录！'}";
@@ -55,7 +64,17 @@ public class PowerInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,ModelAndView modelAndView) throws Exception {
+	private boolean isOpenStressTest(Object handler) {
+		if(handler == null)return true;
+		if(!(handler instanceof HandlerMethod))return true;
+		HandlerMethod m=(HandlerMethod) handler;
+		String name = m.getBean().getClass().getName();
+		if(!"com.hrtx.web.controller.StressTestController".equals(name)) return true;
+		if("true".equals(SystemParam.get("is_stress_test"))) return true;
+		return false;
+	}
+
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,ModelAndView modelAndView) throws Exception {
     	Long _t_start_time=(Long) request.getAttribute("_t_start_time");
 		log.info(String.format("请求[%s]耗时[%s]ms",request.getRequestURI(),(System.currentTimeMillis()-_t_start_time)));
     }

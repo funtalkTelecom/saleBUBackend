@@ -109,6 +109,13 @@ public class CommonController extends BaseReturn{
         return list;
     }
 
+    @RequestMapping("/error-page")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public String pageModel(HttpServletRequest request) {
+        request.setAttribute("errormsg", request.getParameter("errormsg"));
+        return "admin/error-page";
+    }
+
 	@RequestMapping("/{str}")
     @Powers({PowerConsts.NOLOGINPOWER})
     public String pageModel(@PathVariable String str, HttpServletRequest request) {

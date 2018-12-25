@@ -83,6 +83,13 @@ public class LiangHaoController extends BaseReturn{
     @Powers({PowerConsts.LIANGHAOMOUDULE_COMMON_ADD})
     public Result addOrder(HttpServletRequest request){
         //第三方订单号、手机号码、套餐名称、BOSS开户工号、客户名称、客户证件类型、客户证件编码、邮寄联系人、邮寄联系电话、邮寄地址
+//        log.info("进入方法");
+//        try {
+//            Thread.sleep(1000*3);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        if(true)return new Result(Result.ERROR, "test");
         Result result = this.vaildAddOrder(request);
         if(result.getCode() != Result.OK) return  result;
         String id = request.getParameter("id");

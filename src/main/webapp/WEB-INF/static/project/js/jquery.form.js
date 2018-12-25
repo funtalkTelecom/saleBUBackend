@@ -272,10 +272,11 @@
 
         // XMLHttpRequest Level 2 file uploads (big hat tip to francois2metz)
         function fileUploadXhr(a) {
+            var praramData = {};
             var formdata = new FormData();
-
             for (var i=0; i < a.length; i++) {
                 formdata.append(a[i].name, a[i].value);
+                praramData[a[i].name] = a[i].value;
             }
 
             if (options.extraData) {
@@ -313,7 +314,8 @@
                 };
             }
 
-            s.data = null;
+            // s.data = null;  zyq update 20181225
+            s.data = praramData;
             var beforeSend = s.beforeSend;
             s.beforeSend = function(xhr, o) {
                 //Send FormData() provided by user

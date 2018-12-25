@@ -91,6 +91,8 @@
                         </h4>
                     </div>
                     <form role="form" class="form-inline" enctype="multipart/form-data">
+						<input name="maskId" type="hidden" value="batch-add">
+						<input type="hidden" name="mask" value="导入中...">
                         <div class="modal-body">
                             <div class="form-group">
                                 <label class="sr-only">文件输入</label>

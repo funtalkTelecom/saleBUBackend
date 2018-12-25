@@ -81,17 +81,14 @@
 			//获取选中的隔层结点的集合
 			var selected = $("#tree").getCheckedNodes();
 			$("#tree").attr("hasChange",false);//将是否改变设为未改变
-			$("#sendTip").show();
-//			$(this).attr("disabled",true);
 			var param = {
-				"isMask" : "isMask",
+				"mask" : "提交中",
 				"roleId" : $("#roleId").val(),
 				"property" : $("#property").val(),
-				"permissionIds" : selected.join(",")
+				"permissionIds" : selected.join(","),
+
 			};
 			$.post("update-permission",param,function(data){
-				$("#submit").attr("disabled",false);
-				$("#sendTip").hide();
 				alert("授权成功");
 			});
 	});
@@ -106,11 +103,10 @@
 			alert("请输入角色名");
 			return;
 		}
-		$(this).attr("disabled",true);
 		$.ajax({
 			url : "add-role",
 			data : {
-				"t" : new Date().getTime(),
+                "mask" : "提交中",
 				"name":$.trim($("#name").val())
 			},
 			dataType : "json",

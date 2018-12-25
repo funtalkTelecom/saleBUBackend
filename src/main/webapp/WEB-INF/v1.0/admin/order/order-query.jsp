@@ -327,6 +327,8 @@
 					</div>
 					<form role="form" class="form-horizontal">
 						<input type="hidden" name="temp">
+						<input name="maskId" type="hidden" value="check-modal">
+						<input type="hidden" name="mask" value="提交中...">
 						<div class="modal-body">
 							<div class="form-group">
 								<label  class="col-xs-2 control-label">操作<i style="color:red">*</i></label>
