@@ -88,7 +88,12 @@
     <select id="queryNumCountByskuid" resultType="java.util.HashMap">
         select count(*) count from tb_num m
         where m.sku_id=#{skuid}
-        and m.`status`=#{status}
+
+        and m.`status` in (
+        <foreach collection="status.split(',')" item="statuss" separator=",">
+            #{statuss}
+        </foreach>
+        )
     </select>
 
     <select id="findNumFreezeList" resultType="java.util.HashMap">

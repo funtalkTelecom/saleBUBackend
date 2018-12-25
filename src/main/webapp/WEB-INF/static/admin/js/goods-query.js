@@ -64,7 +64,7 @@ $(function() {
                                         var repoGoodsSelect = '<select class="chosen-select" onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
                                         repoGoodsSelect += "<option value=-1>请选择...</option>";
                                         for(var i=0; i<repoGoods.length; i++){
-                                            repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'</option>';
+                                            repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'['+repoGoods[i]["active_quantity"]+']</option>';
                                         }
                                         repoGoodsSelect += '</select>';
                                         titleStrObj.skuRepoGoods.type=repoGoodsSelect;
@@ -945,7 +945,7 @@ function getRepoGodds(){
                 var repoGoodsSelect = '<select class="chosen-select" onchange="skuRepoGoodsChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue">';
                 repoGoodsSelect += "<option value=-1>请选择...</option>";
                 for(var i=0; i<repoGoods.length; i++){
-                    repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'</option>';
+                    repoGoodsSelect += '<option value="'+repoGoods[i]["companystock_id"]+'" acqu="'+repoGoods[i]["active_quantity"]+'">'+repoGoods[i]["commodity_name"]+'['+repoGoods[i]["active_quantity"]+']</option>';
                 }
                 repoGoodsSelect += '</select>';
                 titleStrObj.skuRepoGoods.type=repoGoodsSelect;
