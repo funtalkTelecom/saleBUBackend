@@ -85,8 +85,8 @@ public class GoodsService {
         String skuPropertyJsonStr = request.getParameter("skuJson") == null ? "" : request.getParameter("skuJson");
         //验证参数
         Result resd = this.verify(sku,skuPropertyJsonStr);
-        if(resd.getCode()==500){
-            return new Result(Result.ERROR, resd.getData());
+        if(resd.getCode()==888){
+            return new Result(Result.OTHER, resd.getData());
         }
         if (goods.getgId() != null && goods.getgId() > 0) { //修改
 //            goodsMapper.goodsEdit(goods);
@@ -308,7 +308,7 @@ public class GoodsService {
                         ||((JSONObject) obj.get("skuTobPrice")).get("value").equals("")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value");
                 if("".equals(price)) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return new Result(Result.ERROR, "第"+(i+1)+"行2B价格为空");
+                    return new Result(Result.OTHER, "第"+(i+1)+"行2B价格为空");
                 }else{
                     String pattern = "[1-9]\\d*.?\\d*|0.\\d*[1-9]\\d*";
                     Pattern r = Pattern.compile(pattern);
@@ -318,12 +318,12 @@ public class GoodsService {
                 String Num = ((JSONObject) obj.get("skuNum")).get("value")==null||((JSONObject) obj.get("skuNum")).get("value").equals("null")?"": ((JSONObject) obj.get("skuNum")).get("value").toString();
                 if("".equals(Num)) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return new Result(Result.ERROR, "第" + (i + 1) + "行数量为空");
+                    return new Result(Result.OTHER, "第" + (i + 1) + "行数量为空");
                 }else{
                     String pattern = "[1-9]\\d*";
                     Pattern r = Pattern.compile(pattern);
                     Matcher m = r.matcher(Num);
-                    if(!m.matches()) return new Result(Result.ERROR, "第" + (i + 1) + "行数量格式错误,请输入正整数");
+                    if(!m.matches()) return new Result(Result.OTHER, "第" + (i + 1) + "行数量格式错误,请输入正整数");
                 }
                 sku.setSkuId(skuMapper.getId());
                 String skuSaleNum = ((JSONObject) obj.get("skuSaleNum")).get("value")==null||((JSONObject) obj.get("skuSaleNum")).get("value").equals("null")?"": (String) ((JSONObject) obj.get("skuSaleNum")).get("value");
@@ -331,11 +331,11 @@ public class GoodsService {
                 //白卡不验证号码
                 if(!"1".equals(skuGoodsType)) {
                     String repeatNum = getRepeatNum(skuSaleNum);
-                    if(repeatNum!=null && repeatNum.length()>0) return new Result(Result.ERROR, "以下号码重复\n"+repeatNum);
+                    if(repeatNum!=null && repeatNum.length()>0) return new Result(Result.OTHER, "以下号码重复\n"+repeatNum);
                     String[] nums = skuSaleNum.split("\n");
                     for (String a :nums){
                         if(set.contains(a)){
-                            return new Result(Result.ERROR, "该上架商品存在重复号码\n"+a);
+                            return new Result(Result.OTHER, "该上架商品存在重复号码\n"+a);
                         }
                         set.add(a);
                     }
@@ -350,11 +350,11 @@ public class GoodsService {
                     //有错误号码
                     if (skuSaleNum.split("★").length > 1) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return new Result(Result.ERROR, "第" + (i + 1) + "行,以下号码不可以上架,请重新确认\n" + skuSaleNum.split("★")[1]);
+                        return new Result(Result.OTHER, "第" + (i + 1) + "行,以下号码不可以上架,请重新确认\n" + skuSaleNum.split("★")[1]);
                     }
                     if (sku.getSkuNum() != okCount) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return new Result(Result.ERROR, "第" + (i + 1) + "行,填写数量和允许上架号码量(" + okCount + ")不一致");
+                        return new Result(Result.OTHER, "第" + (i + 1) + "行,填写数量和允许上架号码量(" + okCount + ")不一致");
                     }
                 }
             }
