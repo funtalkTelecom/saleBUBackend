@@ -47,11 +47,6 @@ public class NumPriceController extends BaseReturn{
         request.setAttribute("channel",  Constants.contantsToList("CHANNEL_ID"));
         return new ModelAndView("admin/numprice/numprice-query");
     }
-    @RequestMapping("/batch-set-price")
-    @Powers({PowerConsts.NUMPRICEMOUDULE_COMMON_QUEYR})
-    public ModelAndView batchSetPrice( HttpServletRequest request){
-        return new ModelAndView("admin/numprice/batch-set-price");
-    }
 
     @RequestMapping("/numprice-list")
     @Powers({PowerConsts.NUMPRICEMOUDULE_COMMON_QUEYR})

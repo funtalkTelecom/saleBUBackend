@@ -99,6 +99,7 @@ public class NumPriceService {
         Set<String> set = new HashSet<String>();//已经有代理商价格
         String[] nums = numPrice.getResource().split("\n");
         for (String a :nums){//去重
+            a=a.trim();
             if(!distinct.contains(a)){
                 distinct.add(a);
             }
