@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public interface NumPriceMapper extends BaseMapper<NumPrice>,Mapper<NumPrice> {
@@ -21,6 +22,12 @@ public interface NumPriceMapper extends BaseMapper<NumPrice>,Mapper<NumPrice> {
     void updateFeature(@Param("feature") String feature);
 
     Map queryAgentNumprice(@Param("param") NumPrice numPrice);
+
+    Integer checkNumpriceCount(@Param("param") NumPrice numPrice,@Param("resource")String resource );
+
+    void batchUpdataIsDel(@Param("batch") Set batch, @Param("param") NumPrice numPrice);
+
+    void insertBatchbyAgentId(@Param("batch") Set batch, @Param("param") NumPrice numPrice);
 
     int freezeNum(@Param("param")Num num1);
 }

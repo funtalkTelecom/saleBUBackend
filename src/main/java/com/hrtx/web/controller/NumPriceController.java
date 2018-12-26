@@ -16,6 +16,7 @@ import com.hrtx.web.service.DictService;
 import com.hrtx.web.service.NumPriceService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,11 @@ public class NumPriceController extends BaseReturn{
         request.setAttribute("channel",  Constants.contantsToList("CHANNEL_ID"));
         return new ModelAndView("admin/numprice/numprice-query");
     }
+    @RequestMapping("/batch-set-price")
+    @Powers({PowerConsts.NUMPRICEMOUDULE_COMMON_QUEYR})
+    public ModelAndView batchSetPrice( HttpServletRequest request){
+        return new ModelAndView("admin/numprice/batch-set-price");
+    }
 
     @RequestMapping("/numprice-list")
     @Powers({PowerConsts.NUMPRICEMOUDULE_COMMON_QUEYR})
@@ -61,10 +67,20 @@ public class NumPriceController extends BaseReturn{
         return numPriceService.queryAgentNumprice(numPrice,commpayName);
     }
 
+
     @RequestMapping("/save-agent-numprice")
     @Powers({PowerConsts.NUMPRICEMOUDULE_COMMON_EDIT})
     public Result saveAgentNumprice(NumPrice numPrice,String commpayName){
         return numPriceService.saveAgentNumprice(numPrice,commpayName);
+    }
+
+    @RequestMapping("/save-agent-numprices")
+    @Powers({PowerConsts.NUMPRICEMOUDULE_COMMON_EDIT})
+    public Result saveAgentNumprices(NumPrice numPrice,String commpayName){
+        if(StringUtils.isBlank(numPrice.getPrice().toString())) return new Result(Result.ERROR, "请输入价格");
+        if(StringUtils.isBlank(commpayName)) return new Result(Result.ERROR, "请输入代理商");
+        if(StringUtils.isBlank(numPrice.getResource())) return new Result(Result.ERROR, "请输入号码");
+        return numPriceService.saveAgentNumprices(numPrice,commpayName);
     }
 
     @RequestMapping("/numprice-export")

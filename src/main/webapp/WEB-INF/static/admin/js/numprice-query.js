@@ -84,6 +84,26 @@ $(function() {
 //         minLength:2
 //     });
 // });
+$(document).on("focus","#commpayNameB",function(){
+    $(this).autocomplete({
+        source:function(query, process){
+            $.post("agent/query-agent-by-CName",{commpayName:query.term,t:new Date().getTime()},function (result) {
+            	if(result.code==200){
+                    return process(result.data);
+				}
+            });
+        },
+        select: function(e, ui) {
+            $("#agentIdB").val(ui.item.id);
+            $("#agentCommpayNameB").val(ui.item.value);
+        },
+        disabled:false,
+        autoFocus:true,
+        delay:500,
+        isSelect:true,
+        minLength:2
+    });
+});
 $(document).on("focus","#commpayNameT",function(){
     $(this).autocomplete({
         source:function(query, process){
@@ -254,6 +274,47 @@ $(document).on("click","#goBtn",function() {
     $.post("numprice/save-agent-numprice",{resource:resource,agentId:agentIdT,commpayName:commpayNameT,price:price},function(data){
         dataList.reload();
         $('#myModal').modal('hide');
+    },"json");
+});
+$(document).on("click","#saleNumInfo .modal-footer .btn-success",function() {
+    var commpayNameT = $("#commpayNameB").val();
+    var agentIdT = $("#agentIdB").val();
+    if(!commpayNameT){
+        alert("请输入代理商");
+        return ;
+    }
+    if(!agentIdT){
+        alert("请选择代理商");
+        return ;
+    }
+    var price = $("#priceB").val();
+    var re = /^\d+(?=\.{0,1}\d+$|$)/
+    if(!price){
+        alert("请填写价格");
+        return;
+    }
+    if(!re.test(price)){
+        alert('请输入正确的价格');
+        return false
+    }
+    var agentCommpayName = $("#agentCommpayNameB").val();
+    if(agentCommpayName!=commpayNameT){
+        return ;
+    }
+    var resource = $("#saleNum").val();
+    if(!resource){
+        alert('请输入号码');
+        return false
+    }
+    $.post("numprice/save-agent-numprices",{resource:resource,agentId:agentIdT,commpayName:commpayNameT,price:price},
+        function(data){
+            dataList.reload();
+            $('#saleNumInfo').modal('hide');
+             if(data.code==888){
+                $('#failnumMod').modal('show');
+                $("#failnum").val(data.data)
+            }
+            alert("成功");
     },"json");
 });
 

@@ -74,6 +74,7 @@
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus " id="export">导出</button>
                                         <c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMPRICEMOUDULE_COMMON_EDIT)%>">
                                             <button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#myModal">设置代理商价格</button>
+                                            <button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#saleNumInfo">批量设置价格</button>
                                         </c:if>
 									</form><!-- /form-panel -->
 								</div>
@@ -140,6 +141,73 @@
                                 <button type="button" class="btn btn-primary" id="goBtn">
                                     提交更改
                                 </button>
+                            </div>
+                        </form>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+
+			<div class="modal fade" id="saleNumInfo" tabindex="-1" style="overflow: auto" >
+				<div class="modal-dialog" style="width:300px;">
+					<div class="modal-content" style="width: 300px; max-height:720px; overflow: auto">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+							<h4 class="modal-title">
+								需要设置号码价格列表
+							</h4>
+						</div>
+						<form role="form" class="form-horizontal">
+							<div class="modal-body">
+								<div class="form-group" style="">
+									<label class="control-label col-xs-3">代理商</label>
+									<input type="text" class=" col-xs-8"  id="commpayNameB" placeholder="请输入代理商">
+									<input type="hidden" class="form-control"  name="agentId" id="agentIdB">
+									<input type="hidden" class="form-control"  id="agentCommpayNameB">
+								</div>
+								<div class="form-group" style="">
+									<label class="control-label col-xs-3">价格</label>
+									<input type="text" class="col-xs-8"   id="priceB" placeholder="请输入价格">
+								</div>
+								<div class="form-group">
+									<div class="col-xs-12">
+										<label class="control-label col-xs-3">号码</label>
+										<textarea id="saleNum" class="form-control" style="height:400px;resize: none;" placeholder="请输入号码"></textarea>
+										<span style="color:red">注:输入多个号码时，请使用换行隔开</span>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-success">确定</button>
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+							</div>
+						</form>
+					</div><!-- /.modal-content -->
+				</div><!-- /.modal -->
+			</div>
+
+            <div class="modal fade" id="failnumMod" tabindex="-1" style="overflow: auto" >
+                <div class="modal-dialog" style="width:300px;">
+                    <div class="modal-content" style="width: 300px; max-height:720px; overflow: auto">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title">
+                                无法设置号码价格列表
+                            </h4>
+                        </div>
+                        <form role="form" class="form-horizontal">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <div class="col-xs-12">
+                                        <textarea id="failnum" class="form-control" style="height:500px;resize: none;"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                             </div>
                         </form>
                     </div><!-- /.modal-content -->

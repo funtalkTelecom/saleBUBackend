@@ -15,7 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class NumPriceService {
@@ -74,6 +78,59 @@ public class NumPriceService {
         numPrice2.setId(null);
         numPriceMapper.insert(numPrice2);
         return new Result(Result.OK,"成功");
+    }
+
+    public Result saveAgentNumprices(NumPrice numPrice,String commpayName) {
+        String pattern = "[1-9]\\d*.?\\d*|0.\\d*[1-9]\\d*";
+        Pattern r = Pattern.compile(pattern);
+        String s = numPrice.getPrice().toString();
+        Matcher m = r.matcher(numPrice.getPrice().toString());
+        if(!m.matches()) return new Result(Result.ERROR, "请输入两位正小数");
+        Agent agent1 = new Agent();
+        agent1.setId(numPrice.getAgentId());
+        agent1.setCommpayName(commpayName);
+        agent1.setStatus(2);
+        agent1.setIsDel(0);
+        Agent agent = agentMapper.selectOne(agent1);
+        if(null==agent) return new Result(Result.ERROR, "代理商不存在");
+        numPrice.setChannel(agent.getChannelId());
+        Set<String> distinct  = new HashSet<String>(); //去重
+        Set<String> noPrice = new HashSet<String>();//不能设置价格
+        Set<String> set = new HashSet<String>();//已经有代理商价格
+        String[] nums = numPrice.getResource().split("\n");
+        for (String a :nums){//去重
+            if(!distinct.contains(a)){
+                distinct.add(a);
+            }
+        }
+        for(String b:distinct){
+            Integer integer = numPriceMapper.checkNumpriceCount(numPrice, b);
+            if (integer==0){
+                noPrice.add(b);
+            }if(integer==2){
+                set.add(b);
+            }
+        }
+        if(noPrice.size()>0){
+            for(String c:noPrice){
+                if (distinct.contains(c)){
+                    distinct.remove(c);
+                }
+            }
+        }
+        if(distinct.size()==0) return new Result(Result.ERROR, "无可更新价格的号码");
+        if(set.size()>0){// 已经有代理商价格的更新isdel为1
+            numPriceMapper.batchUpdataIsDel(set,numPrice);
+        }
+        numPriceMapper.insertBatchbyAgentId(distinct,numPrice);//所有符合条件的都新增一条数据
+        if(noPrice.size()>0){
+            String[] devOnlyIds = new String[noPrice.size()];
+            //Set-->数组
+            noPrice.toArray(devOnlyIds);
+            String join = StringUtils.join(devOnlyIds, "\n");
+            return new Result(Result.OTHER, join);
+        }
+	     return new Result(Result.OK, "成功");
     }
 
 

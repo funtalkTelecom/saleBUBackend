@@ -114,4 +114,29 @@
       (select np.price,np.resource from  tb_num_price np where np.resource=#{param.resource} and np.agent_id=-1 and np.is_del=0 and np.channel=#{param.channel}) a left join
     (select np.price,np.resource from  tb_num_price np where np.resource=#{param.resource} and np.agent_id=#{param.agentId} and np.is_del=0 and np.channel=#{param.channel}) b on a.resource=b.resource
   </select>
+
+  <select id="checkNumpriceCount" resultType="java.lang.Integer" useCache="false">
+      select count(1) from
+      tb_num_price np
+      where np.resource=#{resource} and np.is_del=0 and np.channel=#{param.channel} and (np.agent_id=-1 or np.agent_id=#{param.agentId})
+  </select>
+
+  <update id="batchUpdataIsDel">
+    update tb_num_price np set np.is_del=1 where np.resource in (
+    <foreach collection="batch" item="item" separator=",">
+      #{item}
+    </foreach>
+    ) and np.channel=#{param.channel} and np.agent_id=#{param.agentId} and np.is_del=0
+  </update>
+
+  <insert id="insertBatchbyAgentId">
+        insert into tb_num_price(
+        sku_id, num_id,province_code,province_name,city_code,city_name,resource, base_price, net_type,feature,low_consume,corp_id,channel,ratio_price,price,agent_id,agent,is_del,add_date)
+        select np.sku_id, np.num_id,np.province_code,np.province_name,np.city_code,np.city_name,np.resource, np.base_price, np.net_type,np.feature,np.low_consume,np.corp_id,#{param.channel},np.ratio_price,#{param.price},#{param.agentId},np.agent,0,SYSDATE()
+        from tb_num_price np where np.agent_id=-1 and np.channel=#{param.channel} and np.resource in(
+        <foreach collection="batch" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+    </insert>
 </mapper>
