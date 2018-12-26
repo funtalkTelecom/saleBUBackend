@@ -195,6 +195,7 @@
 		</div>
 		<script type="text/javascript">
             var p_addTag = <%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>;
+            var p_sl = <%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_SL)%>;
 		</script>
 	</body>
 </html>

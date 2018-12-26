@@ -66,13 +66,6 @@ public class OrderService extends BaseService {
      */
     @NoRepeat
     public Result payDeliverOrder(Integer orderId) {
-        log.info("进入方法");
-        try {
-            Thread.sleep(1000*3);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if(true)return new Result(Result.ERROR, "test");
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 2) return new Result(Result.ERROR, "订单状态异常");
@@ -105,8 +98,19 @@ public class OrderService extends BaseService {
         for (OrderItem orderItem:items) {
             commodities.add(CommonMap.create("item_id",orderItem.getItemId()).put("companystock_id", orderItem.getCompanystockId()).put("quantity", orderItem.getQuantity()).getData());
         }
+
+        StringBuffer phones = new StringBuffer(order.getConment());
+        if("4".equals(goodsType)) {//超靓
+            example = new Example(OrderItem.class);
+            example.createCriteria().andEqualTo("orderId", order.getOrderId()).andEqualTo("isShipment", 0);
+            List<OrderItem> phoneItems = orderItemMapper.selectByExample(example);
+            for (OrderItem orderItem:phoneItems) {
+                phones.append("|"+orderItem.getNum());
+            }
+        }
+
         Map param = CommonMap.create("receiver", order.getPersonName()).put("phone",order.getPersonTel()).put("address",order.getAddress())
-                .put("receiver_company", order.getOrderType() == 4 ? "jd乐语线上" : order.getConsumerName()).put("remark",order.getConment()).put("callback_url",SystemParam.get("domain-full")+"/order/deliver-order-callback")
+                .put("receiver_company", order.getOrderType() == 4 ? "jd乐语线上" : order.getConsumerName()).put("remark",phones.toString()).put("callback_url",SystemParam.get("domain-full")+"/order/deliver-order-callback")
                 .put("commodities", commodities).put("order_id",order.getOrderId()).getData();
         Result result = StorageApiCallUtil.storageApiCall(param, "HK0004");
         if(result.getCode() != Result.OK) return result;

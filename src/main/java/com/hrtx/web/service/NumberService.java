@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.Constants;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.web.mapper.NumRuleMapper;
 import com.hrtx.web.mapper.NumberMapper;
@@ -160,5 +161,21 @@ public class NumberService {
         }
 
         return new Result(Result.OK, "清空标签成功");
+    }
+
+    public Result againSl(Number number) {
+	    number = numberMapper.selectByPrimaryKey(number.getId());
+	    if(number == null || number.getStatus() != Constants.NUM_STATUS_7.getIntKey()) return new Result(Result.ERROR, "号码不存在");
+        number.setStatus(Constants.NUM_STATUS_5.getIntKey());
+        numberMapper.updateByPrimaryKeySelective(number);
+	    return new Result(Result.OK, "提交成功");
+    }
+
+    public Result over(Number number) {
+        number = numberMapper.selectByPrimaryKey(number.getId());
+        if(number == null || number.getStatus() != Constants.NUM_STATUS_7.getIntKey()) return new Result(Result.ERROR, "号码不存在");
+        number.setStatus(Constants.NUM_STATUS_9.getIntKey());
+        numberMapper.updateByPrimaryKeySelective(number);
+        return new Result(Result.OK, "提交成功");
     }
 }

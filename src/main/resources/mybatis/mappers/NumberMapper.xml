@@ -21,7 +21,8 @@
         a.iccid as iccid,
         a.status as status,
         a.sku_id as skuId,
-        a.tele_type as teleType
+        a.tele_type as teleType,
+        a.sl_reason as sl_reason
     </sql>
     <sql id="ex_col_list">
     </sql>
@@ -45,6 +46,7 @@
         <result column="buyer" property="buyer" javaType="java.lang.String"></result>
         <result column="iccid" property="iccid" javaType="java.lang.String"></result>
         <result column="status" property="status" javaType="java.lang.String"></result>
+        <result column="sl_reason" property="sl_reason" javaType="java.lang.String"></result>
         <result column="sku_id" property="skuId" javaType="java.lang.String"></result>
         <result column="tele_type" property="teleType" javaType="java.lang.String"></result>
     </resultMap>

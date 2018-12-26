@@ -44,6 +44,7 @@ public enum Constants {
     NUM_STATUS_6(6, "已受理", "NUM_STATUS"),
     NUM_STATUS_7(7, "受理失败", "NUM_STATUS"),
     NUM_STATUS_8(8, "已失效", "NUM_STATUS"),
+    NUM_STATUS_9(9, "结束", "NUM_STATUS"),
 
     //订单类型
     ORDER_TYPE_1(1, "普通单", "NUM_STATUS"),

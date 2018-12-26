@@ -101,10 +101,10 @@ $(function() {
 				},{
 					"header" : "号段",
 					"dataIndex" : "sectionNo"
-				},{
+				},/*{
 					"header" : "此号码最多的数字",
 					"dataIndex" : "moreDigit"
-				},{
+				},*/{
 					"header" : "供应商",
 					"dataIndex" : "seller"
 				},{
@@ -120,9 +120,42 @@ $(function() {
 						return numStatus[v];
 					}
 				},{
+                    "header" : "受理结果",
+                    "dataIndex" : "sl_reason"
+                },{
 					"header" : "运营商类型",
 					"dataIndex" : "teleType"
-				}],
+				},{
+                    "header" : "操作",
+                    "dataIndex" : "id",
+                    "renderer":function(v,record){
+                        var node = [];
+                        if(p_sl && record.status == 7) {
+                            node.push('<a class="btn btn-success btn-xs sl" href="javascript:void(0);">重受理</a>');
+                            node.push('<a class="btn btn-success btn-xs over" href="javascript:void(0);">结束</a>');
+                        }
+                        $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
+                        //重受理
+                        $operate.find(".sl").click(function () {
+                            if(confirm("确认重新受理?")) {
+                                $.post("number/again-sl", {id: v, noRepeat : 1}, function (data) {
+                                    dataList.reload();
+                                    alert(data.data);
+                                }, "json");
+                            }
+                        });
+                        //结束
+                        $operate.find(".over").click(function () {
+                            if(confirm("确认结束?")) {
+                                $.post("number/over", {id: v, noRepeat : 1}, function (data) {
+                                    dataList.reload();
+                                    alert(data.data);
+                                }, "json");
+                            }
+                        });
+                        return $operate;
+                    }
+                }],
 		"pm" : {
 			"limit" : 15,
 			"start" : 0

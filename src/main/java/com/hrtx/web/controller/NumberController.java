@@ -19,10 +19,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -178,6 +175,18 @@ public class NumberController extends BaseReturn{
 		if("iccid_upload".equals(type)) lyCrmService.uploadLyIccidData();
 		if("num_download".equals(type)) lyCrmService.praseLyPhoneData();
 		return renderHtml("执行完成");
+	}
+
+	@PostMapping("/again-sl")
+	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_SL})
+	public void againSl(Number number){
+		returnResult(numberService.againSl(number));
+	}
+
+	@PostMapping("/over")
+	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_SL})
+	public void over(Number number){
+		returnResult(numberService.over(number));
 	}
 
 }
