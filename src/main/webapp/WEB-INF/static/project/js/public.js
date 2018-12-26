@@ -4,6 +4,12 @@ function trim(txt){
 	if(txt) return txt.replace(/(^\s*)|(\s*$)/g,'');
 	return "";
 }
+function isIE() {
+    if (!!window.ActiveXObject || "ActiveXObject" in window)
+        return true;
+    else
+        return false;
+}
 
 /**
  * form表单赋值（eg：表单修改）
