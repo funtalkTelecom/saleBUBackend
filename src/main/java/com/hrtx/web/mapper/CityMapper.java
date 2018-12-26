@@ -23,4 +23,6 @@ public interface CityMapper extends Mapper<City>,BaseMapper<City>{
     List queryByPidListForZtree(@Param("pid") int pid, @Param("isopen") String isopen);
 
     List<Map> findCityByGrade(@Param("grade") int grade);
+
+    String findBossNum(@Param("cityId") int cityId);
 }

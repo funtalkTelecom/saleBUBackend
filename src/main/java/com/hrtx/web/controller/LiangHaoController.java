@@ -73,10 +73,12 @@ public class LiangHaoController extends BaseReturn{
         Result result = apiMealService.mealListForNum(numPrice.getNumId()+"", request);
         List mealList = new ArrayList();
         if(result.getCode() == Result.OK) mealList = (List) result.getData();
+        String bossNum = numService.findBossNum(numPrice.getCityCode());
         return new ModelAndView("admin/lianghao/lianghao-add-order")
                 .addObject("numPrice", numPrice)
                 .addObject("types", dictService.findDictByGroup("phone_consumer_id_type"))
-                .addObject("mealList", mealList);
+                .addObject("mealList", mealList)
+                .addObject("bossNum", bossNum);
     }
 
     @PostMapping("/add-order")

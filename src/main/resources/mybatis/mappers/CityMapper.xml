@@ -54,4 +54,7 @@
         select c.pid, p.`name` pname, c.id, c.`name` from tb_city c left join tb_city p on c.pid = p.id where c.grade = #{grade}
         order by c.id
     </select>
+    <select id="findBossNum" resultType="java.lang.String">
+        select ifnull(c.boss_num,'') from tb_third_city c where c.third = 'ly' and c.city_id = #{cityId}
+    </select>
 </mapper>

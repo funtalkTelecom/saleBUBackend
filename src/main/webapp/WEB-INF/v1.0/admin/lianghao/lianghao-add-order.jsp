@@ -60,7 +60,7 @@
 										</div>
 										<label class="col-xs-2 control-label">BOSS开户工号</label>
 										<div class="col-xs-4">
-											<input type="text" class="form-control" name="bossNum">
+											<input type="text" class="form-control" name="bossNum" value="${bossNum}">
 										</div>
 									</div>
 									<div class="form-group">
