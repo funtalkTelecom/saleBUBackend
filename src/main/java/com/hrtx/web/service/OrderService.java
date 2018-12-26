@@ -66,6 +66,13 @@ public class OrderService extends BaseService {
      */
     @NoRepeat
     public Result payDeliverOrder(Integer orderId) {
+        log.info("进入方法");
+        try {
+            Thread.sleep(1000*3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if(true)return new Result(Result.ERROR, "test");
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != 2) return new Result(Result.ERROR, "订单状态异常");

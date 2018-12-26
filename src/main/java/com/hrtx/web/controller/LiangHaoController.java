@@ -126,13 +126,13 @@ public class LiangHaoController extends BaseReturn{
     }
 
 
-    String[] title = new String[]{"号码","套餐名称","第三方订单号","BOSS客户工号","客户名称","客户证件类型","客户证件编码","邮寄联系人","邮寄联系电话","邮寄地址","备注"};
+    String[] title = new String[]{"号码","套餐名称","第三方订单号","客户名称","客户证件类型","客户证件编码","邮寄联系人","邮寄联系电话","邮寄地址","备注"};
     @RequestMapping("/download-batch-add-template")
     @Powers( {PowerConsts.LIANGHAOMOUDULE_COMMON_ADD })
     public void downloadBatchAddTemplate() throws Exception {
         List list = new ArrayList();
         list.add(title);
-        Object[] temp = new Object[]{"17700000000","xxxxx","xxxxx","xxxxxx","xxxxx","xxxxx","xxxxx","xxxxx","xxxxx"};
+        Object[] temp = new Object[]{"17700000000","xxxxx","xxxxxx","xxxxx","xxxxx","xxxxx","xxxxx","xxxxx"};
         List<Meal> mealList = apiMealService.mealList();
         List mealList_t = new ArrayList();
         List<Map> dicts = dictService.findDictByGroup("phone_consumer_id_type");
@@ -144,7 +144,7 @@ public class LiangHaoController extends BaseReturn{
             mealList_t.add(meal.getMid()+"#"+meal.getMealName());
         }
         temp = ArrayUtils.add(temp,1, mealList_t.toArray());
-        temp = ArrayUtils.add(temp,5, dicts_t.toArray());
+        temp = ArrayUtils.add(temp,4, dicts_t.toArray());
         list.add(temp);
         List<List<?>> list1 = new ArrayList();
         list1.add(list);
@@ -183,15 +183,14 @@ public class LiangHaoController extends BaseReturn{
                 String phone = arr.get(0);
                 String meal = arr.get(1);
                 String thirdOrder = arr.get(2);
-                String bossNum = arr.get(3);
-//                String phoneConsumer = arr.get(4);
-                String phoneConsumerIdType = arr.get(5);
-                String phoneConsumerIdNum = arr.get(6);
-                String personName = arr.get(7);
-                String personTel = arr.get(8);
-                String address = arr.get(9);
-//                String conment = arr.get(10);
-                //"号码","套餐名称","第三方订单号","BOSS客户工号","客户名称","客户证件类型","客户证件编码","邮寄联系人","邮寄联系电话","邮寄地址","备注"
+//                String phoneConsumer = arr.get(3);
+                String phoneConsumerIdType = arr.get(4);
+                String phoneConsumerIdNum = arr.get(5);
+                String personName = arr.get(6);
+                String personTel = arr.get(7);
+                String address = arr.get(8);
+//                String conment = arr.get(9);
+                //"号码","套餐名称","第三方订单号","客户名称","客户证件类型","客户证件编码","邮寄联系人","邮寄联系电话","邮寄地址","备注"
                 if(StringUtils.isBlank(phone) || !phone.matches(RegexConsts.REGEX_MOBILE_COMMON)){
                     arr.add("失败");arr.add("号码格式错误");
                     errors.add(arr.toArray());
@@ -207,11 +206,11 @@ public class LiangHaoController extends BaseReturn{
                     errors.add(arr.toArray());
                     continue;
                 }
-                if(StringUtils.isBlank(bossNum)){
-                    arr.add("失败");arr.add("BOSS客户工号未填写");
-                    errors.add(arr.toArray());
-                    continue;
-                }
+//                if(StringUtils.isBlank(bossNum)){
+//                    arr.add("失败");arr.add("BOSS客户工号未填写");
+//                    errors.add(arr.toArray());
+//                    continue;
+//                }
                 if(StringUtils.isNotBlank(phoneConsumerIdType) && !dicts_t.contains(phoneConsumerIdType)){
                     arr.add("失败");arr.add("客户证件类型未按要求填写");
                     errors.add(arr.toArray());
@@ -244,14 +243,14 @@ public class LiangHaoController extends BaseReturn{
                     String phone = arr.get(0);
                     String meal = arr.get(1);
                     String thirdOrder = arr.get(2);
-                    String bossNum = arr.get(3);
-                    String phoneConsumer = arr.get(4);
-                    String phoneConsumerIdType = arr.get(5);
-                    String phoneConsumerIdNum = arr.get(6);
-                    String personName = arr.get(7);
-                    String personTel = arr.get(8);
-                    String address = arr.get(9);
-                    String conment = arr.get(10);
+//                    String bossNum = arr.get(3);
+                    String phoneConsumer = arr.get(3);
+                    String phoneConsumerIdType = arr.get(4);
+                    String phoneConsumerIdNum = arr.get(5);
+                    String personName = arr.get(6);
+                    String personTel = arr.get(7);
+                    String address = arr.get(8);
+                    String conment = arr.get(9);
                     NumPrice numPrice = new NumPrice();
                     numPrice.setResource(phone);
                     List nps = numService.queryNumPriceList(numPrice);
@@ -261,6 +260,13 @@ public class LiangHaoController extends BaseReturn{
                         continue;
                     }
                     Map np = (Map) nps.get(0);
+                    int cityId = NumberUtils.toInt(String.valueOf(np.get("city_code")));
+                    String bossNum = numService.findBossNum(cityId);
+                    if(StringUtils.isBlank(bossNum)) {
+                        arr.add("失败");arr.add("未找到BOSS客户工号");
+                        errors.add(arr.toArray());
+                        continue;
+                    }
                     Result result1 = apiOrderService.submitCustomOrder(NumberUtils.toInt(String.valueOf(np.get("id"))), NumberUtils.toInt(meal.split("#")[0]),
                             personName, personTel, address, conment, thirdOrder, bossNum, phoneConsumer,phoneConsumerIdType.split("#")[0],phoneConsumerIdNum);
                     if(result1.getCode() == Result.OK || result1.getCode() == Result.OTHER) {

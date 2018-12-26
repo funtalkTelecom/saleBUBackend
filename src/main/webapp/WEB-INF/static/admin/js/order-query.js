@@ -223,14 +223,14 @@ $(function() {
                         });
                         //点击发货
                         $operate.find(".payDeliver").click(function () {
-                            $.post("order/order-payDeliver", {orderId: v}, function (data) {
+                            $.post("order/order-payDeliver", {orderId: v, noRepeat : 1}, function (data) {
                                 dataList.reload();
                                 alert(data.data);
                             }, "json");
                         });
                         //点击绑卡
                         $operate.find(".bindCard").click(function () {
-                            $.post("order/order-bindCard", {orderId: v, status:record.status, skuGoodsType:record.skuGoodsType}, function (data) {
+                            $.post("order/order-bindCard", {orderId: v, status:record.status, skuGoodsType:record.skuGoodsType, noRepeat : 1}, function (data) {
                                 dataList.reload();
                                 alert(data.data);
                             }, "json");
