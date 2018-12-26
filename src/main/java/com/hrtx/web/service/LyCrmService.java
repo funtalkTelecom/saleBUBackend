@@ -417,7 +417,7 @@ public class LyCrmService {
 
     private void matchNum() {
         numMapper.insertAcitveNum();
-//        numMapper.updateLoseNum();
+        numMapper.updateLoseNum();
     }
 
     public void addRuel(Dict dict){
