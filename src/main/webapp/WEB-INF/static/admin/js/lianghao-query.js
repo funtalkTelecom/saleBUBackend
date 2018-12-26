@@ -103,7 +103,7 @@ $(function() {
                 $('#batch-add').modal('hide');
                 alert("数据已提交，详见稍后下载的excel表格");
                 var userAgent =navigator.userAgent ;
-                if (userAgent.indexOf("MSIE") >= 0){
+                if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1){
                     window.open("get-file/batch_add_order/"+data.data);
 				}else {
                     window.location.href="get-file/batch_add_order/"+data.data;
