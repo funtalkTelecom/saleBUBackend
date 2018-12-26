@@ -133,7 +133,7 @@
         insert into tb_num_price(
         sku_id, num_id,province_code,province_name,city_code,city_name,resource, base_price, net_type,feature,low_consume,corp_id,channel,ratio_price,price,agent_id,agent,is_del,add_date)
         select np.sku_id, np.num_id,np.province_code,np.province_name,np.city_code,np.city_name,np.resource, np.base_price, np.net_type,np.feature,np.low_consume,np.corp_id,#{param.channel},np.ratio_price,#{param.price},#{param.agentId},np.agent,0,SYSDATE()
-        from tb_num_price np where np.agent_id=-1 and np.channel=#{param.channel} and np.resource in(
+        from tb_num_price np where np.agent_id=-1 and np.channel=#{param.channel} and np.is_del=0 and np.resource in(
         <foreach collection="batch" item="item" separator=",">
             #{item}
         </foreach>
