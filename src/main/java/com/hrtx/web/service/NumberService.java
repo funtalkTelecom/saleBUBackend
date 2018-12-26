@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
 import com.hrtx.global.Constants;
 import com.hrtx.global.SessionUtil;
+import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.NumRuleMapper;
 import com.hrtx.web.mapper.NumberMapper;
 import com.hrtx.web.mapper.NumberPriceMapper;
@@ -182,11 +183,11 @@ public class NumberService {
     }
 
     public Result beginSale(Number number) {
-	    String[] nums = ObjectUtils.toString(number.getNumResource()).split("\\n");
-	    if(nums.length == 0) return new Result(Result.ERROR,"请输入号码");
+        List<String> nums = Utils.trimToArray(ObjectUtils.toString(number.getNumResource()), "\\n");
+	    if(nums.size() == 0) return new Result(Result.ERROR,"请输入号码");
 	    List<String> errors = new ArrayList<>();
-        for (int i = 0; i < nums.length; i++) {
-            String num = nums[i].trim();
+        for (int i = 0; i < nums.size(); i++) {
+            String num = nums.get(i);
             Example example = new Example(Number.class);
             example.createCriteria().andEqualTo("numResource", num).andEqualTo("status", Constants.NUM_STATUS_10.getIntKey());
             Number number1 = new Number();
@@ -198,11 +199,11 @@ public class NumberService {
     }
 
     public Result stopSale(Number number) {
-        String[] nums = ObjectUtils.toString(number.getNumResource()).split("\\n");
-        if(nums.length == 0) return new Result(Result.ERROR,"请输入号码");
+        List<String> nums = Utils.trimToArray(ObjectUtils.toString(number.getNumResource()), "\\n");
+        if(nums.size() == 0) return new Result(Result.ERROR,"请输入号码");
         List<String> errors = new ArrayList<>();
-        for (int i = 0; i < nums.length; i++) {
-            String num = nums[i].trim();
+        for (int i = 0; i < nums.size(); i++) {
+            String num = nums.get(i);
             Example example = new Example(Number.class);
             example.createCriteria().andEqualTo("numResource", num).andEqualTo("status", Constants.NUM_STATUS_2.getIntKey());
             Number number1 = new Number();
