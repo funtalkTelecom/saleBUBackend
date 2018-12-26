@@ -105,7 +105,7 @@ public class OrderService extends BaseService {
             example.createCriteria().andEqualTo("orderId", order.getOrderId()).andEqualTo("isShipment", 0);
             List<OrderItem> phoneItems = orderItemMapper.selectByExample(example);
             for (OrderItem orderItem:phoneItems) {
-                phones.append("|"+orderItem.getNum());
+                phones.append("#"+orderItem.getNum());
             }
         }
 
