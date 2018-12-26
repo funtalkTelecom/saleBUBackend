@@ -17,8 +17,10 @@
      where b.city_code = c.ly_code  and b.num_resource not in (select n.num_resource from tb_num n where  n.`status` not in (6,8))
   </insert>
   <update id="updateLoseNum">
-  	update tb_num n set n.`status` = 8 where n.id in (
-    select a.id from ( select nun.id from tb_num nun where nun.num_resource not in (select b.num_resource from tb_num_base b ) and nun.`status` in (1,2) ) a )
+        update tb_num n,(
+		select n.id from tb_num n left join tb_num_base b on n.num_resource = b.num_resource where n.`status` in (1,2)
+		and b.id is null ) t set n.`status` = 8 where n.id = t.id
+
   </update>
 
     <update id="updateBoundNum">
