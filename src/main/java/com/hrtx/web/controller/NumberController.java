@@ -189,4 +189,16 @@ public class NumberController extends BaseReturn{
 		returnResult(numberService.over(number));
 	}
 
+	@PostMapping("/begin-sale")
+	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_STOP_SALE})
+	public void beginSale(Number number){
+		returnResult(numberService.beginSale(number));
+	}
+
+	@PostMapping("/stop-sale")
+	@Powers({PowerConsts.NUMBERMOUDULE_COMMON_STOP_SALE})
+	public void stopSale(Number number){
+		returnResult(numberService.stopSale(number));
+	}
+
 }
