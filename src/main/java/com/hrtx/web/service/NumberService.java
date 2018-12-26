@@ -1,5 +1,6 @@
 package com.hrtx.web.service;
 
+import com.github.abel533.entity.Example;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -13,6 +14,7 @@ import com.hrtx.web.mapper.SkuMapper;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,5 +179,37 @@ public class NumberService {
         number.setStatus(Constants.NUM_STATUS_9.getIntKey());
         numberMapper.updateByPrimaryKeySelective(number);
         return new Result(Result.OK, "提交成功");
+    }
+
+    public Result beginSale(Number number) {
+	    String[] nums = ObjectUtils.toString(number.getNumResource()).split("\\n");
+	    if(nums.length == 0) return new Result(Result.ERROR,"请输入号码");
+	    List<String> errors = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            String num = nums[i].trim();
+            Example example = new Example(Number.class);
+            example.createCriteria().andEqualTo("numResource", num).andEqualTo("status", Constants.NUM_STATUS_10.getIntKey());
+            Number number1 = new Number();
+            number1.setStatus(Constants.NUM_STATUS_2.getIntKey());
+            int count = numberMapper.updateByExampleSelective(number1, example);
+            if(count == 0) errors.add(num);
+        }
+        return new Result(Result.OK, errors);
+    }
+
+    public Result stopSale(Number number) {
+        String[] nums = ObjectUtils.toString(number.getNumResource()).split("\\n");
+        if(nums.length == 0) return new Result(Result.ERROR,"请输入号码");
+        List<String> errors = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            String num = nums[i].trim();
+            Example example = new Example(Number.class);
+            example.createCriteria().andEqualTo("numResource", num).andEqualTo("status", Constants.NUM_STATUS_2.getIntKey());
+            Number number1 = new Number();
+            number1.setStatus(Constants.NUM_STATUS_10.getIntKey());
+            int count = numberMapper.updateByExampleSelective(number1, example);
+            if(count == 0) errors.add(num);
+        }
+        return new Result(Result.OK, errors);
     }
 }

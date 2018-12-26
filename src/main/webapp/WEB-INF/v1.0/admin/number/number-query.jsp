@@ -72,6 +72,9 @@
 											<select class="form-control" name="qstatus" id="qstatus">
 											</select>
 										</div>
+										<c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_STOP_SALE)%>">
+											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#stop-sale" >停售</button>
+										</c:if>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>">
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#editTags" >设置标签</button>
 										</c:if>
@@ -193,6 +196,67 @@
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal -->
 		</div>
+
+		<div class="modal fade" id="stop-sale" tabindex="-1" style="overflow: auto" >
+			<div class="modal-dialog" style="width:300px;">
+				<div class="modal-content" style="width: 300px; max-height:720px; overflow: auto">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title">
+							停售号码
+						</h4>
+					</div>
+					<form role="form" class="form-horizontal">
+						<input type="hidden" name="mask" value="提交中...">
+						<input type="hidden" name="maskId" value="stop-sale">
+						<div class="modal-body">
+							<div class="form-group">
+								<div class="col-xs-12">
+									<label class="control-label col-xs-3">号码</label>
+									<textarea name="numResource" class="form-control" style="height:400px;resize: none;" placeholder="请输入号码"></textarea>
+									<span style="color:red">注:输入多个号码时，请使用换行隔开</span>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-danger">停售</button>
+							<button type="button" class="btn btn-success">启售</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+					</form>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
+		<div class="modal fade" id="stop-sale-result" tabindex="-1" style="overflow: auto" >
+			<div class="modal-dialog" style="width:300px;">
+				<div class="modal-content" style="width: 300px; max-height:720px; overflow: auto">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title">
+							以下号码更新失败，不存在或状态不可更新
+						</h4>
+					</div>
+					<form role="form" class="form-horizontal">
+						<div class="modal-body">
+							<div class="form-group">
+								<div class="col-xs-12">
+									<textarea id="failnum" class="form-control" style="height:500px;resize: none;"></textarea>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+					</form>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
 		<script type="text/javascript">
             var p_addTag = <%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>;
             var p_sl = <%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_SL)%>;

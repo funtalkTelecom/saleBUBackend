@@ -239,6 +239,34 @@ $(function() {
         },"json");
 	});
 
+    $(document).on("click","#stop-sale .modal-footer .btn-success",function() {
+        $.post("number/begin-sale",$("#stop-sale form").serialize(),function(data){
+            dataList.reload();
+            data = data.data;
+            if(data.length > 0) {
+                $("#failnum").val(data.join("\n"));
+                $('#stop-sale-result').modal('show');
+            }else {
+                $('#stop-sale').modal('hide');
+                alert("提交成功");
+            }
+
+        },"json");
+    });
+    $(document).on("click","#stop-sale .modal-footer .btn-danger",function() {
+        $.post("number/stop-sale",$("#stop-sale form").serialize(),function(data){
+            dataList.reload();
+            data = data.data;
+            if(data.length > 0) {
+                $("#failnum").val(data.join("\n"));
+                $('#stop-sale-result').modal('show');
+            }else {
+                $('#stop-sale').modal('hide');
+                alert("提交成功");
+            }
+        },"json");
+    });
+
     //点击设置标签,初始化
     $("button[data-target=#editTags]").bind("click", function () {
         $("#numberTags").html("");

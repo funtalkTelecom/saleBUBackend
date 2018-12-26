@@ -53,6 +53,7 @@ public enum PowerConsts {
 	NUMBERMOUDULE_COMMON_QUEYR(70301,"查询",70300,1,"",3,1),//号码查询
 	NUMBERMOUDULE_COMMON_ADDTAG(70302,"号码添加标签",70300,1,"",3,2),//号码添加标签
 	NUMBERMOUDULE_COMMON_SL(70303,"受理",70300,1,"",3,2),//受理操作
+	NUMBERMOUDULE_COMMON_STOP_SALE(70304,"停售",70300,1,"",3,2),//停售操作
 
 	ACCOUNTMOUDULE(70400,"收款账号管理",70000,0,"account/query-account",2,1),
 	ACCOUNTMOUDULE_COMMON_QUEYR(70401,"查询",70400,1,"",3,1),//收款账号管理查询
