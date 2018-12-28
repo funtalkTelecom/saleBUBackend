@@ -598,19 +598,19 @@ public class LyCrmService {
         //多出的供货单
         List<Integer> moreGoodSkus = ListUtils.removeAll(goodSkus, numPriceAgentSkus);
         if(moreGoodSkus.size()>0) {
-            int count = numPriceAgentMapper.insertNumPriceAgent(moreGoodSkus);
+            int count = numPriceMapper.insertNumPriceAgent(moreGoodSkus);
             log.info("插入上架记录数"+count+"耗时"+(System.currentTimeMillis()-a)+"ms");
         }
         //已下架的供货单
         long b = System.currentTimeMillis();
         List<Integer> moreNumPriceAgentSkus = ListUtils.removeAll(numPriceAgentSkus, goodSkus);
         if(moreNumPriceAgentSkus.size()>0) {
-            int count = numPriceAgentMapper.deleteNumPriceAgent(moreNumPriceAgentSkus);
+            int count = numPriceMapper.deleteNumPriceAgent(moreNumPriceAgentSkus);
             log.info("删除下架记录数"+count+"耗时"+(System.currentTimeMillis()-b)+"ms");
         }
         long c = System.currentTimeMillis();
         //删除已完成号码
-        int count = numPriceAgentMapper.deleteCompleteNumPriceAgent();
+        int count = numPriceMapper.deleteCompleteNumPriceAgent();
         log.info("删除已完成记录数"+count+"耗时"+(System.currentTimeMillis()-c)+"ms");
     }
 
@@ -619,7 +619,7 @@ public class LyCrmService {
      */
     public void synchNumPriceAgentStatus() {
         long a = System.currentTimeMillis();
-        int count = numPriceAgentMapper.updateNumPriceAgentStatus();
+        int count = numPriceMapper.updateNumPriceAgentStatus();
         log.info("更新状态记录数"+count+"耗时"+(System.currentTimeMillis()-a)+"ms");
     }
 
@@ -629,11 +629,11 @@ public class LyCrmService {
     public void synchNumPriceAgentPrice() {
         //同步基础价格
         long a = System.currentTimeMillis();
-        int count = numPriceAgentMapper.updateNumPriceAgentBasePrice();
+        int count = numPriceMapper.updateNumPriceAgentBasePrice();
         log.info("更新基础价格记录数"+count+"耗时"+(System.currentTimeMillis()-a)+"ms");
         //同步代理商自定义价格
         long b = System.currentTimeMillis();
-        count = numPriceAgentMapper.updateNumPriceAgentAgentPrice();
+        count = numPriceMapper.updateNumPriceAgentAgentPrice();
         log.info("更新代理商价格记录数"+count+"耗时"+(System.currentTimeMillis()-b)+"ms");
     }
 
@@ -647,6 +647,6 @@ public class LyCrmService {
      * 同步状态
      */
     public void synchNumPriceAgentStatus(int numId) {
-        int count = numPriceAgentMapper.updateNumPriceAgentStatusByNumId(numId);
+        int count = numPriceMapper.updateNumPriceAgentStatusByNumId(numId);
     }
 }

@@ -13,17 +13,4 @@ public interface NumPriceAgentMapper extends Mapper<NumPriceAgent>,BaseMapper<Nu
 
     List<Integer> queryGoodSkus();
 
-    int updateNumPriceAgentStatus();
-
-    int insertNumPriceAgent(@Param("skus") List<Integer> moreGoodSkus);
-
-    int deleteNumPriceAgent(@Param("skus") List<Integer> moreNumPriceAgentSkus);
-
-    int deleteCompleteNumPriceAgent();
-
-    int updateNumPriceAgentBasePrice();
-
-    int updateNumPriceAgentAgentPrice();
-
-    int updateNumPriceAgentStatusByNumId(@Param("numId") int numId);
 }
