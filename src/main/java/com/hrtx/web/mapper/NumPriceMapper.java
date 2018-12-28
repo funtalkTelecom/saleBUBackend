@@ -30,4 +30,18 @@ public interface NumPriceMapper extends BaseMapper<NumPrice>,Mapper<NumPrice> {
     void insertBatchbyAgentId(@Param("batch") Set batch, @Param("param") NumPrice numPrice);
 
     int freezeNum(@Param("param")Num num1);
+
+    int updateNumPriceAgentStatus();
+
+    int insertNumPriceAgent(@Param("skus") List<Integer> moreGoodSkus);
+
+    int deleteNumPriceAgent(@Param("skus") List<Integer> moreNumPriceAgentSkus);
+
+    int deleteCompleteNumPriceAgent();
+
+    int updateNumPriceAgentBasePrice();
+
+    int updateNumPriceAgentAgentPrice();
+
+    int updateNumPriceAgentStatusByNumId(@Param("numId") int numId);
 }
