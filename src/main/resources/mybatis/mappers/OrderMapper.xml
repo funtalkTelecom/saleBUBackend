@@ -148,6 +148,9 @@
         <if test="param.personName!=null and param.personName!=''">
             and a.person_name like "%"#{param.personName}"%"
         </if>
+        <if test="param.thirdOrder!=null and param.thirdOrder!=''">
+            and a.third_order = #{param.thirdOrder}
+        </if>
         <if test="param.num!=null and param.num!=''">
             and m.num =#{param.num}
         </if>

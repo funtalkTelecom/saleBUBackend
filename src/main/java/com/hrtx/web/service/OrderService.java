@@ -602,5 +602,11 @@ public class OrderService extends BaseService {
             }
         }
     }
+
+    public Result orderCancel(String orderId, String reason) {
+        Order order = orderMapper.findOrderInfo(NumberUtils.toInt(orderId));
+        if(order==null) return new Result(Result.ERROR, "该订单不存在");
+        return apiOrderService.CancelOrder(orderId,reason);
+    }
 }
 
