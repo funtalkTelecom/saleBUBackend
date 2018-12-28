@@ -33,6 +33,7 @@ public class NumService {
 	@Autowired private NumPriceMapper numPriceMapper;
 	@Autowired private NumFreezeMapper numFreezeMapper;
 	@Autowired private CityMapper cityMapper;
+    @Autowired private LyCrmService lyCrmService;
 
     /**
      * 绑卡
@@ -128,6 +129,7 @@ public class NumService {
         return numPriceMapper.queryList(numPrice);
     }
 
+    //冻结或解冻
     public Result freezeNum(Num num) {
         int isFreeze = NumberUtils.toInt(String.valueOf(num.getIsFreeze()));
         if((isFreeze !=1 && isFreeze != 0)) return new Result(Result.ERROR, "参数异常");
@@ -153,6 +155,7 @@ public class NumService {
         num1.setIsFreeze(num.getIsFreeze());
         int count = numPriceMapper.freezeNum(num1);  //凍結或解凍
         if(count != 1) return new Result(Result.ERROR, "提交失败");
+        lyCrmService.synchNumPriceAgentStatus();
         return new Result(Result.OK, "提交成功");
     }
 
@@ -196,6 +199,8 @@ public class NumService {
                 numPriceMapper.freezeNum(num);
                 log.info("号码冻结>30分钟系统自动解冻,numId:"+id);
             }
+            lyCrmService.synchNumPriceAgentStatus();
+
         }
     }
 
