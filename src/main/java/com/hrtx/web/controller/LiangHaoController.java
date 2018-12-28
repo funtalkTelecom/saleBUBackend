@@ -254,7 +254,7 @@ public class LiangHaoController extends BaseReturn{
                     NumPrice numPrice = new NumPrice();
                     numPrice.setResource(phone);
                     List nps = numService.queryNumPriceList(numPrice);
-                    if(nps.size() != 1) {
+                    if(nps.size() <= 0) {
                         arr.add("失败");arr.add("未找到号码");
                         errors.add(arr.toArray());
                         continue;
