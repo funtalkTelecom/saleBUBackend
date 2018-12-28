@@ -57,6 +57,7 @@ public class ApiOrderService {
 	@Autowired private NumService numService;
 	@Autowired private AgentService agentService;
 	@Autowired private ApiOrderService apiOrderService;
+	@Autowired private LyCrmService lyCrmService;
 
 	public  List<Map> findOrderListByNumId(Integer numId)
 	{
@@ -518,6 +519,9 @@ public class ApiOrderService {
 			update_num=this.numberMapper.updateNumStatusWithData(Constants.NUM_STATUS_2.getIntKey(),Constants.NUM_STATUS_3.getIntKey(),itemNum.getNumId());
 			if(update_num==0)throw new ServiceException("抱歉，您选择的商品已被订购");//数据错误，回滚当前事务
 			if(update_num>1)throw new ServiceException("数据异常，无法下单");//数据错误，回滚当前事务
+			long _start=System.currentTimeMillis();
+			lyCrmService.synchNumPriceAgentStatus(itemNum.getNumId());
+			log.info(String.format("剔除号码销售耗时[%s]",(System.currentTimeMillis()-_start)));
 		}
 		order.setSubTotal(subTotal);
 		order.setTotal(Order.calculateTotal(order));
