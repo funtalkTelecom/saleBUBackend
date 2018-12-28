@@ -51,6 +51,10 @@
 											<input type="text" class="form-control" style="width:170px;" name="orderId">
 										</div>
 										<div class="form-group">
+											<label class="control-label">第三方订单号</label>
+											<input type="text" class="form-control" style="width:150px;" name="thirdOrder">
+										</div>
+										<div class="form-group">
 											<label class="control-label">收货人</label>
 											<input type="text" class="form-control" style="width:100px;" name="personName">
 										</div>
@@ -312,6 +316,66 @@
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal -->
 		</div>
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="cancelOrder" tabindex="-1" style="overflow: auto" >
+			<div class="modal-dialog">
+				<div class="modal-content" >
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title">
+							取消订单
+						</h4>
+					</div>
+					<form role="form" class="form-horizontal">
+						<div class="modal-body">
+							<div class="form-group">
+								<div class="control-group">
+									<input type="hidden" name="orderId" id="cancelOrderId">
+									<label class="control-label bolder blue" style="display: block;text-align: center;">选择取消订单的原因</label>
+									<div class="radio">
+										<label>
+											<input name="reason" type="radio" class="ace" reason="操作错误(商品、地址选错)" value="1">
+											<span class="lbl"> 1、操作错误(商品、地址选错)</span>
+										</label>
+									</div>
+									<div class="radio">
+										<label>
+											<input name="reason" type="radio" class="ace" reason="其他渠道有更低的价格" value="2">
+											<span class="lbl"> 2、其他渠道有更低的价格</span>
+										</label>
+									</div>
+									<div class="radio">
+										<label>
+											<input name="reason" type="radio" class="ace" reason="暂时不想买了" value="3">
+											<span class="lbl"> 3、暂时不想买了</span>
+										</label>
+									</div>
+									<div class="radio">
+										<label>
+											<input name="reason" type="radio" class="ace" reason="重复下单或者误下单" value="4">
+											<span class="lbl"> 4、重复下单或者误下单</span>
+										</label>
+									</div>
+									<div class="radio">
+										<label>
+											<input name="reason" type="radio" class="ace" reason="其他原因" value="5">
+											<span class="lbl"> 5、其他原因</span>
+										</label>
+									</div>
+									<textarea  id="reason" class="form-control input-xxlarge" style="display: none;width: 500px;height: 100px;margin-left: 40px;" ></textarea>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-success">确定</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+					</form>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
 
 		<!-- 模态框（Modal） -->
 		<div class="modal fade" id="check-modal" tabindex="-1" style="overflow: auto" >
@@ -364,6 +428,7 @@
             var p_refund = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_REFUND)%>;
             var p_refund_live = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_REFUND_LIVE)%>;
             var p_check = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CHECK)%>;
+            var p_cancel = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CANCEL)%>;
 		</script>
 	</body>
 </html>

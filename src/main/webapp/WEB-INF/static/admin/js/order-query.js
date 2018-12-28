@@ -152,6 +152,9 @@ $(function() {
 						if(p_receipt && record.status=="1") {
 							node.push('<a class="btn btn-success btn-xs receipt" href="javascript:void(0);">收款</a>');
                         }
+                        if(p_cancel &&( record.status=="1"||record.status=="2"||record.status=="21"||record.status=="3"&&record.orderType!=3)) {
+							node.push('<a class="btn btn-danger btn-xs cancel" href="javascript:void(0);">取消订单</a>');
+                        }
 						if(p_refund && record.status=="14") {
 							node.push('<a class="btn btn-success btn-xs refund" href="javascript:void(0);">退款</a>');
                         }
@@ -219,7 +222,11 @@ $(function() {
                                     alert(data.data);
                                 }, "json");
                             }
-
+                        });
+                        //取消订单
+                        $operate.find(".cancel").click(function () {
+                            $("#cancelOrderId").val(v);
+                            $('#cancelOrder').modal('show');
                         });
                         //点击发货
                         $operate.find(".payDeliver").click(function () {
@@ -397,5 +404,38 @@ $(function() {
             $('#check-modal').modal('hide');
             dataList.reload();
         },"json");
+    });
+    $(document).on("change","#cancelOrder input[name=reason][type=radio]",function() {
+        var val = $(this).val();
+        if(val==="5"){
+            $("#cancelOrder textarea").show();
+        }else {
+            $("#cancelOrder textarea").hide();
+            $("#reason").val("")
+        }
+    });
+    $(document).on("click","#cancelOrder .modal-footer .btn-success",function() {
+        var val =$("#cancelOrder input:radio:checked").val();
+        if(!val){
+            alert("请选择取消订单的原因");
+            return
+        }
+        var reason=$("#cancelOrder input:radio:checked").attr("reason");
+        if(val==="5"){
+            reason=$("#reason").val();
+            if(!reason) {
+                alert("请输入其他原因");
+                return
+            }
+        }
+        $.post("order/order-cancel",{orderId:$("#cancelOrderId").val(),reason:reason},function(result){
+            if(result.code==200){
+                alert(result.data)
+            }
+            $('#cancelOrder').modal('hide');
+            dataList.reload();
+        },"json");
+
+
     });
 });

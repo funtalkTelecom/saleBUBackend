@@ -92,8 +92,6 @@ public class NumPriceController extends BaseReturn{
             numPrice.setLimit(0);
 //            numPrice.setLimit(Integer.parseInt(request.getParameter("total")));
         }
-
-
         Map<String,String> headMap = new LinkedHashMap<String,String>();
         headMap.put("cityName", "地市名称");
         headMap.put("resource", "号码");

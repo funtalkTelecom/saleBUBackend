@@ -80,6 +80,15 @@ public class OrderController extends BaseReturn{
 	public Result reFundLive(Order order, HttpServletRequest request){
 		return orderService.reFundLive(order,request);
 	}
+	/***
+	 * 后台取消订单
+	 * @return
+	 */
+	@RequestMapping("/order-cancel")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_CANCEL})
+	public Result orderCancel( String orderId,String reason){
+		return orderService.orderCancel(orderId,reason);
+	}
 
 	@RequestMapping("/order-yPayAmt")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
