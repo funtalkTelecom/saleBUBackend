@@ -155,7 +155,7 @@ public class NumService {
         num1.setIsFreeze(num.getIsFreeze());
         int count = numPriceMapper.freezeNum(num1);  //凍結或解凍
         if(count != 1) return new Result(Result.ERROR, "提交失败");
-        lyCrmService.synchNumPriceAgentStatus();
+        lyCrmService.synchNumPriceAgentStatus(num1.getId());
         return new Result(Result.OK, "提交成功");
     }
 
@@ -198,8 +198,9 @@ public class NumService {
                 num.setIsFreeze(0);
                 numPriceMapper.freezeNum(num);
                 log.info("号码冻结>30分钟系统自动解冻,numId:"+id);
+                lyCrmService.synchNumPriceAgentStatus(num.getId());
             }
-            lyCrmService.synchNumPriceAgentStatus();
+
 
         }
     }
