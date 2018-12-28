@@ -36,16 +36,16 @@ public enum Constants {
     ORDER_STATUS_13(13, "退款失败", "ORDER_STATUS"),
     ORDER_STATUS_14(14, "待财务退款", "ORDER_STATUS"),
     //号码状态
-    NUM_STATUS_1(1, "在库", "NUM_STATUS"),
-    NUM_STATUS_2(2, "销售中", "NUM_STATUS"),
+    NUM_STATUS_1(1, "在库", "NUM_STATUS"), //未售出（在华睿库）
+    NUM_STATUS_2(2, "销售中", "NUM_STATUS"),//未售出（在华睿库）
     NUM_STATUS_3(3, "冻结", "NUM_STATUS"),
     NUM_STATUS_4(4, "待配卡", "NUM_STATUS"),
     NUM_STATUS_5(5, "待受理", "NUM_STATUS"),
-    NUM_STATUS_6(6, "已受理", "NUM_STATUS"),
+    NUM_STATUS_6(6, "已受理", "NUM_STATUS"),//彻底结束
     NUM_STATUS_7(7, "受理失败", "NUM_STATUS"),
-    NUM_STATUS_8(8, "已失效", "NUM_STATUS"),
-    NUM_STATUS_9(9, "结束", "NUM_STATUS"),
-    NUM_STATUS_10(10, "停售", "NUM_STATUS"),
+    NUM_STATUS_8(8, "已失效", "NUM_STATUS"),//彻底结束
+    NUM_STATUS_9(9, "结束", "NUM_STATUS"),//彻底结束
+    NUM_STATUS_10(10, "停售", "NUM_STATUS"),//未售出（在华睿库）
 
     //订单类型
     ORDER_TYPE_1(1, "普通单", "NUM_STATUS"),

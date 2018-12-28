@@ -4,11 +4,12 @@ import com.github.abel533.mapper.Mapper;
 import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.Number;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
+@Component
 public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
     void updateStatus(@Param("number") Number number, @Param("isClearSkuid") boolean isClearSkuid);
 

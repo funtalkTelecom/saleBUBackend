@@ -5,6 +5,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
+import com.hrtx.global.Utils;
 import com.hrtx.web.pojo.Account;
 import com.hrtx.web.service.*;
 import org.apache.commons.lang.StringUtils;
@@ -78,7 +79,9 @@ public class TimerController extends BaseReturn{
 			this.lyCrmService.praseLyPhoneData();
 		}else if(StringUtils.equals(task,"ly-upload-num")){//上传iccid资源 每日早上2点执行
 			this.lyCrmService.uploadLyIccidData();
+		}else if(StringUtils.equals(task,"ly-synch-num-price-agent")){//
+			this.lyCrmService.paySynchNumPriceAgentData();
 		}
-		return new Result(Result.OK,"执行成功");
+		return new Result(Result.OK,task+"在"+Utils.getCurrentDate("yyyy-MM-dd HH:mm:ss") +"执行成功");
 	}
 }

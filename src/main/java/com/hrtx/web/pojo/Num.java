@@ -16,7 +16,6 @@ import java.util.Date;
 public class Num extends BasePojo  implements java.io.Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonSerialize(using = ToStringSerializer.class)
     private Integer id;
     private Integer cityId;
     private String cityName;

@@ -8,6 +8,7 @@ import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
 import com.hrtx.webservice.crmsps.CrmSpsServiceLocator;
 import com.hrtx.webservice.crmsps.CrmSpsServicePortType;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -70,6 +71,7 @@ public class LyCrmService {
     @Autowired private IccidMapper iccidMapper;
     @Autowired private NumRuleMapper numRuleMapper;
     @Autowired private NumPriceMapper numPriceMapper;
+    @Autowired private NumPriceAgentMapper numPriceAgentMapper;
 
     /**
      * 获取服务
@@ -587,5 +589,57 @@ public class LyCrmService {
             throw new ServiceException("生成文件目录未配置");
         }
         return upload_path+File.separator;
+    }
+
+    public void synchNumPriceAgentCount() {
+        List<Integer> numPriceAgentSkus = numPriceAgentMapper.queryNumPriceAgentSkus();
+        List<Integer> goodSkus = numPriceAgentMapper.queryGoodSkus();
+        long a = System.currentTimeMillis();
+        //多出的供货单
+        List<Integer> moreGoodSkus = ListUtils.removeAll(goodSkus, numPriceAgentSkus);
+        if(moreGoodSkus.size()>0) {
+            int count = numPriceAgentMapper.insertNumPriceAgent(moreGoodSkus);
+            log.info("插入上架记录数"+count+"耗时"+(System.currentTimeMillis()-a)+"ms");
+        }
+        //已下架的供货单
+        long b = System.currentTimeMillis();
+        List<Integer> moreNumPriceAgentSkus = ListUtils.removeAll(numPriceAgentSkus, goodSkus);
+        if(moreNumPriceAgentSkus.size()>0) {
+            int count = numPriceAgentMapper.deleteNumPriceAgent(moreNumPriceAgentSkus);
+            log.info("删除下架记录数"+count+"耗时"+(System.currentTimeMillis()-b)+"ms");
+        }
+        long c = System.currentTimeMillis();
+        //删除已完成号码
+        int count = numPriceAgentMapper.deleteCompleteNumPriceAgent();
+        log.info("删除已完成记录数"+count+"耗时"+(System.currentTimeMillis()-c)+"ms");
+    }
+
+    /**
+     * 同步状态
+     */
+    public void synchNumPriceAgentStatus() {
+        long a = System.currentTimeMillis();
+        int count = numPriceAgentMapper.updateNumPriceAgentStatus();
+        log.info("更新状态记录数"+count+"耗时"+(System.currentTimeMillis()-a)+"ms");
+    }
+
+    /**
+     * 同步价格
+     */
+    public void synchNumPriceAgentPrice() {
+        //同步基础价格
+        long a = System.currentTimeMillis();
+        int count = numPriceAgentMapper.updateNumPriceAgentBasePrice();
+        log.info("更新基础价格记录数"+count+"耗时"+(System.currentTimeMillis()-a)+"ms");
+        //同步代理商自定义价格
+        long b = System.currentTimeMillis();
+        count = numPriceAgentMapper.updateNumPriceAgentAgentPrice();
+        log.info("更新代理商价格记录数"+count+"耗时"+(System.currentTimeMillis()-b)+"ms");
+    }
+
+    public void paySynchNumPriceAgentData(){
+        this.synchNumPriceAgentCount();
+        this.synchNumPriceAgentStatus();
+        this.synchNumPriceAgentPrice();
     }
 }
