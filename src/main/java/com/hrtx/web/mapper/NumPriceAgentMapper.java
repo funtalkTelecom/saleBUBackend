@@ -24,4 +24,6 @@ public interface NumPriceAgentMapper extends Mapper<NumPriceAgent>,BaseMapper<Nu
     int updateNumPriceAgentBasePrice();
 
     int updateNumPriceAgentAgentPrice();
+
+    int updateNumPriceAgentStatusByNumId(@Param("numId") int numId);
 }

@@ -642,4 +642,11 @@ public class LyCrmService {
         this.synchNumPriceAgentStatus();
         this.synchNumPriceAgentPrice();
     }
+
+    /**
+     * 同步状态
+     */
+    public void synchNumPriceAgentStatus(int numId) {
+        int count = numPriceAgentMapper.updateNumPriceAgentStatusByNumId(numId);
+    }
 }

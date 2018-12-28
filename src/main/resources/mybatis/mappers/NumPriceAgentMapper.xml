@@ -44,6 +44,10 @@
     </update>
     <update id="updateNumPriceAgentAgentPrice">
         update tb_num_price_agent npa , tb_num_price np  set npa.price=np.price,npa.exc_price=1
-        where np.agent_id!=-1 and npa.price!=np.price and np.is_del=0  and npa.num_price_id = np.id
+        where npa.agent_id=np.agent_id and np.agent_id!=-1 and  npa.num_id=np.num_id and npa.price!=np.price and np.is_del=0
+    </update>
+    <update id="updateNumPriceAgentStatusByNumId">
+        update tb_num_price_agent npa join tb_num n on npa.num_id=n.id
+        set npa.status=n.status,npa.is_freeze=n.is_freeze where n.id = #{numId}
     </update>
 </mapper>
