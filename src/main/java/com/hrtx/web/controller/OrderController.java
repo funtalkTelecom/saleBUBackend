@@ -190,10 +190,11 @@ public class OrderController extends BaseReturn{
 			//接收仓库回调，取消订单操作
 			Result result = orderService.OrderCallbackStatus(storageInterfaceRequest);
 			if (result.getCode() == 200) {
-				renderHtml("取消订单成功");
-			} else {
-				renderHtml("取消订单失败");
+				renderHtml("success");
 			}
+//			else {
+//				renderHtml("取消订单失败");
+//			}
 			return null;
 		}catch (ServiceException e) {
 			log.error(e.getMessage(), e);
