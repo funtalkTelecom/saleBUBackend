@@ -163,6 +163,13 @@ public class LiangHaoController extends BaseReturn{
             this.deleteFile("batch_add_order/", sourceServerFileName);
             return new Result(Result.ERROR, "导入文件无数据");
         }
+        ArrayList<String> _title=list.get(0);
+        for(int i=0;i<this.title.length;i++){
+            if(!this.title[i].equals((_title.get(i)==null?"":_title.get(i).trim()))){
+                this.deleteFile("batch_add_order/", sourceServerFileName);//删除文件
+                return new Result(Result.ERROR, "对应字段不匹配，请勿修改模板第一行标题的任何一个文字。");
+            }
+        }
         List errors = new ArrayList();
         Object[] title = ArrayUtils.addAll(this.title, new Object[]{"状态", "描述"});
         errors.add(title);
