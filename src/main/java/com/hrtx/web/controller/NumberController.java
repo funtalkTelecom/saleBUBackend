@@ -170,10 +170,11 @@ public class NumberController extends BaseReturn{
 	public String ftpTest(HttpServletRequest request){
 		if(!SessionUtil.hasPower(PowerConsts.SYSTEMMOUULE_USERLIST_ALL)) return renderHtml("没有权限");
 		String type = request.getParameter("type");
+		int date_offset= NumberUtils.toInt(request.getParameter("date_offset"));
 		if("kk_upload".equals(type)) lyCrmService.createAgentCardFile();
 		if("kk_download".equals(type)) lyCrmService.praseOpenCardFileResult();
 		if("iccid_upload".equals(type)) lyCrmService.uploadLyIccidData();
-		if("num_download".equals(type)) lyCrmService.praseLyPhoneData();
+		if("num_download".equals(type)) lyCrmService.praseLyData(date_offset);
 		return renderHtml("执行完成");
 	}
 

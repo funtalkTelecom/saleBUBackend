@@ -9,6 +9,7 @@ import com.hrtx.global.Utils;
 import com.hrtx.web.pojo.Account;
 import com.hrtx.web.service.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ public class TimerController extends BaseReturn{
 	public Result second(HttpServletRequest request){
 		// /timer/second?task=goods-expire
 		String task=request.getParameter("task");
+		int date_offset= NumberUtils.toInt(request.getParameter("date_offset"));
 		String req_ip=SessionUtil.getUserIp();
 		log.info(String.format("准备执行调用定时器，请求任务[%s],请求IP[%s]，限定ip[%s]",task,req_ip,SystemParam.get("timer_limit_ip")));
 		//INSERT INTO `tb_system`(`id`, `key_id`, `key_value`, `remark`, `is_audit`) VALUES (60, 'timer_limit_ip', '127.0.0.1', '定时器调用ip限定', '1')
@@ -76,7 +78,7 @@ public class TimerController extends BaseReturn{
 		}else if(StringUtils.equals(task,"ly-card-result")){//解析开卡结果  每日早上7点执行
 			this.lyCrmService.praseOpenCardFileResult();
 		}else if(StringUtils.equals(task,"ly-download-num")){//下载号码资源	每日早上7点执行
-			this.lyCrmService.praseLyPhoneData();
+			this.lyCrmService.praseLyData(date_offset);
 		}else if(StringUtils.equals(task,"ly-upload-num")){//上传iccid资源 每日早上2点执行
 			this.lyCrmService.uploadLyIccidData();
 		}else if(StringUtils.equals(task,"ly-synch-num-price-agent")){//

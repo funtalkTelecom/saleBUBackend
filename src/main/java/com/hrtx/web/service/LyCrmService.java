@@ -295,13 +295,13 @@ public class LyCrmService {
      * 下载号码资源
      */
 //    @Scheduled(cron = "0 0 6 * * ?")update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
-    public void praseLyPhoneData() {//String type, int dateOffset
+    public void praseLyData(int date_offset) {//String type, int dateOffset
         if(!"true".equals(SystemParam.get("exe_timer"))) return;
 //        if("ly_corp".equals(type)) this.praseLyCorpData(dateOffset);
 //        if("ly_phone".equals(type))
         log.info("开始执行号码资源下载定时器");
         try {
-            this.praseLyPhoneData(0);
+            this.praseLyPhoneData(date_offset);
         }catch (ServiceException e) {
             log.error(e.getMessage(), e);
             Messager.send(SystemParam.get("system_phone"),"下载乐语号码库数据异常("+e.getMessage()+")");
