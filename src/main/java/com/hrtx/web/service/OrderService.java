@@ -531,6 +531,7 @@ public class OrderService extends BaseService {
                     return new Result(Result.OK, "线下支付,待财务退款");
                 }
             }else {//未支付
+                apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
                 //上架涉及的表，数量，状态
                 apiOrderService.orderType(orderId);
             }

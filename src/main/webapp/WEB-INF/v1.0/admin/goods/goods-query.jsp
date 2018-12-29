@@ -107,6 +107,8 @@
 					</div>
 					<form role="form" class="form-horizontal" enctype="multipart/form-data">
 						<input name="gId" id="gId" type="hidden">
+						<input name="mask"  type="hidden" value="号码上架中....">
+						<input name="maskId"  type="hidden" value="goodsInfo">
 						<input name="gIsSale" id="gIsSale" type="hidden">
 						<div class="modal-body">
 							<div class="form-group">
