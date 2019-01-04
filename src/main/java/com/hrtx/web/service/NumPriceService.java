@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.Agent;
 import com.hrtx.web.pojo.NumPrice;
@@ -34,6 +35,7 @@ public class NumPriceService {
 //            Agent agent = agentMapper.selectByPrimaryKey(numPrice.getAgentId());
 //            numPrice.setChannel(agent.getChannelId());
 //        }
+        numPrice.setCorpId(SessionUtil.getUser().getCorpId());
 		PageHelper.startPage(numPrice.startToPageNum(),numPrice.getLimit());
 		Page<Object> ob=numPriceMapper.queryPageList(numPrice);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);

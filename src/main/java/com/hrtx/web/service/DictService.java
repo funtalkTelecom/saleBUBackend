@@ -108,7 +108,7 @@ public class DictService {
 				dict.setSeq(NumberUtils.toInt(String.valueOf(map.get("seq")))+1);
 				dict.setCorpId(SessionUtil.getUser().getCorpId());
 				dictMapper.insert(dict);
-				lyCrmService.addRuel(dict);
+				lyCrmService.addRule(dict);
 			}else {
 				return new Result(Result.ERROR, "没有权限");
 			}
@@ -120,7 +120,7 @@ public class DictService {
 				dict1.setExt2(dict.getExt2());
 				dictMapper.updateByPrimaryKey(dict1);
 				log.info("号码规则["+dict1.getKeyValue()+"]更改后的不带4价为["+dict.getExt1()+"],带4价为["+dict.getExt2()+"]");
-				numPriceMapper.matchNumPrice();
+				numPriceMapper.matchNumPrice(dict1.getCorpId());
 			}else {
 				return new Result(Result.ERROR, "没有权限");
 			}
