@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hrtx.web.mapper.NumBaseMapper" >
     <insert id="batchInsert">
-        INSERT INTO `tb_num_base`(`city_code`, `city_name`, `net_type`, `num_resource`, `num_type`, `num_level`, `low_consume`, `import_date`, `import_file`)
+        INSERT INTO `tb_num_base`(`city_code`, `city_name`, `net_type`, `num_resource`, `num_type`, `num_level`, `low_consume`, `import_date`, `import_file`, `seller_id`)
         VALUES
         <foreach collection ="list" item="item" separator =",">
             (
-            #{item.cityCode}, #{item.cityName}, #{item.netType}, #{item.numResource}, #{item.numType}, #{item.numLevel}, #{item.lowConsume}, now(), #{item.importFile}
+            #{item.cityCode}, #{item.cityName}, #{item.netType}, #{item.numResource}, #{item.numType}, #{item.numLevel}, #{item.lowConsume}, now(), #{item.importFile}, #{item.sellerId}
             )
         </foreach >
     </insert>

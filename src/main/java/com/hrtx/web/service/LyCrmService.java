@@ -352,7 +352,10 @@ public class LyCrmService {
         File dir = new File(this.getLyRootPath()+"phone_boss2hr"+File.separator);
         String tFileName = dir.getPath()+File.separator+fileName;
         List<String> datas = this.readFile(tFileName);
-        numBaseMapper.delete(null);
+        int sellerId = 10;//乐语
+        NumBase nb = new NumBase();
+        nb.setSellerId(sellerId);
+        numBaseMapper.delete(nb);
         if(datas != null) {
             List<NumBase> batch = new ArrayList<>();
             log.info("解析到乐语号码数据["+datas.size()+"]条");
@@ -363,7 +366,7 @@ public class LyCrmService {
                     log.info("第["+j+"]行数据字段不足，异常");
                     continue;
                 }
-                NumBase numBase = new NumBase(row[0],row[1],row[2],row[3],row[4],row[5],NumberUtils.toDouble(row[6]),new Date(), tFileName);
+                NumBase numBase = new NumBase(row[0],row[1],row[2],row[3],row[4],row[5],NumberUtils.toDouble(row[6]),new Date(), tFileName, sellerId);
 //                numBase.setId(numBase.getGeneralId());
                 batch.add(numBase);
                 if(batch.size() >= 1000 || j+1 >= len) {
@@ -374,9 +377,9 @@ public class LyCrmService {
             }
             if(batch.size() > 0)  numBaseMapper.batchInsert(batch);
             long a = System.currentTimeMillis();
-            this.addNumFeature(10);
+            this.addNumFeature(sellerId);
             log.info("------添加特性耗时"+((System.currentTimeMillis()-a)/1000)+"s");
-            this.matchNum(10);
+            this.matchNum(sellerId);
         }
     }
 
