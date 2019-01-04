@@ -144,6 +144,7 @@ public class MealController extends BaseReturn{
 			m.setCreateDate(now);
 			m.setUpdateBy(SessionUtil.getUserId());
 			m.setUpdateDate(now);
+			m.setSellerId(SessionUtil.getUser().getCorpId());
 			mealList.add(m);
 		}
 //		recCardService.importRecCard(list, sourceServerFileName);

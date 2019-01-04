@@ -247,6 +247,9 @@
         <if test="numResource!=null and numResource!=''">
             and a.num_resource = #{numResource}
         </if>
+        <if test="sellerId!=null and sellerId!=''">
+            and a.seller_id = #{sellerId}
+        </if>
     </select>
 
     <resultMap id="queryPageListApiForNumber3" type="java.util.HashMap">
