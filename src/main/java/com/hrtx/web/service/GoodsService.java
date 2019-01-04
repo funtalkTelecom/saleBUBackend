@@ -773,7 +773,7 @@ public class GoodsService {
         //批量验证号码
         for(Sku s : skuList){
             Integer skuIds =s.getSkuId();
-            Map map = numMapper.queryNumCountByskuid(skuIds,Constants.NUM_STATUS_2.getIntKey()+","+Constants.NUM_STATUS_8.getIntKey());
+            Map map = numMapper.queryNumCountByskuid(skuIds,Constants.NUM_STATUS_2.getIntKey()+","+Constants.NUM_STATUS_8.getIntKey()+","+Constants.NUM_STATUS_10.getIntKey());
             int counts = NumberUtils.toInt(String.valueOf(map.get("count")));
             if(!s.getSkuGoodsType().equals("1")){//上架未知异常不验证号码
                 if(s.getStatus()!=90){
