@@ -65,6 +65,7 @@ public class GoodsService {
     private NumberService numberService;
 	public Result pageGoods(Goods goods) {
 		PageHelper.startPage(goods.startToPageNum(),goods.getLimit());
+		goods.setgSellerId(SessionUtil.getUser().getCorpId());
 		Page<Object> ob=this.goodsMapper.queryPageList(goods);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);
@@ -257,7 +258,7 @@ public class GoodsService {
                     }
                 }else{
                     sku.setStatus(1);
-                    sku.setStatusText("");
+                    sku.setStatusText("上架成功");
                     map.put("SkuId",skuid);
                     map.put("skuSaleNumbs",skuSaleNumb);
                     map.put("skuNum",skuNum);
@@ -730,6 +731,7 @@ public class GoodsService {
                 //验证号码可用性
                 number = new Number();
                 number.setNumResource(skuSaleNumbs[i].trim());
+                number.setSellerId(SessionUtil.getUser().getCorpId());
                 if(numberMapper.checkNumberIsOkStatus(number) > 0) {
                     skuSaleNum += skuSaleNumbs[i].trim()+"\n";
                 }else{

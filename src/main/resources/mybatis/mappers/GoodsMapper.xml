@@ -58,6 +58,9 @@
         <if test="param.gIsAuc !=null and param.gIsAuc!='' and param.gIsAuc!='-1'">
             and a.g_is_auc = #{param.gIsAuc}
         </if>
+        <if test="param.gSellerId !=null and param.gSellerId!='' and param.gSellerId!='-1'">
+            and a.g_seller_id = #{param.gSellerId}
+        </if>
         order by a.g_id desc
     </select>
 
