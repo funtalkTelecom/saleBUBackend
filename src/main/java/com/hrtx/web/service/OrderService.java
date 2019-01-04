@@ -96,21 +96,30 @@ public class OrderService extends BaseService {
         List<OrderItem> items = orderItemMapper.selectByExample(example);
         List commodities = new ArrayList();
         for (OrderItem orderItem:items) {
-            commodities.add(CommonMap.create("item_id",orderItem.getItemId()).put("companystock_id", orderItem.getCompanystockId()).put("quantity", orderItem.getQuantity()).getData());
+            Map map = CommonMap.create("item_id",orderItem.getItemId()).put("companystock_id", orderItem.getCompanystockId()).put("quantity", orderItem.getQuantity()).getData();
+            example = new Example(OrderItem.class);
+            example.createCriteria().andEqualTo("pItemId", orderItem.getItemId());
+            List<OrderItem> phoneItems = orderItemMapper.selectByExample(example);
+            List<String> itemPhones = new ArrayList<>();
+            for (OrderItem phone:phoneItems) {
+                itemPhones.add(phone.getNum());
+            }
+            map.put("nums",StringUtils.join(itemPhones,","));
+            commodities.add(map);
         }
 
-        StringBuffer phones = new StringBuffer(order.getConment());
+        List<String> phones = new ArrayList<>();
         if("4".equals(goodsType)) {//超靓
             example = new Example(OrderItem.class);
             example.createCriteria().andEqualTo("orderId", order.getOrderId()).andEqualTo("isShipment", 0);
             List<OrderItem> phoneItems = orderItemMapper.selectByExample(example);
             for (OrderItem orderItem:phoneItems) {
-                phones.append("#"+orderItem.getNum());
+                phones.add(orderItem.getNum());
             }
         }
 
         Map param = CommonMap.create("receiver", order.getPersonName()).put("phone",order.getPersonTel()).put("address",order.getAddress())
-                .put("receiver_company", order.getOrderType() == 4 ? "jd乐语线上" : order.getConsumerName()).put("remark",phones.toString()).put("callback_url",SystemParam.get("domain-full")+"/order/deliver-order-callback")
+                .put("receiver_company", order.getOrderType() == 4 ? "jd乐语线上" : order.getConsumerName()).put("remark",order.getConment()+"#"+StringUtils.join(phones,"#")).put("callback_url",SystemParam.get("domain-full")+"/order/deliver-order-callback")
                 .put("commodities", commodities).put("order_id",order.getOrderId()).getData();
         Result result = StorageApiCallUtil.storageApiCall(param, "HK0004");
         if(result.getCode() != Result.OK) return result;
