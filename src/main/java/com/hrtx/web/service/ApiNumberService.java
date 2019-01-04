@@ -65,7 +65,7 @@ public class ApiNumberService {
 		Agent agent = (Agent) reagent.getData();
 
 
-		numPrice.setChannel(agent.getChannelId());
+//		numPrice.setChannel(agent.getChannelId());
 		numPrice.setAgentId(agent.getId());
 		pm = numService.queryNumPrice(numPrice);
 		//处理号码,生成号码块字段(numBlock)
@@ -192,7 +192,7 @@ public class ApiNumberService {
 			}
 
 			Agent agent = (Agent) reagent.getData();
-			numPrice.setAgentId(agent.getChannelId());
+			numPrice.setAgentId(agent.getId());
 			pm = numService.queryNumPrice(numPrice);
 			List ob = pm.getList();
 			if(ob.size()==0) return new Result(Result.ERROR, "未找到号码");
