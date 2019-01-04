@@ -348,9 +348,10 @@ public class LyCrmService {
 
     private void praseLyPhoneData(int date_offset) {
         String fileName = Utils.getDate(-1-date_offset, "yyyyMMdd")+".txt";
-        this.downloadFileToSftp("phone_boss2hr", "phone_boss2hr", fileName);
         File dir = new File(this.getLyRootPath()+"phone_boss2hr"+File.separator);
         String tFileName = dir.getPath()+File.separator+fileName;
+        File file = new File(tFileName);
+        if(!file.exists()) this.downloadFileToSftp("phone_boss2hr", "phone_boss2hr", fileName);
         List<String> datas = this.readFile(tFileName);
         int sellerId = 10;//乐语
         NumBase nb = new NumBase();
