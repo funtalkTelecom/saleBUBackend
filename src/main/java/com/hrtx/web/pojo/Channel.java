@@ -24,6 +24,8 @@ public class Channel extends BasePojo{
 
     private Double ratioPrice;
 
+    private Integer corpId;
+
 
 
     public Integer getId() {
@@ -64,5 +66,13 @@ public class Channel extends BasePojo{
 
     public void setRatioPrice(Double ratioPrice) {
         this.ratioPrice = ratioPrice;
+    }
+
+    public Integer getCorpId() {
+        return corpId;
+    }
+
+    public void setCorpId(Integer corpId) {
+        this.corpId = corpId;
     }
 }

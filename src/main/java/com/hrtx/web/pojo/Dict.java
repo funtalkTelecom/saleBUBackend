@@ -24,6 +24,7 @@ public class Dict extends BasePojo implements java.io.Serializable {
     private int seq;
     private String ext1;
     private String ext2;
+    private Integer corpId;
 
     public Dict() {
     }
@@ -122,5 +123,13 @@ public class Dict extends BasePojo implements java.io.Serializable {
 
     public void setExt2(String ext2) {
         this.ext2 = ext2;
+    }
+
+    public Integer getCorpId() {
+        return corpId;
+    }
+
+    public void setCorpId(Integer corpId) {
+        this.corpId = corpId;
     }
 }
