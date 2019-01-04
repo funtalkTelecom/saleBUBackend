@@ -7,6 +7,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.Agent;
+import com.hrtx.web.pojo.Num;
 import com.hrtx.web.pojo.NumPrice;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -28,6 +30,7 @@ public class NumPriceService {
 	private Logger log = LoggerFactory.getLogger(NumPriceService.class);
 
 	@Autowired private NumPriceMapper numPriceMapper;
+	@Autowired private NumMapper numMapper;
 	@Autowired private AgentMapper agentMapper;
 
 	public Result queryNumPrice(NumPrice numPrice) {
@@ -43,14 +46,19 @@ public class NumPriceService {
 	}
 
     public Result queryAgentNumprice(NumPrice numPrice,String commpayName) {
+        Num num = new Num();
+        num.setNumResource(numPrice.getResource());
+        num.setStatus(2);
+        num.setSellerId(SessionUtil.getUser().getCorpId());
+        Num num1 = numMapper.selectOne(num);
+        if(null==num1) return new Result(Result.ERROR, "号码不存在");
         Agent agent1 = new Agent();
         agent1.setId(numPrice.getAgentId());
-        agent1.setCommpayName(commpayName);
-        agent1.setStatus(2);
-        agent1.setIsDel(0);
-        Agent agent = agentMapper.selectOne(agent1);
-		if(null==agent) return new Result(Result.ERROR, "代理商不存在");
-		numPrice.setChannel(agent.getChannelId());
+//        agent1.setCommpayName(commpayName);
+        Integer integer = agentMapper.queryAgentChannel(agent1, SessionUtil.getUser().getCorpId());
+		if(null==integer) return new Result(Result.ERROR, "代理商不存在");
+		numPrice.setChannel(integer);
+		numPrice.setNumId(num1.getId());
 		Map map=numPriceMapper.queryAgentNumprice(numPrice);
 		return new Result(Result.OK, map);
     }
@@ -62,20 +70,22 @@ public class NumPriceService {
         if(map.size()==0) return new Result(Result.ERROR,"无此号码此代理商价格数据");
         BigDecimal angetPrict = new BigDecimal(String.valueOf(map.get("agentPrice")));
         if(angetPrict.compareTo(numPrice.getPrice())==0) return new Result(Result.ERROR,"价格相同无需修改");
-        Agent agent = agentMapper.selectByPrimaryKey(numPrice.getAgentId());
+//        Agent agent = agentMapper.selectByPrimaryKey(numPrice.getAgentId());
+        Agent agent1 = new Agent();
+        agent1.setId(numPrice.getAgentId());
         NumPrice numPrice1 = new NumPrice();
-        numPrice1.setChannel(agent.getChannelId());
+        numPrice1.setChannel(agentMapper.queryAgentChannel(agent1, SessionUtil.getUser().getCorpId()));
         numPrice1.setResource(numPrice.getResource());
         numPrice1.setAgentId(-1);
         numPrice1.setIsDel(0);
         NumPrice numPrice2 = numPriceMapper.selectOne(numPrice1);// 查出初始数据
-        numPrice1.setAgentId(agent.getId());
+        numPrice1.setAgentId(numPrice.getAgentId());
         NumPrice numPrice3 = numPriceMapper.selectOne(numPrice1);// 查出代理数据
         if(numPrice3!=null){
             numPrice3.setIsDel(1);
             numPriceMapper.updateByPrimaryKey(numPrice3);
         }
-        numPrice2.setAgentId(agent.getId());
+        numPrice2.setAgentId(numPrice.getAgentId());
         numPrice2.setPrice(numPrice.getPrice());
         numPrice2.setId(null);
         numPriceMapper.insert(numPrice2);
@@ -90,12 +100,10 @@ public class NumPriceService {
         if(!m.matches()) return new Result(Result.ERROR, "请输入两位正小数");
         Agent agent1 = new Agent();
         agent1.setId(numPrice.getAgentId());
-        agent1.setCommpayName(commpayName);
-        agent1.setStatus(2);
-        agent1.setIsDel(0);
-        Agent agent = agentMapper.selectOne(agent1);
-        if(null==agent) return new Result(Result.ERROR, "代理商不存在");
-        numPrice.setChannel(agent.getChannelId());
+        Integer i = agentMapper.queryAgentChannel(agent1, SessionUtil.getUser().getCorpId());
+        if(null==i) return new Result(Result.ERROR, "代理商不存在");
+        numPrice.setChannel(i);
+        numPrice.setCorpId(SessionUtil.getUser().getCorpId());
         Set<String> distinct  = new HashSet<String>(); //去重
         Set<String> noPrice = new HashSet<String>();//不能设置价格
         Set<String> set = new HashSet<String>();//已经有代理商价格

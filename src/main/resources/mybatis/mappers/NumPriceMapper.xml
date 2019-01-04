@@ -93,14 +93,14 @@
 
   <select id="queryAgentNumprice" resultType="java.util.Map" useCache="false">
     select a.price ,ifnull(b.price,a.price) agentPrice from
-      (select np.price,np.resource from  tb_num_price np where np.resource=#{param.resource} and np.agent_id=-1 and np.is_del=0 and np.channel=#{param.channel}) a left join
-    (select np.price,np.resource from  tb_num_price np where np.resource=#{param.resource} and np.agent_id=#{param.agentId} and np.is_del=0 and np.channel=#{param.channel}) b on a.resource=b.resource
+      (select np.price,np.num_id from  tb_num_price np where np.num_id=#{param.numId} and np.agent_id=-1 and np.is_del=0 and np.channel=#{param.channel}) a left join
+    (select np.price,np.num_id from  tb_num_price np where np.num_id=#{param.numId} and np.agent_id=#{param.agentId} and np.is_del=0 and np.channel=#{param.channel}) b on a.num_id=b.num_id
   </select>
 
   <select id="checkNumpriceCount" resultType="java.lang.Integer" useCache="false">
       select count(1) from
       tb_num_price np
-      where np.resource=#{resource} and np.is_del=0 and np.channel=#{param.channel} and (np.agent_id=-1 or np.agent_id=#{param.agentId})
+      where np.resource=#{resource} and np.is_del=0 and np.channel=#{param.channel} and np.corp_id=#{param.corpId} and (np.agent_id=-1 or np.agent_id=#{param.agentId})
   </select>
 
   <update id="batchUpdataIsDel">
