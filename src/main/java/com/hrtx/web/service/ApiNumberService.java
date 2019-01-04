@@ -256,8 +256,8 @@ public class ApiNumberService {
 		numPrice.setPageNum(numPrice.startToPageNum());
 		String num = request.getParameter("num")==null?"": request.getParameter("num");
 		Consumer consumer= this.apiSessionUtil.getConsumer();
-	    Result reagent = agentService.queryCurrAgent(consumer);
-	    if(reagent.getCode()!=Result.OK){
+		Result reagent = agentService.queryCurrAgent(consumer);
+		if(reagent.getCode()!=Result.OK){
 			return new Result(reagent.ERROR, reagent.getData());
 		}
 		Agent agent = (Agent) reagent.getData();
