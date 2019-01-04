@@ -22,16 +22,21 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	private Long district;
 	private String address;
 	private String tradingImg;
+	@Transient
 	private Integer status;
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Integer addConsumerId;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date addDate;
 	private Integer isDel;
+	@Transient
 	private String checkRemark;  //备注信息
+	@Transient
 	private String loginName;
+	@Transient
 	private String pwd;
 	private Integer type;
+	@Transient
 	private Integer channelId;  //渠道ID
 
 	@Transient
@@ -53,7 +58,7 @@ public class Agent extends BasePojo implements java.io.Serializable {
 	}
 
 	public Agent(Integer id,String commpayName, String person,String phone,Long province,Long city,Long district
-				 , String address,String tradingImg, Integer status, Integer addConsumerId, Date addDate, Integer isDel,Integer type,Integer channelId ) {
+				 , String address,String tradingImg, Integer addConsumerId, Date addDate, Integer isDel,Integer type) {
 		this.id = id;
 		this.commpayName = commpayName;
 		this.person = person;
@@ -63,15 +68,13 @@ public class Agent extends BasePojo implements java.io.Serializable {
 		this.district = district;
 		this.address = address;
 		this.tradingImg =tradingImg;
-		this.status = status;
 		this.addConsumerId = addConsumerId;
 		this.addDate = addDate;
 		this.isDel = isDel;
 		this.type = type;
-		this.channelId = channelId;
 	}
 	public Agent(String commpayName, String person,String phone,Long province,Long city,Long district
-				 , String address,String tradingImg, Integer status, Integer addConsumerId, Date addDate, Integer isDel,Integer type,Integer channelId ) {
+				 , String address,String tradingImg, Integer addConsumerId, Date addDate, Integer isDel,Integer type) {
 		this.commpayName = commpayName;
 		this.person = person;
 		this.phone =phone;
@@ -80,12 +83,10 @@ public class Agent extends BasePojo implements java.io.Serializable {
 		this.district = district;
 		this.address = address;
 		this.tradingImg =tradingImg;
-		this.status = status;
 		this.addConsumerId = addConsumerId;
 		this.addDate = addDate;
 		this.isDel = isDel;
 		this.type = type;
-		this.channelId = channelId;
 	}
 
 	public Integer getId() {
