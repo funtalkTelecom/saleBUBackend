@@ -229,4 +229,5 @@ public class Goods extends BasePojo implements java.io.Serializable {
     public void setStatusText(String statusText) {
         this.statusText = statusText;
     }
+
 }

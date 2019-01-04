@@ -50,7 +50,7 @@
         left join (
         select e.num_id num_id, Concat(',', GROUP_CONCAT(t.key_value),',') keyvalue
         from tb_num_rule e ,tb_dict t where e.`value` = t.key_id and t.key_group='FEATHER_TYPE' and e.rule_type='FEATHER_TYPE' and t.is_del=0  GROUP BY  e.num_id
-        ) tt on m.id = tt.num_id ,tb_channel c where c.is_del = 0 and m.`status` in (1,2)
+        ) tt on m.id = tt.num_id ,tb_channel c where c.is_del = 0 and c.corp_id = m.seller_id and m.`status` in (1,2)
         and m.sku_id =#{skuId}
 
     </insert>

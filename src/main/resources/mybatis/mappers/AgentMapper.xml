@@ -114,8 +114,9 @@
         and t.add_consumer_id=#{ConsumerId}
     </select>
     <select id="findConsumenrIdCount" resultType="java.util.HashMap">
-        select g.id,g.commpay_name,g.person,g.add_consumer_id,g.phone,g.channel_id  from tb_agent g where g.`status`=2 and g.is_del=0
-        and g.add_consumer_id=#{ConsumerId}
+        select a.id,a.commpay_name,a.person,a.phone,ca.`status`,ca.channel_id
+        from tb_agent a left join tb_corp_agent ca on a.id = ca.agent_id where a.is_del=0 and ca.`status`=2
+		and a.add_consumer_id=#{ConsumerId}
     </select>
     <select id="queryAgentByCName" resultType="java.util.HashMap">
         select a.id id,a.commpay_name label,ca.channel_id channelId from tb_agent a

@@ -63,8 +63,10 @@ public class ApiNumberService {
 			return new Result(reagent.ERROR, reagent.getData());
 		}
 		Agent agent = (Agent) reagent.getData();
+
+
+//		numPrice.setChannel(agent.getChannelId());
 		numPrice.setAgentId(agent.getId());
-		numPrice.setTag(tags);
 		pm = numService.queryNumPrice(numPrice);
 		//处理号码,生成号码块字段(numBlock)
 		List ob =pm.getList();
@@ -188,6 +190,7 @@ public class ApiNumberService {
 			if(reagent.getCode()!=Result.OK){
 				return new Result(reagent.ERROR, reagent.getData());
 			}
+
 			Agent agent = (Agent) reagent.getData();
 			numPrice.setAgentId(agent.getId());
 			pm = numService.queryNumPrice(numPrice);
