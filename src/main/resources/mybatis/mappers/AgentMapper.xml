@@ -13,11 +13,9 @@
             a.district =#{district},
             a.address =#{address},
             a.trading_img=#{tradingImg},
-            a.status= #{status},
             a.add_consumer_id=#{addConsumerId},
             a.add_date =#{addDate},
-            a.is_del=#{isDel},
-            a.channel_id=#{channelId}
+            a.is_del=#{isDel}
         where a.id = #{id}
     </update>
 
@@ -30,13 +28,7 @@
         select concat(t.id,'')as id, t.commpay_name,t.person,t.phone,
         y.name as provinceName ,c.name as cityName,d.name as districtName,
         t.address,u.nick_name as userName,
-        t.status as status,
-        case
-				when t.status =1 then '待审核'
-				when t.status =2 then '审核通过'
-                when t.status =3 then '审核未通过'
-				else '未知'
-				end as statustext,t.province as provinceId,t.city as cityId,t.district as districtId,
+        t.province as provinceId,t.city as cityId,t.district as districtId,
         DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,t.login_name as loginName,
         t.trading_img ,t.check_remark checkRemark,t.type tyep
         from tb_agent t left join tb_city y on t.province = y.id
@@ -52,15 +44,16 @@
         y.name as provinceName ,c.name as cityName,d.name as districtName,
         t.address,u.nick_name as userName,
         DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,
-        t.trading_img,t.status as status,
+        t.trading_img,ct.status as status,
 				case
-				when t.status =1 then '待审核'
-				when t.status =2 then '审核通过'
-                when t.status =3 then '审核未通过'
+				when ct.status =1 then '待审核'
+				when ct.status =2 then '审核通过'
+                when ct.status =3 then '审核未通过'
 				else '未知'
 				end as statustext,l.channel as channelName
 				from tb_agent t
-        left join tb_channel l on t.channel_id = l.channel_id
+        left join tb_corp_agent ct on t.id = ct.agent_id
+        left join tb_channel l on ct.channel_id = l.channel_id
         left join tb_city y on t.province = y.id
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
@@ -73,7 +66,7 @@
             and t.person like "%"#{param.person}"%"
         </if>
         <if test="param.status!=-1 and param.status!=null and param.status!='' ">
-            and t.status = #{param.status}
+            and ct.status = #{param.status}
         </if>
     </select>
 
@@ -82,15 +75,8 @@
         y.name as provinceName ,c.name as cityName,d.name as districtName,
         t.address,u.nick_name as userName,
         DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,
-        t.trading_img as tradingImg,t.status as status,t.add_consumer_id as addConsumerId,
-        case
-        when t.status =1 then '待审核'
-        when t.status =2 then '审核通过'
-        when t.status =3 then '审核未通过'
-        else '未知'
-        end as statustext,t.check_remark as checkRemark,l.channel as channelName
+        t.trading_img as tradingImg,t.add_consumer_id as addConsumerId
         from tb_agent t
-        left join tb_channel l on t.channel_id = l.channel_id
         left join tb_city y on t.province = y.id
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
@@ -118,15 +104,8 @@
          select t.add_consumer_id, t.id, t.commpay_name,t.person,t.phone,
         y.name as provinceName ,c.name as cityName,d.name as districtName,
         t.address,u.nick_name as userName,
-        t.status as status,
-        case
-				when t.status =1 then '待审核'
-				when t.status =2 then '审核通过'
-                when t.status =3 then '审核未通过'
-				else '未知'
-				end as statustext,
-        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,t.login_name as loginName,
-        t.trading_img ,t.check_remark checkRemark,t.type tyep
+        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,
+        t.trading_img ,t.type tyep
         from tb_agent t left join tb_city y on t.province = y.id
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id

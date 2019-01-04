@@ -125,7 +125,8 @@ public class AgentController {
 	@ResponseBody
 	@Powers({PowerConsts.AGENTMOUDULE_COMMON_UPDATE})
 	public Result updateAgent(Agent agent){
-		return agentService.updateAgentChannel(agent.getIds(),agent.getChannelId());
+//		return agentService.updateAgentChannel(agent.getIds(),agent.getChannelId());
+		return null;
 	}
 
 	@PostMapping("/agent/query-agent-by-CName")

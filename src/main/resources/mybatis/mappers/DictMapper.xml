@@ -109,6 +109,10 @@
         select * from tb_dict a where a.is_del = 0 and a.key_group = #{keyGroup} order by a.seq asc
     </select>
 
+    <select id="findDictByGroupAndCorpId" resultMap="dictGroupList">
+        select * from tb_dict a where a.is_del = 0 and a.key_group = #{keyGroup} and a.corp_id = #{corpId} order by a.seq asc
+    </select>
+
     <resultMap id="typeGroupDictList" type="java.util.HashMap">
         <result column="gtp_group" property="gtpGroup"></result>
         <result column="key_id" property="keyId"></result>

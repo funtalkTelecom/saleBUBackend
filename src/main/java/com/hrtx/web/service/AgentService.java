@@ -12,6 +12,7 @@ import com.hrtx.web.controller.BaseReturn;
 import com.hrtx.web.mapper.AccountMapper;
 import com.hrtx.web.mapper.AgentMapper;
 import com.hrtx.web.mapper.ConsumerMapper;
+import com.hrtx.web.mapper.CorpAgentMapper;
 import com.hrtx.web.pojo.Account;
 import com.hrtx.web.pojo.Agent;
 import com.hrtx.web.pojo.Consumer;
@@ -34,6 +35,7 @@ public class AgentService {
 	@Autowired private AgentMapper agentMapper;
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private ConsumerMapper consumerMapper;
+	@Autowired private CorpAgentMapper corpAgentMapper;
 
 	public Result SaveOrUpdateAgent(Integer id,String commpayName,String person,String phone,long province,long city,long district,
 									String address, MultipartFile file){
@@ -52,18 +54,16 @@ public class AgentService {
 			e.printStackTrace();
 			return new Result(Result.ERROR, "图片保存异常,请稍后再试");
 		}
-//		String a = "1006420771322462210";
-//		long consumerId = Long.valueOf(a);
 		Agent ag ;
 		if(id==null){  //添加
 			Agent param = new Agent();
 			param.setAddConsumerId(consumerId);
 			Agent ap = agentMapper.selectOne(param);
-			if(ap !=null) return new Result(Result.ERROR, "已申请注册过代理商或已经绑定了乐语账号");
-			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1,3);
+			if(ap !=null) return new Result(Result.ERROR, "已申请注册过代理商");
+			ag = new Agent(commpayName,person,phone,province,city,district,address,tradingImg,consumerId, new Date(),0,1);
 			agentMapper.insert(ag);
 		}else {  //修改
-			ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,1,consumerId, new Date(),0,1,3);
+			ag = new Agent(id,commpayName,person,phone,province,city,district,address,tradingImg,consumerId, new Date(),0,1);
 			agentMapper.updateAgent(ag);
 		}
 		return new Result(Result.OK, "提交成功");
@@ -73,12 +73,10 @@ public class AgentService {
 	public Result SaveAgentLeyu(String loginName,String pwd){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		Integer consumerId = consumer.getId();
-//		String a = "1014426510456520704";
-//		long consumerId = Long.valueOf(a);
 		Agent param = new Agent();
-		param.setLoginName(loginName);
-		param.setPwd(pwd);
-		param.setStatus(1);
+//		param.setLoginName(loginName);
+//		param.setPwd(pwd);
+//		param.setStatus(1);
 		param.setType(2);    //乐语导入
 		Agent agent =  agentMapper.selectOne(param);
 		if(agent==null) return new Result(Result.ERROR, "绑定乐语的账号或密码不对");
@@ -86,9 +84,9 @@ public class AgentService {
 		agent.setAddConsumerId(consumerId);
 
 		Agent params = new Agent();
-		params.setLoginName(loginName);
-		params.setPwd(pwd);
-		params.setStatus(2);
+//		params.setLoginName(loginName);
+//		params.setPwd(pwd);
+//		params.setStatus(2);
 		params.setType(2);    //乐语导入
 		params.setAddConsumerId(consumerId);
 		Agent ag = agentMapper.selectOne(params);
@@ -101,7 +99,7 @@ public class AgentService {
 		Consumer  consumer1 = consumerMapper.selectOne(consparam);
 		if(consumer1 ==null ) return new Result(Result.ERROR, "当前客商已是代理商，无法绑定");
 		//更新agent 状态2，客商id
-		agent.setStatus(2);
+//		agent.setStatus(2);
 		agentMapper.updateAgentStatusToLeyu(agent);
 		consumer1.setIsAgent(2);
 		consumer1.setCommpayName(agent.getCommpayName());
@@ -146,13 +144,13 @@ public class AgentService {
 		Agent param = new Agent();
 		param.setId(agent.getId());
 		param.setAddConsumerId(agent.getAddConsumerId());
-		param.setStatus(1);
+//		param.setStatus(1);
 		param.setType(1);  //自注册
 		Agent aa =agentMapper.selectOne(param);
 		if(aa ==null) return new Result(Result.ERROR, "当前状态不能审核，请确认！");
-		aa.setStatus(agent.getStatus());
-		aa.setCheckRemark(agent.getCheckRemark());
-		if(agent.getStatus()==2){
+//		aa.setStatus(agent.getStatus());
+//		aa.setCheckRemark(agent.getCheckRemark());
+//		if(agent.getStatus()==2){
 			Consumer consparam = new Consumer();
 			consparam.setId(aa.getAddConsumerId());
 			consparam.setStatus(1);
@@ -171,7 +169,7 @@ public class AgentService {
 //			this.apiSessionUtil.saveOrUpdate(apiSessionUtil.getTokenStr(),consumer);
 			consumerMapper.insertAgentToConsumer(consumer);
 
-		}
+//		}
 		agentMapper.updateAgentStatus(aa);
 
 		return new Result(Result.OK, "提交成功");

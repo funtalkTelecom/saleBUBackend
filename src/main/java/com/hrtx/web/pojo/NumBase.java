@@ -27,7 +27,9 @@ public class NumBase extends BasePojo {
 
     private String importFile;
 
-    public NumBase(String cityCode, String cityName, String netType, String numResource, String numType, String numLevel, Double lowConsume, Date importDate, String importFile) {
+    private Integer sellerId;
+
+    public NumBase(String cityCode, String cityName, String netType, String numResource, String numType, String numLevel, Double lowConsume, Date importDate, String importFile, Integer sellerId) {
         this.cityCode = cityCode;
         this.cityName = cityName;
         this.netType = netType;
@@ -37,6 +39,7 @@ public class NumBase extends BasePojo {
         this.lowConsume = lowConsume;
         this.importDate = importDate;
         this.importFile = importFile;
+        this.sellerId = sellerId;
     }
 
     public NumBase() {
@@ -121,5 +124,13 @@ public class NumBase extends BasePojo {
 
     public void setImportFile(String importFile) {
         this.importFile = importFile == null ? null : importFile.trim();
+    }
+
+    public Integer getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Integer sellerId) {
+        this.sellerId = sellerId;
     }
 }

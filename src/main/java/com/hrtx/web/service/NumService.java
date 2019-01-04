@@ -213,10 +213,6 @@ public class NumService {
         return numFreezeMapper.queryFreeze(numId);
     }
 
-    public long matchNumPrice(){
-        return numPriceMapper.matchNumPrice();
-    }
-
     public String findBossNum(int cityId) {
         return cityMapper.findBossNum(cityId);
     }

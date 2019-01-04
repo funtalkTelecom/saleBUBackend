@@ -24,6 +24,8 @@ public interface DictMapper extends Mapper<Dict>,BaseMapper<Dict>{
 
     List findDictByGroup(@Param("keyGroup")String group);
 
+    List findDictByGroupAndCorpId(@Param("keyGroup")String group, @Param("corpId") Integer corpId);
+
     List findDictByTypeGroup(@Param("keyGroup")String group);
 
     Map maxSeqAndKeyId(@Param("keyGroup") String keyGroup);

@@ -1,6 +1,5 @@
 package com.hrtx.web.service;
 
-import com.github.abel533.entity.Example;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -12,7 +11,6 @@ import com.hrtx.web.mapper.NumPriceMapper;
 import com.hrtx.web.pojo.Dict;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +73,7 @@ public class DictService {
 	public Result featherDelete(Dict dict) {
 		Dict dict1 = dictMapper.selectByPrimaryKey(dict.getId());
 		dictMapper.dictDelete(dict);
-		lyCrmService.delRuel(dict1);
+		lyCrmService.delRule(dict1);
 		return new Result(Result.OK, "删除成功");
 	}
 
@@ -144,7 +142,7 @@ public class DictService {
 		dict.setKeyId(String.valueOf(NumberUtils.toInt(String.valueOf(map.get("keyId")))+1));
 		dict.setSeq(NumberUtils.toInt(String.valueOf(map.get("seq")))+1);
 		dictMapper.insert(dict);
-		lyCrmService.addRuel(dict);
+		lyCrmService.addRule(dict);
 		return new Result(Result.OK, "成功");
 	}
 }
