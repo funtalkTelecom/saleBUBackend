@@ -62,13 +62,11 @@ public class ApiNumberService {
 		if(reagent.getCode()!=Result.OK){
 			return new Result(reagent.ERROR, reagent.getData());
 		}
-//		Agent agent = (Agent) reagent.getData();
-		Map map = (Map) reagent.getData();
-		Integer channelid =NumberUtils.toInt(String.valueOf(map.get("channel_id"))) ;
-		Integer agentid =NumberUtils.toInt(String.valueOf(map.get("id"))) ;
+		Agent agent = (Agent) reagent.getData();
 
-		numPrice.setChannel(channelid);
-		numPrice.setAgentId(agentid);
+
+		numPrice.setChannel(agent.getChannelId());
+		numPrice.setAgentId(agent.getId());
 		pm = numService.queryNumPrice(numPrice);
 		//处理号码,生成号码块字段(numBlock)
 		List ob =pm.getList();
@@ -193,12 +191,8 @@ public class ApiNumberService {
 				return new Result(reagent.ERROR, reagent.getData());
 			}
 
-//			Agent agent = (Agent) reagent.getData();
-			Map map1 = (Map) reagent.getData();
-			Integer channelid =NumberUtils.toInt(String.valueOf(map1.get("channel_id"))) ;
-			Integer agentid =NumberUtils.toInt(String.valueOf(map1.get("id"))) ;
-
-			numPrice.setAgentId(channelid);
+			Agent agent = (Agent) reagent.getData();
+			numPrice.setAgentId(agent.getChannelId());
 			pm = numService.queryNumPrice(numPrice);
 			List ob = pm.getList();
 			if(ob.size()==0) return new Result(Result.ERROR, "未找到号码");
