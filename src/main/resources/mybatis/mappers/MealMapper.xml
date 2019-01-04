@@ -63,7 +63,7 @@
         <include refid="col_list"/>
         from tb_meal a
         left join tb_third_city b on a.sale_city=b.city_id
-        left join tb_num c on c.tele_type = a.tele_type
+        left join tb_num c on c.tele_type = a.tele_type  and a.seller_id = c.seller_id
         where a.is_del = 0
         and c.id = #{id} order by a.mid
     </select>
@@ -81,7 +81,8 @@
             update_by,
             update_date,
             tele_type,
-            is_del
+            is_del,
+        seller_id
         ) values
         <foreach collection="mealList" item="meal" separator=",">
             (
@@ -96,7 +97,8 @@
                 #{meal.updateBy},
                 #{meal.updateDate},
                 #{meal.teleType},
-                0
+                0,
+                #{meal.sellerId}
             )
         </foreach>
     </insert>

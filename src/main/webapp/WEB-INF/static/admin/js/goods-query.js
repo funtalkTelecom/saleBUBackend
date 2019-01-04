@@ -905,7 +905,8 @@ var titleStrObj = {
     "skuGoodsType":{
         "isShow":true,
         "title":"商品类型",
-        "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="-1">请选择...</option><option value="1">白卡</option><option value="2">普号</option><option value="3">普靓</option><option value="4">超靓</option></select>',
+        // "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="-1">请选择...</option><option value="1">白卡</option><option value="2">普号</option><option value="3">普靓</option><option value="4">超靓</option></select>',
+        "type":'<select onchange="skuIsNumChange(this)" tag="sku_skuindex" name="skukey" selectValue="skuvalue"><option value="-1">请选择...</option><option value="4">超靓</option></select>',
         "titleClass":""
     },
     "skuRepoGoodsName":{

@@ -191,17 +191,17 @@ public class AgentService {
 	 * @return Result.code=200时data=Agent,否则说明数据异常，data是错误的信息
 	 */
 	public Result queryCurrAgent(Consumer user){
-//        int channel=3;//一般用户无渠道，即默认是线上商城渠道，价格最高
-//        int agent_id=-1;
-		Example example = new Example(Agent.class);
-		example.createCriteria().andEqualTo("addConsumerId",user.getId())
-				.andEqualTo("isDel",0)
-				.andEqualTo("status",2);
-		List<Agent> agent_list=agentMapper.selectByExample(example);
-		if(agent_list.size()>1)return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
-		else if(agent_list.size()==1){//说明当前的用户有对应的渠道，取其渠道对应的价格
-			if(agent_list.get(0).getChannelId()==null)return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
-			else return new Result(Result.OK, agent_list.get(0));
+//		Example example = new Example(Agent.class);
+//		example.createCriteria().andEqualTo("addConsumerId",user.getId())
+//				.andEqualTo("isDel",0)
+//				.andEqualTo("status",2);
+//		List<Agent> agent_list=agentMapper.selectByExample(example);
+		List agent_list=agentMapper.findConsumenrIdCount(user.getId());
+		Map map =null;
+		if(agent_list.size()>0){//说明当前的用户有对应的渠道，取其渠道对应的价格
+			map = (Map) agent_list.get(0);
+			if(map.get("channel_id")==null)return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
+			else return new Result(Result.OK, map);
 		}else{/*(agent_list.size()==0)*///若无代理渠道，则去默认
 			Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
 			if(agent==null) return new Result(Result.ERROR, "系统代理商不存在");
