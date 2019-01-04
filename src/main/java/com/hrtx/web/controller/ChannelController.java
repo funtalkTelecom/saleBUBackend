@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.pojo.*;
 import com.hrtx.web.pojo.Number;
@@ -51,6 +52,7 @@ public class ChannelController extends BaseReturn{
         Dict dict = new Dict();
         dict.setKeyGroup("feather_price");
         dict.setIsDel(1);
+        dict.setCorpId(SessionUtil.getUser().getCorpId());
         return dictService.pageDict(dict);
     }
     @RequestMapping("/feather-type-list")
@@ -69,7 +71,7 @@ public class ChannelController extends BaseReturn{
     }
 
     @PostMapping("/feather-price-edit")
-    @Powers({PowerConsts.CHANNELMOUDULE_COMMON_EDIT})
+    @Powers({PowerConsts.CHANNELMOUDULE_COMMON_EDIT,PowerConsts.CHANNELMOUDULE_COMMON_ADD})
     public Result editFeatherPrice(Dict dict){
         return dictService.editFeatherPrice(dict);
     }
@@ -82,7 +84,7 @@ public class ChannelController extends BaseReturn{
 
 
     @RequestMapping("/feather-delete")
-    @Powers({PowerConsts.CHANNELMOUDULE_COMMON_EDIT})
+    @Powers({PowerConsts.CHANNELMOUDULE_COMMON_DELETE})
     public Result featherDelete(Dict dict){
         return dictService.featherDelete(dict);
     }

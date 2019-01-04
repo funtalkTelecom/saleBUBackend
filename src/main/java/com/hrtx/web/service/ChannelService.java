@@ -31,6 +31,7 @@ public class ChannelService {
 
 
     public Result queryChannel(Channel channel) {
+        channel.setCorpId(SessionUtil.getUser().getCorpId());
         PageHelper.startPage(channel.startToPageNum(),channel.getLimit());
         Page<Object> ob=channelMapper.queryPageList(channel);
         PageInfo<Object> pm = new PageInfo<Object>(ob);
@@ -46,6 +47,7 @@ public class ChannelService {
         cl.setChannelId(c.getChannelId());
         cl.setIsDel(0);
         cl.setRatioPrice(channel.getRatioPrice());
+        cl.setCorpId(c.getCorpId());
         channelMapper.insert(cl);
         c.setIsDel(1);
         channelMapper.updateByPrimaryKey(c);
