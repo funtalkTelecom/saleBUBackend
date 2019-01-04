@@ -374,16 +374,16 @@ public class LyCrmService {
             }
             if(batch.size() > 0)  numBaseMapper.batchInsert(batch);
             long a = System.currentTimeMillis();
-            this.addNumFeature();
+            this.addNumFeature(10);
             log.info("------添加特性耗时"+((System.currentTimeMillis()-a)/1000)+"s");
-            this.matchNum();
+            this.matchNum(10);
         }
     }
 
-    private void addNumFeature() {
-        List<Map> nums = numMapper.queryActiveNum();
+    private void addNumFeature(int corpId) {
+        List<Map> nums = numMapper.queryActiveNum(corpId);
         List<Map> feathers = dictMapper.findDictByGroup("FEATHER_TYPE");
-        List<Map> priceFeathers = dictMapper.findDictByGroup("feather_price");
+        List<Map> priceFeathers = dictMapper.findDictByGroupAndCorpId("feather_price", corpId);
         List<NumRule> batch = new ArrayList<>();
         for (int j = 0, len = nums.size(); j < len; j++) {
             Map num = nums.get(j);
@@ -417,13 +417,13 @@ public class LyCrmService {
 //    1在库、2销售中、3冻结(下单未付款)、4待配卡(已付款 针对2C或电销无需购买卡时、代理商买号而未指定白卡时)、5待受理(代理商已提交或仓库已发货，待提交乐语BOSS)、
 //            6已受理(乐语BOSS处理成功)、7受理失败(BOSS受理失败，需要人介入解决)、8已失效(乐语BOSS提示号码已非可用)、9受理中
 
-    private void matchNum() {
-        numMapper.insertAcitveNum();
-        numMapper.updateLoseNum();
+    private void matchNum(int corpId) {
+        numMapper.insertAcitveNum(corpId);
+        numMapper.updateLoseNum(corpId);
     }
 
-    public void addRuel(Dict dict){
-        List<Map> nums = numMapper.queryInNum();
+    public void addRule(Dict dict){
+        List<Map> nums = numMapper.queryInNum(dict.getCorpId());
         List<Map> feathers = new ArrayList<>();
         feathers.add(CommonMap.create().put("keyId",dict.getKeyId()).put("note",dict.getNote()).getData());
         String type = dict.getKeyGroup();
@@ -440,7 +440,7 @@ public class LyCrmService {
         }
         if(batch.size() > 0) this.insertNumRule(batch, dict);
 
-        if("feather_price".equals(type)) numPriceMapper.matchNumPrice();
+        if("feather_price".equals(type)) numPriceMapper.matchNumPrice(dict.getCorpId());
     }
 
     private void insertNumRule(List<NumRule> batch, Dict dict) {
@@ -450,14 +450,14 @@ public class LyCrmService {
         }
     }
 
-    public void delRuel(Dict dict){
+    public void delRule(Dict dict){
         String type = dict.getKeyGroup();
         NumRule numRule = new NumRule();
         numRule.setValue(dict.getKeyId());
         numRule.setRuleType(dict.getKeyGroup());
         numRuleMapper.delete(numRule);
 
-        if("feather_price".equals(type)) numPriceMapper.matchNumPrice();
+        if("feather_price".equals(type)) numPriceMapper.matchNumPrice(dict.getCorpId());
         if("FEATHER_TYPE".equals(type)) {
             numPriceMapper.updateFeature(","+dict.getKeyValue()+",");
         }

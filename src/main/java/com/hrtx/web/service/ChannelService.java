@@ -49,7 +49,7 @@ public class ChannelService {
         channelMapper.insert(cl);
         c.setIsDel(1);
         channelMapper.updateByPrimaryKey(c);
-        numPriceMapper.matchNumPrice();
+        numPriceMapper.matchNumPrice(channel.getCorpId());
         return new Result(Result.OK, "成功");
     }
 

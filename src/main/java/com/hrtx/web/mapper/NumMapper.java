@@ -16,16 +16,16 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
      * 查询本次需要插入的号码
      * @return
      */
-    List<Map> queryActiveNum();
+    List<Map> queryActiveNum(@Param("corpId") int corpId);
     /**
      * 添加可用号码
      */
-    void insertAcitveNum();
+    void insertAcitveNum(@Param("corpId") int corpId);
 
     /**
      * 更新失效号码
      */
-    void updateLoseNum();
+    void updateLoseNum(@Param("corpId") int corpId);
 
     /**
      * 绑定号码
@@ -70,5 +70,5 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
 
     List<Map> findNumFreezeList();
 
-    List<Map> queryInNum();
+    List<Map> queryInNum(@Param("corpId") Integer corpId);
 }
