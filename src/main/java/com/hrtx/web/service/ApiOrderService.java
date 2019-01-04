@@ -473,7 +473,6 @@ public class ApiOrderService {
 			if(super_num/*order.getOrderType()==2&&StringUtils.equals(order.getSkuGoodsType(),"4")*/){
 				NumPrice numPrice=new NumPrice();
 				numPrice.setAgentId(agent.getId());
-				numPrice.setChannel(agent.getChannelId());
 				numPrice.setNumId(number.getId());
 				List aplist=this.numPriceMapper.queryList(numPrice);
 				if(aplist.size()==0||aplist.size()>1)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");

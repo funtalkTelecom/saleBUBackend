@@ -53,7 +53,6 @@ public class LiangHaoController extends BaseReturn{
         Result result = agentService.queryCurrAgent(user);
         if(result.getCode()!=200) return result;
         Agent data = (Agent) result.getData();
-        numPrice.setChannel(data.getChannelId());
         numPrice.setAgentId(data.getId());
         PageInfo<Object> objectPageInfo = numService.queryNumPrice(numPrice);
         objectPageInfo =numService.queryFreeze(objectPageInfo);

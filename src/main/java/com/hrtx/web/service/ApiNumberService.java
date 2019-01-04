@@ -63,7 +63,6 @@ public class ApiNumberService {
 			return new Result(reagent.ERROR, reagent.getData());
 		}
 		Agent agent = (Agent) reagent.getData();
-		numPrice.setChannel(agent.getChannelId());
 		numPrice.setAgentId(agent.getId());
 		numPrice.setTag(tags);
 		pm = numService.queryNumPrice(numPrice);
@@ -190,7 +189,7 @@ public class ApiNumberService {
 				return new Result(reagent.ERROR, reagent.getData());
 			}
 			Agent agent = (Agent) reagent.getData();
-			numPrice.setChannel(agent.getChannelId());
+			numPrice.setAgentId(agent.getId());
 			pm = numService.queryNumPrice(numPrice);
 			List ob = pm.getList();
 			if(ob.size()==0) return new Result(Result.ERROR, "未找到号码");
@@ -256,7 +255,6 @@ public class ApiNumberService {
 			return new Result(reagent.ERROR, reagent.getData());
 		}
 		Agent agent = (Agent) reagent.getData();
-		numPrice.setChannel(agent.getChannelId());
 		numPrice.setAgentId(agent.getId());
 		numPrice.setResource(num);
 		pm = numService.queryNumPrice(numPrice);
