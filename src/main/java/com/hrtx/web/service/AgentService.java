@@ -184,7 +184,7 @@ public class AgentService {
 	}
 
 	public Result queryAgentByCName(Agent agent){
-		List list=agentMapper.queryAgentByCName(agent);
+        List list=agentMapper.queryAgentByCName(agent,SessionUtil.getUser().getCorpId());
 		return new Result(Result.OK, list);
 	}
 

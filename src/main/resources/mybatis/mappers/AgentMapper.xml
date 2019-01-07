@@ -119,7 +119,14 @@
 		and a.add_consumer_id=#{ConsumerId}
     </select>
     <select id="queryAgentByCName" resultType="java.util.HashMap">
-        select g.id id,g.commpay_name label from tb_agent g where g.`status`=2 and g.is_del=0
-        and g.commpay_name like "%"#{param.commpayName}"%"
+        select a.id id,a.commpay_name label,ca.channel_id channelId from tb_agent a
+        left join tb_corp_agent ca on ca.agent_id=a.id
+        where  a.commpay_name like "%"#{param.commpayName}"%" and ca.corp_id=#{corpId} and ca.`status`=2 and a.is_del=0
+    </select>
+
+    <select id="queryAgentChannel" resultType="java.lang.Integer">
+        select ca.channel_id channelId from tb_agent a
+        left join tb_corp_agent ca on ca.agent_id=a.id
+        where ca.corp_id=#{corpId} and ca.`status`=2 and a.is_del=0 and a.id =#{param.id}
     </select>
 </mapper>

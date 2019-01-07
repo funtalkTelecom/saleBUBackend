@@ -4,6 +4,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
+import com.hrtx.global.PowerConsts;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.web.mapper.DictMapper;
 import com.hrtx.web.mapper.NumPriceMapper;
 import com.hrtx.web.pojo.Dict;
@@ -90,28 +92,38 @@ public class DictService {
 	public Result editFeatherPrice(Dict dict) {
 		int id = NumberUtils.toInt(String.valueOf(dict.getId()));
 		if(id==0){
-			String name =ObjectUtils.toString(dict.getKeyValue(), " ");
-			Dict d = new Dict();
-			d.setKeyValue(dict.getKeyValue());
-			d.setKeyGroup("feather_price");
-			d.setIsDel(0);
-			Dict dict2 = dictMapper.selectOne(d);
-			if(dict2!=null) return new Result(Result.ERROR,"["+name+"]在该类别已存在");
-			dict.setKeyGroup("feather_price");
-			dict.setIsDel(0);
-			Map map=dictMapper.maxSeqAndKeyId("feather_price");
-			dict.setKeyId(String.valueOf(NumberUtils.toInt(String.valueOf(map.get("keyId")))+1));
-			dict.setSeq(NumberUtils.toInt(String.valueOf(map.get("seq")))+1);
-			dictMapper.insert(dict);
-			lyCrmService.addRule(dict);
+			if(SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_ADD)){
+				String name =ObjectUtils.toString(dict.getKeyValue(), " ");
+				Dict d = new Dict();
+				d.setKeyValue(dict.getKeyValue());
+				d.setKeyGroup("feather_price");
+				d.setCorpId(SessionUtil.getUser().getCorpId());
+				d.setIsDel(0);
+				Dict dict2 = dictMapper.selectOne(d);
+				if(dict2!=null) return new Result(Result.ERROR,"["+name+"]在该类别已存在");
+				dict.setKeyGroup("feather_price");
+				dict.setIsDel(0);
+				Map map=dictMapper.maxSeqAndKeyId("feather_price");
+				dict.setKeyId(String.valueOf(NumberUtils.toInt(String.valueOf(map.get("keyId")))+1));
+				dict.setSeq(NumberUtils.toInt(String.valueOf(map.get("seq")))+1);
+				dict.setCorpId(SessionUtil.getUser().getCorpId());
+				dictMapper.insert(dict);
+				lyCrmService.addRule(dict);
+			}else {
+				return new Result(Result.ERROR, "没有权限");
+			}
 		}else {
-			Dict dict1 = dictMapper.selectByPrimaryKey(dict.getId());
-			if(dict1==null) return new Result(Result.OK, "数据不存在");
-			dict1.setExt1(dict.getExt1());
-			dict1.setExt2(dict.getExt2());
-			dictMapper.updateByPrimaryKey(dict1);
-			log.info("号码规则["+dict1.getKeyValue()+"]更改后的不带4价为["+dict.getExt1()+"],带4价为["+dict.getExt2()+"]");
-			numPriceMapper.matchNumPrice(dict.getCorpId());
+			if(SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_EDIT)){
+				Dict dict1 = dictMapper.selectByPrimaryKey(dict.getId());
+				if(dict1==null) return new Result(Result.OK, "数据不存在");
+				dict1.setExt1(dict.getExt1());
+				dict1.setExt2(dict.getExt2());
+				dictMapper.updateByPrimaryKey(dict1);
+				log.info("号码规则["+dict1.getKeyValue()+"]更改后的不带4价为["+dict.getExt1()+"],带4价为["+dict.getExt2()+"]");
+				numPriceMapper.matchNumPrice(dict1.getCorpId());
+			}else {
+				return new Result(Result.ERROR, "没有权限");
+			}
 		}
 		return new Result(Result.OK, "成功");
 	}

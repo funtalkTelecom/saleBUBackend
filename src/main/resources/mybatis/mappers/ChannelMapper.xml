@@ -6,7 +6,9 @@
         select concat(c.id,'') id,c.channel_id channelId,c.channel channel ,c.ratio_price ratioPrice from tb_channel c where c.is_del=0 order by c.channel_id
     </select>
     <select id="queryPageList" resultType="java.util.HashMap">
-        select concat(c.id,'') id,c.channel channel ,c.ratio_price ratioPrice from tb_channel c where c.is_del=0 order by c.channel_id
+        select concat(c.id,'') id,c.channel channel ,c.ratio_price ratioPrice from tb_channel c
+        where c.is_del=0 and c.corp_id=#{param.corpId}
+        order by c.channel_id
     </select>
 
     <select id="getListbyNum" resultType="java.util.HashMap">

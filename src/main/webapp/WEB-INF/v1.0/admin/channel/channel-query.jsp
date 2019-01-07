@@ -57,13 +57,13 @@
 									<div id="channelList"></div>
 								</div>
 								<div id="feather-price" class="tab-pane fade">
-									<c:if test="<%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_EDIT)%>">
+									<c:if test="<%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_ADD)%>">
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#myModal">添加</button>
 									</c:if>
 									<div id="featherPriceList"></div>
 								</div>
 								<div id="feather-type" class="tab-pane fade">
-									<c:if test="<%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_EDIT)%>">
+									<c:if test="<%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_ADD)%>">
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#typeModal">添加</button>
 									</c:if>
 									<div id="featherTypeList"></div>
@@ -174,6 +174,7 @@
 		<script type="text/javascript">
             var channel_d = <%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_EDIT)%>;
             var channel_del = <%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_DELETE)%>;
+            var channel_add = <%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_ADD)%>;
 		</script>
 	</body>
 </html>

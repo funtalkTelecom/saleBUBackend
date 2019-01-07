@@ -11,7 +11,8 @@
         a.pid as pid,
         a.seq as seq,
         a.ext1 as ext1,
-        a.ext2 as ext2
+        a.ext2 as ext2,
+        a.corp_id as corpId
     </sql>
     <select id="findDictInfo" resultType="Dict">
         select
@@ -38,6 +39,9 @@
         </if>
         <if test="param.note!=null and param.note!=''">
             and a.note like "%"#{param.note}"%"
+        </if>
+        <if test="param.corpId!=null and param.corpId!=''">
+            and a.corp_id = #{param.corpId}
         </if>
         order by a.key_group, a.seq
     </select>
