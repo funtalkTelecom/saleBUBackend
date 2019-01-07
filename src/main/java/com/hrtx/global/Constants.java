@@ -57,6 +57,11 @@ public enum Constants {
     CHANNEL_ID_2("2", "二级代理", "CHANNEL_ID"),
     CHANNEL_ID_3("3", "线上商超", "CHANNEL_ID"),
 
+    //1 待审核，2 审核通过,3 审核未通过
+    CORP_AGENT_STATUS_1(1, "待审核", "CORP_AGENT_STATUS"),
+    CORP_AGENT_STATUS_2(2, "审核通过", "CORP_AGENT_STATUS"),
+    CORP_AGENT_STATUS_3(3, "审核未通过", "CORP_AGENT_STATUS"),
+
     ;
 
     private Object key;

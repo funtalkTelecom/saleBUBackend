@@ -83,6 +83,10 @@ public class TimerController extends BaseReturn{
 			this.lyCrmService.uploadLyIccidData();
 		}else if(StringUtils.equals(task,"ly-synch-num-price-agent")){//
 			this.lyCrmService.paySynchNumPriceAgentData();
+		}else if(StringUtils.equals(task,"base-to-num")){//
+			int sellerId= NumberUtils.toInt(request.getParameter("sellerId"));
+			if(sellerId == 0) return new Result(Result.ERROR,"请传入虚商id");
+			this.lyCrmService.synchBaseToNum(sellerId);
 		}
 		return new Result(Result.OK,task+"在"+Utils.getCurrentDate("yyyy-MM-dd HH:mm:ss") +"执行成功");
 	}

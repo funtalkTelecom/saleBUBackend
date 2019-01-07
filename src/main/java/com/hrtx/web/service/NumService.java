@@ -4,6 +4,7 @@ import com.github.abel533.entity.Example;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.dto.Result;
+import com.hrtx.global.Constants;
 import com.hrtx.global.EgtPage;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
@@ -34,6 +35,9 @@ public class NumService {
 	@Autowired private NumFreezeMapper numFreezeMapper;
 	@Autowired private CityMapper cityMapper;
     @Autowired private LyCrmService lyCrmService;
+    @Autowired private BossNumMapper bossNumMapper;
+    @Autowired private CorpAgentMapper corpAgentMapper;
+    @Autowired private NumPriceAgentMapper numPriceAgentMapper;
 
     /**
      * 绑卡
@@ -213,7 +217,19 @@ public class NumService {
         return numFreezeMapper.queryFreeze(numId);
     }
 
-    public String findBossNum(int cityId) {
-        return cityMapper.findBossNum(cityId);
+    public Result findBossNum(int cityId, int agentId, int corpId) {
+        Example example = new Example(CorpAgent.class);
+        example.createCriteria().andEqualTo("corpId", corpId).andEqualTo("agentId", agentId).andEqualTo("status", Constants.CORP_AGENT_STATUS_2.getIntKey());
+        List<CorpAgent> list = corpAgentMapper.selectByExample(example);
+        if(list.size() != 1) return new Result(Result.ERROR, "未找到号码所属代理商");
+        example = new Example(BossNum.class);
+        example.createCriteria().andEqualTo("cityId", cityId).andEqualTo("corpAgentId", list.get(0).getId());
+        List<BossNum> bns = bossNumMapper.selectByExample(example);
+        if(bns.size() == 1) return new Result(Result.OK, bns.get(0).getBossNum());
+        return new Result(Result.OK, "");
+    }
+
+    public NumPriceAgent getNumPriceAgent(Integer id) {
+        return numPriceAgentMapper.selectByPrimaryKey(id);
     }
 }

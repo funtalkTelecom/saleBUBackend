@@ -66,15 +66,17 @@ public class LiangHaoController extends BaseReturn{
 
     @GetMapping("/add-order")
     @Powers({PowerConsts.LIANGHAOMOUDULE_COMMON_ADD})
-    public ModelAndView addOrder(NumPrice numPrice, HttpServletRequest request){
-        numPrice = numService.getNumPrice(numPrice.getId());
-        if(numPrice == null) return new ModelAndView("admin/error-page").addObject("errormsg", "号码未找到");
-        Result result = apiMealService.mealListForNum(numPrice.getNumId()+"", request);
+    public ModelAndView addOrder(NumPriceAgent numPriceAgent, HttpServletRequest request){
+        numPriceAgent = numService.getNumPriceAgent(numPriceAgent.getId());
+        if(numPriceAgent == null) return new ModelAndView("admin/error-page").addObject("errormsg", "号码未找到");
+        Result result = numService.findBossNum(numPriceAgent.getCityCode(), numPriceAgent.getAgentId(), numPriceAgent.getCorpId());
+        if(result.getCode() != Result.OK) return new ModelAndView("admin/error-page").addObject("errormsg", result.getData());
+        String bossNum = (String) result.getData();
+        result = apiMealService.mealListForNum(numPriceAgent.getNumId()+"", request);
         List mealList = new ArrayList();
         if(result.getCode() == Result.OK) mealList = (List) result.getData();
-        String bossNum = numService.findBossNum(numPrice.getCityCode());
         return new ModelAndView("admin/lianghao/lianghao-add-order")
-                .addObject("numPrice", numPrice)
+                .addObject("numPriceAgent", numPriceAgent)
                 .addObject("types", dictService.findDictByGroup("phone_consumer_id_type"))
                 .addObject("mealList", mealList)
                 .addObject("bossNum", bossNum);
@@ -96,13 +98,13 @@ public class LiangHaoController extends BaseReturn{
         String id = request.getParameter("id");
         if(!LockUtils.tryLock("kfadd"+id)) return new Result(Result.ERROR, "此号码下单中，请稍后再试!");
         try {
-            NumPrice numPrice = numService.getNumPrice(NumberUtils.toInt(id));
-            if(numPrice == null) return new Result(Result.ERROR, "未找到号码");
+            NumPriceAgent numPriceAgent = numService.getNumPriceAgent(NumberUtils.toInt(id));
+            if(numPriceAgent == null) return new Result(Result.ERROR, "未找到号码");
             //判断是否冻结
 //            Integer fuser = numService.queryFreeze(numPrice.getNumId());
 //            if(fuser != null && !fuser.equals(SessionUtil.getUserId())) return new Result(Result.ERROR, "此号码已冻结不可下单");
             int mealId = NumberUtils.toInt(request.getParameter("mealId"));
-            return apiOrderService.submitCustomOrder(numPrice.getNumId(), mealId,request.getParameter("personName"),request.getParameter("personTel"),
+            return apiOrderService.submitCustomOrder(numPriceAgent.getNumId(), mealId,request.getParameter("personName"),request.getParameter("personTel"),
                     request.getParameter("address"),request.getParameter("conment"),request.getParameter("thirdOrder"),request.getParameter("bossNum"),
                     request.getParameter("phoneConsumer"),request.getParameter("phoneConsumerIdType"),request.getParameter("phoneConsumerIdNum"));
         }finally {
@@ -267,13 +269,28 @@ public class LiangHaoController extends BaseReturn{
                     }
                     Map np = (Map) nps.get(0);
                     int cityId = NumberUtils.toInt(String.valueOf(np.get("city_code")));
-                    String bossNum = numService.findBossNum(cityId);
+                    int agentId = NumberUtils.toInt(String.valueOf(np.get("agent_id")));
+                    int corpId = NumberUtils.toInt(String.valueOf(np.get("corp_id")));
+                    Result result2 = numService.findBossNum(cityId, agentId, corpId);
+                    if(result2.getCode() != Result.OK) {
+                        arr.add("失败");arr.add(String.valueOf(result2.getData()));
+                        errors.add(arr.toArray());
+                        continue;
+                    }
+                    String bossNum = (String) result2.getData();
                     if(StringUtils.isBlank(bossNum)) {
                         arr.add("失败");arr.add("未找到BOSS客户工号");
                         errors.add(arr.toArray());
                         continue;
                     }
-                    Result result1 = apiOrderService.submitCustomOrder(NumberUtils.toInt(String.valueOf(np.get("id"))), NumberUtils.toInt(meal.split("#")[0]),
+                    int mealId = NumberUtils.toInt(meal.split("#")[0]);
+                    List<Integer> meals = apiMealService.mealListByNum(phone);
+                    if(!meals.contains(mealId)) {
+                        arr.add("失败");arr.add("所选套餐与号码不匹配");
+                        errors.add(arr.toArray());
+                        continue;
+                    }
+                    Result result1 = apiOrderService.submitCustomOrder(NumberUtils.toInt(String.valueOf(np.get("id"))), mealId,
                             personName, personTel, address, conment, thirdOrder, bossNum, phoneConsumer,phoneConsumerIdType.split("#")[0],phoneConsumerIdNum);
                     if(result1.getCode() == Result.OK || result1.getCode() == Result.OTHER) {
                         arr.add("成功");arr.add("");

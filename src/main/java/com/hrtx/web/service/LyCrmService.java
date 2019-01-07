@@ -384,6 +384,13 @@ public class LyCrmService {
         }
     }
 
+    public void synchBaseToNum(int sellerId){
+        long a = System.currentTimeMillis();
+        this.addNumFeature(sellerId);
+        log.info("------添加特性耗时"+((System.currentTimeMillis()-a)/1000)+"s");
+        this.matchNum(sellerId);
+    }
+
     private void addNumFeature(int corpId) {
         List<Map> nums = numMapper.queryActiveNum(corpId);
         List<Map> feathers = dictMapper.findDictByGroup("FEATHER_TYPE");

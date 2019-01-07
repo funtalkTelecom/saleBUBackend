@@ -35,13 +35,13 @@
 					<div class="page-content">
 						<div class="row">
 							<form role="form" class="form-horizontal" id="form">
-								<input name="id" type="hidden" value="${numPrice.id}">
+								<input name="id" type="hidden" value="${numPriceAgent.id}">
 								<input name="mask" type="hidden" value="提交中...">
 								<div class="modal-body">
 									<div class="form-group">
 										<label class="col-xs-2 control-label">手机号码</label>
 										<div class="col-xs-4">
-											<input type="text" class="form-control" name="phone" disabled="disabled" value="${numPrice.resource}">
+											<input type="text" class="form-control" name="phone" disabled="disabled" value="${numPriceAgent.resource}">
 										</div>
 										<label class="col-xs-2 control-label">套餐名称</label>
 										<div class="col-xs-4">

@@ -68,6 +68,15 @@
         and c.id = #{id} order by a.mid
     </select>
 
+    <select id="mealListByNum" resultType="java.lang.Integer">
+        select a.mid
+        from tb_meal a
+        left join tb_third_city b on a.sale_city=b.city_id
+        left join tb_num c on c.tele_type = a.tele_type  and a.seller_id = c.seller_id
+        where a.is_del = 0
+        and c.num_resource = #{phone} and c.`status` = 2 order by a.mid
+    </select>
+
     <insert id="insertBatch">
         insert into tb_meal(
             mid,
