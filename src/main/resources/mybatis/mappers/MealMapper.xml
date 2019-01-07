@@ -43,6 +43,9 @@
         <if test="param.mealId!=null and param.mealId!=''">
             and a.meal_id like "%"#{param.mealId}"%"
         </if>
+        <if test="param.sellerId!=null and param.sellerId!=''">
+            and a.seller_id =#{param.sellerId}
+        </if>
     </select>
 
     <select id="queryPageListApi" resultType="Meal">

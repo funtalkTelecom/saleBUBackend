@@ -21,6 +21,7 @@ public class MealService {
 
 	public Result pageMeal(Meal meal) {
 		PageHelper.startPage(meal.startToPageNum(),meal.getLimit());
+		meal.setSellerId(SessionUtil.getUser().getCorpId());
 		Page<Object> ob=this.mealMapper.queryPageList(meal);
 		PageInfo<Object> pm = new PageInfo<Object>(ob);
 		return new Result(Result.OK, pm);
