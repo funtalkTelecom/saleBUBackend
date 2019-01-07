@@ -206,8 +206,8 @@ public class AgentService {
 				return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
 			}else{
 				Agent ang = new Agent();
-				ang.setChannelId(NumberUtils.toInt(String.valueOf(map.get("id"))));
-				ang.setId(NumberUtils.toInt(String.valueOf(map.get("channel_id"))));
+				ang.setId(NumberUtils.toInt(String.valueOf(map.get("id"))));
+				ang.setChannelId(NumberUtils.toInt(String.valueOf(map.get("channel_id"))));
 				return new Result(Result.OK, ang);
 			}
 		}else{/*(agent_list.size()==0)*///若无代理渠道，则去默认
