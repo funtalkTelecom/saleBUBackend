@@ -49,7 +49,7 @@
         left join tb_city yy on y.pid= yy.id
         left join (
         select e.num_id num_id, Concat(',', GROUP_CONCAT(t.key_value),',') keyvalue
-        from tb_num_rule e ,tb_dict t where e.`value` = t.key_id and t.key_group='FEATHER_TYPE' and e.rule_type='FEATHER_TYPE' and t.is_del=0  GROUP BY  e.num_id
+        from tb_num_rule e ,tb_dict t,tb_num n1  where e.`value` = t.key_id  and e.num_id=n1.id and n1.sku_id=#{skuId} and t.key_group='FEATHER_TYPE' and e.rule_type='FEATHER_TYPE' and t.is_del=0  GROUP BY  e.num_id
         ) tt on m.id = tt.num_id ,tb_channel c where c.is_del = 0 and c.corp_id = m.seller_id and m.`status` in (1,2)
         and m.sku_id =#{skuId}
 
