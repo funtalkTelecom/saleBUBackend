@@ -221,6 +221,7 @@ public class GoodsService {
                 String skuRepoGoods =String.valueOf(map1.get("companystock_id"));
                 String skuGoodsType =String.valueOf(map1.get("skuGoodsType"));
                 double basePrice =Double.valueOf(String.valueOf(map1.get("basePrice")));
+                log.info("仓库接口调用结束");
                 if(!skuGoodsType.equals("3")){
                     //调用仓储接口
                     Map param = new HashMap();
@@ -269,7 +270,7 @@ public class GoodsService {
                 }
                 skuMapper.updateSkuStatus(sku);
             }
-
+            log.info("仓库接口调用结束");
             numberService.numberUpdate(isGoodSkuMap,goods);
 
             goods.setStatus(5);   //价格更新失败

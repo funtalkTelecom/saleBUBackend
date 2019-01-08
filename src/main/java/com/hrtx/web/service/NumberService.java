@@ -18,6 +18,8 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +41,11 @@ public class NumberService {
 	@Autowired
 	private NumberPriceMapper numberPriceMapper;
 
+    public final Logger log = LoggerFactory.getLogger(this.getClass());
+
 	public Result numberUpdate(List<Map<String,Object>> isGoodSkuMap, Goods goods){
         for(int i=0; i<isGoodSkuMap.size(); i++){
+            log.info("更新开始");
             Map map1 =(Map) isGoodSkuMap.get(i);
             Integer skuid =NumberUtils.toInt(String.valueOf(map1.get("SkuId")));
             Sku s =  skuMapper.selectByPrimaryKey(skuid);
@@ -65,11 +70,13 @@ public class NumberService {
                         }else{
                             numberMapper.updateStatusByNumber(StrNums,skuid,2,null,null);
                         }
-
                     }
+                    log.info("更新tb_num 结束");
                     if("0".equals(goods.getgIsAuc()) && "4".equals(s.getSkuGoodsType())){//更新tb_num_price
                         numberPriceMapper.insertListNumPrice(skuid,basePrice,SessionUtil.getUser().getCorpId());
+                        log.info("更新tb_num_price 结束");
                     }
+
                 }
             }
         }
