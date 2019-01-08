@@ -40,33 +40,13 @@
     </select>
 
     <select id="queryPageList" resultType="Agent">
-        select t.id id, t.commpay_name,t.person,t.phone,
-        y.name as provinceName ,c.name as cityName,d.name as districtName,
-        t.address,u.nick_name as userName,
-        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,
-        t.trading_img,ct.status as status,
-				case
-				when ct.status =1 then '待审核'
-				when ct.status =2 then '审核通过'
-                when ct.status =3 then '审核未通过'
-				else '未知'
-				end as statustext,l.channel as channelName
-				from tb_agent t
-        left join tb_corp_agent ct on t.id = ct.agent_id
-        left join tb_channel l on ct.channel_id = l.channel_id
-        left join tb_city y on t.province = y.id
-        left join tb_city c on t.city = c.id
-        left join tb_city d on t.district = d.id
-        left join tb_consumer u on t.add_consumer_id = u.id
-        where t.is_del=0 and t.type=1 and l.is_del=0
+        select t.id id, t.commpay_name,t.person,t.phone, t.address, DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate, t.trading_img
+				from tb_agent t where t.is_del=0
         <if test="param.commpayName!=null and param.commpayName!=''">
             and  t.commpay_name  like "%"#{param.commpayName}"%"
         </if>
         <if test="param.person!=null and param.person!=''">
             and t.person like "%"#{param.person}"%"
-        </if>
-        <if test="param.status!=-1 and param.status!=null and param.status!='' ">
-            and ct.status = #{param.status}
         </if>
     </select>
 

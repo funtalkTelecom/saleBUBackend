@@ -24,5 +24,5 @@ public interface CityMapper extends Mapper<City>,BaseMapper<City>{
 
     List<Map> findCityByGrade(@Param("grade") int grade);
 
-    String findBossNum(@Param("cityId") int cityId);
+    String findBossNum(@Param("cityId") int cityId, @Param("agentId") int agentId, @Param("corpId") int corpId);
 }

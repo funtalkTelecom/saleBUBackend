@@ -53,7 +53,7 @@ $(function() {
                             node.push('<a class="btn btn-success btn-xs unfreeze" href="javascript:void(0);">解冻</a>');
                         }
                         if(lh_add) {
-                            node.push('<a class="btn btn-success btn-xs" href="lianghao/add-order?id='+record.numPriceId+'" target="_blank">下单</a>');
+                            node.push('<a class="btn btn-success btn-xs" href="lianghao/add-order?id='+record.num_price_agent_id+'" target="_blank">下单</a>');
 						}
             		    $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
             		    //点击详情

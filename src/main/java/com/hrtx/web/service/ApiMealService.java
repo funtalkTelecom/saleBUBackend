@@ -88,4 +88,8 @@ public class ApiMealService {
 		meal.setIsDel(0);
 		return mealMapper.select(meal);
 	}
+
+	public List<Integer> mealListByNum(String phone) {
+		return mealMapper.mealListByNum(phone);
+	}
 }

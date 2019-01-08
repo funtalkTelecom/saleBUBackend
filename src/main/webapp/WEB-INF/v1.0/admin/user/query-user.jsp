@@ -105,6 +105,19 @@
 										<input type="text" class="form-control" name="phone">
 									</div>
 								</div>
+
+								<div class="form-group">
+									<label class="col-xs-2 col-sm-2 control-label">代理商</label>
+									<div class="col-xs-4 col-sm-4">
+										<select name="agentId" class="form-control">
+											<option value="0">请选择</option>
+											<c:forEach items="${agents}" varStatus="i" var="item">
+												<option value="${item.id}">${item.commpayName}</option>
+											</c:forEach>
+										</select>
+									</div>
+								</div>
+
 								<div class="form-group">
 									<label class="col-xs-3 col-sm-2 control-label">角色</label>
 									<div class="col-xs-9 col-sm-10">

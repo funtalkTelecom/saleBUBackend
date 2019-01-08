@@ -9,14 +9,14 @@
     </select>
     <select id="queryActiveNum" resultType="java.util.HashMap">
         select b.id, b.num_resource
-         from tb_num_base b, tb_city c
-          where b.city_code = c.ly_code and b.seller_id = #{corpId} and b.num_resource not in (select n.num_resource from tb_num n where  n.`status` not in (6,8,9) and n.seller_id = #{corpId})
+         from tb_num_base b, tb_third_city c
+      where b.city_code = c.third_id and b.seller_id = c.corp_id and b.seller_id = #{corpId} and b.num_resource not in (select n.num_resource from tb_num n where  n.`status` not in (6,8,9) and n.seller_id = #{corpId})
     </select>
   <insert id="insertAcitveNum">
   	INSERT INTO tb_num (`id`, `city_id`, `city_name`, `net_type`, `num_resource`, `num_type`, `num_level`, `low_consume`, `with4`, `feature`, `section_no`, `more_digit`, `seller_id`, `seller`, `buyer_id`, `buyer`, `iccid`, `status`, `tele_type`)
-     select b.id, c.id, c.name, b.net_type, b.num_resource, b.num_type, b.num_level, b.low_consume, case when LOCATE('4',b.num_resource) > 0 then 1 else 0 end, '', substr(b.num_resource, 1,7), '',  #{corpId}, '', 0, '', '', 1, b.net_type
-     from tb_num_base b, tb_city c
-     where b.city_code = c.ly_code and b.seller_id = #{corpId} and b.num_resource not in (select n.num_resource from tb_num n where n.seller_id = #{corpId} and n.`status` not in (6,8,9))
+     select b.id, c.city_id, c.city_name, b.net_type, b.num_resource, b.num_type, b.num_level, b.low_consume, case when LOCATE('4',b.num_resource) > 0 then 1 else 0 end, '', substr(b.num_resource, 1,7), '',  #{corpId}, '', 0, '', '', 1, b.net_type
+     from tb_num_base b, tb_third_city c
+     where b.city_code = c.third_id and b.seller_id = c.corp_id and b.seller_id = #{corpId} and b.num_resource not in (select n.num_resource from tb_num n where n.seller_id = #{corpId} and n.`status` not in (6,8,9))
   </insert>
   <update id="updateLoseNum">
         update tb_num n,(

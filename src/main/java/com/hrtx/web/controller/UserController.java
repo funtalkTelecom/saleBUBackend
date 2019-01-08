@@ -2,13 +2,16 @@ package com.hrtx.web.controller;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.github.pagehelper.PageInfo;
+import com.hrtx.web.pojo.Agent;
 import com.hrtx.web.pojo.Corporation;
+import com.hrtx.web.service.AgentService;
 import com.hrtx.web.service.CorporationService;
 import com.hrtx.web.service.PermissionService;
 import org.apache.commons.lang.ObjectUtils;
@@ -38,6 +41,7 @@ public class UserController {
 	@Autowired private UserService userService;
 	@Autowired private PermissionService permissionService;
 	@Autowired private CorporationService corporationService;
+	@Autowired private AgentService agentService;
 
 	@GetMapping("/")
 	@Powers({PowerConsts.NOLOGINPOWER})
@@ -97,6 +101,8 @@ public class UserController {
     public ModelAndView queryUser(User user, HttpServletRequest request) {
         request.setAttribute("roles",((PageInfo)permissionService.listRole(null).getData()).getList());
         request.setAttribute("corps", ((PageInfo)corporationService.pageCorporation(new Corporation()).getData()).getList());
+        List angets = ((PageInfo)agentService.pageAgent(new Agent()).getData()).getList();
+        request.setAttribute("agents", angets);
         return new ModelAndView("admin/user/query-user");
     }
     

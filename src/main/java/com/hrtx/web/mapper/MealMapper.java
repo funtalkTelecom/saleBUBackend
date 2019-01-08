@@ -25,4 +25,6 @@ public interface MealMapper extends Mapper<Meal>,BaseMapper<Meal>{
     Page<Object> queryPageListApi(Meal meal);
 
     List getMealListByNum(@Param("id") String id);
+
+    List<Integer> mealListByNum(@Param("phone") String phone);
 }

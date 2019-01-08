@@ -26,8 +26,9 @@
   <select id="queryList" resultType="java.util.HashMap">
 
     select a.num_price_id numPriceId, a.resource, case when a.net_type = '电信' then 1 when a.net_type = '联通' then 2 when a.net_type = '移动' then 3 else 0 end net_type,
-    a.province_name, a.city_name, a.feature, a.price, a.is_freeze, a.num_id id, a.`status`, a.city_code,
-    a.with4,a.net_type teleType, 0 skuTobPrice,0 skuTocPrice, a.net_type netType, a.num_level numLevel, a.low_consume lowConsume, a.sku_id skuId,a.num_tags tags
+    a.province_name, a.city_name, a.feature, a.price, a.is_freeze, a.num_id id, a.`status`, a.city_code, a.id num_price_agent_id,
+    a.with4,a.net_type teleType, 0 skuTobPrice,0 skuTocPrice, a.net_type netType, a.num_level numLevel, a.low_consume lowConsume, a.sku_id skuId,a.num_tags tags,
+    a.agent_id, a.corp_id
     from tb_num_price_agent a  where a.status = 2
 
     <if test="param.agentId!=null and param.agentId > 0"> and a.agent_id = #{param.agentId}</if>
@@ -72,10 +73,10 @@
     select r.num_id, r.num, case when locate('4',r.num) > 0 then d.ext2 else d.ext1 end price
     from tb_num_rule r, tb_dict d where r.`value` = d.key_id and r.rule_type = 'feather_price' and d.key_group = 'feather_price' and d.is_del = 0 and d.corp_id = #{corpId}
     ) t group by t.num_id
-    ) bp on n.num_id = bp.num_id, tb_channel c where n.agent_id = -1 and n.channel = c.channel_id and c.corp_id = #{corpId} and c.is_del = 0 and n.is_del = 0
+    ) bp on n.num_id = bp.num_id, tb_channel c where n.agent_id = -1 and n.channel = c.channel_id and n.corp_id = #{corpId} and c.corp_id = #{corpId} and c.is_del = 0 and n.is_del = 0
      and ((n.base_price != bp.price) or n.ratio_price != c.ratio_price)
 
-    ) t1 set t.ratio_price = t1.ratio_price, t.base_price = t1.price, t.price = t1.ratio_price * t1.price where t.id = t1.id and t.is_del = 0
+    ) t1 set t.ratio_price = t1.ratio_price, t.base_price = t1.price, t.price = t1.ratio_price * t1.price where t.id = t1.id and t.is_del = 0 and t.corp_id = #{corpId}
 
   </update>
 

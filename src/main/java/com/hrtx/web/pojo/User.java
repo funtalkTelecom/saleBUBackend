@@ -18,6 +18,7 @@ public class User extends BasePojo implements java.io.Serializable {
 	private String pwd;
 	private String name;
 	private Integer corpId;
+	private Integer agentId;
 	private String phone;
 	private Integer addUser;
 	private Date addDate;
@@ -85,6 +86,14 @@ public class User extends BasePojo implements java.io.Serializable {
 
 	public void setCorpId(Integer corpId) {
 		this.corpId = corpId;
+	}
+
+	public Integer getAgentId() {
+		return agentId;
+	}
+
+	public void setAgentId(Integer agentId) {
+		this.agentId = agentId;
 	}
 
 	public String getPhone() {
