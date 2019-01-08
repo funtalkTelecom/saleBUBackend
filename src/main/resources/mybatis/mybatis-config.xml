@@ -9,7 +9,7 @@
 		<setting name="mapUnderscoreToCamelCase" value="true" />
 		<!--<setting name="autoMappingBehavior" value="true" />-->
 		<!-- 打印查询语句 -->
-        <setting name="logImpl" value="STDOUT_LOGGING" />
+        <setting name="logImpl" value="LOG4J2" />
 	</settings>
 
 	<plugins>
