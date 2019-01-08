@@ -389,6 +389,9 @@ public class LyCrmService {
         this.addNumFeature(sellerId);
         log.info("------添加特性耗时"+((System.currentTimeMillis()-a)/1000)+"s");
         this.matchNum(sellerId);
+        NumBase nb = new NumBase();
+        nb.setSellerId(sellerId);
+        numBaseMapper.delete(nb);
     }
 
     private void addNumFeature(int corpId) {
