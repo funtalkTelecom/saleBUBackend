@@ -433,7 +433,7 @@ public class LyCrmService {
 
     private void matchNum(int corpId) {
         numMapper.insertAcitveNum(corpId);
-        numMapper.updateLoseNum(corpId);
+        if(corpId == 10) numMapper.updateLoseNum(corpId);
     }
 
     public void addRule(Dict dict){
