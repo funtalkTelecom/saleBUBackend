@@ -51,7 +51,7 @@ public class ChannelService {
         channelMapper.insert(cl);
         c.setIsDel(1);
         channelMapper.updateByPrimaryKey(c);
-        numPriceMapper.matchNumPrice(channel.getCorpId());
+        numPriceMapper.matchNumPrice(c.getCorpId());
         return new Result(Result.OK, "成功");
     }
 
