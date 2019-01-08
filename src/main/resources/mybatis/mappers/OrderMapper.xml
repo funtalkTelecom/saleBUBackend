@@ -166,10 +166,6 @@
         <if test="param.status!=null and param.status!='' and param.status!='-1'">
             and a.status = #{param.status}
         </if>
-        <if test="sellerId!=null and sellerId > 0">
-            and m.seller_id = #{sellerId}
-        </if>
-
         order by a.add_date desc
     </select>
 

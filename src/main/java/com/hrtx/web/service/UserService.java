@@ -190,7 +190,7 @@ public class UserService extends BaseService {
         User u = list.size() == 0 ? null : list.get(0);
         if(u != null && u.getId() != id && StringUtils.equals(u.getLoginName(),loginName)) return new Result(Result.ERROR,"["+loginName+"]已存在");
         if(id==0){
-            if(StringUtils.isBlank(user.getLoginName()) || StringUtils.isBlank(user.getName()) || user.getCorpId() == null || user.getCorpId() == 0L || StringUtils.isBlank(user.getPhone())) {
+            if(StringUtils.isBlank(user.getLoginName()) || StringUtils.isBlank(user.getName()) || user.getCorpId() == null || user.getCorpId() == 0 || user.getAgentId() == null || user.getAgentId() == 0 || StringUtils.isBlank(user.getPhone())) {
                 return new Result(Result.ERROR,"必填参数未填写");
             }
             if(!user.getPhone().matches(RegexConsts.REGEX_MOBILE_COMMON)) return new Result(Result.ERROR,"请填写正确的手机号码");
@@ -209,7 +209,7 @@ public class UserService extends BaseService {
             id = user.getId();
             Messager.send(user.getPhone(), "尊敬的用户,系统给您分配的平台账号" + user.getLoginName()+"已生效，密码是："+ pwd + ",感谢您的使用！");
         }else{//修改
-            if(StringUtils.isBlank(user.getName()) || user.getCorpId() == null || user.getCorpId() == 0L || StringUtils.isBlank(user.getPhone())) {
+            if(StringUtils.isBlank(user.getName()) || user.getCorpId() == null || user.getCorpId() == 0 || user.getAgentId() == null || user.getAgentId() == 0 || StringUtils.isBlank(user.getPhone())) {
                 return new Result(Result.ERROR,"必填参数未填写");
             }
             if(!user.getPhone().matches(RegexConsts.REGEX_MOBILE_COMMON)) return new Result(Result.ERROR,"请填写正确的手机号码");
@@ -217,6 +217,7 @@ public class UserService extends BaseService {
             if(u == null) return new Result(Result.ERROR, "用户不存在");
             u.setName(user.getName());
             u.setCorpId(user.getCorpId());
+            u.setAgentId(user.getAgentId());
             u.setPhone(user.getPhone());
             userMapper.updateByPrimaryKeySelective(u);
         }

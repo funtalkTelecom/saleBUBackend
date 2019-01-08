@@ -50,6 +50,7 @@ $(function() {
                                     $(this)[0].checked = false;
                                 })
                                 var arr=(_data.roles).split(",");
+                                $('#myModal').modal('show');
                                 for (var index = 0; index < arr.length; index++) {
                                     if(arr[index]=='')continue;
                                     // $("#myModal input.pmid"+arr[index]).prop("checked",true);
