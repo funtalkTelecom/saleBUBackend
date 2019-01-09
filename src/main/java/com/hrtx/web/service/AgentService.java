@@ -199,6 +199,11 @@ public class AgentService {
 //				.andEqualTo("isDel",0)
 //				.andEqualTo("status",2);
 //		List<Agent> agent_list=agentMapper.selectByExample(example);
+		if(user ==null){
+			Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
+			if(agent==null) return new Result(Result.ERROR, "系统代理商不存在");
+			else return new Result(Result.OK, agent);
+		}
 		List agent_list=agentMapper.findConsumenrIdCount(user.getId());
 		if(agent_list.size()>0){//说明当前的用户有对应的渠道，取其渠道对应的价格
 			Map map = (Map) agent_list.get(0);
