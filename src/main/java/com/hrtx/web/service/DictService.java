@@ -145,4 +145,6 @@ public class DictService {
 		lyCrmService.addRule(dict);
 		return new Result(Result.OK, "成功");
 	}
+
+
 }

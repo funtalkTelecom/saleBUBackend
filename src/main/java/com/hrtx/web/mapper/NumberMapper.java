@@ -57,4 +57,12 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
 
     Map getNumSkuGoodsTypeById(@Param("id") String id);
 
+
+    /**
+     * 活动验证上架的号码
+     * @param
+     * @return
+     */
+    int activitycheckNumberIsOkStatus(@Param("sellerId") Integer sellerId,@Param("numResource") String numResource,@Param("angentId") Integer angentId);
+
 }

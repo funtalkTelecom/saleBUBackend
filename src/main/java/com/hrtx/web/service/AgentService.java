@@ -188,6 +188,10 @@ public class AgentService {
 		return new Result(Result.OK, list);
 	}
 
+	public List queryAgentBySellerId(Integer sellerId) {
+		return  agentMapper.queryAgentBySellerId(sellerId);
+	}
+
 	/**
 	 * 根据提交用户获取代理商信息，若一个用户存在多个代理商或用户存在一个代理商但无渠道信息 则说明数据异常，若用户不存在代理商则取默认的代理商
 	 * @param user	当前登录用户

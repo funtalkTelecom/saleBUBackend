@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrtx.web.mapper.ActivityMapper">
+
+    <insert id="insertActivity">
+        insert into tb_activity (id,type,begin_date,end_date,add_seller_id,add_user_id,add_date,agent_id,title,status,start_h,end_h,is_del)
+        VALUES
+            (
+            #{id},
+            #{type},
+            #{beginDate},
+            #{endDate},
+            #{addSellerId},
+            #{addUserId},
+            #{addDate},
+            #{agentId},
+            #{title},
+            #{status},
+            #{startH},
+            #{endH},
+            '0'
+            )
+    </insert>
+
+    <select id="queryPageList" resultType="Activity">
+        select y.id,y.type, y.title,y.begin_date,y.end_date,y.status,
+        case
+        when y.status =0 then '失效'
+        when y.status =1 then '正常'
+        else '未知'
+        end as statusText
+        from tb_activity y where y.is_del=0
+        <if test="param.title!=null and param.title!=''">
+            and  y.title like "%"#{param.title}"%"
+        </if>
+        order by y.id desc
+    </select>
+
+</mapper>

@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.SystemParam;
+import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.AgentMapper;
 import com.hrtx.web.mapper.NumPriceMapper;
 import com.hrtx.web.mapper.NumberMapper;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,8 @@ public class ApiNumberService {
 	private NumService numService;
 	@Autowired
 	private AgentService agentService;
+	@Autowired
+	private ActivityService activityService;
 	/**
 	 * 根据tags获取号码
 	 * @param numPrice
@@ -63,9 +67,12 @@ public class ApiNumberService {
 			return new Result(reagent.ERROR, reagent.getData());
 		}
 		Agent agent = (Agent) reagent.getData();
-
-
-//		numPrice.setChannel(agent.getChannelId());
+		//-----zdh
+//		Date[] queryActiveDate = activityService.queryActiveDate(1);
+//		numPrice.setFalg(1);
+//		numPrice.setBeginDate(Utils.getDate(queryActiveDate[0],"yyyy-MM-dd HH:mm:ss"));
+//		numPrice.setEndDate(Utils.getDate(queryActiveDate[2],"yyyy-MM-dd HH:mm:ss"));
+		//------zdh
 		numPrice.setAgentId(agent.getId());
 		pm = numService.queryNumPrice(numPrice);
 		//处理号码,生成号码块字段(numBlock)
@@ -74,7 +81,52 @@ public class ApiNumberService {
 			Map obj= (Map) ob.get(i);
 			obj.put("numBlock", getNumBlock((String) obj.get("resource")));
 		}
+		return new Result(Result.OK, pm);
+	}
 
+
+	public Result seckillListTime( HttpServletRequest request){
+		int falg = request.getParameter("falg")==null? 1: Integer.parseInt(request.getParameter("falg"));
+		Date[] queryActiveDate = activityService.queryActiveDate(falg);
+		NumPrice numPrice = new NumPrice();
+		numPrice.setBeginDate(Utils.getDate(queryActiveDate[0],"yyyy-MM-dd HH:mm:ss"));
+		numPrice.setNewDate(Utils.getDate(queryActiveDate[1],"yyyy-MM-dd HH:mm:ss"));
+		numPrice.setEndDate(Utils.getDate(queryActiveDate[2],"yyyy-MM-dd HH:mm:ss"));
+		return new Result(Result.OK, numPrice);
+	}
+	/***
+	 * 秒杀
+	 * @param numPrice
+	 * @param request
+	 * @return
+	 */
+	public Result numberSeckillList(NumPrice numPrice, HttpServletRequest request){
+		PageInfo<Object> pm = null;
+		int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+		int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+		numPrice.setPageNum(pageNum);
+		numPrice.setLimit(limit);
+		//1 当前正在进行；2即将开始
+		int falg = request.getParameter("falg")==null? 1: Integer.parseInt(request.getParameter("falg"));
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		//是否是代理商
+		Result reagent = agentService.queryCurrAgent(consumer);
+		if(reagent.getCode()!=Result.OK){
+			return new Result(reagent.ERROR, reagent.getData());
+		}
+		Date[] queryActiveDate = activityService.queryActiveDate(falg);
+		Agent agent = (Agent) reagent.getData();
+		numPrice.setAgentId(agent.getId());
+		numPrice.setFalg(falg);
+		numPrice.setBeginDate(Utils.getDate(queryActiveDate[0],"yyyy-MM-dd HH:mm:ss"));
+		numPrice.setEndDate(Utils.getDate(queryActiveDate[2],"yyyy-MM-dd HH:mm:ss"));
+		pm = numService.queryNumPrice(numPrice);
+		//处理号码,生成号码块字段(numBlock)
+		List ob =pm.getList();
+		for (int i = 0; i < ob.size(); i++) {
+			Map obj= (Map) ob.get(i);
+			obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+		}
 		return new Result(Result.OK, pm);
 	}
 //	public Result numberList(Number number, HttpServletRequest request){

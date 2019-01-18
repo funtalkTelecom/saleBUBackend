@@ -42,6 +42,26 @@ public class ApiNumberController extends BaseReturn{
 		return apiNumberService.numberList(numPrice, request);
 	}
 
+	@GetMapping("/seckillListTime ")
+	@Powers(PowerConsts.NOLOGINPOWER)
+	@ResponseBody
+	public Result seckillListTime(HttpServletRequest request){
+		return apiNumberService.seckillListTime(request);
+	}
+
+	/***
+	 * 手机秒杀列表
+	 * @param numPrice
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/numberSeckillList ")
+	@Powers(PowerConsts.NOLOGINPOWER)
+	@ResponseBody
+	public Result numberSeckillList(NumPrice numPrice, HttpServletRequest request){
+		return apiNumberService.numberSeckillList(numPrice, request);
+	}
+
 	@GetMapping("/number/{id}")
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody

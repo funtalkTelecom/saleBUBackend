@@ -8,4 +8,31 @@
         select sku.sku_id from tb_goods c join tb_sku sku on c.g_id=sku.g_id
         where SYSDATE( ) BETWEEN c.g_start_time AND c.g_end_time and c.`status` = 1 AND c.g_is_auc = 0 AND sku.sku_goods_type = '4' AND c.g_is_sale = '1'
     </select>
+
+    <select id="listNum" resultType="java.util.HashMap">
+        select m.num_resource, m.tele_type ,p.price from tb_num m
+        left join tb_num_price_agent p on  m.id = p.num_id  and m.seller_id = p.corp_id
+        where m.`status`=2
+        <if test="sellerId!=null and sellerId!=''">
+            and p.corp_id= #{sellerId}
+        </if>
+        <if test="agentId!=null and agentId!=''">
+            and p.agent_id= #{agentId}
+        </if>
+        and  p.resource in (
+        <foreach collection="StrNums.split(',')" item="Nums" separator=",">
+            #{Nums}
+        </foreach>
+        )
+    </select>
+
+    <update id="updateNumPriceAgent">
+        update tb_num_price_agent g
+        set g.activity_id=#{activityId} ,
+        g.activity_type=#{activityType},
+        g.activity_sdate=#{activitySdate},
+        g.activity_edate=#{activityEdate},
+        g.activity_price=#{activityPrice}
+        where g.agent_id=#{agentId} and g.corp_id=#{corpId} and g.resource =#{resource}
+    </update>
 </mapper>

@@ -119,6 +119,10 @@ public enum PowerConsts {
 	EPSALEMOUDULE_COMMON_QUEYR(90702,"查询",90700,1,"",3,2),//竞拍活动查询
 	EPSALEMOUDULE_COMMON_EDIT(90703,"修改",90700,1,"",3,3),//竞拍活动修改
 	EPSALEMOUDULE_COMMON_DELETE(90704,"删除",90700,1,"",3,4),//竞拍活动删除
+
+	ACTIVITYMOUDULE(90900,"活动管理",90000,0,"activity/activity-query",2,1),
+	ACTIVITYMOUDULE_COMMON_ADD(90901,"添加",90900,1,"",3,1),//活动添加
+	ACTIVITYMOUDULE_COMMON_QUEYR(90902,"查询",90900,1,"",3,2),//活动查询
 	;
 	
 	public int getId() {

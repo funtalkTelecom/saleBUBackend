@@ -5,6 +5,9 @@ import org.apache.commons.lang.ArrayUtils;
 import javax.persistence.*;
 import javax.tools.Tool;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import static javax.persistence.GenerationType.SEQUENCE;
 
 /**
@@ -106,18 +109,18 @@ public class City implements java.io.Serializable {
 	}
 
 	public static void main(String[] args) {
-		String[] skuSaleNumbs = {"a","b","c","d","e","f","g"};
-		int size = skuSaleNumbs.length;
-		int start = 0;
-		Object[] t = null;
-		int limit = 5;
-		while(start < size) {
-			t = ArrayUtils.subarray(skuSaleNumbs,start, start+limit);
-			start = start + t.length;
-			String a =ArrayUtils.toString(t,"");
-			String getSignInfo = a.substring(a.indexOf("{") + 1, a.indexOf("}"));
-			java.lang.System.out.println( a);
-			java.lang.System.out.println( getSignInfo);
-		}
+//		String[] skuSaleNumbs = {"a","b","c","d","e","f","g"};
+//		int size = skuSaleNumbs.length;
+//		int start = 0;
+//		Object[] t = null;
+//		int limit = 5;
+//		while(start < size) {
+//			t = ArrayUtils.subarray(skuSaleNumbs,start, start+limit);
+//			start = start + t.length;
+//			String a =ArrayUtils.toString(t,"");
+//			String getSignInfo = a.substring(a.indexOf("{") + 1, a.indexOf("}"));
+//			java.lang.System.out.println( a);
+//			java.lang.System.out.println( getSignInfo);
+//		}
 	}
 }

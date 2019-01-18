@@ -64,6 +64,17 @@ public class NumPriceAgent implements java.io.Serializable {
 
     private Integer excPrice;
 
+    private Integer activityId;
+
+    private Integer activityType;
+
+    private Date activitySdate;
+
+    private Date activityEdate;
+
+    private Double activityPrice;
+
+
     public NumPriceAgent(Integer id, Integer skuId, Integer numId, Integer provinceCode, String provinceName, Integer cityCode, String cityName, String resource, BigDecimal basePrice, String netType, String feature, BigDecimal lowConsume, Integer corpId, Integer channel, BigDecimal ratioPrice, BigDecimal price, String agent, Integer agentId, Date addDate, Integer with4, Integer isFreeze, String numLevel, BigDecimal skuTocPrice, BigDecimal skuTobPrice, String numTags, Integer status, Integer excPrice) {
         this.id = id;
         this.skuId = skuId;
@@ -312,5 +323,45 @@ public class NumPriceAgent implements java.io.Serializable {
 
     public void setExcPrice(Integer excPrice) {
         this.excPrice = excPrice;
+    }
+
+    public Integer getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(Integer activityId) {
+        this.activityId = activityId;
+    }
+
+    public Integer getActivityType() {
+        return activityType;
+    }
+
+    public void setActivityType(Integer activityType) {
+        this.activityType = activityType;
+    }
+
+    public Date getActivitySdate() {
+        return activitySdate;
+    }
+
+    public void setActivitySdate(Date activitySdate) {
+        this.activitySdate = activitySdate;
+    }
+
+    public Date getActivityEdate() {
+        return activityEdate;
+    }
+
+    public void setActivityEdate(Date activityEdate) {
+        this.activityEdate = activityEdate;
+    }
+
+    public Double getActivityPrice() {
+        return activityPrice;
+    }
+
+    public void setActivityPrice(Double activityPrice) {
+        this.activityPrice = activityPrice;
     }
 }

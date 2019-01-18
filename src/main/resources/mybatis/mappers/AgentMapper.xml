@@ -109,4 +109,10 @@
         left join tb_corp_agent ca on ca.agent_id=a.id
         where ca.corp_id=#{corpId} and ca.`status`=2 and a.is_del=0 and a.id =#{param.id}
     </select>
+    <select id="queryAgentBySellerId" resultType="java.util.HashMap">
+        select t.id id,t.commpay_name name from tb_corp_agent ca
+        left join tb_agent  t on ca.agent_id =  t.id
+        where ca.`status`=2 and ca.corp_id= #{sellerId}
+    </select>
+
 </mapper>

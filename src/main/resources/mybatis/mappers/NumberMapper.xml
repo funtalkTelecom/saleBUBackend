@@ -408,4 +408,19 @@
         and m.id= #{id}
     </select>
 
+    <select id="activitycheckNumberIsOkStatus" resultType="java.lang.Integer">
+        select count(1) as num from
+        tb_num_price_agent p
+        where p.`status`=2
+        <if test="numResource!=null and numResource!=''">
+            and p.resource = #{numResource}
+        </if>
+        <if test="sellerId!=null and sellerId!=''">
+            and p.corp_id = #{sellerId}
+        </if>
+        <if test="angentId!=null and angentId!=''">
+           and p.agent_id = #{angentId}
+        </if>
+    </select>
+
 </mapper>
