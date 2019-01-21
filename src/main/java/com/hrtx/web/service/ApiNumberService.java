@@ -258,6 +258,7 @@ public class ApiNumberService {
 			if(obj==null) return new Result(Result.ERROR, "未找到号码");
 			obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
 		}
+		obj.put("newDate",new Date());
 		return new Result(Result.OK, obj);
 	}
 
