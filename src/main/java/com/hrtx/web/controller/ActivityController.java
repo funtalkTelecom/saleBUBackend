@@ -39,6 +39,11 @@ public class ActivityController extends BaseReturn{
 	@Autowired
 	private DictService dictService;
 
+	/**
+	 * 初始化活动界面
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("activity/activity-query")
 	@Powers({PowerConsts.ACTIVITYMOUDULE})
 	public ModelAndView activityQuery(HttpServletRequest request){
@@ -49,6 +54,11 @@ public class ActivityController extends BaseReturn{
 		return new ModelAndView("admin/activity/activity-query");
 	}
 
+	/***
+	 * 活动列表
+	 * @param activity
+	 * @return
+	 */
 	@RequestMapping("activity/activity-list")
 	@Powers({PowerConsts.ACTIVITYMOUDULE_COMMON_QUEYR})
 	public Result listEPSale(Activity activity){

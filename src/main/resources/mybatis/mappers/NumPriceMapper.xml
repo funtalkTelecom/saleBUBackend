@@ -46,10 +46,10 @@
         and a.activity_type=1
         and SYSDATE() BETWEEN a.activity_sdate and a.activity_edate
       </when>
-      <otherwise>
+      <when test="param.falg == 2">
         and a.activity_type=1
         and DATE_FORMAT(#{param.beginDate}, '%Y-%m-%d %H:%i:%S') =a.activity_sdate
-      </otherwise>
+      </when>
     </choose>
 
     <choose>
@@ -75,6 +75,18 @@
     <if test="param.temp!=null and param.temp!=''"> and a.resource like #{param.temp}</if>
     <if test="param.resource!=null and param.resource!=''"> and a.resource like "%"#{param.resource}"%"</if>
     <if test="param.numId!=null and param.numId > 0"> and a.num_id = #{param.numId}</if>
+
+    <choose>
+      <when test="param.falg == 1">
+        and a.activity_type=1
+        and SYSDATE() BETWEEN a.activity_sdate and a.activity_edate
+      </when>
+      <when test="param.falg == 2">
+        and a.activity_type=1
+        and DATE_FORMAT(#{param.beginDate}, '%Y-%m-%d %H:%i:%S') =a.activity_sdate
+      </when>
+    </choose>
+
   </select>
 
   <update id="matchNumPrice">

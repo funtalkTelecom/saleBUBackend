@@ -42,7 +42,7 @@ public class ApiNumberController extends BaseReturn{
 		return apiNumberService.numberList(numPrice, request);
 	}
 
-	@GetMapping("/seckillListTime ")
+	@GetMapping("/seckillListTime")
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Result seckillListTime(HttpServletRequest request){
@@ -55,7 +55,7 @@ public class ApiNumberController extends BaseReturn{
 	 * @param request
 	 * @return
 	 */
-	@GetMapping("/numberSeckillList ")
+	@GetMapping("/numberSeckillList")
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Result numberSeckillList(NumPrice numPrice, HttpServletRequest request){
