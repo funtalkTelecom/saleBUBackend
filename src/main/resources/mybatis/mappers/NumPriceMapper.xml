@@ -46,8 +46,7 @@
     <choose>
       <when test="param.falg == 1">
         and a.activity_type=1
-        and a.activity_sdate=DATE_FORMAT(#{param.beginDate}, '%Y-%m-%d %H:%i:%S')
-        and  a.activity_edate =DATE_FORMAT(#{param.endDate}, '%Y-%m-%d %H:%i:%S')
+        and DATE_FORMAT(#{param.beginDate}, '%Y-%m-%d %H:%i:%S') BETWEEN a.activity_sdate and a.activity_edate
       </when>
       <when test="param.falg == 2">
         and a.activity_type=1
