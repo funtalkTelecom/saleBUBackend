@@ -86,6 +86,14 @@ $(function() {
 	dataList.load();
 
 	$("#query").click(function() {
+		var sPrice = $("input[name=sPrice]").val();
+		var ePrice = $("input[name=ePrice]").val();
+		if(sPrice&&ePrice){
+			if(sPrice>ePrice){
+                $("input[name=sPrice]").val(ePrice);
+                $("input[name=ePrice]").val(sPrice);
+			}
+		}
 		dataList.load();
 	});
 	

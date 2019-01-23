@@ -8,7 +8,7 @@
 		<!-- 驼峰的自动映射 -->
 		<setting name="mapUnderscoreToCamelCase" value="true" />
 		<!--<setting name="autoMappingBehavior" value="true" />-->
-		<!-- 打印查询语句 -->
+		<!-- 打印查询语句  LOG4J2-->
         <setting name="logImpl" value="LOG4J2" />
 	</settings>
 

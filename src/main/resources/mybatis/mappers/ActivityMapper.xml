@@ -36,4 +36,17 @@
         order by y.id desc
     </select>
 
+    <select id="findActivityById" resultType="Activity">
+        select a.id id,a.title title,a.type type,a.agent_id agentId,
+        DATE_FORMAT(a.begin_date,'%Y-%m-%d') gStartTime,
+        DATE_FORMAT(a.end_date,'%Y-%m-%d') gEndTime,a.start_h startH,a.end_h endH from tb_activity a where a.is_del=0
+        and a.id =#{id}
+    </select>
+
+    <update id="activityUnsale">
+        update tb_activity a set
+            a.status = '0'
+        where a.id = #{id}
+    </update>
+
 </mapper>

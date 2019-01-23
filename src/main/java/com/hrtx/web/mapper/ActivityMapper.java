@@ -20,4 +20,9 @@ public interface ActivityMapper extends Mapper<Activity>,BaseMapper<Activity>{
 
     Page<Object> queryPageList(@Param("param") Activity activity);
 
+    Activity findActivityById(@Param("id") Integer id);
+
+
+    void activityUnsale(Activity activity);
+
 }
