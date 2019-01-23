@@ -40,6 +40,10 @@ public class Activity extends BasePojo implements java.io.Serializable {
 	private String strjson;
 	@Transient
 	private String statusText;
+	@Transient
+	private String gStartTime;
+	@Transient
+	private String gEndTime;
 
 	public Activity() {
 	}
@@ -204,4 +208,19 @@ public class Activity extends BasePojo implements java.io.Serializable {
 		this.endH = endH;
 	}
 
+	public String getgStartTime() {
+		return gStartTime;
+	}
+
+	public void setgStartTime(String gStartTime) {
+		this.gStartTime = gStartTime;
+	}
+
+	public String getgEndTime() {
+		return gEndTime;
+	}
+
+	public void setgEndTime(String gEndTime) {
+		this.gEndTime = gEndTime;
+	}
 }

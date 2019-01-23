@@ -17,5 +17,16 @@
         </foreach>
     </insert>
 
+    <select id="findActivityItemList" resultType="java.util.HashMap">
+        select m.id,m.activity_id,m.num,m.price,m.down_price from tb_activity_item m
+        where m.activity_id=#{activityId}
+        order by m.id
+    </select>
+
+    <update id="updateItem">
+        update tb_activity_item m set
+            m.is_del =1
+        where m.activity_id=#{activityId}
+    </update>
 
 </mapper>

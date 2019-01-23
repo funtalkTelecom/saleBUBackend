@@ -10,9 +10,9 @@
     </select>
 
     <select id="listNum" resultType="java.util.HashMap">
-        select m.num_resource, m.tele_type ,p.price from tb_num m
-        left join tb_num_price_agent p on  m.id = p.num_id  and m.seller_id = p.corp_id
-        where m.`status`=2
+        select p.resource, p.net_type ,p.price,t.key_value
+        from tb_num_price_agent p left join tb_dict t on p.`status` = t.key_id and t.key_group='num_status'
+        where p.`status`=2
         <if test="sellerId!=null and sellerId!=''">
             and p.corp_id= #{sellerId}
         </if>
@@ -34,5 +34,12 @@
         g.activity_edate=#{activityEdate},
         g.activity_price=#{activityPrice}
         where g.agent_id=#{agentId} and g.corp_id=#{corpId} and g.resource =#{resource}
+    </update>
+    <update id="updateNumPriceAgentByActivityId">
+        update tb_num_price_agent g
+        set g.activity_id=0 ,
+        g.activity_type=0,
+        g.activity_price=0
+        where g.activity_id=#{activityId} and g.status=2
     </update>
 </mapper>

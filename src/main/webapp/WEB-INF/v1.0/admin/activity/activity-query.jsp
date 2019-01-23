@@ -87,7 +87,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						<button type="button" class="close" id="close">
 							&times;
 						</button>
 						<h4 class="modal-title">
@@ -126,7 +126,7 @@
 								<label class="col-xs-2 control-label">活动日期</label>
 								<div class="col-xs-2 ">
 									<input type="hidden" name="beginDates"  id="beginDates">
-									<input class="form-control"  id="gStartTime" style="width: 150px;" type="text" onclick="WdatePicker({maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',dateFmt : 'yyyy-MM-dd'});"/>
+									<input class="form-control" name="gStartTime" id="gStartTime" style="width: 150px;" type="text" onclick="WdatePicker({maxDate : '#F{$dp.$D(\'gEndTime\',{s:-1})}',dateFmt : 'yyyy-MM-dd'});"/>
 								</div>
 								<div class="col-xs-2 ">
 									<select  class="form-control" id="startH"  name="startH">
@@ -139,7 +139,7 @@
 								<label class="col-xs-1 control-label">到</label>
 								<div class="col-xs-2">
 									<input type="hidden" name="endDates"  id="endDates">
-									<input class="form-control" id="gEndTime"  style="width: 150px;" type="text" onclick="WdatePicker({ minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',dateFmt : 'yyyy-MM-dd'});"/>
+									<input class="form-control" name="gEndTime" id="gEndTime"  style="width: 150px;" type="text" onclick="WdatePicker({ minDate : '#F{$dp.$D(\'gStartTime\',{s:1})}',dateFmt : 'yyyy-MM-dd'});"/>
 								</div>
 								<div class="col-xs-2 ">
 									<select  class="form-control" id="endH"  name="endH" >
@@ -151,7 +151,7 @@
 								</div>
 							</div>
 							<h3 class="header smaller lighter blue"></h3>
-							<div class="form-group">
+							<div class="form-group" id="numDivs" >
 								<label class="col-xs-2 control-label">活动号码</label>
 								<div class="col-xs-6 ">
 									<textarea id="saleNum" name="saleNum" style="width: 350px;height: 100px;" ></textarea>
@@ -165,7 +165,6 @@
 									<table class="table table-striped table-bordered table-hover" border="0" cellpadding="0" cellspacing="0">
 										<thead><tr align="center">
 											<td><strong>号码</strong></td>
-											<td><strong>运营商</strong></td>
 											<td><strong>原价</strong></td>
 											<td><strong>秒杀价</strong></td>
 											<td><strong>操作</strong></td>
@@ -179,7 +178,7 @@
 				   </div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-success">提交</button>
-						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						<button type="button" class="btn btn-default" id="modColse">关闭</button>
 					</div>
 					</form>
 				</div><!-- /.modal-content -->
@@ -188,8 +187,8 @@
 		</div>
 		<script type="text/javascript">
             var basePath = "<%=basePath %>";
-            var p_edit = <%=SessionUtil.hasPower(PowerConsts.EPSALEMOUDULE_COMMON_EDIT)%>;
-            var p_delete= <%=SessionUtil.hasPower(PowerConsts.EPSALEMOUDULE_COMMON_DELETE)%>;
+            var p_edit = <%=SessionUtil.hasPower(PowerConsts.ACTIVITYMOUDULE_COMMON_ADD)%>;
+            var p_cancel= <%=SessionUtil.hasPower(PowerConsts.ACTIVITYMOUDULE_COMMON_CANCEL)%>;
 
 		</script>
 	</body>

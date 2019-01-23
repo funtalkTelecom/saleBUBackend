@@ -70,7 +70,17 @@ public class ActivityService {
     }
 
     public Result verify(String skuSaleNum,Integer agentId ,Integer sellerId){
-       String  skuSaleNums = checkSkuSaleNum(skuSaleNum,agentId,sellerId);
+        Set<String> set = new HashSet<String>();
+        String repeatNum = getRepeatNum(skuSaleNum);
+        if(repeatNum!=null && repeatNum.length()>0) return new Result(Result.OTHER, "以下号码重复\n"+repeatNum);
+        String[] nums = skuSaleNum.split("\n");
+        for (String a :nums){
+            if(set.contains(a)){
+                return new Result(Result.OTHER, "该上架商品存在重复号码\n"+a);
+            }
+            set.add(a);
+        }
+        String  skuSaleNums = checkSkuSaleNum(skuSaleNum,agentId,sellerId);
         //有错误号码
         if (skuSaleNums.split("★").length > 1) {
             return new Result(Result.OTHER, "以下号码未上架，不可以做活动,请重新确认\n" + skuSaleNums.split("★")[1]);
@@ -78,6 +88,23 @@ public class ActivityService {
        return new Result(Result.OK, "参数验证成功");
     }
 
+
+    private String getRepeatNum(String skuSaleNum) {
+        if(skuSaleNum==null || skuSaleNum.length() <=0) return "";
+        String repeatNum = "";
+        String[] nums = skuSaleNum.split("\\r?\\n");
+        Set set = new HashSet();
+        int psize = set.size();
+        for (String n : nums) {
+            if(StringUtils.isBlank(n)) continue;
+            set.add(n);
+            if(set.size()<= psize){
+                repeatNum += n + "\n";
+            }
+            psize = set.size();
+        }
+        return repeatNum;
+    }
 
     private String checkSkuSaleNum(String skuSaleNum,Integer agentId,Integer sellerId) {
         String errorNum = "";
@@ -227,6 +254,23 @@ public class ActivityService {
         end_calendar.set(Calendar.SECOND,end_calendar.get(Calendar.SECOND)-1);//结束时间减一秒为实际活动的结束时间
         log.info(String.format("活动获取时间结果：耗时[%s]；标签[%s];当前时间[%s];开始时间[%s];结束时间[%s]",(System.currentTimeMillis()-_start_time),falg,Utils.getDate(calendar.getTime(),"MM-dd HH"),Utils.getDate(begin_calendar.getTime(),"yyyy-MM-dd HH:mm:ss"),Utils.getDate(end_calendar.getTime(),"yyyy-MM-dd HH:mm:ss")));
         return new Date[]{begin_calendar.getTime(),calendar.getTime(),end_calendar.getTime()};
+    }
+
+    public Activity findActivityById(Integer id) {
+        Activity activity = activityMapper.findActivityById(id);
+        return activity;
+    }
+
+        public List findActivityItemList(Integer activityId) {
+        return activityItemMapper.findActivityItemList(activityId);
+    }
+
+    public Result activityCancel(Activity activity) {
+        Integer activityId = activity.getId();
+        activityMapper.activityUnsale(activity);
+        activityItemMapper.updateItem(activityId);
+        numPriceAgentMapper.updateNumPriceAgentByActivityId(activityId);
+        return new Result(Result.OK, "活动取消成功");
     }
 
 }

@@ -13,4 +13,8 @@ public interface ActivityItemMapper extends Mapper<ActivityItem>,BaseMapper<Acti
 
     void insertBatch(@Param("activityItemsList") List<ActivityItem> activityItemsList);
 
+    List findActivityItemList(@Param("activityId") Integer activityId);
+
+    void updateItem(@Param("activityId") Integer activityId);
+
 }
