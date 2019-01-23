@@ -39,6 +39,7 @@ $(function() {
                     $.post("activity/find-activity-by-id", {id: v}, function (data) {
                         var _data = data.data;
                         $("#numDivs").attr("style","display:none;");
+                        $("#epSaleInfo .modal-footer .btn-success").attr("disabled","disabled");
                         formInit($("#epSaleInfo form"), _data.at);
                         var activityItemList = _data.activityItemList;
                         for (var i=0;i<activityItemList.length;i++) {
@@ -137,10 +138,11 @@ $(function() {
                        $tr=$('<tr align="center" >' +
                            '<td >'+obj[i].resource+'</td>' +
                            '<td >'+obj[i].price+'</td>' +
-                           '<td ><input class="downPrice" type="text"/></td>' +
+                           '<td ><input class="downPrice" type="text" onkeyup="value=value.replace(/[^\\d.]/g,\'\')"  /></td>' +
                            '<td><a class="btn btn-danger btn-xs del">移除</a></td></tr>');
                        $("#NumsDiv tbody").append($tr.append('<input type="hidden" class="num_resource" value="'+obj[i].resource+'" >' +
-                           '<input type="hidden" class="price" value="'+obj[i].price+'"  >'));
+                           '<input type="hidden" class="price" value="'+obj[i].price+'"  >' +
+                           '<input type="hidden" class="agentid" value="'+obj[i].agent_id+'"  > '));
                    }
                    $("#saleNum").val("");
                }
@@ -200,6 +202,7 @@ $(function() {
         $("#NumsDiv tbody tr").each(function(i, obj){
             json.push('{"num_resource":"'+$(obj).find(".num_resource").val()+'"' +
                 ',"downPrice":"'+$(obj).find(".downPrice").val()+'"' +
+                ',"agentid":"'+$(obj).find(".agentid").val()+'"' +
                 ',"price":"'+$(obj).find(".price").val()+'"}');
         })
         $("#strjson").val("["+json.join(",")+"]");
@@ -208,6 +211,7 @@ $(function() {
             url: "activity/activity-edit",
             success: function (data) {
                 dataList.load();
+                $("#NumsDiv tbody tr ").remove();
                 $('#epSaleInfo').modal('hide');
                 alert(data.data);
             }
@@ -218,6 +222,7 @@ $(function() {
 
     $("#close").click(function(){
         $("#numDivs").attr("style","display:block;");
+        $("#epSaleInfo .modal-footer .btn-success").attr("disabled",true);
         $("#NumsDiv tbody tr ").remove();
         $('#epSaleInfo').modal('hide');
     });
@@ -225,8 +230,15 @@ $(function() {
     $("#modColse").click(function(){
         $("#numDivs").attr("style","display:block;");
         $("#NumsDiv tbody tr ").remove();
+        $("#epSaleInfo .modal-footer .btn-success").attr("disabled",true);
         $('#epSaleInfo').modal('hide');
+
     });
+
+    $('#agentId').on('change',function(){
+        $("#NumsDiv tbody tr ").remove();
+    })
+
 
 })
 

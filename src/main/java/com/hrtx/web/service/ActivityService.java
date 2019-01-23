@@ -76,14 +76,14 @@ public class ActivityService {
         String[] nums = skuSaleNum.split("\n");
         for (String a :nums){
             if(set.contains(a)){
-                return new Result(Result.OTHER, "该上架商品存在重复号码\n"+a);
+                return new Result(Result.OTHER, "该活动存在重复号码\n"+a);
             }
             set.add(a);
         }
         String  skuSaleNums = checkSkuSaleNum(skuSaleNum,agentId,sellerId);
         //有错误号码
         if (skuSaleNums.split("★").length > 1) {
-            return new Result(Result.OTHER, "以下号码未上架，不可以做活动,请重新确认\n" + skuSaleNums.split("★")[1]);
+            return new Result(Result.OTHER, "以下号码不可以做活动,请重新确认\n" + skuSaleNums.split("★")[1]);
         }
        return new Result(Result.OK, "参数验证成功");
     }
@@ -165,9 +165,7 @@ public class ActivityService {
         activityMapper.insertActivity(activity);
 
         Integer actId = activity.getId();
-        Object[] Numbs = null;
         List<ActivityItem> activityItemsList = new ArrayList<ActivityItem>();
-        List<NumPriceAgent> numagentList = new ArrayList<NumPriceAgent>();
         for (Map<String, Object> map : list) {
             String num_resource = String.valueOf(map.get("num_resource"));
             double price =  Double.parseDouble(String.valueOf(map.get("price")));
