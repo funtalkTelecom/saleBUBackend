@@ -10,7 +10,7 @@
     </select>
 
     <select id="listNum" resultType="java.util.HashMap">
-        select p.resource, p.net_type ,p.price,t.key_value
+        select p.resource, p.net_type ,p.price,t.key_value,p.agent_id
         from tb_num_price_agent p left join tb_dict t on p.`status` = t.key_id and t.key_group='num_status'
         where p.`status`=2
         <if test="sellerId!=null and sellerId!=''">
