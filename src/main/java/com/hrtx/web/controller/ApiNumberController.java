@@ -149,5 +149,12 @@ public class ApiNumberController extends BaseReturn{
 		return  map;
 	}
 
+	@GetMapping("/search-number")
+	@Powers(PowerConsts.NOLOGINPOWER)
+	@ResponseBody
+	public Result searchNumberList(NumPrice numPrice,HttpServletRequest request){
+		return apiNumberService.searchNumberList(numPrice,request);
+	}
+
 
 }

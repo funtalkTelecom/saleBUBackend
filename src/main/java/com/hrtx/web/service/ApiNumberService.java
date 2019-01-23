@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
+import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.AgentMapper;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -270,7 +272,6 @@ public class ApiNumberService {
 	}
 
 
-
 	/**
 	 * 根据号码查询获取号码
 	 * @param numPrice
@@ -313,6 +314,48 @@ public class ApiNumberService {
 		Agent agent = (Agent) reagent.getData();
 		numPrice.setAgentId(agent.getId());
 		numPrice.setResource(num);
+		pm = numService.queryNumPrice(numPrice);
+		List ob =pm.getList();
+		if(ob!=null && ob.size()>0){
+			//处理号码,生成号码块字段(numBlock)
+			for (int i = 0; i < ob.size(); i++) {
+				Map obj= (Map) ob.get(i);
+				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+			}
+		}
+		pm = new PageInfo<Object>(ob);
+		return new Result(Result.OK, pm);
+	}
+
+
+	public Result searchNumberList( NumPrice numPrice,HttpServletRequest request){
+		PageInfo<Object> pm = null;
+		numPrice.setPageNum(numPrice.startToPageNum());
+
+		String feature = request.getParameter("feature")==null?"": request.getParameter("feature");  //靓号类型
+		String netType = request.getParameter("netType")==null?"": request.getParameter("netType");  //运营商
+		String numTags = request.getParameter("numTags")==null?"": request.getParameter("numTags");	 //吉利号
+		Integer cityCode = request.getParameter("numTags")==null ? -1: NumberUtils.toInt(request.getParameter("numTags")) ;	 //吉利号
+		String num = request.getParameter("num")==null?"": request.getParameter("num");  //号码
+		double priceS = request.getParameter("priceS")==null? 0: Double.valueOf(request.getParameter("priceS")) ;  //起始价格
+		double priceE = request.getParameter("priceE")==null? 0 : Double.valueOf( request.getParameter("priceE"));  //结束价格
+
+
+		Consumer consumer= this.apiSessionUtil.getConsumer();
+		Result reagent = agentService.queryCurrAgent(consumer);
+		if(reagent.getCode()!=Result.OK){
+			return new Result(reagent.ERROR, reagent.getData());
+		}
+		Agent agent = (Agent) reagent.getData();
+		numPrice.setAgentId(agent.getId());
+		numPrice.setFeature(feature);
+		numPrice.setNetType(netType);
+		numPrice.setNumTags(numTags);
+		numPrice.setCityCode(cityCode);
+		numPrice.setResource(num);
+		numPrice.setPriceS(new BigDecimal(priceS));
+		numPrice.setPriceE(new BigDecimal(priceE));
+
 		pm = numService.queryNumPrice(numPrice);
 		List ob =pm.getList();
 		if(ob!=null && ob.size()>0){
