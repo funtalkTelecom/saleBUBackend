@@ -123,6 +123,7 @@ public enum PowerConsts {
 	ACTIVITYMOUDULE(90900,"活动管理",90000,0,"activity/activity-query",2,1),
 	ACTIVITYMOUDULE_COMMON_ADD(90901,"添加",90900,1,"",3,1),//活动添加
 	ACTIVITYMOUDULE_COMMON_QUEYR(90902,"查询",90900,1,"",3,2),//活动查询
+	ACTIVITYMOUDULE_COMMON_CANCEL(90903,"取消",90900,1,"",3,3),//活动取消
 	;
 	
 	public int getId() {

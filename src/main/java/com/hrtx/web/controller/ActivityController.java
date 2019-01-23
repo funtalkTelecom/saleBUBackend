@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.lang.System;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -76,13 +77,31 @@ public class ActivityController extends BaseReturn{
 	@RequestMapping("activity/activity-edit")
 	@Powers({PowerConsts.ACTIVITYMOUDULE_COMMON_ADD})
 	public Result activityEdit(Activity activity, HttpServletRequest request) throws ParseException{
-		String  strjson = request.getParameter("strjson");
-		String title = activity.getTitle();
 		return activityService.activityEdit(activity,request);
 	}
 
 
+	@PostMapping("activity/find-activity-by-id")
+	@ResponseBody
+	@Powers({PowerConsts.ACTIVITYMOUDULE_COMMON_ADD})
+	public Map findActivityById(Activity activity){
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map m = new HashMap();
+		Activity at=activityService.findActivityById(activity.getId());
+		List list =activityService.findActivityItemList(activity.getId());
+		m.put("at",at);
+		m.put("activityItemList",list);
+		map.put("code", Result.OK);
+		map.put("data", m);
+		return map;
+	}
 
+	@PostMapping("activity/activity-cancel")
+	@ResponseBody
+	@Powers({PowerConsts.ACTIVITYMOUDULE_COMMON_CANCEL})
+	public Result activityCancel(Activity activity){
+		return  activityService.activityCancel(activity);
+	}
 
 
 

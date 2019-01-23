@@ -411,7 +411,7 @@
     <select id="activitycheckNumberIsOkStatus" resultType="java.lang.Integer">
         select count(1) as num from
         tb_num_price_agent p
-        where p.`status`=2
+        where p.`status`=2 and ( p.activity_id =0 or p.activity_id ='null'  or p.activity_id ='' )
         <if test="numResource!=null and numResource!=''">
             and p.resource = #{numResource}
         </if>
