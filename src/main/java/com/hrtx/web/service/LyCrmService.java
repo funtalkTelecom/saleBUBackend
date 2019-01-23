@@ -398,6 +398,7 @@ public class LyCrmService {
         List<Map> nums = numMapper.queryActiveNum(corpId);
         List<Map> feathers = dictMapper.findDictByGroup("FEATHER_TYPE");
         List<Map> priceFeathers = dictMapper.findDictByGroupAndCorpId("feather_price", corpId);
+        List<Map> tagFeathers = dictMapper.findDictByGroup("num_tags");
         List<NumRule> batch = new ArrayList<>();
         for (int j = 0, len = nums.size(); j < len; j++) {
             Map num = nums.get(j);
@@ -405,6 +406,7 @@ public class LyCrmService {
             String num_resource = String.valueOf(num.get("num_resource"));
             this.addNumFeature(id, num_resource, feathers, batch, "FEATHER_TYPE");
             this.addNumFeature(id, num_resource, priceFeathers, batch, "feather_price");
+            this.addNumFeature(id, num_resource, tagFeathers, batch, "num_tags");
             if(batch.size() >= 1000) {
                 numRuleMapper.batchInsert(batch);
                 batch = new ArrayList<>();
