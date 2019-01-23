@@ -104,50 +104,58 @@ public class ApiNumberController extends BaseReturn{
 	}
 
 
-	/**
-	 * 手机端获取靓号类型AAA
-	 * @return
-	 */
-	@GetMapping("/find-feather_type")
-	@Powers(PowerConsts.NOLOGINPOWER)
-	@ResponseBody
-	public Map findFeatherType(){
-		Map<String, Object> map = new HashMap<String, Object>();
-		List list =dictService.findDictByGroup("FEATHER_TYPE");
-		map.put("code", Result.OK);
-		map.put("data", list);
-		return  map;
-	}
+
 
 	/***
-	 * 手机端获取运营商
+	 * 手机端获取靓号类型,运营商, 吉利号
 	 * @return
 	 */
-	@GetMapping("/find-haoka_yys")
+	@GetMapping("/find-all")
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
 	public Map findHaokaYys(){
 		Map<String, Object> map = new HashMap<String, Object>();
-		List list =dictService.findDictByGroup("haoka_yys");
+		Map nmap = new HashMap();
+		List featherlist =dictService.findDictByGroup("FEATHER_TYPE");
+		List yyslist =dictService.findDictByGroup("haoka_yys");
+		List taglist =dictService.findDictByGroup("num_tags");
+		nmap.put("featherlist",featherlist);
+		nmap.put("yyslist",yyslist);
+		nmap.put("taglist",taglist);
 		map.put("code", Result.OK);
-		map.put("data", list);
+		map.put("data", nmap);
 		return  map;
 	}
 
-	/**
-	 * 吉利号
-	 * @return
-	 */
-	@GetMapping("/find-num_tags")
-	@Powers(PowerConsts.NOLOGINPOWER)
-	@ResponseBody
-	public Map findNumTags(){
-		Map<String, Object> map = new HashMap<String, Object>();
-		List list =dictService.findDictByGroup("num_tags");
-		map.put("code", Result.OK);
-		map.put("data", list);
-		return  map;
-	}
+//	/**
+//	 * 手机端获取靓号类型AAA
+//	 * @return
+//	 */
+//	@GetMapping("/find-feather_type")
+//	@Powers(PowerConsts.NOLOGINPOWER)
+//	@ResponseBody
+//	public Map findFeatherType(){
+//		Map<String, Object> map = new HashMap<String, Object>();
+//		List list =dictService.findDictByGroup("FEATHER_TYPE");
+//		map.put("code", Result.OK);
+//		map.put("data", list);
+//		return  map;
+//	}
+
+//	/**
+//	 * 吉利号
+//	 * @return
+//	 */
+//	@GetMapping("/find-num_tags")
+//	@Powers(PowerConsts.NOLOGINPOWER)
+//	@ResponseBody
+//	public Map findNumTags(){
+//		Map<String, Object> map = new HashMap<String, Object>();
+//		List list =dictService.findDictByGroup("num_tags");
+//		map.put("code", Result.OK);
+//		map.put("data", list);
+//		return  map;
+//	}
 
 	@GetMapping("/search-number")
 	@Powers(PowerConsts.NOLOGINPOWER)
