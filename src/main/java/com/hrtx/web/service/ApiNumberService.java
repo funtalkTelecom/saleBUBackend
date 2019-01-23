@@ -335,10 +335,11 @@ public class ApiNumberService {
 		String feature = request.getParameter("feature")==null?"": request.getParameter("feature");  //靓号类型
 		String netType = request.getParameter("netType")==null?"": request.getParameter("netType");  //运营商
 		String numTags = request.getParameter("numTags")==null?"": request.getParameter("numTags");	 //吉利号
-		Integer cityCode = request.getParameter("numTags")==null ? -1: NumberUtils.toInt(request.getParameter("numTags")) ;	 //吉利号
+		Integer provinceCode = request.getParameter("provinceCode")==null ? 0: NumberUtils.toInt(request.getParameter("provinceCode")) ;	 //省份
+		Integer cityCode = request.getParameter("cityCode")==null ? 0: NumberUtils.toInt(request.getParameter("cityCode")) ;	 //城市
 		String num = request.getParameter("num")==null?"": request.getParameter("num");  //号码
-		double priceS = request.getParameter("priceS")==null? 0: Double.valueOf(request.getParameter("priceS")) ;  //起始价格
-		double priceE = request.getParameter("priceE")==null? 0 : Double.valueOf( request.getParameter("priceE"));  //结束价格
+		double priceS = request.getParameter("priceS")==""? 0: Double.valueOf(request.getParameter("priceS")) ;  //起始价格
+		double priceE = request.getParameter("priceE")==""? 0 : Double.valueOf( request.getParameter("priceE"));  //结束价格
 
 
 		Consumer consumer= this.apiSessionUtil.getConsumer();
@@ -347,11 +348,15 @@ public class ApiNumberService {
 			return new Result(reagent.ERROR, reagent.getData());
 		}
 		Agent agent = (Agent) reagent.getData();
+		if(cityCode==-1){
+			numPrice.setProvinceCode(provinceCode);
+		}else{
+			numPrice.setCityCode(cityCode);
+		}
 		numPrice.setAgentId(agent.getId());
 		numPrice.setFeature(feature);
 		numPrice.setNetType(netType);
 		numPrice.setNumTags(numTags);
-		numPrice.setCityCode(cityCode);
 		numPrice.setResource(num);
 		numPrice.setPriceS(new BigDecimal(priceS));
 		numPrice.setPriceE(new BigDecimal(priceE));
