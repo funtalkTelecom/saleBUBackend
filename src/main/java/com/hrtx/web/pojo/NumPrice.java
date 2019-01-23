@@ -64,6 +64,14 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     @Transient
     private int falg;         //1 当前正在进行；2即将开始
 
+    @Transient
+    private BigDecimal priceS;
+
+    @Transient
+    private BigDecimal priceE;
+    @Transient
+    private String numTags;
+
     public NumPrice(Integer id, Integer skuId, Integer numId, Integer provinceCode, String provinceName, Integer cityCode, String cityName, String resource, BigDecimal basePrice, String netType, String feature, BigDecimal lowConsume, Integer corpId, Integer channel, BigDecimal ratioPrice, BigDecimal price, String agent, Integer agentId, Integer isDel, Date addDate) {
         this.id = id;
         this.skuId = skuId;
@@ -289,5 +297,29 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
 
     public void setNewDate(String newDate) {
         this.newDate = newDate;
+    }
+
+    public BigDecimal getPriceS() {
+        return priceS;
+    }
+
+    public void setPriceS(BigDecimal priceS) {
+        this.priceS = priceS;
+    }
+
+    public BigDecimal getPriceE() {
+        return priceE;
+    }
+
+    public void setPriceE(BigDecimal priceE) {
+        this.priceE = priceE;
+    }
+
+    public String getNumTags() {
+        return numTags;
+    }
+
+    public void setNumTags(String numTags) {
+        this.numTags = numTags;
     }
 }

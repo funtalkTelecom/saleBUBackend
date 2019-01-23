@@ -43,6 +43,10 @@
     <if test="param.resource!=null and param.resource!=''"> and a.resource like "%"#{param.resource}"%"</if>
     <if test="param.numId!=null and param.numId > 0"> and a.num_id = #{param.numId}</if>
 
+    <if test="param.numTags!=null and param.numTags != ''"> and a.numTags REGEXP ".*,"#{param.numTags}",.*"</if>
+    <if test="param.priceS!=null and param.priceS > 0"> and a.price &gt;= #{param.priceS}</if>
+    <if test="param.priceE!=null and param.priceE > 0"> and a.price &lt;= #{param.priceE}</if>
+
     <choose>
       <when test="param.falg == 1">
         and a.activity_type=1
@@ -77,6 +81,10 @@
     <if test="param.temp!=null and param.temp!=''"> and a.resource like #{param.temp}</if>
     <if test="param.resource!=null and param.resource!=''"> and a.resource like "%"#{param.resource}"%"</if>
     <if test="param.numId!=null and param.numId > 0"> and a.num_id = #{param.numId}</if>
+
+    <if test="param.numTags!=null and param.numTags != ''"> and a.numTags REGEXP ".*,"#{param.numTags}",.*"</if>
+    <if test="param.priceS!=null and param.priceS > 0"> and a.price &gt;= #{param.priceS}</if>
+    <if test="param.priceE!=null and param.priceE > 0"> and a.price &lt;= #{param.priceE}</if>
 
     <choose>
       <when test="param.falg == 1">
