@@ -55,10 +55,10 @@
 										<div class="form-group" style="">
 											<label class="control-label">运营商</label>
 											<select name="netType" class="form-control" id="netType">
-												<option value="-1">请选择</option>
-												<option value="1">电信</option>
-												<option value="2">联通</option>
-												<option value="3">移动</option>
+												<option value="">请选择</option>
+												<option value="电信">电信</option>
+												<option value="联通">联通</option>
+												<%--<option value="3">移动</option>--%>
 											</select>
 										</div>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
