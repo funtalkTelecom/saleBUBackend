@@ -125,6 +125,6 @@
         where a.g_type2 = #{keyGroup} order by a.seq, b.seq asc
     </select>
     <select id="maxSeqAndKeyId" resultType="java.util.HashMap">
-        select ifnull(max(d.seq),0) seq, ifnull(max(cast(d.key_id as UNSIGNED INTEGER)),0) keyId from tb_dict d where d.key_group=#{keyGroup}
+        select ifnull(max(d.seq),0) seq, ifnull(max(cast(d.key_id as UNSIGNED INTEGER)),0) keyId from tb_dict d where d.key_group=#{keyGroup} and d.is_del=0
     </select>
 </mapper>

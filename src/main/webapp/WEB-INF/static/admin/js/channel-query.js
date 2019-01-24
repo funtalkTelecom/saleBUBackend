@@ -199,9 +199,11 @@ $(function() {
             return false
         }
         if (confirm("提交后将按最新的价格规则同步更新当前在售的号码价格，请确认是否提交")) {
+            $("#myModal .modal-footer .btn-primary").attr("disabled",true);
             $.post("channel/feather-price-edit", $("#myModal form").serialize(), function (data) {
                 dataList.reload();
                 $('#myModal').modal('hide');
+                $("#myModal .modal-footer .btn-primary").attr("disabled",false);
             }, "json");
         }
     });
@@ -255,9 +257,11 @@ $(function() {
         if(!$("#typeModal form textarea[name=note]").val()) {
             alert("请输入正则表达式")
             return false}
+            $("#typeModal .modal-footer .btn-primary").attr("disabled",true);
         $.post("channel/add-feather-type",$("#typeModal form").serialize(),function(data){
             featherTypeList.reload();
             $('#typeModal').modal('hide');
+            $("#typeModal .modal-footer .btn-primary").attr("disabled",false);
         },"json");
     });
 
@@ -310,9 +314,11 @@ $(function() {
         if(!$("#tagsModal form textarea[name=note]").val()) {
             alert("请输入正则表达式")
             return false}
+            $("#tagsModal .modal-footer .btn-primary").attr("disabled",true);
         $.post("channel/add-num-tags",$("#tagsModal form").serialize(),function(data){
             numTagsList.reload();
             $('#tagsModal').modal('hide');
+            $("#tagsModal .modal-footer .btn-primary").attr("disabled",false);
         },"json");
     });
 });
