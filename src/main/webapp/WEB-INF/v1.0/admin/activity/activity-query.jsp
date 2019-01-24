@@ -166,7 +166,10 @@
 										<thead><tr align="center">
 											<td><strong>号码</strong></td>
 											<td><strong>原价</strong></td>
-											<td><strong>秒杀价</strong></td>
+											<td><strong>秒杀价<input type="text" id="rePrice" style="width: 80px;" onkeyup="value=value.replace(/[^\d.]/g,'')" />
+                                                <a class="btn btn-danger btn-xs copy">复制</a>
+                                            </strong>
+                                            </td>
 											<td><strong>操作</strong></td>
 										</tr></thead>
 										<tbody>
