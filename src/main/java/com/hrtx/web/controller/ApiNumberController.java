@@ -128,6 +128,12 @@ public class ApiNumberController extends BaseReturn{
 	}
 
 
+	/**
+	 * 手机端搜索
+	 * @param numPrice
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/search-number")
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
