@@ -467,7 +467,7 @@ public class ApiOrderService {
 			Result result=this.checkNumCondition(number,sku_id);
 			if(result.getCode()!=Result.OK)return result;
 			double num_price=ep_num?ep_price:sku.getSkuTobPrice();
-            Result curr_agent=this.agentService.queryCurrAgent(user);
+            Result curr_agent=this.agentService.queryCurrAgent();
             if(curr_agent.getCode()!=Result.OK)return curr_agent;
             Agent agent=(Agent)curr_agent.getData();
 			if(super_num/*order.getOrderType()==2&&StringUtils.equals(order.getSkuGoodsType(),"4")*/){

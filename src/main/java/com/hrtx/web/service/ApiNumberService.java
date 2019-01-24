@@ -61,14 +61,15 @@ public class ApiNumberService {
 		numPrice.setPageNum(pageNum);
 		numPrice.setLimit(limit);
 		String tags = request.getParameter("tags")==null?"": request.getParameter("tags");
-		tags = "'"+ tags.replaceAll(",", "','") +"'";
-		Consumer consumer= this.apiSessionUtil.getConsumer();
+//		tags = "'"+ tags.replaceAll(",", "','") +"'";
+//		Consumer consumer= this.apiSessionUtil.getConsumer();
 		//是否是代理商
-		Result reagent = agentService.queryCurrAgent(consumer);
+		Result reagent = agentService.queryCurrAgent();
 		if(reagent.getCode()!=Result.OK){
 			return new Result(reagent.ERROR, reagent.getData());
 		}
 		Agent agent = (Agent) reagent.getData();
+		numPrice.setNumTags(tags);
 		//-----zdh
 //		Date[] queryActiveDate = activityService.queryActiveDate(1);
 //		numPrice.setFalg(1);
@@ -110,9 +111,9 @@ public class ApiNumberService {
 		numPrice.setLimit(limit);
 		//1 当前正在进行；2即将开始
 		int falg = request.getParameter("falg")==null? 1: Integer.parseInt(request.getParameter("falg"));
-		Consumer consumer= this.apiSessionUtil.getConsumer();
+//		Consumer consumer= this.apiSessionUtil.getConsumer();
 		//是否是代理商
-		Result reagent = agentService.queryCurrAgent(consumer);
+		Result reagent = agentService.queryCurrAgent();
 		if(reagent.getCode()!=Result.OK){
 			return new Result(reagent.ERROR, reagent.getData());
 		}
@@ -238,9 +239,9 @@ public class ApiNumberService {
 			NumPrice numPrice = new NumPrice();
 			int unmId = NumberUtils.toInt(id);
 			numPrice.setNumId(unmId);
-			Consumer consumer= this.apiSessionUtil.getConsumer();
+//			Consumer consumer= this.apiSessionUtil.getConsumer();
 			//是否是代理商
-			Result reagent = agentService.queryCurrAgent(consumer);
+			Result reagent = agentService.queryCurrAgent();
 			if(reagent.getCode()!=Result.OK){
 				return new Result(reagent.ERROR, reagent.getData());
 			}
@@ -282,8 +283,8 @@ public class ApiNumberService {
 		PageInfo<Object> pm = null;
 		numPrice.setPageNum(numPrice.startToPageNum());
 		String num = request.getParameter("num")==null?"": request.getParameter("num");
-		Consumer consumer= this.apiSessionUtil.getConsumer();
-	    Result reagent = agentService.queryCurrAgent(consumer);
+//		Consumer consumer= this.apiSessionUtil.getConsumer();
+	    Result reagent = agentService.queryCurrAgent();
 	    if(reagent.getCode()!=Result.OK){
 			return new Result(reagent.ERROR, reagent.getData());
 		}
@@ -321,8 +322,8 @@ public class ApiNumberService {
 		double priceE = request.getParameter("priceE")==""? 0 : Double.valueOf( request.getParameter("priceE"));  //结束价格
 
 
-		Consumer consumer= this.apiSessionUtil.getConsumer();
-		Result reagent = agentService.queryCurrAgent(consumer);
+//		Consumer consumer= this.apiSessionUtil.getConsumer();
+		Result reagent = agentService.queryCurrAgent();
 		if(reagent.getCode()!=Result.OK){
 			return new Result(reagent.ERROR, reagent.getData());
 		}

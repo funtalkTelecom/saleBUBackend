@@ -46,11 +46,11 @@ public class LiangHaoController extends BaseReturn{
     public Result listNumber(NumPrice numPrice){
         numPrice.setPageNum(numPrice.startToPageNum());
         User u = SessionUtil.getUser();
-        Consumer user =new Consumer();
-        user.setId(u.getId());
-        user.setName(u.getName());
-        user.setIsAgent(0);
-        Result result = agentService.queryCurrAgent(user);
+//        Consumer user =new Consumer();
+//        user.setId(u.getId());
+//        user.setName(u.getName());
+//        user.setIsAgent(0);
+        Result result = agentService.queryCurrAgent();
         if(result.getCode()!=200) return result;
         Agent data = (Agent) result.getData();
         numPrice.setAgentId(data.getId());
