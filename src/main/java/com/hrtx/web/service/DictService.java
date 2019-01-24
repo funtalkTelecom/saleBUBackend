@@ -134,11 +134,12 @@ public class DictService {
 		d.setKeyValue(dict.getKeyValue());
 		d.setKeyGroup(keyGroup);
 		d.setIsDel(0);
+		d.setCorpId(-1);
 		Dict dict2 = dictMapper.selectOne(d);
 		if(dict2!=null) return new Result(Result.ERROR,"["+name+"]在该类别已存在");
 		dict.setKeyGroup(keyGroup);
 		dict.setIsDel(0);
-		Map map=dictMapper.maxSeqAndKeyId("keyValue");
+		Map map=dictMapper.maxSeqAndKeyId(keyGroup);
 		dict.setKeyId(String.valueOf(NumberUtils.toInt(String.valueOf(map.get("keyId")))+1));
 		dict.setSeq(NumberUtils.toInt(String.valueOf(map.get("seq")))+1);
 		dictMapper.insert(dict);
