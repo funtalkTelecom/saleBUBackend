@@ -128,15 +128,15 @@ public class DictService {
 		return new Result(Result.OK, "成功");
 	}
 
-	public Result addFeatherType(Dict dict) {
+	public Result addFeatherType(Dict dict,String keyGroup) {
 		String name =ObjectUtils.toString(dict.getKeyValue(), " ");
 		Dict d = new Dict();
 		d.setKeyValue(dict.getKeyValue());
-		d.setKeyGroup("FEATHER_TYPE");
+		d.setKeyGroup(keyGroup);
 		d.setIsDel(0);
 		Dict dict2 = dictMapper.selectOne(d);
 		if(dict2!=null) return new Result(Result.ERROR,"["+name+"]在该类别已存在");
-		dict.setKeyGroup("FEATHER_TYPE");
+		dict.setKeyGroup(keyGroup);
 		dict.setIsDel(0);
 		Map map=dictMapper.maxSeqAndKeyId("keyValue");
 		dict.setKeyId(String.valueOf(NumberUtils.toInt(String.valueOf(map.get("keyId")))+1));

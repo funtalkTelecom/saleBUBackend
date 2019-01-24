@@ -1,6 +1,7 @@
 var dataList = null;
 var channlList=null;
 var featherTypeList=null;
+var numTagsList=null;
 var start;
 $(function() {
 	/* 初始化入库单列表数据 */
@@ -224,7 +225,7 @@ $(function() {
                 $operate.find(".del").click(function () {
                     if (confirm("确认删除？")) {
                         $.post("channel/feather-delete", {id:  record.id}, function (data) {
-                            dataList.reload();
+                            featherTypeList.reload();
                             alert(data.data);
                         }, "json");
                     }
@@ -257,6 +258,61 @@ $(function() {
         $.post("channel/add-feather-type",$("#typeModal form").serialize(),function(data){
             featherTypeList.reload();
             $('#typeModal').modal('hide');
+        },"json");
+    });
+
+    numTagsList = new $.DSTable({
+        "url" : 'channel/num-tags-list',
+        "ct" : "#numTagsList",
+        "cm" : [{
+            "header" : "号码标签",
+            "dataIndex" : "keyValue"
+        },{
+            "header" : "正则表达式",
+            "dataIndex" : "note"
+        },{
+            "header" : "操作",
+            "dataIndex" : "ratioPrice",
+            "renderer":function(v,record){
+                var node = [];
+                if(channel_del) node.push('<a class="btn btn-danger btn-xs del" href="javascript:void(0);">删除</a>');
+                $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
+                $operate.find(".del").click(function () {
+                    if (confirm("确认删除？")) {
+                        $.post("channel/feather-delete", {id:  record.id}, function (data) {
+                            numTagsList.reload();
+                            alert(data.data);
+                        }, "json");
+                    }
+                });
+                return $operate;
+            }
+        }],
+        "getParam" : function() {
+            var obj={};
+            $(".query input,.query select").each(function(index,v2){
+                var name=$(v2).attr("name");
+                obj[name]=$(v2).val();
+            });
+            return obj;
+        }
+    });
+    numTagsList.load();
+
+    window.reload = function(){
+        numTagsList.reload();
+    }
+
+    $(document).on("click","#tagsModal .modal-footer .btn-primary",function() {
+        if(!$("#tagsModal form input[name=keyValue]").val()) {
+            alert("请输入号码标签");
+            return false}
+        if(!$("#tagsModal form textarea[name=note]").val()) {
+            alert("请输入正则表达式")
+            return false}
+        $.post("channel/add-num-tags",$("#tagsModal form").serialize(),function(data){
+            numTagsList.reload();
+            $('#tagsModal').modal('hide');
         },"json");
     });
 });

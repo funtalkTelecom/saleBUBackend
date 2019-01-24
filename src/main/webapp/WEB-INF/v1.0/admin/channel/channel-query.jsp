@@ -51,6 +51,11 @@
 										查询规则
 									</a>
 								</li>
+								<li>
+									<a data-toggle="tab" href="#num-tags">
+										号码标签
+									</a>
+								</li>
 							</ul>
 							<div class="tab-content">
 								<div id="channel" class="tab-pane fade in active">
@@ -67,6 +72,12 @@
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#typeModal">添加</button>
 									</c:if>
 									<div id="featherTypeList"></div>
+								</div>
+								<div id="num-tags" class="tab-pane fade">
+									<c:if test="<%=SessionUtil.hasPower(PowerConsts.CHANNELMOUDULE_COMMON_ADD)%>">
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#tagsModal">添加</button>
+									</c:if>
+									<div id="numTagsList"></div>
 								</div>
 							</div>
 						</div>
@@ -141,6 +152,44 @@
 									<label class="col-xs-3 col-sm-3 control-label">规则：</label>
 									<div class="col-xs-8 col-sm-8">
 										<input type="text" class="form-control loginName" name="keyValue" placeholder="请输入规则">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-xs-3 col-sm-3 control-label">正则表达式：</label>
+									<div class="col-xs-8 col-sm-8">
+										<textarea type="text" class="form-control" placeholder="请输入正则表达式" name="note" ></textarea>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+								</button>
+								<button type="button" class="btn btn-primary" >
+									提交更改
+								</button>
+							</div>
+						</form>
+					</div><!-- /.modal-content -->
+				</div><!-- /.modal -->
+			</div>
+
+			<div class="modal fade" id="tagsModal" tabindex="-1">
+				<div class="modal-dialog" >
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+							<h4 class="modal-title" id="tagsModalLabel">
+								标签规则添加
+							</h4>
+						</div>
+						<form role="form" class="form-horizontal">
+							<div class="modal-body">
+								<div class="form-group">
+									<label class="col-xs-3 col-sm-3 control-label">号码标签：</label>
+									<div class="col-xs-8 col-sm-8">
+										<input type="text" class="form-control loginName" name="keyValue" placeholder="请输入号码标签">
 									</div>
 								</div>
 								<div class="form-group">
