@@ -75,7 +75,7 @@ $(function() {
                         start = dataList.pm.start;
                         return with4s[v];
 					}
-				},{
+				},/*{
 					"header" : "标签",
 					"dataIndex" : "tags",
                     "renderer":function(v,record){
@@ -98,7 +98,7 @@ $(function() {
                         }
                         return $operate;
                     }
-				},{
+				},*/{
 					"header" : "号段",
 					"dataIndex" : "sectionNo"
 				},/*{

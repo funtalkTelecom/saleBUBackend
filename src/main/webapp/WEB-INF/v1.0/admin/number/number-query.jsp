@@ -44,7 +44,7 @@
 							<div class="col-xs-12">
 								<div class="query" style="margin-bottom: -10px">
 									<form class="form-inline pd5" role="form">
-										<div class="form-group" style="width: 100%">
+										<div class="form-group hidden" style="width: 100%">
 											<div class="form-group" id="qnumberTags" style="width: 100%">
 											</div>
 										</div>
@@ -76,7 +76,7 @@
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#stop-sale" >停售</button>
 										</c:if>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.NUMBERMOUDULE_COMMON_ADDTAG)%>">
-											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" data-target="#editTags" >设置标签</button>
+											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right hidden" data-toggle="modal" data-target="#editTags" >设置标签</button>
 										</c:if>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="export">导出</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
