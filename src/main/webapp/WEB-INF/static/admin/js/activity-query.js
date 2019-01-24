@@ -93,7 +93,15 @@ $(function() {
     $(document).on("click","#NumsDiv .del",function(){
         $(this).parents("tr").remove();
     })
-    
+    $(document).on("click","#NumsDiv .copy",function(){
+        var reprice = $("#rePrice").val();
+        if(reprice==""){
+            alert("请填写秒杀价格！");
+            return false;
+        }
+        $(".downPrice").val(reprice);
+    })
+
     $("#checkAdd").click(function () {
         var agentId =  $("#agentId").val();
         var saleNum =  $("#saleNum").val();
@@ -114,7 +122,6 @@ $(function() {
                 alert(num+"已经存在列表中");
                 return false;
             }
-
         })
         if(!istrue){
             return false;

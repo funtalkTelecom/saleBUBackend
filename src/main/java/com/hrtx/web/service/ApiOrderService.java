@@ -477,7 +477,10 @@ public class ApiOrderService {
 				List aplist=this.numPriceMapper.queryList(numPrice);
 				if(aplist.size()==0||aplist.size()>1)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
 				Map numPrice1=(Map)aplist.get(0);
-				num_price=NumberUtils.toDouble(ObjectUtils.toString(numPrice1.get("price")));// numPrice1.getPrice().doubleValue();
+//				num_price=NumberUtils.toDouble(ObjectUtils.toString(numPrice1.get("price")));// numPrice1.getPrice().doubleValue();
+				Object price_range=numPrice1.get("price_range");
+				if(price_range==null)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
+				num_price=NumberUtils.toDouble(ObjectUtils.toString(price_range));//2019.1.24增加秒杀功能，秒杀时取秒杀价格
 			}
 
 			OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,meal_id,goods,sku,null,1,0d);
