@@ -127,35 +127,6 @@ public class ApiNumberController extends BaseReturn{
 		return  map;
 	}
 
-//	/**
-//	 * 手机端获取靓号类型AAA
-//	 * @return
-//	 */
-//	@GetMapping("/find-feather_type")
-//	@Powers(PowerConsts.NOLOGINPOWER)
-//	@ResponseBody
-//	public Map findFeatherType(){
-//		Map<String, Object> map = new HashMap<String, Object>();
-//		List list =dictService.findDictByGroup("FEATHER_TYPE");
-//		map.put("code", Result.OK);
-//		map.put("data", list);
-//		return  map;
-//	}
-
-//	/**
-//	 * 吉利号
-//	 * @return
-//	 */
-//	@GetMapping("/find-num_tags")
-//	@Powers(PowerConsts.NOLOGINPOWER)
-//	@ResponseBody
-//	public Map findNumTags(){
-//		Map<String, Object> map = new HashMap<String, Object>();
-//		List list =dictService.findDictByGroup("num_tags");
-//		map.put("code", Result.OK);
-//		map.put("data", list);
-//		return  map;
-//	}
 
 	@GetMapping("/search-number")
 	@Powers(PowerConsts.NOLOGINPOWER)

@@ -280,30 +280,6 @@ public class ApiNumberService {
 	 */
 	public Result numberListByNum(NumPrice numPrice, HttpServletRequest request){
 		PageInfo<Object> pm = null;
-//		try {
-//			int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
-//			int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
-////			number.setStart(limit*(pageNum-1));
-//			number.setLimit(limit);
-//			number.setPageNum(pageNum);
-//			String num = request.getParameter("num")==null?"": request.getParameter("num");
-//
-//			PageHelper.startPage(number.getPageNum(),number.getLimit());
-//			Page<Object> ob=this.numberMapper.queryPageByNumList(num);
-//			if(ob!=null && ob.size()>0){
-//				//处理号码,生成号码块字段(numBlock)
-//				for (int i = 0; i < ob.size(); i++) {
-//					Map obj= (Map) ob.get(i);
-//					obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
-//				}
-//			}
-//			pm = new PageInfo<Object>(ob);
-//		} catch (NumberFormatException e) {
-//			e.printStackTrace();
-//			pm = new PageInfo<Object>(null);
-//			return new Result(Result.ERROR, pm);
-//		}
-
 		numPrice.setPageNum(numPrice.startToPageNum());
 		String num = request.getParameter("num")==null?"": request.getParameter("num");
 		Consumer consumer= this.apiSessionUtil.getConsumer();
@@ -330,7 +306,10 @@ public class ApiNumberService {
 
 	public Result searchNumberList( NumPrice numPrice,HttpServletRequest request){
 		PageInfo<Object> pm = null;
-		numPrice.setPageNum(numPrice.startToPageNum());
+		int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
+		int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
+		numPrice.setPageNum(pageNum);
+		numPrice.setLimit(limit);
 
 		String feature = request.getParameter("feature")==null?"": request.getParameter("feature");  //靓号类型
 		String netType = request.getParameter("netType")==null?"": request.getParameter("netType");  //运营商
