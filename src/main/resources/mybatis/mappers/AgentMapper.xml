@@ -29,8 +29,8 @@
         y.name as provinceName ,c.name as cityName,d.name as districtName,
         t.address,u.nick_name as userName,
         t.province as provinceId,t.city as cityId,t.district as districtId,
-        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,t.login_name as loginName,
-        t.trading_img ,t.check_remark checkRemark,t.type tyep
+        DATE_FORMAT(t.add_date,'%Y-%m-%d %H:%i:%s') as adddate,
+        t.trading_img ,t.type tyep
         from tb_agent t left join tb_city y on t.province = y.id
         left join tb_city c on t.city = c.id
         left join tb_city d on t.district = d.id
