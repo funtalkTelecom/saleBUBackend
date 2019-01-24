@@ -166,12 +166,9 @@
     select np.`id`, np.`sku_id`, np.`num_id`, np.`province_code`, np.`province_name`, np.`city_code`, np.`city_name`, np.`resource`, np.`base_price`,
     np.`net_type`, np.`feature`, np.`low_consume`, np.`corp_id`, np.`channel`, np.`ratio_price`, np.`price`, agent.commpay_name, agent.id agent_id,now(),n.`status`,
     n.with4,n.is_freeze,n.num_level,sku.sku_toc_price,sku.sku_tob_price,tags.num_tags, 0
-
     from tb_num_price np ,tb_corp_agent a, tb_agent agent,
-    tb_num n left join (select nr.num_id,group_concat(d.key_value) num_tags from tb_num_rule nr ,
-    tb_dict d where nr.`value`=d.key_id and d.key_group='num_tags' and nr.rule_type='tag' group by nr.num_id) tags on tags.num_id=n.id,
+    tb_num n left join (select nr.num_id,Concat(',',group_concat(nr.`value`),',')  num_tags from tb_num_rule nr where nr.rule_type='num_tags' group by nr.num_id) tags on tags.num_id=n.id,
     tb_goods c, tb_sku sku
-
     WHERE  np.num_id = n.id  AND np.sku_id = sku.sku_id  and a.corp_id=n.seller_id and a.channel_id = np.channel and a.agent_id = agent.id 	AND n.STATUS = 2  and np.is_del=0 and np.agent_id=-1 and a.`status` = 2
     AND c.g_id = sku.g_id AND sku.sku_goods_type = '4' AND c.g_is_sale = '1'  AND SYSDATE( ) BETWEEN c.g_start_time AND c.g_end_time  AND c.g_is_auc = 0 AND c.`status` = 1
     and sku.sku_id in (
