@@ -48,9 +48,9 @@
 										</div>
 										<div class="form-group" style="">
 											<label class="control-label">起止价格</label>
-											<input type="number" class="form-control" style="width:100px;" name="sPrice">
+											<input type="number" class="form-control" style="width:100px;" name="priceS">
 											-
-											<input type="number" class="form-control" style="width:100px;" name="ePrice">
+											<input type="number" class="form-control" style="width:100px;" name="priceE">
 										</div>
 										<div class="form-group" style="">
 											<label class="control-label">运营商</label>
