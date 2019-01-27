@@ -33,6 +33,10 @@
         <if test="param.title!=null and param.title!=''">
             and  y.title like "%"#{param.title}"%"
         </if>
+        <if test="param.addSellerId!=null and param.addSellerId!=''">
+            and y.add_seller_id=#{param.addSellerId}
+        </if>
+
         order by y.id desc
     </select>
 

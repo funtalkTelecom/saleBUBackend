@@ -52,6 +52,7 @@ public class ActivityService {
 
     public Result pageActivity(Activity activity) {
         PageHelper.startPage(activity.startToPageNum(),activity.getLimit());
+        activity.setAddSellerId(SessionUtil.getUser().getCorpId());
         Page<Object> ob=this.activityMapper.queryPageList(activity);
         PageInfo<Object> pm = new PageInfo<Object>(ob);
         return new Result(Result.OK, pm);
@@ -265,6 +266,8 @@ public class ActivityService {
 
     public Result activityCancel(Activity activity) {
         Integer activityId = activity.getId();
+        Activity ac = activityMapper.findActivityById(activityId);
+        if(SessionUtil.getUser().getCorpId()!=ac.getAddSellerId()) return new Result(Result.OTHER, "该活不可以取消");
         activityMapper.activityUnsale(activity);
         activityItemMapper.updateItem(activityId);
         numPriceAgentMapper.updateNumPriceAgentByActivityId(activityId);

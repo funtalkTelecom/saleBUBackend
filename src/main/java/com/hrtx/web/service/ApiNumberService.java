@@ -91,11 +91,11 @@ public class ApiNumberService {
 	public Result seckillListTime( HttpServletRequest request){
 		int falg = request.getParameter("falg")==null? 1: Integer.parseInt(request.getParameter("falg"));
 		Date[] queryActiveDate = activityService.queryActiveDate(falg);
-		NumPrice numPrice = new NumPrice();
-		numPrice.setBeginDate(Utils.getDate(queryActiveDate[0],"yyyy-MM-dd HH:mm:ss"));
-		numPrice.setNewDate(Utils.getDate(queryActiveDate[1],"yyyy-MM-dd HH:mm:ss"));
-		numPrice.setEndDate(Utils.getDate(queryActiveDate[2],"yyyy-MM-dd HH:mm:ss"));
-		return new Result(Result.OK, numPrice);
+		Map map = new HashMap();
+		map.put("beginDate",queryActiveDate[0].getTime());
+		map.put("newDate",queryActiveDate[1].getTime());
+		map.put("endDate",queryActiveDate[2].getTime());
+		return new Result(Result.OK, map);
 	}
 	/***
 	 * 秒杀
