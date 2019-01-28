@@ -2,6 +2,7 @@ package com.hrtx.web.service;
 
 import com.github.abel533.entity.Example;
 import com.hrtx.config.advice.ServiceException;
+import com.hrtx.dto.Parameter;
 import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.web.mapper.*;
@@ -72,6 +73,7 @@ public class LyCrmService {
     @Autowired private NumRuleMapper numRuleMapper;
     @Autowired private NumPriceMapper numPriceMapper;
     @Autowired private NumPriceAgentMapper numPriceAgentMapper;
+    @Autowired private CorporationMapper corporationMapper;
 
     /**
      * 获取服务
@@ -233,15 +235,16 @@ public class LyCrmService {
      */
 //    @Scheduled(cron = "0 0 7 * * ?")update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void praseOpenCardFileResult() {
-        if(!"true".equals(SystemParam.get("exe_timer"))) return;
+//        if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行解析开卡结果定时器");
         List<Map> list = dictService.findDictByGroup("opend_card_file_name");
+        List<Object[]> fails = new ArrayList<>();
         for (Map map:list) {
             String yFileName = String.valueOf(map.get("keyValue"));
             String fileName = yFileName+".ok";
             log.info("开始解析["+fileName+"]结果");
             try {
-                this.downloadFileToSftp("download", "download", fileName);
+//                this.downloadFileToSftp("download", "download", fileName);
                 File dir = new File(this.getLyRootPath()+"download"+File.separator);
                 List<String> datas = this.readFile(dir.getPath()+File.separator+fileName);
                 if(datas != null) {
@@ -258,8 +261,12 @@ public class LyCrmService {
                         num.setStatus(status == 3 ? 6 : 7);
                         num.setSlReason(row[7]);
                         Example example = new Example(Num.class);
-                        example.createCriteria().andEqualTo("numResource",row[2]).andEqualTo("iccid", row[3]).andEqualTo("status", 9);
+                        example.createCriteria().andEqualTo("numResource",row[2]).andEqualTo("iccid", row[3]).andEqualTo("status", Constants.NUM_STATUS_11.getIntKey());
+                        String thirdOrder = "";
+                        if(status != 3) thirdOrder = numMapper.findThirdOrder(row[2], row[3], Constants.NUM_STATUS_11.getIntKey());
                         numMapper.updateByExampleSelective(num, example);
+                        ////号码、iccid、京东订单号、失败原因
+                        if(status != 3) fails.add(new Object[]{row[2], row[3], thirdOrder, row[7]});
                     }
                 }
                 Dict dict = new Dict();
@@ -269,10 +276,21 @@ public class LyCrmService {
                 dictMapper.updateByExampleSelective(dict, example);
             }catch (ServiceException e) {
                 log.error("解析["+fileName+"]结果异常，原因["+e.getMessage()+"]", e);
+                Messager.send(SystemParam.get("system_phone"),"解析["+fileName+"]结果异常，原因["+e.getMessage()+"]");
             }catch (Exception e) {
                 log.error("解析["+fileName+"]结果异常, 未知异常", e);
+                Messager.send(SystemParam.get("system_phone"),"解析["+fileName+"]结果异常, 未知异常");
             }
-
+        }
+        try{
+            Corporation corporation = corporationMapper.selectByPrimaryKey(10);
+            String email = StringUtils.defaultString(corporation.getEmail(),"");
+            if(fails.size() > 0 && email.matches(RegexConsts.REGEX_EMAIL)) {
+                fails.add(0, new Object[]{"号码","iccid","京东订单号","失败原因"});
+                SendMailUtils.sendAttachmentMail("开卡错误信息推送",EmailUtils.baseHtml(EmailUtils.tableHtml("zyq", fails)), new Parameter(email,"ly"), null);
+            }
+        }catch (Exception e) {
+            log.error("发送开卡失败邮件未知异常", e);
         }
     }
 
