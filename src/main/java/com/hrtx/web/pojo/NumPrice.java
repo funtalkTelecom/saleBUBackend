@@ -61,6 +61,8 @@ public class NumPrice extends BasePojo implements java.io.Serializable {
     private String newDate;   //秒杀当前时间
     @Transient
     private String endDate;   //秒杀结束时间
+
+
     @Transient
     private int falg;         //1 当前正在进行；2即将开始
 
