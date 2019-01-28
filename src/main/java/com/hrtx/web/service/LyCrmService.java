@@ -291,6 +291,7 @@ public class LyCrmService {
             }
         }catch (Exception e) {
             log.error("发送开卡失败邮件未知异常", e);
+            Messager.send(SystemParam.get("system_phone"),"发送开卡失败邮件未知异常");
         }
     }
 
