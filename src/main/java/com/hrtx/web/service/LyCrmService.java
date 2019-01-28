@@ -143,12 +143,13 @@ public class LyCrmService {
         if(!"true".equals(SystemParam.get("exe_timer"))) return;
         log.info("开始执行上传开卡文件定时器");
         try {
+            List<Map> nums = numMapper.queryDslNum();
+            if(nums.size() <= 0) return;
             int date_offset = 0;
             int count = 1;
             String order = "1000000009"+Utils.getDate(0, "yyyyMMddHHmmss")+StringUtils.leftPad(count+"", 4, "0");
 //          list.add(new Object[]{"190",order,"17003564498","8986031754351004498","LYHR_ZYQ1141","1370761","zhouyq","01","350782198706203512","29号","zhouyq11","18965902603"});
 //            n.id, c.third_id, n.num_resource, n.iccid, m.meal_id
-            List<Map> nums = numMapper.queryDslNum();
             int start = 0;
             int len = nums.size();
             int maxCapacity = 1000000;
