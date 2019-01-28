@@ -287,7 +287,7 @@ public class LyCrmService {
             String email = StringUtils.defaultString(corporation.getEmail(),"");
             if(fails.size() > 0 && email.matches(RegexConsts.REGEX_EMAIL)) {
                 fails.add(0, new Object[]{"号码","iccid","京东订单号","失败原因"});
-                SendMailUtils.sendAttachmentMail("开卡错误信息推送",EmailUtils.baseHtml(EmailUtils.tableHtml("zyq", fails)), new Parameter(email,"ly"), null);
+                SendMailUtils.sendAttachmentMail("开卡错误信息推送",EmailUtils.baseHtml(EmailUtils.tableHtml("乐语", fails)), new Parameter(email,"乐语"), null);
             }
         }catch (Exception e) {
             log.error("发送开卡失败邮件未知异常", e);
