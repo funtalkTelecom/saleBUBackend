@@ -40,7 +40,7 @@
         )
     </update>
     <update id="batchUpdateSlz">
-        update tb_num n set n.`status` = 9, n.upload_file_name=#{fileName} where n.id in (
+        update tb_num n set n.`status` = 11, n.upload_file_name=#{fileName} where n.id in (
         <foreach collection ="list" item="item" separator =",">
             #{item}
         </foreach >
@@ -105,6 +105,11 @@
         where n.is_freeze=1
         group by n.id
         having TIMESTAMPDIFF(MINUTE,max(nf.add_Date), now()) >30;
+    </select>
+
+    <select id="findThirdOrder" resultType="java.lang.String">
+        select o.third_order from tb_num n, tb_order o, tb_order_item oi
+        where n.id = oi.num_id and oi.order_id = o.order_id and n.iccid = #{iccid} and n.num_resource = #{num} and n.`status` = #{status}
     </select>
 
 </mapper>

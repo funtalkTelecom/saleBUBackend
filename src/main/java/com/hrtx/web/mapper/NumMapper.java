@@ -71,4 +71,6 @@ public interface NumMapper extends BaseMapper<Num>,Mapper<Num> {
     List<Map> findNumFreezeList();
 
     List<Map> queryInNum(@Param("corpId") Integer corpId);
+
+    String findThirdOrder(@Param("num")String num, @Param("iccid")String iccid, @Param("status")int status);
 }

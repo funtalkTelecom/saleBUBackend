@@ -16,6 +16,7 @@ public class Corporation extends BasePojo implements java.io.Serializable{
     private String phone;
     private Integer district;
     private String address;
+    private String email;
     private String remark;
     private Byte status;
     private Date addDate;
@@ -143,5 +144,13 @@ public class Corporation extends BasePojo implements java.io.Serializable{
 
     public void setCompanyId(Integer companyId) {
         this.companyId = companyId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

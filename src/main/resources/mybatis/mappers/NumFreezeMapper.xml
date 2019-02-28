@@ -3,6 +3,6 @@
 <mapper namespace="com.hrtx.web.mapper.NumFreezeMapper" >
     <select id="queryFreeze" resultType="java.lang.Integer">
         select nf.add_user from  tb_num_freeze nf
-        where  nf.add_Date=(select max(nf.add_Date) from tb_num_freeze nf where nf.num_id=#{numId} and nf.is_freeze=1);
+        where  nf.num_id=#{numId} and nf.add_Date=(select max(nf.add_Date) from tb_num_freeze nf where nf.num_id=#{numId} and nf.is_freeze=1);
     </select>
 </mapper>

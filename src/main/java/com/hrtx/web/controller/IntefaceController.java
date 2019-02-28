@@ -30,6 +30,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -220,18 +221,25 @@ public class IntefaceController extends BaseReturn{
 		String feature = ObjectUtils.toString(data.elementText("feature"));
 		String pattern = ObjectUtils.toString(data.elementText("pattern"));
 		int page_num = NumberUtils.toInt(String.valueOf(data.elementText("page_num")));
+		double start_price = NumberUtils.toDouble(String.valueOf(data.elementText("start_price")));
+		double end_price = NumberUtils.toDouble(String.valueOf(data.elementText("end_price")));
 		NumPrice numPrice = new NumPrice();
         numPrice.setLimit(30);
         numPrice.setStart((page_num-1)*numPrice.getLimit());
+//		private BigDecimal priceS;
+//		private BigDecimal priceE;
+
 		numPrice.setNetType(operator == 1 ? "电信":(operator == 2 ? "联通" : (operator == 3 ? "移动" : "")));
 		numPrice.setProvinceCode(province_code);
 		numPrice.setCityCode(city_code);
 		numPrice.setFeature(feature);
 		numPrice.setTemp(pattern.replaceAll("\\?","_"));
 		numPrice.setAgentId(merchant.getCorpId());
-		numPrice.setChannel(merchant.getChanel());
+//		numPrice.setChannel(merchant.getChanel());
+		numPrice.setPriceS(new BigDecimal(start_price));
+		numPrice.setPriceE(new BigDecimal(end_price));
 
-		if("???????????".equals(pattern) && operator == 0 && province_code == 0 && city_code == 0 && StringUtils.isBlank(feature)) {
+		if("???????????".equals(pattern) && operator == 0 && province_code == 0 && city_code == 0 && StringUtils.isBlank(feature) && start_price == 0 && end_price == 0) {
 //			numPrice.setProvinceCode(1);
 //			numPrice.setCityCode(44);
 			numPrice.setSort(1);

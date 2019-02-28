@@ -46,6 +46,7 @@ public enum Constants {
     NUM_STATUS_8(8, "已失效", "NUM_STATUS"),//彻底结束
     NUM_STATUS_9(9, "结束", "NUM_STATUS"),//彻底结束
     NUM_STATUS_10(10, "停售", "NUM_STATUS"),//未售出（在华睿库）
+    NUM_STATUS_11(11, "受理中", "NUM_STATUS"),
 
     //订单类型
     ORDER_TYPE_1(1, "普通单", "NUM_STATUS"),

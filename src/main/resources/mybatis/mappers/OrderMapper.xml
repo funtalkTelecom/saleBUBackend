@@ -33,7 +33,8 @@
         a.total as total,
         a.conment as conment,
         a.sku_goods_type as skuGoodsType,
-        a.is_del as isDel
+        a.is_del as isDel,
+        a.third_order as thirdOrder
     </sql>
     <select id="findOrderInfo" resultType="Order">
         select

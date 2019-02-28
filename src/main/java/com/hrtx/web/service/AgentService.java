@@ -13,10 +13,7 @@ import com.hrtx.web.mapper.AccountMapper;
 import com.hrtx.web.mapper.AgentMapper;
 import com.hrtx.web.mapper.ConsumerMapper;
 import com.hrtx.web.mapper.CorpAgentMapper;
-import com.hrtx.web.pojo.Account;
-import com.hrtx.web.pojo.Agent;
-import com.hrtx.web.pojo.Consumer;
-import com.hrtx.web.pojo.ConsumerLog;
+import com.hrtx.web.pojo.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ObjectUtils;
@@ -194,35 +191,67 @@ public class AgentService {
 
 	/**
 	 * 根据提交用户获取代理商信息，若一个用户存在多个代理商或用户存在一个代理商但无渠道信息 则说明数据异常，若用户不存在代理商则取默认的代理商
-	 * @param user	当前登录用户
 	 * @return Result.code=200时data=Agent,否则说明数据异常，data是错误的信息
 	 */
-	public Result queryCurrAgent(Consumer user){
+	public Result queryCurrAgent( ){
+		User user = SessionUtil.getUser();
+		if(user == null) {
+			Consumer con =this.apiSessionUtil.getConsumer();
+			if(con ==null){
+				Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
+				if(agent==null) return new Result(Result.ERROR, "系统代理商不存在");
+				else return new Result(Result.OK, agent);
+			}else {
+				List agent_list=agentMapper.findConsumenrIdCount(con.getId());
+				if(agent_list.size()>0){//说明当前的用户有对应的渠道，取其渠道对应的价格
+					Map map = (Map) agent_list.get(0);
+					if(map.get("channel_id")==null){
+						return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
+					}else{
+						Agent ang = new Agent();
+						ang.setId(NumberUtils.toInt(String.valueOf(map.get("id"))));
+						ang.setChannelId(NumberUtils.toInt(String.valueOf(map.get("channel_id"))));
+						return new Result(Result.OK, ang);
+					}
+				}else{/*(agent_list.size()==0)*///若无代理渠道，则去默认
+					Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
+					if(agent==null) return new Result(Result.ERROR, "系统代理商不存在");
+					else return new Result(Result.OK, agent);
+				}
+			}
+		}else {
+			Agent ang = new Agent();
+			ang.setId(user.getAgentId());
+			return new Result(Result.OK, ang);
+		}
+
+
+
 //		Example example = new Example(Agent.class);
 //		example.createCriteria().andEqualTo("addConsumerId",user.getId())
 //				.andEqualTo("isDel",0)
 //				.andEqualTo("status",2);
 //		List<Agent> agent_list=agentMapper.selectByExample(example);
-		if(user ==null){
-			Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
-			if(agent==null) return new Result(Result.ERROR, "系统代理商不存在");
-			else return new Result(Result.OK, agent);
-		}
-		List agent_list=agentMapper.findConsumenrIdCount(user.getId());
-		if(agent_list.size()>0){//说明当前的用户有对应的渠道，取其渠道对应的价格
-			Map map = (Map) agent_list.get(0);
-			if(map.get("channel_id")==null){
-				return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
-			}else{
-				Agent ang = new Agent();
-				ang.setId(NumberUtils.toInt(String.valueOf(map.get("id"))));
-				ang.setChannelId(NumberUtils.toInt(String.valueOf(map.get("channel_id"))));
-				return new Result(Result.OK, ang);
-			}
-		}else{/*(agent_list.size()==0)*///若无代理渠道，则去默认
-			Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
-			if(agent==null) return new Result(Result.ERROR, "系统代理商不存在");
-			else return new Result(Result.OK, agent);
-		}
+//		if(user ==null){
+//			Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
+//			if(agent==null) return new Result(Result.ERROR, "系统代理商不存在");
+//			else return new Result(Result.OK, agent);
+//		}
+//		List agent_list=agentMapper.findConsumenrIdCount(user.getId());
+//		if(agent_list.size()>0){//说明当前的用户有对应的渠道，取其渠道对应的价格
+//			Map map = (Map) agent_list.get(0);
+//			if(map.get("channel_id")==null){
+//				return new Result(Result.ERROR, "抱歉，您的渠道归属异常，无法订购");
+//			}else{
+//				Agent ang = new Agent();
+//				ang.setId(NumberUtils.toInt(String.valueOf(map.get("id"))));
+//				ang.setChannelId(NumberUtils.toInt(String.valueOf(map.get("channel_id"))));
+//				return new Result(Result.OK, ang);
+//			}
+//		}else{/*(agent_list.size()==0)*///若无代理渠道，则去默认
+//			Agent agent=agentMapper.selectByPrimaryKey(NumberUtils.toInt(SystemParam.get("default_agent")));
+//			if(agent==null) return new Result(Result.ERROR, "系统代理商不存在");
+//			else return new Result(Result.OK, agent);
+//		}
 	}
 }
