@@ -1,4 +1,5 @@
 package com.hrtx.web.test;
+import com.hrtx.web.service.DictService;
 import net.sf.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,18 +25,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @WebAppConfiguration
-public class TestDemo {
-    //参考文章：https://www.cnblogs.com/0201zcr/p/5756642.html
-    //https://www.cnblogs.com/lyy-2016/p/6122144.html
+    public class TestDemo {
+        //参考文章：https://www.cnblogs.com/0201zcr/p/5756642.html
+        //https://www.cnblogs.com/lyy-2016/p/6122144.html
 
     private MockMvc mvc;
     @Autowired private WebApplicationContext context;
+    @Autowired private DictService dictService;
 
     @Before
     public void setupMockMvc() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
-
+    @Test
+    public void test() throws Exception {
+    }
     @Test
     public void testApiSession() throws Exception{
 
