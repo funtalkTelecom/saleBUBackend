@@ -528,24 +528,24 @@ public class OrderService extends BaseService {
                 if("1".equals(String.valueOf(ispay.getData()))){//线上支付
                     Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
                     if(payR.getCode()==Result.OK){  //退款成功
-                        apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
+                        apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
                         apiOrderService.orderType(orderId);
                         return new Result(Result.OK, payR.getData());
                     }else { //退款失败
-                        apiOrderService.CancelOrderStatus(orderId,13,reason); //退款失败
+                        apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),reason); //退款失败
                         return new Result(Result.OK, payR.getData());
                     }
                 }else {//线下支付
-                    apiOrderService.CancelOrderStatus(orderId,14,reason); //待财务退款
+                    apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),reason); //待财务退款
                     return new Result(Result.OK, "线下支付,待财务退款");
                 }
             }else {//未支付
-                apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
+                apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
                 //上架涉及的表，数量，状态
                 apiOrderService.orderType(orderId);
             }
         }else if (cancel_res==2){//撤销取消,还原订单状态
-            apiOrderService.CancelOrderStatus(orderId,3,reason);
+            apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_3.getIntKey(),reason);
         }
         return new Result(Result.OK, "撤销取消成功");
     }
