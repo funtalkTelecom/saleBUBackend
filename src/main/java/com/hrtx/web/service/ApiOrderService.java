@@ -201,7 +201,18 @@ public class ApiOrderService {
 		if(adresult.getCode()!=Result.OK)return adresult;
 		DeliveryAddress address=(DeliveryAddress)adresult.getData();
 		String shippingMenthodId="";
-		return this.submitOrder(Constants.ORDER_TYPE_2.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",null);
+
+		Map<String,Object> order_ext_param=new HashMap<>();
+		Result curr_agent=this.agentService.queryCurrAgent();
+		if(curr_agent.getCode()!=Result.OK)return curr_agent;
+		Agent agent=(Agent)curr_agent.getData();
+		Number number=this.numberMapper.selectByPrimaryKey(num_id);
+		if(number==null)return new Result(Result.OTHER,"抱歉，尚未找到您提交的号码");
+		Result result = numService.findBossNum(number.getCityId(),agent.getId(),number.getSellerId());
+		if(result.getCode() != Result.OK)return result;
+		order_ext_param.put("bossNum",String.valueOf(result.getData()));
+
+		return this.submitOrder(Constants.ORDER_TYPE_2.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);
 	}
 
 	/**
