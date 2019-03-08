@@ -230,11 +230,10 @@ public class ApiNumberService {
 
 	public Result numberInfo(String id, HttpServletRequest request){
 		PageInfo<Object> pm = null;
-
 		Map map = numberMapper.getNumSkuGoodsTypeById(id);
+		if(map == null) return new Result(Result.ERROR, "未找到号码");
 		String skuGoodsType =String.valueOf(map.get("sku_goods_type"));
 		Map obj = new HashMap();
-		if(map == null) return new Result(Result.ERROR, "未找到号码");
 		if( skuGoodsType.equals("4")){ //超靓
 			NumPrice numPrice = new NumPrice();
 			int unmId = NumberUtils.toInt(id);

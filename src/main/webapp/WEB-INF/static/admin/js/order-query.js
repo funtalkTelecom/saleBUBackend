@@ -152,6 +152,9 @@ $(function() {
 						if(p_receipt && record.status=="1") {
 							node.push('<a class="btn btn-success btn-xs receipt" href="javascript:void(0);">收款</a>');
                         }
+                        if(record.status=="20") {
+                            node.push('<a class="btn btn-success btn-xs order-push-storage" href="javascript:void(0);">推送</a>');
+                        }
                         if(p_cancel &&( record.status=="1"||record.status=="2"||record.status=="21"||record.status=="3"&&record.orderType!=3)) {
 							node.push('<a class="btn btn-danger btn-xs cancel" href="javascript:void(0);">取消订单</a>');
                         }
@@ -214,6 +217,16 @@ $(function() {
                             $("#refund-orderId").val(v);
                             $('#refundInfo').modal('show');
                         });
+
+                        $operate.find(".order-push-storage").click(function () {
+                            if(confirm("是否确认推送？")){
+                                $.post("order/order-push-storage", {orderId: v}, function (data) {
+                                    dataList.reload();
+                                    alert(data.data);
+                                }, "json");
+                            }
+                        });
+
                         // 退款失败，重新退款
                         $operate.find(".refund_live").click(function () {
                             if(confirm("是否确认再次退款？")){

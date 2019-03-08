@@ -9,10 +9,7 @@ import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.pojo.Order;
 import com.hrtx.web.pojo.OrderItem;
-import com.hrtx.web.service.AuctionDepositService;
-import com.hrtx.web.service.NumService;
-import com.hrtx.web.service.OrderItemService;
-import com.hrtx.web.service.OrderService;
+import com.hrtx.web.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +35,7 @@ public class OrderController extends BaseReturn{
 	@Autowired
 	private AuctionDepositService auctionDepositService;
 	@Autowired private NumService numService;
+	@Autowired private ApiOrderService apiOrderService;
 
 	@RequestMapping("/order-query")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
@@ -56,6 +54,14 @@ public class OrderController extends BaseReturn{
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
 	public Result receipt(Order order, HttpServletRequest request){
 		return orderService.payReceipt(order, request);
+	}
+
+	@RequestMapping("/order-push-storage")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_RECEIPT})
+	public Result orderPushStorage(HttpServletRequest request){
+		String order_id=request.getParameter("orderId");
+		Result result=apiOrderService.payPushOrderToStorage(Integer.valueOf(order_id));
+		return result;
 	}
 
 	/**

@@ -88,6 +88,9 @@ $(function() {
 	$("#query").click(function() {
 		var sPrice = $("input[name=priceS]").val();
 		var ePrice = $("input[name=priceE]").val();
+		if(sPrice<0||ePrice<0){
+			alert("请输入合理的数字")
+		}
 		if(sPrice&&ePrice){
 			if(sPrice>ePrice){
                 $("input[name=priceS]").val(ePrice);

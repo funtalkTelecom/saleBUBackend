@@ -201,7 +201,18 @@ public class ApiOrderService {
 		if(adresult.getCode()!=Result.OK)return adresult;
 		DeliveryAddress address=(DeliveryAddress)adresult.getData();
 		String shippingMenthodId="";
-		return this.submitOrder(Constants.ORDER_TYPE_2.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",null);
+
+		Map<String,Object> order_ext_param=new HashMap<>();
+		Result curr_agent=this.agentService.queryCurrAgent();
+		if(curr_agent.getCode()!=Result.OK)return curr_agent;
+		Agent agent=(Agent)curr_agent.getData();
+		Number number=this.numberMapper.selectByPrimaryKey(num_id);
+		if(number==null)return new Result(Result.OTHER,"抱歉，尚未找到您提交的号码");
+		Result result = numService.findBossNum(number.getCityId(),agent.getId(),number.getSellerId());
+		if(result.getCode() != Result.OK)return result;
+		order_ext_param.put("bossNum",String.valueOf(result.getData()));
+
+		return this.submitOrder(Constants.ORDER_TYPE_2.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);
 	}
 
 	/**
@@ -1360,16 +1371,16 @@ public class ApiOrderService {
 			Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 			if(ispay.getCode()==200){  //已支付
 				if(ispay.getData().equals("1")){//线上支付
-					CancelOrderStatus(orderId,12,""); //退款中
+					CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 					Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
 					if(payR.getCode()==200){  //退款成功
 						orderType(orderId);
 					}else { //退款失败
-						CancelOrderStatus(orderId,13,""); //退款失败
+						CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
 
 					}
 				}else {//线下支付
-					CancelOrderStatus(orderId,14,""); //待财务退款
+					CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
 				}
 			}else {//未支付
 				//上架涉及的表，数量，状态
@@ -1401,15 +1412,15 @@ public class ApiOrderService {
 				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 				if(ispay.getCode()==200){  //已支付
 					if(ispay.getData().equals("1")){ //线上支付
-						CancelOrderStatus(orderId,12,""); //退款中
+						CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
 						if(payR.getCode()==Result.OK){  //退款成功
 							orderType(orderId);
 						}else { //退款失败
-							CancelOrderStatus(orderId,13,""); //退款失败
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
 						}
 					}else {//线下支付
-						CancelOrderStatus(orderId,14,""); //待财务退款
+						CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
 					}
 				}else {//未支付
 					//上架涉及的表，数量，状态
