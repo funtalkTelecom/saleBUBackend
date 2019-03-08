@@ -148,7 +148,7 @@ public class OrderController extends BaseReturn{
 			log.info("接收到发货回调参数["+param+"]");
 			StorageInterfaceRequest storageInterfaceRequest = StorageInterfaceRequest.create(param, SystemParam.get("key"));
 			Result result = orderService.updateDeliverCallbackInfo(storageInterfaceRequest);
-			if(result.getCode() == 200) {
+			if(result.getCode() == Result.OK) {
                 renderHtml("success");
 				Order order = (Order) result.getData();
                 String goodsType = order.getSkuGoodsType();

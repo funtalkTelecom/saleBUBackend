@@ -68,7 +68,7 @@ public class OrderService extends BaseService {
     public Result payDeliverOrder(Integer orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
-        if(order.getIsDel() == 1 || order.getStatus() != 2) return new Result(Result.ERROR, "订单状态异常");
+        if(order.getIsDel() == 1 || order.getStatus() != Constants.ORDER_STATUS_2.getIntKey()) return new Result(Result.ERROR, "订单状态异常");
         String goodsType = order.getSkuGoodsType();
         if(!ArrayUtils.contains(goodsTypes, goodsType)) return new Result(Result.ERROR, "订单业务类型不存在，终止发货。");
         List<Map> nums = null;
@@ -79,14 +79,14 @@ public class OrderService extends BaseService {
             if(nums.size() == 0) return new Result(Result.ERROR, "订单未找到可更新号码");
             for (Map num:nums) {
                 int status = NumberUtils.toInt(ObjectUtils.toString(num.get("status")));
-                if(status != 3) notFreezeCount++;
+                if(status != Constants.NUM_STATUS_3.getIntKey()) notFreezeCount++;
             }
             if(notFreezeCount > 0) return new Result(Result.ERROR, "号码处于非冻结数量["+notFreezeCount+"]，状态异常");
         }
 
         if("3".equals(goodsType)) {//普靓
             if(nums != null && nums.size() > 0) this.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
-            order.setStatus(4);//待配卡
+            order.setStatus(Constants.ORDER_STATUS_4.getIntKey());//待配卡
             orderMapper.updateByPrimaryKey(order);
             return new Result(Result.OK, "订单下未找到需要发货的产品");
         }
@@ -126,7 +126,7 @@ public class OrderService extends BaseService {
         StorageInterfaceResponse storageInterfaceResponse = StorageInterfaceResponse.create(String.valueOf(result.getData()), SystemParam.get("key"));
         if("00000".equals(storageInterfaceResponse.getCode())) {
             if(nums != null && nums.size() > 0) this.batchUpdateDpk(order.getConsumer(), order.getConsumerName(), nums);
-            order.setStatus(3);//待配货
+            order.setStatus(Constants.ORDER_STATUS_3.getIntKey());//待配货
             order.setNoticeShipmentDate(new Date());
             orderMapper.updateByPrimaryKey(order);
         }else {
@@ -162,7 +162,7 @@ public class OrderService extends BaseService {
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || (order.getStatus() != Constants.ORDER_STATUS_1.getIntKey() && order.getStatus() != Constants.ORDER_STATUS_21.getIntKey())) return new Result(Result.ERROR, "订单状态异常");
         order.setPayDate(new Date());
-        order.setStatus(2);
+        order.setStatus(Constants.ORDER_STATUS_2.getIntKey());
         orderMapper.updateByPrimaryKey(order);
         return new Result(Result.OK, "success");
     }
@@ -176,33 +176,39 @@ public class OrderService extends BaseService {
     public Result updateDeliverCallbackInfo(StorageInterfaceRequest storageInterfaceRequest) {
         Map platrequest = (Map) storageInterfaceRequest.getPlatrequest();
         int orderId = NumberUtils.toInt(ObjectUtils.toString(platrequest.get("order_id")));
+        int opType = NumberUtils.toInt(ObjectUtils.toString(platrequest.get("op_type")), 1);
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
-        if(order.getStatus() != 3) return new Result(Result.ERROR, "订单状态异常");
         order.setExpressId(ObjectUtils.toString(platrequest.get("logistic_type")));
         order.setExpressName(ObjectUtils.toString(platrequest.get("logistic_name")));
         order.setExpressNumber(ObjectUtils.toString(platrequest.get("logistic_id")));
-        try {
-            order.setDeliverDate(Utils.stringToDate(ObjectUtils.toString(platrequest.get("refill_date")), "yyyy-MM-dd HH:mm:ss"));
-        } catch (ParseException e) {
-            log.error("解析回填时间异常", e);
-        }
-        order.setPickupDate(new Date());
-        order.setStatus(4);//待配卡
+        if(opType == 1) {//回填
+            if(order.getStatus() != Constants.ORDER_STATUS_3.getIntKey()) return new Result(Result.ERROR, "订单状态异常");
+            try {
+                order.setDeliverDate(Utils.stringToDate(ObjectUtils.toString(platrequest.get("refill_date")), "yyyy-MM-dd HH:mm:ss"));
+            } catch (ParseException e) {
+                log.error("解析回填时间异常", e);
+            }
+            order.setPickupDate(new Date());
+            order.setStatus(Constants.ORDER_STATUS_4.getIntKey());//待配卡
 
-        /**插入仓库回调回来的条码**/
-        List<Map> commodities = (List) platrequest.get("commodities");
-        List allImeis = new ArrayList();
-        for (Map commodity:commodities) {
-            List imeis = (List) commodity.get("imeis");
-            String item_id = ObjectUtils.toString(commodity.get("item_id"));
-            allImeis.add(CommonMap.create("iccids",imeis).put("itemId", item_id).getData());
+            /**插入仓库回调回来的条码**/
+            List<Map> commodities = (List) platrequest.get("commodities");
+            List allImeis = new ArrayList();
+            for (Map commodity:commodities) {
+                List imeis = (List) commodity.get("imeis");
+                String item_id = ObjectUtils.toString(commodity.get("item_id"));
+                allImeis.add(CommonMap.create("iccids",imeis).put("itemId", item_id).getData());
+            }
+            iccidMapper.deleteTempByBatchNum(orderId);
+            int insertCount = iccidMapper.batchInsertTemp(allImeis, orderId);
+            /**插入仓库回调回来的条码**/
+            orderMapper.updateByPrimaryKey(order);
+            return new Result(Result.OK, order);
+        }else {//仓库重填，只更新物流信息
+            orderMapper.updateByPrimaryKey(order);
+            return new Result(Result.ERROR, "success");
         }
-        iccidMapper.deleteTempByBatchNum(orderId);
-        int insertCount = iccidMapper.batchInsertTemp(allImeis, orderId);
-        /**插入仓库回调回来的条码**/
-        orderMapper.updateByPrimaryKey(order);
-        return new Result(Result.OK, order);
     }
 
     /**
@@ -216,7 +222,7 @@ public class OrderService extends BaseService {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() != 0) return new Result(Result.ERROR, "订单已删除");
-        if(order.getStatus() !=1 ) return new Result(Result.ERROR, "订单已支付");
+        if(order.getStatus() != Constants.ORDER_STATUS_1.getIntKey() ) return new Result(Result.ERROR, "订单已支付");
         order.setPayMenthodId(payType);
         order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payType));
         orderMapper.updateByPrimaryKey(order);
@@ -236,7 +242,7 @@ public class OrderService extends BaseService {
     public Result updateDqx(Integer orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
-        order.setStatus(5);
+        order.setStatus(Constants.ORDER_STATUS_5.getIntKey());
         orderMapper.updateByPrimaryKey(order);
         return new Result(Result.OK, "success");
     }
@@ -259,7 +265,7 @@ public class OrderService extends BaseService {
         if(order == null) return new Result(Result.ERROR, "订单不存在");
 //        if(order.getIsDel() == 1 || order.getStatus() != 1) return new Result(Result.ERROR, "订单状态异常");
         if(order.getIsDel() != 0) return new Result(Result.ERROR, "订单已删除");
-        if(order.getStatus() !=1 ) return new Result(Result.ERROR, "订单已支付");
+        if(order.getStatus() != Constants.ORDER_STATUS_1.getIntKey() ) return new Result(Result.ERROR, "订单已支付");
 //        DeliveryAddress address = deliveryAddressMapper.selectByPrimaryKey(addresId);
 //        if(address == null) return new Result(Result.ERROR, "地址不存在");
         List<Map> list=this.deliveryAddressMapper.findDeliveryAddressById(addresId);
@@ -316,7 +322,7 @@ public class OrderService extends BaseService {
         Order parm = orderMapper.selectByPrimaryKey(orderId);
         parm.setRefundReason(refunReason);
         orderMapper.updateByPrimaryKey(parm);
-        apiOrderService.CancelOrderStatus(orderId,7,"null"); //取消
+        apiOrderService.CancelOrderStatus(orderId, Constants.ORDER_STATUS_7.getIntKey(),"null"); //取消
         //上架涉及的表，数量，状态
         apiOrderService.orderType(orderId);
         return new Result(Result.OK, "退款成功");
@@ -326,10 +332,10 @@ public class OrderService extends BaseService {
         String reason ="null";
         Order order1 = orderMapper.selectByPrimaryKey(orderId);
         if(order1 == null) return new Result(Result.ERROR, "订单不存在");
-        if(order1.getStatus() != 13) return new Result(Result.ERROR, "非退款失败状态的订单");
+        if(order1.getStatus() != Constants.ORDER_STATUS_13.getIntKey()) return new Result(Result.ERROR, "非退款失败状态的订单");
         Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
         if(payR.getCode()==Result.OK){  //退款成功
-            apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
+            apiOrderService.CancelOrderStatus(orderId, Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
             apiOrderService.orderType(orderId);
             return new Result(Result.OK,  payR.getData());
         }else { //退款失败
@@ -519,7 +525,7 @@ public class OrderService extends BaseService {
         String reason = ObjectUtils.toString(platrequest.get("reson"));
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
-        if(order.getStatus() != 11) return new Result(Result.ERROR, "非待仓库撤销状态的订单");
+        if(order.getStatus() != Constants.ORDER_STATUS_11.getIntKey()) return new Result(Result.ERROR, "非待仓库撤销状态的订单");
         if(cancel_res==1) {
             //确认取消
             Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
@@ -528,24 +534,24 @@ public class OrderService extends BaseService {
                 if("1".equals(String.valueOf(ispay.getData()))){//线上支付
                     Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
                     if(payR.getCode()==Result.OK){  //退款成功
-                        apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
+                        apiOrderService.CancelOrderStatus(orderId, Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
                         apiOrderService.orderType(orderId);
                         return new Result(Result.OK, payR.getData());
                     }else { //退款失败
-                        apiOrderService.CancelOrderStatus(orderId,13,reason); //退款失败
+                        apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),reason); //退款失败
                         return new Result(Result.OK, payR.getData());
                     }
                 }else {//线下支付
-                    apiOrderService.CancelOrderStatus(orderId,14,reason); //待财务退款
+                    apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),reason); //待财务退款
                     return new Result(Result.OK, "线下支付,待财务退款");
                 }
             }else {//未支付
-                apiOrderService.CancelOrderStatus(orderId,7,reason); //取消
+                apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
                 //上架涉及的表，数量，状态
                 apiOrderService.orderType(orderId);
             }
         }else if (cancel_res==2){//撤销取消,还原订单状态
-            apiOrderService.CancelOrderStatus(orderId,3,reason);
+            apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_3.getIntKey(),reason);
         }
         return new Result(Result.OK, "撤销取消成功");
     }

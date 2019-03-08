@@ -226,8 +226,6 @@ public class IntefaceController extends BaseReturn{
 		NumPrice numPrice = new NumPrice();
         numPrice.setLimit(30);
         numPrice.setStart((page_num-1)*numPrice.getLimit());
-//		private BigDecimal priceS;
-//		private BigDecimal priceE;
 
 		numPrice.setNetType(operator == 1 ? "电信":(operator == 2 ? "联通" : (operator == 3 ? "移动" : "")));
 		numPrice.setProvinceCode(province_code);

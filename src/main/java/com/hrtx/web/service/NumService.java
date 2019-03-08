@@ -47,7 +47,7 @@ public class NumService {
     public Result blindNum(Integer orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "绑卡订单不存在");
-        if(order.getIsDel() == 1 || order.getStatus() != 4) return new Result(Result.ERROR, "订单状态异常");
+        if(order.getIsDel() == 1 || order.getStatus() != Constants.ORDER_STATUS_4.getIntKey()) return new Result(Result.ERROR, "订单状态异常");
         int insertCount = 0;
         List<Map> items = iccidMapper.queryTempItemsByBatchNum(orderId);
         for (Map item:items) {
