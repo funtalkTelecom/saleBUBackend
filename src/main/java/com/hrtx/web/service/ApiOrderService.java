@@ -596,12 +596,13 @@ public class ApiOrderService {
 	 */
 	public Result queryExpressInfo(Integer order_id){
 		Consumer user =apiSessionUtil.getConsumer();
-//		if(user==null)return new Result(Result.ERROR,"请登录后查询");
+		if(user==null)return new Result(Result.ERROR,"请登录后查询");
 		Order order=orderMapper.selectByPrimaryKey(order_id);
 		if(order==null)return new Result(Result.ERROR,"订单数据错误");
 		String expressId=order.getExpressId();
 		String expressNo=order.getExpressNumber();
-//		if(!order.getConsumer().equals(user.getId()))return new Result(Result.ERROR,"无法查询他人订单信息");
+		String express_phone=StringUtils.substring(order.getPersonTel(),String.valueOf(order.getPersonTel()).length()-4);//收件人或寄件人手机号后四位
+		if(!order.getConsumer().equals(user.getId()))return new Result(Result.ERROR,"无法查询他人订单信息");
 		if(StringUtils.isEmpty(expressId)&&StringUtils.isEmpty(expressNo))return new Result(Result.ERROR,"订单尚未发货");
 		Example example = new Example(Dict.class);
 		example.createCriteria().andEqualTo("keyGroup","express-type").andEqualTo("keyId",expressId);
@@ -609,6 +610,7 @@ public class ApiOrderService {
 		if(dict_list.size()<=0)return new Result(Result.ERROR,"物流代码未配置，暂时无法查询");
 		Dict dict=dict_list.get(0);
 		String expressType=dict.getNote();
+		if(StringUtils.equals(expressType,"SFEXPRESS"))expressNo+=":"+express_phone;
 		com.hrtx.common.dto.Result expressStr = ExpressUtils.queryExpressInfo(expressNo, expressType);
 		if(expressStr.getCode()==com.hrtx.common.dto.Result.OK)return new Result(Result.OK,expressStr.getData());
 		return new Result(Result.ERROR,expressStr.getDesc());

@@ -54,7 +54,14 @@ public class ApiOrderController extends BaseReturn {
     @ResponseBody
     public Result orderExpress(HttpServletRequest request) {
         Integer order_id = NumberUtils.toInt(request.getParameter("order_id"));
-        Result result=this.apiOrderService.queryExpressInfo(order_id);
+        Result result=null;
+        try {
+            result=this.apiOrderService.queryExpressInfo(order_id);
+        }catch (Exception e){
+            Long err_num=System.currentTimeMillis();
+            log.error("查询订单快递信息错误,错误编码",e);
+            result=new Result(Result.ERROR,String.format("系统错误,错误编码[%s]",err_num));
+        }
         return result;
     }
 //    @PostMapping("/order")
