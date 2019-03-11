@@ -11,6 +11,7 @@
         <!--<version>1.5.9.RELEASE</version>-->
         <version>1.5.9.RELEASE</version>
     </parent>
+
     <dependencies>
         <!-- 单元测试 -->
         <dependency>
@@ -265,7 +266,11 @@
             <artifactId>commons-email</artifactId>
             <version>1.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.hrtx</groupId>
+            <artifactId>common-util</artifactId>
+            <version>0.0.8</version>
+        </dependency>
     </dependencies>
 
     <build>

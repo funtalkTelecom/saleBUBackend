@@ -49,7 +49,14 @@ public class ApiOrderController extends BaseReturn {
             return apiOrderService.submitNumOrder(skuid, numid, mealid, addrid, "");
         }
     }
-
+    @GetMapping("/order-express")
+    @Powers(PowerConsts.NOLOGINPOWER)
+    @ResponseBody
+    public Result orderExpress(HttpServletRequest request) {
+        Integer order_id = NumberUtils.toInt(request.getParameter("order_id"));
+        Result result=this.apiOrderService.queryExpressInfo(order_id);
+        return result;
+    }
 //    @PostMapping("/order")
 ////    @Powers(PowerConsts.NOPOWER)
 //    @Powers(PowerConsts.NOLOGINPOWER)

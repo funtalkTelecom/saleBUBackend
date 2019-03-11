@@ -4,6 +4,7 @@ import com.github.abel533.entity.Example;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hrtx.common.express.ExpressUtils;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
@@ -58,6 +59,7 @@ public class ApiOrderService {
 	@Autowired private AgentService agentService;
 	@Autowired private ApiOrderService apiOrderService;
 	@Autowired private LyCrmService lyCrmService;
+	@Autowired private DictMapper dictMapper;
 
 	public  List<Map> findOrderListByNumId(Integer numId)
 	{
@@ -585,6 +587,33 @@ public class ApiOrderService {
 				address1, commission, shippingTotal, subTotal,conment,skuGoodsType);
 		return order;
 	}
+//////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 查询订单快递路由
+	 * @param order_id
+	 * @return
+	 */
+	public Result queryExpressInfo(Integer order_id){
+		Consumer user =apiSessionUtil.getConsumer();
+//		if(user==null)return new Result(Result.ERROR,"请登录后查询");
+		Order order=orderMapper.selectByPrimaryKey(order_id);
+		if(order==null)return new Result(Result.ERROR,"订单数据错误");
+		String expressId=order.getExpressId();
+		String expressNo=order.getExpressNumber();
+//		if(!order.getConsumer().equals(user.getId()))return new Result(Result.ERROR,"无法查询他人订单信息");
+		if(StringUtils.isEmpty(expressId)&&StringUtils.isEmpty(expressNo))return new Result(Result.ERROR,"订单尚未发货");
+		Example example = new Example(Dict.class);
+		example.createCriteria().andEqualTo("keyGroup","express-type").andEqualTo("keyId",expressId);
+		List<Dict> dict_list=this.dictMapper.selectByExample(example);
+		if(dict_list.size()<=0)return new Result(Result.ERROR,"物流代码未配置，暂时无法查询");
+		Dict dict=dict_list.get(0);
+		String expressType=dict.getNote();
+		com.hrtx.common.dto.Result expressStr = ExpressUtils.queryExpressInfo(expressNo, expressType);
+		if(expressStr.getCode()==com.hrtx.common.dto.Result.OK)return new Result(Result.OK,expressStr.getData());
+		return new Result(Result.ERROR,expressStr.getDesc());
+	}
+
 //////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * 根据商品id创建订单
