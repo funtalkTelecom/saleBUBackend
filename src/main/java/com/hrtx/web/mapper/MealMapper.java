@@ -27,4 +27,7 @@ public interface MealMapper extends Mapper<Meal>,BaseMapper<Meal>{
     List getMealListByNum(@Param("id") String id);
 
     List<Integer> mealListByNum(@Param("phone") String phone);
+
+    List getMeal(@Param("id") String id);
+
 }

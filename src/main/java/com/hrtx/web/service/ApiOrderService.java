@@ -1348,7 +1348,7 @@ public class ApiOrderService {
 			}
 
 			List mealList = new ArrayList();
-			mealList = mealMapper.getMealListByNum(String.valueOf(((Map) list.get(0)).get("numId")));
+			mealList = mealMapper.getMeal(String.valueOf(((Map) list.get(0)).get("mealId")));
 			if(mealList == null && mealList.size()==0){
 				mealList = new ArrayList();
 			}

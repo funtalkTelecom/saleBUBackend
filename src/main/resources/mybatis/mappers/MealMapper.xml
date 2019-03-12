@@ -135,4 +135,11 @@
     <select id="checkMealIdIsExist" resultType="java.lang.Integer">
         select count(1) as num from tb_meal a where a.mid != #{mid} and a.meal_id = #{mealId}
     </select>
+
+    <select id="getMeal" resultType="Meal">
+        select
+        <include refid="col_list"/>
+        from tb_meal a
+        where a.mid = #{id} order by a.mid
+    </select>
 </mapper>
