@@ -69,9 +69,14 @@
     <select id="queryPageListDetailForConsumer" resultMap="OrderItemDetail">
         select
         b.sku_goods_type as skuGoodsType,
+        m.tele_type as teleType,
+        m.net_type as netType,
+        m.city_name as cityName,
         <include refid="col_list"/>
         from tb_order_item a left join tb_sku b on b.sku_id = a.sku_id
+        left join tb_num m on a.num_id = m.id
         where 1=1
+        and a.is_shipment=0
         <if test="orderId!=null and orderId != ''">
             and a.order_id = #{orderId}
         </if>
