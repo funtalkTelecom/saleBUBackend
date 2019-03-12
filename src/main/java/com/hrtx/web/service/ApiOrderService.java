@@ -1279,7 +1279,6 @@ public class ApiOrderService {
 			Goods goods = new Goods();
 			if(list!=null && list.size()>0) {
 				goods = goodsMapper.findGoodsInfo(Integer.parseInt(String.valueOf(((Map) list.get(0)).get("goodsId"))));
-
 				fileList = fileMapper.findFilesByRefid(String.valueOf(goods.getgId()));
 				String picUrl = "";
 				if (fileList != null && fileList.size() > 0) {
@@ -1306,12 +1305,18 @@ public class ApiOrderService {
 				}
 			}
 
+			List mealList = new ArrayList();
+			mealList = mealMapper.getMealListByNum(String.valueOf(((Map) list.get(0)).get("numId")));
+			if(mealList == null && mealList.size()==0){
+				mealList = new ArrayList();
+			}
 			DeliveryAddress deliveryAddress = deliveryAddressMapper.findDeliveryAddressByIdForOrder(order.getAddressId());
 			order.setAddress(getFullAddress(deliveryAddress));
 
 			o.put("order", order);
 			o.put("goods", goods);
 			o.put("orderItem", list);
+			o.put("mealList", mealList);
 		}catch(Exception e){
 			return new Result(Result.ERROR, "获取异常");
 		}
