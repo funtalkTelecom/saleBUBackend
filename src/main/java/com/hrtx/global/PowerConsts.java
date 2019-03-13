@@ -89,6 +89,10 @@ public enum PowerConsts {
 	NUMPRICEMOUDULE_COMMON_QUEYR(70901,"查询",70900,1,"",3,1),//号码价格查询
 	NUMPRICEMOUDULE_COMMON_EDIT(70902,"修改",70900,1,"",3,2),//修改
 
+	PROMOTIONPLAN(71100,"推广计划",70000,0,"partner/promotion-plan-index",2,1),//佣金管理
+	PROMOTIONPLAN_QUERY(71101,"查询",71100,1,"",3,1),
+	PROMOTIONPLAN_EDIT(71102,"编辑",71100,1,"",3,1),
+
 	SYSMOUDULE(90300,"配置管理",90000,0,"system/system-query",2,1),//配置管理
 	SYSMOUDULE_COMMON_QUEYR(90301,"查询",90300,1,"",3,1),//配置查询
 	SYSMOUDULE_COMMON_EDIT(90302,"修改",90300,1,"",3,2),//配置修改

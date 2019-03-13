@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrtx.web.mapper.PromotionPlanNumMapper" >
+
+    <update id="deletePromotionPlanNum">
+        update tb_promotion_plan_num n set n.is_del=1 ,n.update_date=now() where n.promotion_plan_id= #{promotion_plan_id}
+    </update>
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrtx.web.mapper.PromotionPlanMapper" >
+    <sql id="col_list">
+        select p.id,p.promotion,p.award_way,p.award,p.is_limit,p.limit_award,p.begin_price,p.end_price,p.begin_date,p.end_date,p.`status`
+        from tb_promotion_plan p where p.fee_type=1 and p.corp_id=#{param.corpId}
+    </sql>
+    <select id="queryPageList" resultType="PromotionPlan">
+        <include refid="col_list"/>
+        <if test="param.status!=null and param.status >=0">and p.status=#{param.status}</if>
+        <if test="param.num!=null and param.num!=''">and p.id in (select n.promotion_plan_id from tb_promotion_plan_num n where n.num=#{param.num}) </if>
+        order by p.status,p.id desc
+    </select>
+    <select id="queryConflictList" resultType="PromotionPlan">
+        <include refid="col_list"/>
+        <!-- end_time 小于 a OR (start_time 大于 b -->
+        and not (p.end_date &lt; #{param.beginDate} or p.begin_date &gt; #{param.endDate}) and p.status=#{param.status}
+    </select>
+
+
+
+</mapper>
