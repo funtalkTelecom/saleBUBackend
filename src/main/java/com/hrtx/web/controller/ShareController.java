@@ -6,9 +6,11 @@ import com.hrtx.global.Constants;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.Utils;
 import com.hrtx.web.pojo.Account;
+import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.PromotionPlan;
 import com.hrtx.web.service.AccountService;
 import com.hrtx.web.service.CityService;
+import com.hrtx.web.service.ConsumerService;
 import com.hrtx.web.service.ShareService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -16,9 +18,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.text.ParseException;
 import java.util.*;
 
@@ -27,117 +33,83 @@ public class ShareController extends BaseReturn{
 
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired private ShareService shareService;
-	/**
-	 * 添加合伙人信息
-	 */
-	@PostMapping("/api/partner/user-info")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result addInfo(){
-		return new Result(Result.OK,"");
-	}
+
 
 	/**
 	 * 查询合伙人信息
 	 */
 	@GetMapping("/api/partner/user-info")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result findInfo(){
-		return new Result(Result.OK,"");
-	}
-
-	/**
-	 * 修改合伙人信息
-	 */
-	@PutMapping("/api/partner/user-info")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result editInfo(){
-		return new Result(Result.OK,"");
+	@Powers({PowerConsts.NOPOWER})
+	public Result findInfo(HttpServletRequest request){
+		return this.shareService.findInfo();
 	}
 
 	////////////////////////////////////////////////////////
 	/**
-	 * 查看合伙人收益
-	 */
-	@GetMapping("/api/partner/income")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result findIncome(){
-		return new Result(Result.OK,"");
-	}
-	/**
 	 * 查看推广记录
 	 */
 	@GetMapping("/api/partner/share")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	public Result queryShareList(){
 		return new Result(Result.OK,"");
+	}
+	/**
+	 * 生成分享地址  由合伙人提交生成分享地址
+	 */
+	@PostMapping("/api/partner/share-url")
+	@Powers({PowerConsts.NOPOWER})
+	public Result shareUrl(HttpServletRequest request){
+		String num_id=request.getParameter("num_id");
+		return this.shareService.shareUrl(NumberUtils.toInt(num_id));
 	}
 	/**
 	 * 生成推广卡片
 	 */
 	@PostMapping("/api/partner/share-card")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	public Result shareCard(){
 		return new Result(Result.OK,"");
 	}
+
 	/**
-	 * 生成分享地址
+	 * 分享浏览记录
 	 */
-	@PostMapping("/api/partner/share-url")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result shareUrl(){
-		return new Result(Result.OK,"");
-	}
-	/**
-	 * 分享浏览记录统计
-	 */
-	@GetMapping("/api/partner/share-browse-count")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result shareBrowseCount(){
-		return new Result(Result.OK,"");
+	@PostMapping("/api/num-browse")
+	@Powers({PowerConsts.NOPOWER})
+	public Result addBrowse(HttpServletRequest request){
+		String open_url=request.getParameter("open_url");
+		int num_id=NumberUtils.toInt(request.getParameter("num_id"));
+		int share_id=NumberUtils.toInt(request.getParameter("share_id"));
+		int chennel=NumberUtils.toInt(request.getParameter("chennel"),-1);
+		return this.shareService.addBrowse(num_id,chennel,open_url,share_id);
 	}
 	/**
 	 * 分享浏览记录
 	 */
-	@GetMapping("/api/partner/share-browse")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@GetMapping("/api/share-browse")
+	@Powers({PowerConsts.NOPOWER})
 	public Result shareBrowse(){
 		return new Result(Result.OK,"");
 	}
 
-	///////////////////////
-	/**
-	 * 余额查看
-	 */
-	@GetMapping("/api/partner/finance-balance")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result financeBalance(){
-		return new Result(Result.OK,"");
-	}
-	/**
-	 * 结算汇总
-	 */
-	@GetMapping("/api/partner/finance-count")
-	@Powers({PowerConsts.NOLOGINPOWER})
-	public Result financeCount(){
-		return new Result(Result.OK,"");
-	}
 	/**
 	 * 收支明细
 	 */
 	@GetMapping("/api/partner/finance-list")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	public Result financeList(){
 		return new Result(Result.OK,"");
 	}
 	/**
-	 * 收支明细
+	 * 提现进度
 	 */
 	@GetMapping("/api/partner/finance-withdraw-progresss")
-	@Powers({PowerConsts.NOLOGINPOWER})
+	@Powers({PowerConsts.NOPOWER})
 	public Result financeWithdrawProgresss(){
 		return new Result(Result.OK,"");
 	}
 
+	//////////////////////////////////////////////////////
 	/**
 	 * 推广计划
 	 */

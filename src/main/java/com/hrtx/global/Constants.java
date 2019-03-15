@@ -82,6 +82,17 @@ public enum Constants {
     PROMOTION_PLAN_STATUS_4(4, "过期", "PROMOTION_PLAN_STATUS"),
     PROMOTION_PLAN_STATUS_99(99, "删除", "PROMOTION_PLAN_STATUS"),
 
+    /**是否合伙人*/
+    CONSUMER_ISPARTNER_1(1, "是", "CONSUMER_ISPARTNER"),
+    CONSUMER_ISPARTNER_0(0, "否", "CONSUMER_ISPARTNER"),
+    /**已确认的合伙人*/
+    CONSUMER_PARTNERCHECK_1(1, "是", "CONSUMER_PARTNERCHECK"),
+    CONSUMER_PARTNERCHECK_0(0, "否", "CONSUMER_PARTNERCHECK"),
+
+    /**文件上传存储的相对路径*/
+    UPLOAD_PATH_IDCARD("idcard", "身份证", "UPLOAD_PATH"),
+    /**分享的资源*/
+    SHARE_SOURCE_4(4, "号码详情", "UPLOAD_PATH"),
     ;
 
     private Object key;

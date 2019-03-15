@@ -13,7 +13,7 @@ public class PromotionPlan extends BasePojo {
     private Integer promotion;
     private Integer awardWay;
     private BigDecimal award;
-    private Integer isLimit;
+    private Integer isLimit;//0无1有
     private BigDecimal limitAward;
     private BigDecimal beginPrice;
     private BigDecimal endPrice;
@@ -30,15 +30,28 @@ public class PromotionPlan extends BasePojo {
     protected String addUserStr;
     @Transient
     protected String updateUserStr;
+    @Transient
+    protected Date nowDate;
+    @Transient
+    protected BigDecimal nowPrice;
+
+    public PromotionPlan(Integer corpId,Integer promotion,Integer status ,Date nowDate ,Double nowPrice,String num) {
+        this.promotion = promotion;
+        this.status=status;
+        this.nowDate=nowDate;
+        if(nowPrice!=null)this.nowPrice=BigDecimal.valueOf(nowPrice);
+        this.corpId=corpId;
+        this.num=num;
+    }
 
     public PromotionPlan(Integer promotion, Integer awardWay, double award, Integer isLimit, double limitAward, double beginPrice, double endPrice, Date beginDate, Date endDate) {
         this.promotion = promotion;
         this.awardWay = awardWay;
         this.award = new BigDecimal(award);
         this.isLimit = isLimit;
-        this.limitAward = new BigDecimal(limitAward);
-        this.beginPrice = new BigDecimal(beginPrice);
-        this.endPrice = new BigDecimal(endPrice);
+        this.limitAward =BigDecimal.valueOf(limitAward);
+        this.beginPrice =BigDecimal.valueOf(beginPrice);
+        this.endPrice =BigDecimal.valueOf(endPrice);
         this.beginDate = beginDate;
         this.endDate = endDate;
         this.addDate=new Date();
@@ -227,5 +240,21 @@ public class PromotionPlan extends BasePojo {
 
     public void setUpdateUserStr(String updateUserStr) {
         this.updateUserStr = updateUserStr;
+    }
+
+    public Date getNowDate() {
+        return nowDate;
+    }
+
+    public void setNowDate(Date nowDate) {
+        this.nowDate = nowDate;
+    }
+
+    public BigDecimal getNowPrice() {
+        return nowPrice;
+    }
+
+    public void setNowPrice(BigDecimal nowPrice) {
+        this.nowPrice = nowPrice;
     }
 }

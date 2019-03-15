@@ -22,7 +22,12 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 	private Integer status;
 	private Date regDate;
 	private Integer isAgent;
-
+	private String idcard;//身份证号
+	private String idcardFace;//身份证正面  文件名
+	private String idcardBack;//身份证背面
+	private Integer isPartner;//是否合伙人 1是0否
+	private Integer partnerCheck;//已确认的合伙人 1是0否 是则可提现
+	private Integer upConsumer;//首次通过那个用户打开的
 	private String commpayName;
 	private Long agentProvince;
 	private Long agentCity;
@@ -180,5 +185,53 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 
 	public void setTradingImg(String tradingImg) {
 		this.tradingImg = tradingImg;
+	}
+
+	public String getIdcard() {
+		return idcard;
+	}
+
+	public void setIdcard(String idcard) {
+		this.idcard = idcard;
+	}
+
+	public String getIdcardFace() {
+		return idcardFace;
+	}
+
+	public void setIdcardFace(String idcardFace) {
+		this.idcardFace = idcardFace;
+	}
+
+	public String getIdcardBack() {
+		return idcardBack;
+	}
+
+	public void setIdcardBack(String idcardBack) {
+		this.idcardBack = idcardBack;
+	}
+
+	public Integer getIsPartner() {
+		return isPartner;
+	}
+
+	public void setIsPartner(Integer isPartner) {
+		this.isPartner = isPartner;
+	}
+
+	public Integer getPartnerCheck() {
+		return partnerCheck;
+	}
+
+	public void setPartnerCheck(Integer partnerCheck) {
+		this.partnerCheck = partnerCheck;
+	}
+
+	public Integer getUpConsumer() {
+		return upConsumer;
+	}
+
+	public void setUpConsumer(Integer upConsumer) {
+		this.upConsumer = upConsumer;
 	}
 }

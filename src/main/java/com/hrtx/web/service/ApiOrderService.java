@@ -480,10 +480,14 @@ public class ApiOrderService {
 			Result result=this.checkNumCondition(number,sku_id);
 			if(result.getCode()!=Result.OK)return result;
 			double num_price=ep_num?ep_price:sku.getSkuTobPrice();
-            Result curr_agent=this.agentService.queryCurrAgent();
-            if(curr_agent.getCode()!=Result.OK)return curr_agent;
-            Agent agent=(Agent)curr_agent.getData();
 			if(super_num/*order.getOrderType()==2&&StringUtils.equals(order.getSkuGoodsType(),"4")*/){
+				Result curr_price=findNumSalePrice(number.getId());
+				if(curr_price.getCode()!=Result.OK)return curr_price;
+				num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
+				/*2019.3.14update
+				Result curr_agent=this.agentService.queryCurrAgent();
+				if(curr_agent.getCode()!=Result.OK)return curr_agent;
+				Agent agent=(Agent)curr_agent.getData();
 				NumPrice numPrice=new NumPrice();
 				numPrice.setAgentId(agent.getId());
 				numPrice.setNumId(number.getId());
@@ -493,7 +497,7 @@ public class ApiOrderService {
 //				num_price=NumberUtils.toDouble(ObjectUtils.toString(numPrice1.get("price")));// numPrice1.getPrice().doubleValue();
 				Object price_range=numPrice1.get("price_range");
 				if(price_range==null)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
-				num_price=NumberUtils.toDouble(ObjectUtils.toString(price_range));//2019.1.24增加秒杀功能，秒杀时取秒杀价格
+				num_price=NumberUtils.toDouble(ObjectUtils.toString(price_range));//2019.1.24增加秒杀功能，秒杀时取秒杀价格*/
 			}
 
 			OrderItem itemIccid=this.createOrderItemBean(order.getOrderId(),0,meal_id,goods,sku,null,1,0d);
@@ -504,6 +508,22 @@ public class ApiOrderService {
 		}
 //		throw new ServiceException("未知订单类型");
 		return new Result(Result.ERROR, "未知订单类型");
+	}
+
+	public Result findNumSalePrice(Integer num_id){
+		Result curr_agent=this.agentService.queryCurrAgent();
+		if(curr_agent.getCode()!=Result.OK)return curr_agent;
+		Agent agent=(Agent)curr_agent.getData();
+		NumPrice numPrice=new NumPrice();
+		numPrice.setAgentId(agent.getId());
+		numPrice.setNumId(num_id);
+		List aplist=this.numPriceMapper.queryList(numPrice);
+		if(aplist.size()==0||aplist.size()>1)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
+		Map numPrice1=(Map)aplist.get(0);
+		Object price_range=numPrice1.get("price_range");
+		if(price_range==null)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
+		Double num_price=NumberUtils.toDouble(ObjectUtils.toString(price_range));//2019.1.24增加秒杀功能，秒杀时取秒杀价格
+		return new Result(Result.OK,num_price);
 	}
 
 	private Result saveOrderInfo(Sku sku,int order_amount,Order order,OrderItem itemIccid,List<OrderItem> itemNums){

@@ -25,12 +25,29 @@ public class ApiSessionUtil {
         return "egt-kh:api:" + key;
     }
 
+    public String getBaseKey(){
+        String token=getTokenStr();
+        return getApiKey(token);
+    }
+
     public String getTokenStr(){
         if(RequestContextHolder.getRequestAttributes()==null)return null;
         HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
         return request.getParameter(JESSION_ID_NAME);
     }
 
+    public void saveObject(String apiKey,Object object,long time) {
+        if(apiKey == null) return ;
+        String key1 = getApiKey(apiKey);
+        redisUtils.set(key1,object,time);
+    }
+
+    public Object getObject(String apiKey){
+        String token=this.getTokenStr();
+        if(token==null)return null;
+        String key = getApiKey(token);
+        return redisUtils.get(key);
+    }
     public void saveOrUpdate(String apiKey,User user) {
         if(apiKey == null) return ;
         String key1 = getApiKey(apiKey);

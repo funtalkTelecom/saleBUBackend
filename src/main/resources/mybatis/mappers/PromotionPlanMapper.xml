@@ -9,6 +9,8 @@
         <include refid="col_list"/>
         <if test="param.status!=null and param.status >=0">and p.status=#{param.status}</if>
         <if test="param.num!=null and param.num!=''">and p.id in (select n.promotion_plan_id from tb_promotion_plan_num n where n.num=#{param.num}) </if>
+        <if test="param.nowDate!=null">and #{param.nowDate} between p.begin_date and p.end_date</if>
+        <if test="param.nowPrice!=null">and #{param.nowPrice} between p.begin_price and p.end_price</if>
         order by p.status,p.id desc
     </select>
     <select id="queryConflictList" resultType="PromotionPlan">
