@@ -48,7 +48,7 @@ public class ConsumerController extends BaseReturn{
 	/**
 	 * 添加/修改合伙人信息
 	 */
-	@PostMapping("/api/partner/user-info")
+	@PostMapping("/partner/user-info")
 	@Powers({PowerConsts.NOPOWER})
 	public Result addInfo(HttpServletRequest request){
 		String idcard_face=request.getParameter("idcard_face_file_name");
@@ -73,7 +73,7 @@ public class ConsumerController extends BaseReturn{
 	/**
 	 * 上传文件信息
 	 */
-	@PostMapping("/api/upload/image")
+	@PostMapping("/upload/image")
 	@Powers({PowerConsts.NOPOWER})
 	public Result uploadImage(HttpServletRequest request){
 		String upload_file_name=null;
@@ -106,7 +106,7 @@ public class ConsumerController extends BaseReturn{
 	/**
 	 * 发送短信验证码
 	 */
-	@PostMapping("/api/sms/ack")
+	@PostMapping("/sms/ack")
 	@Powers({PowerConsts.NOPOWER})
 	public Result sendSmsMessage(HttpServletRequest request){
 		String phone=request.getParameter("phone");
