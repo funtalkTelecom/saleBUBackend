@@ -43,9 +43,8 @@ public class ApiSessionUtil {
     }
 
     public Object getObject(String apiKey){
-        String token=this.getTokenStr();
-        if(token==null)return null;
-        String key = getApiKey(token);
+        if(apiKey == null) return null;
+        String key = getApiKey(apiKey);
         return redisUtils.get(key);
     }
     public void saveOrUpdate(String apiKey,User user) {
