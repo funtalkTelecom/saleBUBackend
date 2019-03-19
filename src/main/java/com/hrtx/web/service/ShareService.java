@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.lang.System;
 import java.math.BigDecimal;
 import java.util.*;
@@ -34,6 +35,7 @@ public class ShareService {
 	@Autowired private NumPriceMapper numPriceMapper;
 	@Autowired private ApiOrderService apiOrderService;
 	@Autowired private NumMapper numMapper;
+	@Autowired private ImageService imageService;
 
 	/**
 	 * 添加合伙人信息
@@ -98,6 +100,7 @@ public class ShareService {
 	 * 生成分享地址
 	 */
 	public Result shareUrl(Integer num_id){
+		String req_path=SessionUtil.getRequestPath(SessionUtil.getRequest());
 		Num num=numMapper.selectByPrimaryKey(num_id);
 		if(num==null)return new Result(Result.ERROR,"号码不存在");
 		Consumer consumer=apiSessionUtil.getConsumer();
@@ -106,7 +109,14 @@ public class ShareService {
 		if(_share_list.size()<=0){
 			String share_image="";
 			String share_url="";
-			bean=new Share(consumer.getId(),Constants.SHARE_SOURCE_4.getIntKey(),"",num_id,"","");
+			try{
+				Result result=imageService.createShareLinkFile(num.getNumResource(),num.getCityName(),num.getNetType(),num.getTeleType(),String.valueOf(num.getLowConsume()));
+				share_image=String.valueOf(result.getData());
+			}catch (IOException e){
+				log.error("分享图片创建失败",e);
+				return new Result(Result.ERROR,"分享图片创建失败");
+			}
+			bean=new Share(consumer.getId(),Constants.SHARE_SOURCE_4.getIntKey(),num.getNumResource(),num_id,share_image,share_url);
 			this.shareMapper.insert(bean);
 		}else{
 			bean=_share_list.get(0);
@@ -140,8 +150,8 @@ public class ShareService {
 		_map.put("income",ppfee==null?"":Utils.formatFloatNumber(ppfee));//预期收益
 		_map.put("valid_date",valid_date==null?"":valid_date);//有效期至
 		_map.put("share_id",bean.getId()+"");//推广编号
-		_map.put("share_image",bean.getShareImage());//推广图片
-		_map.put("share_url",bean.getShareUrl());//推广URL地址
+		_map.put("share_image",req_path+"get-img/"+Constants.UPLOAD_PATH_SHARE.getStringKey()+"/"+StringUtils.defaultIfEmpty(bean.getShareImage(),""));//推广图片
+		_map.put("share_url", req_path+StringUtils.defaultIfEmpty(bean.getShareUrl(),""));//推广URL地址
 
 		return new Result(Result.OK,_map);
 	}
@@ -150,7 +160,7 @@ public class ShareService {
 	 */
 	public Result addBrowse(int num_id,int chennel,String open_url,int share_id){
 		Consumer consumer=apiSessionUtil.getConsumer();
-		NumBrowse bean=new NumBrowse(num_id,null,consumer.getId(),chennel,open_url,SessionUtil.getUserIp(),share_id);
+		NumBrowse bean=new NumBrowse(num_id,null,consumer.getId(),chennel,open_url,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_1.getIntKey(),share_id);
 		return this.addBrowse(bean);
 	}
 	private Result addBrowse(NumBrowse bean){
@@ -173,7 +183,27 @@ public class ShareService {
 	 * 分享浏览记录
 	 */
 	public Result shareBrowse(){
-		return new Result(Result.OK,"");
+		Consumer consumer=apiSessionUtil.getConsumer();
+		Example example = new Example(NumBrowse.class);
+		example.createCriteria().andEqualTo("shareConsumerId",consumer.getId()).andEqualTo("shareFirstBrowse",1);
+		PageHelper.startPage(2,10);
+		List<?> page=this.numBrownseMapper.selectByExample(example);
+		List<Map<String,String>> _list=new ArrayList<>();
+		Map<String,String> _map=null;
+		for(int i=0;i<page.size();i++){
+			NumBrowse bean=(NumBrowse)page.get(i);
+			Consumer cbean=this.consumerMapper.selectByPrimaryKey(bean.getConsumerId());
+			_map=new HashMap<>();
+			_map.put("head-image",cbean.getImg());
+			_map.put("nick-name",cbean.getNickName());
+			_map.put("act-type",bean.getActType()+"");
+			_map.put("act-type",bean.getNum());
+			_map.put("act-date",bean.getAddDate().getTime()+"");
+			_list.add(_map);
+		}
+		page.clear();
+//		page.addAll(_list);
+		return new Result(Result.OK,page);
 	}
 
 	//////////////////////////////////////////////

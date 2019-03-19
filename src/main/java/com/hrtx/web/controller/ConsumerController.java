@@ -60,11 +60,11 @@ public class ConsumerController extends BaseReturn{
 		String check_code=request.getParameter("check_code");
 		String name_ = "^[\\u4E00-\\u9FA5\\uf900-\\ufa2d·s]{2,20}$";//验证姓名正则
 
-		String key=this.apiSessionUtil.getTokenStr()+":sms-ack";
-		Object object=this.apiSessionUtil.getObject(key);
-		if(object==null)return new Result(Result.OK,"短信验证码错误");
-		Map<String,String> _map=(Map<String,String>)object;
-		String session_rand=_map.get("rand");
+        String key=this.apiSessionUtil.getTokenStr()+":sms-ack";
+        Object object=this.apiSessionUtil.getObject(key);
+        if(object==null)return new Result(Result.OK,"短信验证码错误");
+        Map<String,String> _map=(Map<String,String>)object;
+        String session_rand=_map.get("rand");
 		String session_phone=_map.get("phone");
 		if(!(StringUtils.equals(session_rand,check_code)&&StringUtils.equals(phone,session_phone)))return new Result(Result.OK,"短信验证码错误");
 		return this.shareService.addInfo(name,phone,idcard,idcard_face,idcard_back);

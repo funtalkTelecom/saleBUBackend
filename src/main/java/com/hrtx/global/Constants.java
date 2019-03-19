@@ -91,8 +91,12 @@ public enum Constants {
 
     /**文件上传存储的相对路径*/
     UPLOAD_PATH_IDCARD("idcard", "身份证", "UPLOAD_PATH"),
+    UPLOAD_PATH_SHARE("share", "分享", "UPLOAD_PATH"),
     /**分享的资源*/
     SHARE_SOURCE_4(4, "号码详情", "UPLOAD_PATH"),
+    /**分享的资源*/
+    NUMBROWSE_ACTTYPE_1(1, "浏览", "NUMBROWSE_ACTTYPE"),
+    NUMBROWSE_ACTTYPE_2(2, "购买", "NUMBROWSE_ACTTYPE"),
     ;
 
     private Object key;

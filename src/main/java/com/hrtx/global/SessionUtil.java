@@ -210,5 +210,8 @@ public final class SessionUtil {
 		if(ips.length>1)return ips[0];
 		return ip;
 	}
-	
+	public static String getRequestPath(HttpServletRequest request){
+//		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
+		return request.getScheme()+"://"+request.getServerName()+request.getContextPath()+"/";
+	}
 }
