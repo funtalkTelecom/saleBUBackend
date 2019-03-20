@@ -87,14 +87,50 @@ public class ShareService {
 	/**
 	 * 查看推广记录
 	 */
-	public Result queryShareList(){
-		return new Result(Result.OK,"");
+	public PageInfo queryShareList(int start,int limit){
+		Consumer consumer=apiSessionUtil.getConsumer();
+		PageHelper.startPage(start,limit);
+		Page<Object> page=this.shareMapper.queryShareList(consumer.getId());
+		for(int i=0;i<page.size();i++){
+			Map map=(Map)page.get(i);
+			Map<String,String> _map_num=findNumPromotionInfo(NumberUtils.toInt(ObjectUtils.toString(map.get("share_num_id"))));
+			map.putAll(_map_num);
+		}
+		PageInfo<Object> pm = new PageInfo<Object>(page);
+		return pm;
 	}
 	/**
 	 * 生成推广卡片
 	 */
 	public Result shareCard(){
 		return new Result(Result.OK,"");
+	}
+
+	private Map<String,String> findNumPromotionInfo(Integer num_id){
+		Result curr_price = apiOrderService.findNumSalePrice(num_id);
+		Double num_price=0d;
+		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
+		Map<String,String> _map=new HashMap<>();
+		PromotionPlan ppbean=null;
+		Double ppfee=null;
+		String valid_date=null;
+		Result result=this.findNumPromotionPlan(num_id);
+		if(result.getCode()==Result.OK){
+			ppbean=(PromotionPlan)result.getData();
+			valid_date=String.valueOf(ppbean.getEndDate().getTime());
+			if(ppbean.getAwardWay()==Constants.PROMOTION_PLAN_AWARDWAY_1.getIntKey())ppfee=ppbean.getAward().doubleValue();
+			if(ppbean.getAwardWay()==Constants.PROMOTION_PLAN_AWARDWAY_2.getIntKey()){
+				ppfee=Arith.div(Arith.mul(num_price,ppbean.getAwardWay()),100);
+				//检查是否有设置上限
+				if(ppbean.getIsLimit()==1)ppfee=ppfee>ppbean.getLimitAward().doubleValue()?ppbean.getLimitAward().doubleValue():ppfee;
+			}
+		}
+		_map.put("is_pp",ppbean==null?"0":"1");//是否进行推广1是0否
+		_map.put("income",ppfee==null?"0":Utils.formatFloatNumber(ppfee));//预期收益
+		_map.put("valid_date",valid_date==null?"":valid_date);//有效期至
+		_map.put("is_pp",ppbean==null?"0":"1");//是否进行推广1是0否
+		_map.put("sale_price",Utils.formatFloatNumber(num_price));//号码当前售价
+		return _map;
 	}
 	/**
 	 * 生成分享地址
@@ -122,43 +158,23 @@ public class ShareService {
 			bean=_share_list.get(0);
 		}
 		Map<String,String> _map=new HashMap<>();
-		Result curr_price = apiOrderService.findNumSalePrice(num_id);
-		Double num_price=0d;
-		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
-		PromotionPlan ppbean=null;
-		Double ppfee=null;
-		String valid_date=null;
-		Result result=this.findNumPromotionPlan(num_id);
-		if(result.getCode()==Result.OK){
-			ppbean=(PromotionPlan)result.getData();
-			valid_date=String.valueOf(ppbean.getEndDate().getTime());
-			if(ppbean.getAwardWay()==Constants.PROMOTION_PLAN_AWARDWAY_1.getIntKey())ppfee=ppbean.getAward().doubleValue();
-			if(ppbean.getAwardWay()==Constants.PROMOTION_PLAN_AWARDWAY_2.getIntKey()){
-				ppfee=Arith.div(Arith.mul(num_price,ppbean.getAwardWay()),100);
-				//检查是否有设置上限
-				if(ppbean.getIsLimit()==1)ppfee=ppfee>ppbean.getLimitAward().doubleValue()?ppbean.getLimitAward().doubleValue():ppfee;
-			}
-		}
+		Map<String,String> _map_num=findNumPromotionInfo(num_id);
 		_map.put("num_id",num.getId()+"");//号码编码
 		_map.put("num_resource",num.getNumResource());//号码
 		_map.put("city_name",num.getCityName());//地市
 		_map.put("net_type",num.getNetType());//网络制式
 		_map.put("tele_type",num.getTeleType());//运营商
-		_map.put("sale_price",Utils.formatFloatNumber(num_price));//号码当前售价
 		_map.put("low_consume",num.getLowConsume()+"");//最低消费
-		_map.put("is_pp",ppbean==null?"0":"1");//是否进行推广1是0否
-		_map.put("income",ppfee==null?"":Utils.formatFloatNumber(ppfee));//预期收益
-		_map.put("valid_date",valid_date==null?"":valid_date);//有效期至
 		_map.put("share_id",bean.getId()+"");//推广编号
 		_map.put("share_image",req_path+"get-img/"+Constants.UPLOAD_PATH_SHARE.getStringKey()+"/"+StringUtils.defaultIfEmpty(bean.getShareImage(),""));//推广图片
 		_map.put("share_url", req_path+StringUtils.defaultIfEmpty(bean.getShareUrl(),""));//推广URL地址
-
+		_map.putAll(_map_num);
 		return new Result(Result.OK,_map);
 	}
 	/**
 	 * 号码浏览记录
 	 */
-	public Result addBrowse(int num_id,int chennel,String open_url,int share_id){
+	public Result addBrowse(int num_id,String chennel,String open_url,int share_id){
 		Consumer consumer=apiSessionUtil.getConsumer();
 		NumBrowse bean=new NumBrowse(num_id,null,consumer.getId(),chennel,open_url,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_1.getIntKey(),share_id);
 		return this.addBrowse(bean);
@@ -175,35 +191,28 @@ public class ShareService {
 		if(_list.isEmpty())bean.setShareFirstBrowse(1);
 		this.numBrownseMapper.insert(bean);//每次都添加浏览记录
 		/////////////////////以下处理分享的问题////////////////////////
-		this.numBrownseMapper.updateOpenCount(bean.getConsumerId(),numbean.getId());//只要用户有浏览，则通知所有以往的浏览记录
+		if(numbean!=null)this.numBrownseMapper.updateOpenCount(bean.getConsumerId(),numbean.getId());//只要用户有浏览，则通知所有以往的浏览记录
 		log.info(String.format("添加浏览记录并更新浏览次数耗时[%s]ms",(System.currentTimeMillis()-_start)));
 		return new Result(Result.OK,"添加成功");
 	}
 	/**
 	 * 分享浏览记录
 	 */
-	public Result shareBrowse(){
+	public PageInfo shareBrowse(int start,int limit){
 		Consumer consumer=apiSessionUtil.getConsumer();
-		Example example = new Example(NumBrowse.class);
-		example.createCriteria().andEqualTo("shareConsumerId",consumer.getId()).andEqualTo("shareFirstBrowse",1);
-		PageHelper.startPage(2,10);
-		List<?> page=this.numBrownseMapper.selectByExample(example);
-		List<Map<String,String>> _list=new ArrayList<>();
-		Map<String,String> _map=null;
+//		NumBrowse pp=new NumBrowse();
+//		pp.setStart(start);
+//		pp.setLimit(limit);
+//		PageHelper.startPage(pp.startToPageNum(),pp.getLimit());
+		PageHelper.startPage(start,limit);
+		Page<Object> page=this.numBrownseMapper.queryPartnerNumBrowseList(consumer.getId());
+		Map map_act=Constants.contantsToMap("NUMBROWSE_ACTTYPE");
 		for(int i=0;i<page.size();i++){
-			NumBrowse bean=(NumBrowse)page.get(i);
-			Consumer cbean=this.consumerMapper.selectByPrimaryKey(bean.getConsumerId());
-			_map=new HashMap<>();
-			_map.put("head-image",cbean.getImg());
-			_map.put("nick-name",cbean.getNickName());
-			_map.put("act-type",bean.getActType()+"");
-			_map.put("act-type",bean.getNum());
-			_map.put("act-date",bean.getAddDate().getTime()+"");
-			_list.add(_map);
+			Map map=(Map)page.get(i);
+			map.put("act_type",map_act.get(map.get("act_type")));
 		}
-		page.clear();
-//		page.addAll(_list);
-		return new Result(Result.OK,page);
+		PageInfo<Object> pm = new PageInfo<Object>(page);
+		return pm;
 	}
 
 	//////////////////////////////////////////////

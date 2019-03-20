@@ -1,5 +1,6 @@
 package com.hrtx.web.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.Constants;
@@ -50,8 +51,10 @@ public class ShareController extends BaseReturn{
 	 */
 	@GetMapping("/api/partner/share")
 	@Powers({PowerConsts.NOPOWER})
-	public Result queryShareList(){
-		return new Result(Result.OK,"");
+	public PageInfo queryShareList(HttpServletRequest request){
+		int start=NumberUtils.toInt(request.getParameter("pageNum"));
+		int limit=NumberUtils.toInt(request.getParameter("limit"));
+		return this.shareService.queryShareList(start,limit);
 	}
 	/**
 	 * 生成分享地址  由合伙人提交生成分享地址
@@ -80,7 +83,7 @@ public class ShareController extends BaseReturn{
 		String open_url=request.getParameter("open_url");
 		int num_id=NumberUtils.toInt(request.getParameter("num_id"));
 		int share_id=NumberUtils.toInt(request.getParameter("share_id"));
-		int chennel=NumberUtils.toInt(request.getParameter("chennel"),-1);
+		String chennel=request.getParameter("chennel");
 		return this.shareService.addBrowse(num_id,chennel,open_url,share_id);
 	}
 	/**
@@ -88,8 +91,10 @@ public class ShareController extends BaseReturn{
 	 */
 	@GetMapping("/api/share-browse")
 	@Powers({PowerConsts.NOPOWER})
-	public Result shareBrowse(){
-		return new Result(Result.OK,"");
+	public PageInfo shareBrowse(HttpServletRequest request){
+		int start=NumberUtils.toInt(request.getParameter("pageNum"));
+		int limit=NumberUtils.toInt(request.getParameter("limit"));
+		return this.shareService.shareBrowse(start,limit);
 	}
 
 	/**

@@ -14,7 +14,7 @@ public class NumBrowse extends BasePojo{
     private Integer numId;
     private String num;
     private Integer consumerId;
-    private Integer channel;
+    private String channel;
     private String openUrl;
     private Date addDate;
     private String openIp;
@@ -24,7 +24,7 @@ public class NumBrowse extends BasePojo{
     private Integer shareConsumerId;
     private Integer shareFirstBrowse;
 
-    public NumBrowse(Integer numId, String num, Integer consumerId, Integer channel, String openUrl, String openIp,Integer actType, Integer shareId) {
+    public NumBrowse(Integer numId, String num, Integer consumerId, String channel, String openUrl, String openIp,Integer actType, Integer shareId) {
         this.numId=numId;
         this.num=num;
         this.consumerId = consumerId;
@@ -37,7 +37,7 @@ public class NumBrowse extends BasePojo{
         this.shareFirstBrowse=0;
         this.actType=actType;
     }
-    public NumBrowse(Integer id, Integer consumerId, Integer shareId, Integer channel, String openUrl, Date addDate, String openIp, Integer openCount) {
+    public NumBrowse(Integer id, Integer consumerId, Integer shareId, String channel, String openUrl, Date addDate, String openIp, Integer openCount) {
         this.id = id;
         this.consumerId = consumerId;
         this.shareId = shareId;
@@ -76,11 +76,11 @@ public class NumBrowse extends BasePojo{
         this.shareId = shareId;
     }
 
-    public Integer getChannel() {
+    public String getChannel() {
         return channel;
     }
 
-    public void setChannel(Integer channel) {
+    public void setChannel(String channel) {
         this.channel = channel;
     }
     public Integer getNumId() {

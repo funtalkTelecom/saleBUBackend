@@ -4,4 +4,9 @@
     <update id="updateOpenCount">
         update tb_num_browse nb set nb.open_count=nb.open_count+1 where nb.consumer_id=#{consumer_id} and nb.num_id=#{num_id} and nb.share_first_browse=1
     </update>
+
+    <select id="queryPartnerNumBrowseList" resultType="java.util.HashMap">
+        select b.id,c.img,c.nick_name,b.act_type,b.num,b.add_date,b.open_count from tb_num_browse b left join tb_consumer c on b.consumer_id=c.id where b.share_consumer_id=#{share_consumer_id} and b.share_first_browse=1 order by b.id desc
+    </select>
+
 </mapper>
