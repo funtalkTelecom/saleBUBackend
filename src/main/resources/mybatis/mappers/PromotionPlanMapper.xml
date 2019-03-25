@@ -3,7 +3,7 @@
 <mapper namespace="com.hrtx.web.mapper.PromotionPlanMapper" >
     <sql id="col_list">
         select p.id,p.promotion,p.award_way,p.award,p.is_limit,p.limit_award,p.begin_price,p.end_price,p.begin_date,p.end_date,p.`status`
-        from tb_promotion_plan p where p.fee_type=1 and p.corp_id=#{param.corpId}
+        from tb_promotion_plan p where p.fee_type=#{param.feeType} and p.corp_id=#{param.corpId}
     </sql>
     <select id="queryPageList" resultType="PromotionPlan">
         <include refid="col_list"/>

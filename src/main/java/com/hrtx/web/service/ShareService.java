@@ -8,6 +8,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -36,6 +37,9 @@ public class ShareService {
 	@Autowired private ApiOrderService apiOrderService;
 	@Autowired private NumMapper numMapper;
 	@Autowired private ImageService imageService;
+	@Autowired private OrderSettleMapper orderSettleMapper;
+	@Autowired private OrderMapper orderMapper;
+	@Autowired private OrderItemMapper orderItemMapper;
 
 	/**
 	 * 添加合伙人信息
@@ -105,22 +109,97 @@ public class ShareService {
 	public Result shareCard(){
 		return new Result(Result.OK,"");
 	}
+	/**
+	 * 创建订单结算数据(只生成数据不实际结算)
+	 * 需要结算的群体有
+	 * 	1.推广人佣金
+	 * 	2.服务费
+	 * 	3.交易费
+	 * 	4.发展人员
+	 * 	5.市场人员
+	 *
+	 */
+	public Result createOrderSettle(int order_id){
+		int share_settle_user=-1;
+		Order order=orderMapper.selectByPrimaryKey(order_id);
+		double order_price=order.getTotal();
+		int[] ok_order_status=new int[]{Constants.ORDER_STATUS_2.getIntKey(),Constants.ORDER_STATUS_3.getIntKey()};
+		if(!ArrayUtils.contains(ok_order_status,order.getStatus()))return new Result(Result.ERROR,"订单状态非可结算状态");
+		if(order.getShareId()!=null&&order.getShareId()!=0){
+			Share share=this.shareMapper.selectByPrimaryKey(order.getShareId());
+			share_settle_user=share.getConsumerId();
+		}
 
-	private Map<String,String> findNumPromotionInfo(Integer num_id){
-		Result curr_price = apiOrderService.findNumSalePrice(num_id);
-		Double num_price=0d;
-		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
+		Example example = new Example(OrderItem.class);
+		example.createCriteria().andEqualTo("orderId",order.getOrderId()).andEqualTo("isShipment",Constants.ORDERITEM_SHIPMENT_0.getIntKey());
+		List<OrderItem> _list=this.orderItemMapper.selectByExample(example);
+		int fee_type=-1;
+		int num_id=-1;
+		for(OrderItem orderItem:_list){//推广人佣金   按循环则规则上运行按号码收费，不按循环只能按订单收费
+			num_id=orderItem.getNumId();//考虑当前的模式下，一个订单只会有一个号码
+			fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();//结算用户
+			double order_item_price=orderItem.getPrice()*orderItem.getQuantity();
+			initSettleFee(order_id,num_id,fee_type,order_item_price,share_settle_user,false,0d,0,0d);
+		}
+		//技术服务费
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey();//结算用户
+		initSettleFee(order_id,num_id,fee_type,order_price,fee_type,true,NumberUtils.toDouble(SystemParam.get("settle_tech_fee"),2),1,NumberUtils.toDouble(SystemParam.get("settle_tech_fee_limit"),50));
+		//交易费
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_3.getIntKey();//结算用户
+		initSettleFee(order_id,num_id,fee_type,order_price,fee_type,true,NumberUtils.toDouble(SystemParam.get("settle_pay_fee"),0.8),0,0d);
+		//发展人员
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_4.getIntKey();//结算用户
+		initSettleFee(order_id,num_id,fee_type,order_price,fee_type,true,NumberUtils.toDouble(SystemParam.get("settle_expand_fee"),0.05),1,NumberUtils.toDouble(SystemParam.get("settle_expand_fee_limit"),500));
+		//市场人员
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_5.getIntKey();//结算用户
+		initSettleFee(order_id,num_id,fee_type,order_price,fee_type,true,NumberUtils.toDouble(SystemParam.get("settle_market_fee"),5),1,NumberUtils.toDouble(SystemParam.get("settle_market_fee_limit"),500));
+
+		return new Result(Result.OK,"结算创建成功");
+	}
+	private Result initSettleFee(int order_id,int num_id,int fee_type,double order_price,int settle_user,boolean emptyAndInit,double init_award,int init_limit,double init_limit_award){
+        if(settle_user==-1)return new Result(Result.OK,"结算用户不存在");
+        Example example = new Example(OrderSettle.class);
+        example.createCriteria().andEqualTo("orderId",order_id).andEqualTo("feeType",fee_type).andIn("status",Arrays.asList(new Object[]{Constants.ORDERSETTLE_STATUS_1.getIntKey(),Constants.ORDERSETTLE_STATUS_2.getIntKey()}));
+        List<OrderSettle> _list=this.orderSettleMapper.selectByExample(example);
+        if(!_list.isEmpty())return new Result(Result.OK,"该订单类型已经结算");
+		Map<String,String> _map=findNumPromotionInfo(fee_type,num_id,order_price);
+		if(emptyAndInit&&StringUtils.equals(_map.get("is_pp"),"0")){
+			Num num=numMapper.selectByPrimaryKey(num_id);
+			initSettlePromotionPlan(num.getSellerId(),fee_type,init_award,init_limit,init_limit_award);
+			_map=findNumPromotionInfo(fee_type,num_id,order_price);
+		}
+		OrderSettle orderSettle=new OrderSettle(order_id,fee_type,settle_user,NumberUtils.toDouble(_map.get("income")),Constants.ORDERSETTLE_STATUS_1.getIntKey());
+        this.orderSettleMapper.insert(orderSettle);
+        log.info(String.format("订单[%s]结算[%s]给用户[%s]费用[%s]",order_id,fee_type,settle_user,_map.get("income")));
+		return new Result(Result.OK,"结算创建成功");
+	}
+	private PromotionPlan initSettlePromotionPlan(int corp_id,int feeType,Double award,int isLimit,Double limit_award){
+		Calendar calendar=Calendar.getInstance();
+		calendar.set(2019,1,1,0,0,0);
+		Date beginDate=calendar.getTime();
+		calendar.set(2119,1,1,0,0,0);//百年大计
+		Date endDate=calendar.getTime();
+		PromotionPlan newBean=new PromotionPlan(Constants.PROMOTION_PLAN_PROMOTION_0.getIntKey(),Constants.PROMOTION_PLAN_AWARDWAY_2.getIntKey(),award,isLimit,limit_award,0d,0d,beginDate,endDate);
+		newBean.setAddUser(1);
+		newBean.setCorpId(corp_id);
+		newBean.setStatus(Constants.PROMOTION_PLAN_STATUS_2.getIntKey());
+		newBean.setFeeType(feeType);
+		this.promotionPlanMapper.insert(newBean);
+		return newBean;
+	}
+
+	private Map<String,String> findNumPromotionInfo(int free_type,int num_id,Double num_price){
 		Map<String,String> _map=new HashMap<>();
 		PromotionPlan ppbean=null;
 		Double ppfee=null;
 		String valid_date=null;
-		Result result=this.findNumPromotionPlan(num_id);
+		Result result=this.findNumPromotionPlan(free_type,num_id);
 		if(result.getCode()==Result.OK){
 			ppbean=(PromotionPlan)result.getData();
 			valid_date=String.valueOf(ppbean.getEndDate().getTime());
 			if(ppbean.getAwardWay()==Constants.PROMOTION_PLAN_AWARDWAY_1.getIntKey())ppfee=ppbean.getAward().doubleValue();
 			if(ppbean.getAwardWay()==Constants.PROMOTION_PLAN_AWARDWAY_2.getIntKey()){
-				ppfee=Arith.div(Arith.mul(num_price,ppbean.getAwardWay()),100);
+				ppfee=Arith.div(Arith.mul(num_price,ppbean.getAward().doubleValue()),100);
 				//检查是否有设置上限
 				if(ppbean.getIsLimit()==1)ppfee=ppfee>ppbean.getLimitAward().doubleValue()?ppbean.getLimitAward().doubleValue():ppfee;
 			}
@@ -128,8 +207,15 @@ public class ShareService {
 		_map.put("is_pp",ppbean==null?"0":"1");//是否进行推广1是0否
 		_map.put("income",ppfee==null?"0":Utils.formatFloatNumber(ppfee));//预期收益
 		_map.put("valid_date",valid_date==null?"":valid_date);//有效期至
-		_map.put("is_pp",ppbean==null?"0":"1");//是否进行推广1是0否
 		_map.put("sale_price",Utils.formatFloatNumber(num_price));//号码当前售价
+		return _map;
+	}
+
+	private Map<String,String> findNumPromotionInfo(Integer num_id){
+		Result curr_price = apiOrderService.findNumSalePrice(num_id);
+		Double num_price=0d;
+		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
+		Map<String,String> _map=findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(),num_id,num_price);
 		return _map;
 	}
 	/**
@@ -171,12 +257,18 @@ public class ShareService {
 		_map.putAll(_map_num);
 		return new Result(Result.OK,_map);
 	}
+
 	/**
 	 * 号码浏览记录
+	 * @param num_id	号码id
+	 * @param channel	打开的渠道
+	 * @param open_url	打开的地址
+	 * @param share_id	分享编码
+	 * @return
 	 */
-	public Result addBrowse(int num_id,String chennel,String open_url,int share_id){
+	public Result addBrowse(int num_id,String channel,String open_url,int share_id){
 		Consumer consumer=apiSessionUtil.getConsumer();
-		NumBrowse bean=new NumBrowse(num_id,null,consumer.getId(),chennel,open_url,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_1.getIntKey(),share_id);
+		NumBrowse bean=new NumBrowse(num_id,null,consumer.getId(),channel,open_url,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_1.getIntKey(),share_id);
 		return this.addBrowse(bean);
 	}
 	private Result addBrowse(NumBrowse bean){
@@ -280,6 +372,7 @@ public class ShareService {
 		pp.setLimit(limit);
 		PageHelper.startPage(pp.startToPageNum(),pp.getLimit());
 		pp.setCorpId(SessionUtil.getUser().getCorpId());
+		pp.setFeeType(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey());
 		pp.setStatus(status);
 		pp.setNum(StringUtils.trim(num));
 		Page<Object> ob=promotionPlanMapper.queryPageList(pp);
@@ -423,11 +516,12 @@ public class ShareService {
 	 * @param num_id
 	 * @return
 	 */
-	public Result findNumPromotionPlan(Integer num_id){
+	public Result findNumPromotionPlan(int fee_type,Integer num_id){
 		//1.按号码查
 		Num num=numMapper.selectByPrimaryKey(num_id);
 		PromotionPlan ppbean=null;
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_2.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),null,num.getNumResource());
+		ppbean.setFeeType(fee_type);
 		List<?> list= this.promotionPlanMapper.queryPageList(ppbean);
 		log.info(String.format("查得以号码[编码%s]的推广计划[%s]条",num_id,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));
@@ -436,11 +530,13 @@ public class ShareService {
 		Double num_price=-1d;
 		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_1.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),num_price,null);
+		ppbean.setFeeType(fee_type);
 		list= this.promotionPlanMapper.queryPageList(ppbean);
 		log.info(String.format("查得以号码[编码%s]销售价[%s]的推广计划[%s]条",num_id,curr_price,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));
 		//3.按全号码查
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_0.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),null,null);
+		ppbean.setFeeType(fee_type);
 		list= this.promotionPlanMapper.queryPageList(ppbean);
 		log.info(String.format("查得全号码[号码编码%s]的推广计划[%s]条",num_id,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));

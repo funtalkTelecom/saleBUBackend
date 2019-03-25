@@ -229,7 +229,7 @@ public class TestController {
         Integer mead_id=501;
         Integer address_id=3889;
         String conment="";
-        Result result= this.apiOrderService.submitNumOrder(sku_id,num_id,mead_id,address_id,conment);
+        Result result= this.apiOrderService.submitNumOrder(sku_id,num_id,mead_id,address_id,conment,0);
 //        System.out.println(result.getData());
 //        Result result= this.apiOrderService.submitCustomOrder(num_id,mead_id,"张先生","18965902602","福建福州仓山工农街36-91",conment,"20181218001","LYB8019","张进春","身份证","35222919112341");
         System.out.println(result.getData());

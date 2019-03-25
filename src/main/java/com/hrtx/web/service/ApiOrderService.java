@@ -195,9 +195,10 @@ public class ApiOrderService {
 	 * @param mead_id	配对套餐
 	 * @param address_id	收获地址
 	 * @param conment		备注(选填)
+     * @param share_id	分享的编码
 	 * @return 返回result code=200成功；=888订单已生成，仓储异常；=500失败
 	 */
-	public Result submitNumOrder(Integer sku_id,Integer num_id,Integer mead_id,Integer address_id,String conment){
+	public Result submitNumOrder(Integer sku_id,Integer num_id,Integer mead_id,Integer address_id,String conment,int share_id){
 		Consumer user = apiSessionUtil.getConsumer();
 		Result adresult=this.checkAddress(address_id,user.getId());
 		if(adresult.getCode()!=Result.OK)return adresult;
@@ -213,7 +214,7 @@ public class ApiOrderService {
 		Result result = numService.findBossNum(number.getCityId(),agent.getId(),number.getSellerId());
 		if(result.getCode() != Result.OK)return result;
 		order_ext_param.put("bossNum",String.valueOf(result.getData()));
-
+        order_ext_param.put("share_id",share_id);
 		return this.submitOrder(Constants.ORDER_TYPE_2.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);
 	}
 

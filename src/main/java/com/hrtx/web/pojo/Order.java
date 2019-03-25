@@ -76,6 +76,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     private String phoneConsumer; //客户名称
     private String phoneConsumerIdType; //客户证件类型
     private String phoneConsumerIdNum; //客户证件编码
+    private Integer shareId; //下单编码
 
     @Transient
     private String num;
@@ -494,5 +495,13 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public void setCheckConment(String checkConment) {
         this.checkConment = checkConment;
+    }
+
+    public Integer getShareId() {
+        return shareId;
+    }
+
+    public void setShareId(Integer shareId) {
+        this.shareId = shareId;
     }
 }

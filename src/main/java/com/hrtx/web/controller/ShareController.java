@@ -96,7 +96,15 @@ public class ShareController extends BaseReturn{
 		int limit=NumberUtils.toInt(request.getParameter("limit"));
 		return this.shareService.shareBrowse(start,limit);
 	}
-
+	/**
+	 * 订单结算
+	 */
+	@GetMapping("/api/order-settle")
+	@Powers({PowerConsts.NOPOWER})
+	public Result createOrderSettle(HttpServletRequest request){
+		int order_id=NumberUtils.toInt(request.getParameter("order_id"));
+		return this.shareService.createOrderSettle(order_id);
+	}
 	/**
 	 * 收支明细
 	 */
