@@ -40,6 +40,7 @@ public class ShareService {
 	@Autowired private OrderSettleMapper orderSettleMapper;
 	@Autowired private OrderMapper orderMapper;
 	@Autowired private OrderItemMapper orderItemMapper;
+	@Autowired private FundOrderService fundOrderService;
 
 	/**
 	 * 添加合伙人信息
@@ -65,6 +66,7 @@ public class ShareService {
 	 * 查询合伙人信息
 	 */
 	public Result findInfo(){
+		String req_path=SessionUtil.getRequestPath(SessionUtil.getRequest());
 		Map<String,String> _map=new HashMap<>();
 		Consumer consumer=apiSessionUtil.getConsumer();
 		Consumer bean=consumerMapper.selectByPrimaryKey(consumer.getId());
@@ -73,17 +75,40 @@ public class ShareService {
 		_map.put("name",bean.getName());
 		_map.put("phone",bean.getPhone());
 		_map.put("idcard",bean.getIdcard());
-		_map.put("idcard_face",Constants.UPLOAD_PATH_IDCARD.getStringKey()+"/1000/"+bean.getIdcardFace());//格式为:idcard/1000/CN9031409047001.jpg
-		_map.put("idcard_back",Constants.UPLOAD_PATH_IDCARD.getStringKey()+"/1000/"+bean.getIdcardBack());
+		_map.put("idcard_face",req_path+"get-img/"+Constants.UPLOAD_PATH_IDCARD.getStringKey()+"/1000/"+bean.getIdcardFace());//格式为:idcard/1000/CN9031409047001.jpg
+		_map.put("idcard_back",req_path+"get-img/"+Constants.UPLOAD_PATH_IDCARD.getStringKey()+"/1000/"+bean.getIdcardBack());
 		//个人信息和统计数据是否需要分开？ TODO 以下待实现
-		_map.put("all_income","0.00");//总收益
-		_map.put("share_count","0.00");//推广个数
-		_map.put("share_browse","0.00");//浏览量
-		_map.put("sale_count","0.00");//销售量
-		_map.put("sale_price","0.00");//销售额
-		_map.put("balance","0.00");//可用余额
-		_map.put("wait_balance","0.00");//待结算金额
-		_map.put("has_balance","0.00");//已结算金额
+		List<Object> list=this.shareMapper.countConsumerShare(consumer.getId());
+		int share_count=0,browse_count=0;
+		if(list.size()>0){
+			Map map=(Map)list.get(0);
+			share_count=NumberUtils.toInt(ObjectUtils.toString(map.get("share_num")));
+			browse_count=NumberUtils.toInt(ObjectUtils.toString(map.get("browse_num")));
+		}
+		_map.put("share_count",share_count+"");//推广个数
+		_map.put("share_browse",browse_count+"");//浏览量
+		Double sale_count=0d,sale_price=0d,wait_settle=0d,has_settle=0d,all_settle=0d,balance=0d;
+		list=this.orderSettleMapper.countConsumerSettle(consumer.getId());
+		if(list.size()>0){
+			Map map=(Map)list.get(0);
+			sale_count=NumberUtils.toDouble(ObjectUtils.toString(map.get("sale_count")));
+			sale_price=NumberUtils.toDouble(ObjectUtils.toString(map.get("sale_price")));
+			wait_settle=NumberUtils.toDouble(ObjectUtils.toString(map.get("wait_settle")));
+			has_settle=NumberUtils.toDouble(ObjectUtils.toString(map.get("has_settle")));
+			all_settle=NumberUtils.toDouble(ObjectUtils.toString(map.get("all_settle")));
+		}
+		_map.put("sale_count",sale_count.intValue()+"");//销售量
+		_map.put("sale_price",Utils.formatFloatNumber(sale_price));//销售额
+		_map.put("wait_balance",Utils.formatFloatNumber(wait_settle));//待结算金额
+		_map.put("has_balance",Utils.formatFloatNumber(has_settle));//已结算金额
+		_map.put("all_income",Utils.formatFloatNumber(all_settle));//总收益
+
+		Result result=this.fundOrderService.payHrPayAccount(consumer.getId()+"");
+		if(result.getCode()==Result.OK){
+			Map map=(Map)result.getData();
+			balance=NumberUtils.toDouble(ObjectUtils.toString(map.get("balance")));
+		}
+		_map.put("balance",Utils.formatFloatNumber(balance));//可用余额
 		return new Result(Result.OK,_map);
 	}
 
@@ -156,6 +181,36 @@ public class ShareService {
 
 		return new Result(Result.OK,"结算创建成功");
 	}
+
+	/**
+	 * 订单正式结算(进行确认支付，费用、佣金等结算)
+	 * @param order_id	订单号
+	 * @return
+	 */
+	public Result orderSettle(int order_id){
+		Result result=fundOrderService.payHrPayOrderSign(order_id+"");
+		log.info(String.format("订单签收结果[%s],[%s]",result.getCode(),result.getData()));
+		Example example = new Example(OrderSettle.class);
+		example.createCriteria().andEqualTo("orderId",order_id).andEqualTo("status",Constants.ORDERSETTLE_STATUS_1.getIntKey());
+		List<OrderSettle> _list=this.orderSettleMapper.selectByExample(example);
+		if(_list.isEmpty()) return new Result(Result.ERROR,"暂无需要结算的费用");
+		List<Map> payeeList= new ArrayList<>();
+		for(OrderSettle orderSettle:_list){
+			Map map=new HashMap();
+			map.put("payee",orderSettle.getSettleUser());
+			map.put("item_amt",orderSettle.getSettleAmt().doubleValue());
+			map.put("item_id",orderSettle.getId());
+			payeeList.add(map);
+		}
+		OrderSettle settle=new OrderSettle();
+		settle.setStatus(Constants.ORDERSETTLE_STATUS_2.getIntKey());
+		settle.setSettleDate(new Date());
+		result=this.fundOrderService.payHrOrderSettle(order_id,payeeList);
+		log.info(String.format("订单结算结果[%s],[%s]",result.getCode(),result.getData()));
+		if(result.getCode()==Result.OK)this.orderSettleMapper.updateByExampleSelective(settle,example);
+		return result;
+	}
+
 	private Result initSettleFee(int order_id,int num_id,int fee_type,double order_price,int settle_user,boolean emptyAndInit,double init_award,int init_limit,double init_limit_award){
         if(settle_user==-1)return new Result(Result.OK,"结算用户不存在");
         Example example = new Example(OrderSettle.class);
@@ -312,51 +367,48 @@ public class ShareService {
 	/**
 	 * 收支明细
 	 */
-	public Result financeList(){
-		return new Result(Result.OK,"");
+	public Object financeList(int pageNum,int limit){
+		Consumer consumer=apiSessionUtil.getConsumer();
+//		String account_no=consumer.getId()+"";
+		String account_no="2";
+		Result result= this.fundOrderService.payHrPayAccountDetail(pageNum,limit,null,account_no,null,null);
+		boolean _bool=result.getCode()==Result.OK;
+		if(!_bool)return new PageInfo<Object>(null);
+		List<Map> _list=new ArrayList<>();
+		Map pageInfo=(Map)result.getData();
+		List _res_list=null;
+		if(pageInfo.containsKey("list"))_res_list=(List)pageInfo.get("list");
+		for(int i=0;_res_list!=null&&i<_res_list.size();i++){
+			Map map=(Map)_res_list.get(i);
+			try {
+				map.put("pay_date",Utils.stringToDate(ObjectUtils.toString(map.get("add_date")),"yyyy-MM-dd HH:mm:ss"));
+			}catch (Exception e){
+
+			}
+		}
+		return pageInfo;
 	}
 	/**
-	 * 收支明细
+	 * 提现进度
 	 */
 	public Result financeWithdrawProgresss(){
-		return new Result(Result.OK,"");
+		return new Result(Result.OK,"");//TODO 待实现
 	}
-
+	/**
+	 * 提现
+	 */
+	public Result financeWithdraw(Double amt){
+		if(amt<=0.3d)return new Result(Result.OK,"提现金额必须大于等于0.3元");
+		Consumer consumer=apiSessionUtil.getConsumer();
+		Consumer consumer1=this.consumerMapper.selectByPrimaryKey(consumer.getId());
+		if(!(consumer1.getPartnerCheck()!=null&&consumer1.getPartnerCheck()==1))return new Result(Result.OK,"抱歉，您的材料还未审核通过，无法完成提现");
+		String account_no=consumer.getId()+"";
+		Result result=fundOrderService.payHrPayWithdrawToWx(account_no,amt);
+		if(result.getCode()==Result.OK)return new Result(Result.OK,"提现成功");
+		else return new Result(Result.ERROR,result.getData());
+	}
 
 	//////////////////////////////////////////////
-
-	/**
-	 * 提交默认佣金--初始化	(商家开户时调用)
-	 * @return
-	 */
-	public Result defaultCommission(){
-		/*
-		 *利益关系体  2技术服务费；3交易服务费；4发展人；5天下梧桐
-		 */
-		return new Result(Result.OK,"");
-	}
-
-	/**
-	 *商家设置结算佣金
-	 * @return
-	 */
-	public Result saveCommission(){
-		return new Result(Result.OK,"");
-	}
-	/**
-	 *计算佣金(商家订单支付成功后调用)
-	 * @return
-	 */
-	public Result calculateCommission(){
-		return new Result(Result.OK,"");
-	}
-	/**
-	 * 正式结算佣金(商家订单签收后7天调用)
-	 * @return
-	 */
-	public Result settelCommission(){
-		return new Result(Result.OK,"");
-	}
 
 	/**
 	 *

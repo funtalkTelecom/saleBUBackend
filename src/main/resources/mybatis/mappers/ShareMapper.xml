@@ -10,4 +10,11 @@
         from tb_share s left join tb_num n on s.share_num_id=n.id where s.is_del=0 and s.consumer_id=#{consumer_id}
         order by s.id desc
     </select>
+
+    <select id="countConsumerShare" resultType="java.util.HashMap">
+        select count(distinct s.id) share_num,count(nb.id) browse_num
+        from tb_share s left join tb_num_browse nb on s.id=nb.share_id and nb.act_type=1
+        where s.consumer_id=#{consumer_id}
+    </select>
+
 </mapper>

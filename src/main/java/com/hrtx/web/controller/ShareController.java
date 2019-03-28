@@ -103,23 +103,36 @@ public class ShareController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	public Result createOrderSettle(HttpServletRequest request){
 		int order_id=NumberUtils.toInt(request.getParameter("order_id"));
-		return this.shareService.createOrderSettle(order_id);
+		int opt=NumberUtils.toInt(request.getParameter("opt"));
+		if(opt==1)return this.shareService.createOrderSettle(order_id);
+		else return this.shareService.orderSettle(order_id);
 	}
 	/**
 	 * 收支明细
 	 */
 	@GetMapping("/api/partner/finance-list")
 	@Powers({PowerConsts.NOPOWER})
-	public Result financeList(){
-		return new Result(Result.OK,"");
+	public Object financeList(HttpServletRequest request){
+		int pageNum=NumberUtils.toInt(request.getParameter("pageNum"),1);
+		int limit=NumberUtils.toInt(request.getParameter("limit"),15);
+		return this.shareService.financeList(pageNum,limit);
 	}
 	/**
 	 * 提现进度
 	 */
-	@GetMapping("/api/partner/finance-withdraw-progresss")
+	@PostMapping("/api/partner/finance-withdraw-progresss")
 	@Powers({PowerConsts.NOPOWER})
 	public Result financeWithdrawProgresss(){
 		return new Result(Result.OK,"");
+	}
+	/**
+	 * 提现
+	 */
+	@GetMapping("/api/partner/finance-withdraw")
+	@Powers({PowerConsts.NOPOWER})
+	public Result financeWithdraw(HttpServletRequest request){
+		Double amt=NumberUtils.toDouble(request.getParameter("amt"));
+		return this.shareService.financeWithdraw(amt);
 	}
 
 	//////////////////////////////////////////////////////

@@ -9,6 +9,7 @@ import com.hrtx.web.service.ShareService;
 import com.hrtx.web.service.UserService;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -120,4 +122,36 @@ public class ConsumerController extends BaseReturn{
 		return new Result(Result.OK,"验证码发送成功");
 	}
 	//
+
+	/**
+	 * 合伙人管理
+	 */
+	@GetMapping("/partner/partner-index")
+	@Powers({PowerConsts.PROMOTIONPLAN_QUERY})
+	public ModelAndView partnerIndex(){
+		return new ModelAndView("admin/goods/num-share");
+	}
+	/**
+	 * 合伙人列表
+	 */
+	@PostMapping("/partner/partner-list")
+	@Powers({PowerConsts.PROMOTIONPLAN_EDIT})
+	public Result partnerList(HttpServletRequest request){
+		int start=NumberUtils.toInt(request.getParameter("start"),1);
+		int limit=NumberUtils.toInt(request.getParameter("limit"),15);
+		int status=NumberUtils.toInt(request.getParameter("status"),-1);
+		String num=request.getParameter("num");
+		return shareService.promotionPlanPage(status,num,start,limit);
+	}
+	/**
+	 * 合伙人审核
+	 */
+	@PostMapping("/partner/partner-check")
+	@Powers({PowerConsts.PROMOTIONPLAN_EDIT})
+	public Result partnerCheck(HttpServletRequest request){
+		String consumer_id=request.getParameter("start");
+		String check_status=request.getParameter("check_status");
+		String check_remark=request.getParameter("check_remark");
+		return null;
+	}
 }

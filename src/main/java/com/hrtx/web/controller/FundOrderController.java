@@ -1,9 +1,11 @@
 package com.hrtx.web.controller;
 
+import com.hrtx.common.pay.PayClient;
 import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.global.SystemParam;
 import com.hrtx.web.pojo.FundOrder;
 import com.hrtx.web.pojo.Groups;
 import com.hrtx.web.pojo.Order;
@@ -53,7 +55,19 @@ public class FundOrderController extends BaseReturn{
             renderHtml("notify_success");
         }
 	}
-
+    @RequestMapping("/hr-pay-result")
+    @Powers({PowerConsts.NOLOGINPOWER})
+    public String hrPayResult(HttpServletRequest request){
+        String json=this.getParamBody(request);
+        String key=SystemParam.get("hr-pay-key");
+        com.hrtx.common.dto.Result res_result= PayClient.parseRequest(json,key);
+        if(res_result.getCode()==com.hrtx.common.dto.Result.OK){
+            Map map=(Map)res_result.getData();
+            Result result = fundOrderService.hrPayResult(map);
+            if(result.getCode()==Result.OK)return renderHtml("success");
+        }
+        return renderHtml("fail");
+    }
 	@RequestMapping("/yzffq-pay-result")
 	@Powers({PowerConsts.NOLOGINPOWER})
 	public void yzffqPayResult(HttpServletRequest request){
