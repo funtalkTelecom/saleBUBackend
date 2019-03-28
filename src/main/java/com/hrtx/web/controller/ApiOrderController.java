@@ -45,7 +45,7 @@ public class ApiOrderController extends BaseReturn {
         } else {  //普通靓号3或超级靓号4
             Integer numid = NumberUtils.toInt(request.getParameter("numid"));
             Integer mealid = Integer.valueOf(request.getParameter("mealid"));
-            Integer share_id =0;
+            Integer share_id =NumberUtils.toInt(request.getParameter("share_id"));
             if ( numid==0 || mealid==0) return new Result(Result.ERROR, "参数有误");
             return apiOrderService.submitNumOrder(skuid, numid, mealid, addrid, "",share_id);
         }
