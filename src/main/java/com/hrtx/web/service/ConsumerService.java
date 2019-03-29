@@ -1,5 +1,7 @@
 package com.hrtx.web.service;
 
+import com.hrtx.common.weixin.api.AccessTokenApi;
+import com.hrtx.common.weixin.api.WxConfig;
 import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.web.mapper.ConsumerLogMapper;
@@ -124,9 +126,10 @@ public class ConsumerService extends BaseService {
 		return  consumer;
 	}
     public Result getAccess_token() {
-        String appid = SystemParam.get("AppID");
-        String appsecret = SystemParam.get("AppSecret");
-        String tokenUrl = "https://api.weixin.qq.com/cgi-bin/token";
+		WxConfig.init(SystemParam.get("AppID"),SystemParam.get("AppSecret"),"");
+		String ACCESS_TOKEN=AccessTokenApi.getAccessToken().getAccessToken();
+		return new Result(Result.OK, ACCESS_TOKEN);
+        /*String tokenUrl = "https://api.weixin.qq.com/cgi-bin/token";
         String tokenParams = "grant_type=client_credential&appid=" + appid + "&secret=" + appsecret;
         String access_token = null;//发送请求
         try {
@@ -139,12 +142,11 @@ public class ConsumerService extends BaseService {
         } catch (Exception e) {
             log.error("获取access_token失败", e);
         }
-
-        return new Result(Result.ERROR, "无法获取access_token");
+        return new Result(Result.ERROR, "无法获取access_token");*/
     }
 
     public Result getQrcode(String access_token, String scene, String page,String width,String auto_color,String line_color,String is_hyaline,HttpServletResponse response) {
-        String requestUrl = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + access_token;
+		String requestUrl = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + access_token;
         JSONObject json = new JSONObject();
         if(!StringUtils.isBlank(scene)){
             json.put("scene", scene);
@@ -170,5 +172,14 @@ public class ConsumerService extends BaseService {
         }catch (Exception e){
             return new Result(Result.ERROR,"二维码生成失败");
         }
-    }
+	}
+
+	public ConsumerLog getConsumerLog(int consumer_id,int loginType){
+		ConsumerLog consumerLog = new ConsumerLog();
+		consumerLog.setUserId(consumer_id);
+		consumerLog.setStatus(1);
+		consumerLog.setLoginType(loginType);
+		consumerLog = consumerLogMapper.selectOne(consumerLog);
+		return consumerLog;
+	}
 }

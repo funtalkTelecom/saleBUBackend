@@ -8,6 +8,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -41,6 +42,7 @@ public class ShareService {
 	@Autowired private OrderMapper orderMapper;
 	@Autowired private OrderItemMapper orderItemMapper;
 	@Autowired private FundOrderService fundOrderService;
+	@Autowired private ConsumerService consumerService;
 
 	/**
 	 * 添加合伙人信息
@@ -131,8 +133,40 @@ public class ShareService {
 	/**
 	 * 生成推广卡片
 	 */
-	public Result shareCard(){
-		return new Result(Result.OK,"");
+	public Result shareCard(int num_id,String head_img_file,String nick_name,String promotion_tip,String share_page){
+		String req_path=SessionUtil.getRequestPath(SessionUtil.getRequest());
+		Num num=numMapper.selectByPrimaryKey(num_id);
+		Consumer consumer=apiSessionUtil.getConsumer();
+		try {
+			if(StringUtils.isEmpty(head_img_file)){//下载默认头像，否则用系统logo
+				String root_path = SystemParam.get("upload_root_path");
+				if(StringUtils.isEmpty(nick_name))nick_name=consumer.getNickName();
+				if(StringUtils.isEmpty(nick_name))nick_name=SystemParam.get("system_name");
+				head_img_file=root_path+"/headimg/"+String.valueOf(consumer.getId())+".jpg";
+				java.io.File file=new java.io.File(root_path+"/headimg/"+String.valueOf(consumer.getId())+".jpg");
+				if(!file.exists()){
+//					ConsumerLog consumerLog=consumerService.getConsumerLog(consumer.getId(),2);
+					String head_img_url=consumer.getImg();//获取用的头像地址
+					if(StringUtils.isEmpty(head_img_url)){
+						head_img_file=root_path+"/headimg/default.jpg";
+					}else{
+						Result result=HttpUtil.doHttpPost2Download(head_img_url,"","application/json","utf-8",-1,root_path,".jpg");
+						if(result.getCode()!=Result.OK)return result;
+						String new_head_img=String.valueOf(result.getData());
+						FileUtils.copyFile(new java.io.File(new_head_img),file);
+					}
+				}
+			}
+			Result result=imageService.createShareCardFile(head_img_file,nick_name,promotion_tip,share_page,num.getNumResource(),num.getCityName(),num.getNetType(),num.getTeleType(),String.valueOf(num.getLowConsume()));
+			if(result.getCode()!=Result.OK)return result;
+			Map _map=new HashMap();
+			_map.put("share_image",req_path+"get-img/"+Constants.UPLOAD_PATH_SHARE.getStringKey()+"/"+result.getData());//推广图片
+			return new Result(Result.OK,_map);
+		}catch (Exception e){
+			log.error("分享图片创建失败",e);
+			return new Result(Result.ERROR,"分享图片创建失败");
+		}
+
 	}
 	/**
 	 * 创建订单结算数据(只生成数据不实际结算)

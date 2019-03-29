@@ -70,8 +70,16 @@ public class ShareController extends BaseReturn{
 	 */
 	@PostMapping("/api/partner/share-card")
 	@Powers({PowerConsts.NOPOWER})
-	public Result shareCard(){
-		return new Result(Result.OK,"");
+	public Result shareCard(HttpServletRequest request){
+		int num_id=NumberUtils.toInt(request.getParameter("num_id"));
+		String head_img_file=request.getParameter("head_img");
+		String nick_name=request.getParameter("nick_name");
+		String promotion_tip=request.getParameter("promotion_tip");
+		String share_page=request.getParameter("share_page");
+		if(StringUtils.isEmpty(share_page))return new Result(Result.ERROR,"分享的地址不能为空");
+		if(StringUtils.isEmpty(promotion_tip))return new Result(Result.ERROR,"说一段分享推荐语吧");
+		Result result=this.shareService.shareCard(num_id,head_img_file,nick_name,promotion_tip,share_page);
+		return result;
 	}
 
 	/**

@@ -29,6 +29,7 @@ public class FundOrderService extends BaseService {
 	@Autowired private FundOrderMapper fundOrderMapper;
 	@Autowired private FundDetailMapper fundDetailMapper;
 	@Autowired private ConsumerLogMapper consumerLogMapper;
+	@Autowired private ConsumerService consumerService;
 	@Autowired private PinganService pinganService;
 	@Autowired private ThirdPayService thirdPayService;
 	@Autowired private OrderService orderService;
@@ -408,14 +409,12 @@ public class FundOrderService extends BaseService {
      * @return
      */
     public Result getPayer(int loginType){
-        ConsumerLog consumerLog = new ConsumerLog();
-        consumerLog.setUserId(apiSessionUtil.getConsumer() == null ? 0 : apiSessionUtil.getConsumer().getId());
-        consumerLog.setStatus(1);
-        consumerLog.setLoginType(loginType);
-        consumerLog = consumerLogMapper.selectOne(consumerLog);
+        ConsumerLog consumerLog=consumerService.getConsumerLog(apiSessionUtil.getConsumer() == null ? 0 : apiSessionUtil.getConsumer().getId(),loginType);
         if(consumerLog == null || StringUtils.isBlank(consumerLog.getOpenid())) return new Result(Result.ERROR, "未找到付款账户");
         return new Result(Result.OK, consumerLog.getOpenid());
     }
+
+
 
     /**
      * 查询业务订单支付成功总额
