@@ -48,6 +48,8 @@ public class ApiNumberService {
 	private AgentService agentService;
 	@Autowired
 	private ActivityService activityService;
+	@Autowired
+	private ShareService shareService ;
 	/**
 	 * 根据tags获取号码
 	 * @param numPrice
@@ -230,6 +232,11 @@ public class ApiNumberService {
 
 	public Result numberInfo(String id, HttpServletRequest request){
 		PageInfo<Object> pm = null;
+		String open_url=request.getParameter("open_url");
+		int num_id=NumberUtils.toInt(request.getParameter("num_id"));
+		int share_id=NumberUtils.toInt(request.getParameter("share_id"));
+		String chennel=request.getParameter("chennel");
+
 		Map map = numberMapper.getNumSkuGoodsTypeById(id);
 		if(map == null) return new Result(Result.ERROR, "未找到号码");
 		String skuGoodsType =String.valueOf(map.get("sku_goods_type"));
@@ -261,6 +268,8 @@ public class ApiNumberService {
 			obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
 		}
 		obj.put("newDate",new Date());
+		//存储浏览记录
+	    shareService.addBrowse(num_id,chennel,open_url,share_id);
 		return new Result(Result.OK, obj);
 	}
 
