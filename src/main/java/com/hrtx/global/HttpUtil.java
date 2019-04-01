@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
@@ -41,6 +42,7 @@ public class HttpUtil {
 	 */
 	public static Result doHttpPost2Download(String url, String sendR, String type, String charset,int downloadLimit,String root_path,String suffix) throws Exception{
 		Result result=doHttpPostForBytes(url,sendR,type,charset);
+		if(result.getCode()!=Result.OK)return result;
 		byte[] bytes=(byte[]) result.getData();
 		if(downloadLimit==-1||bytes.length>downloadLimit){
 			String fn=Utils.randomNoByDateTime();
@@ -97,15 +99,21 @@ public class HttpUtil {
 	}
 
     private static HttpMethodBase createMethod(String url, String param, String type, String  charset) throws UnsupportedEncodingException {
-        PostMethod method = null;
-        method = new PostMethod(url);
-        RequestEntity se = new StringRequestEntity(param, type, charset);
-        method.setRequestEntity(se);
+		HttpMethodBase httpMethodBase=null;
+		if(StringUtils.isEmpty(param)){
+			GetMethod method = new GetMethod(url);// 创建GET方法的实例
+			httpMethodBase=method;
+		}else{
+			PostMethod method = new PostMethod(url);
+			RequestEntity se = new StringRequestEntity(param, type, charset);
+			method.setRequestEntity(se);
+			httpMethodBase=method;
+		}
         //使用系统提供的默认的恢复策略
-        method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
+		httpMethodBase.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
         //设置超时的时间
-        method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 30000);
-        return method;
+		httpMethodBase.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 30000);
+        return httpMethodBase;
     }
 	/**
 	 *
