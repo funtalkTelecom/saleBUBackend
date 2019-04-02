@@ -30,11 +30,12 @@ public class Meal extends BasePojo implements java.io.Serializable {
 	private String teleType;
 	private Integer isDel;
     private Integer sellerId;
+    private String netType;
 
 	public Meal() {
 	}
 
-    public Meal(Integer mid, String mealId, String mealName, String mealDesc, Integer saleCity, String saleCityName, String saleType, Integer createBy, Date createDate, Integer updateBy, Date updateDate, String teleType, Integer isDel,Integer sellerId) {
+    public Meal(Integer mid, String mealId, String mealName, String mealDesc, Integer saleCity, String saleCityName, String saleType, Integer createBy, Date createDate, Integer updateBy, Date updateDate, String teleType, Integer isDel,Integer sellerId,String netType) {
         this.mid = mid;
         this.mealId = mealId;
         this.mealName = mealName;
@@ -49,6 +50,7 @@ public class Meal extends BasePojo implements java.io.Serializable {
         this.teleType = teleType;
         this.isDel = isDel;
         this.sellerId = sellerId;
+        this.netType = netType;
     }
 
     public Integer getMid() {
@@ -161,5 +163,13 @@ public class Meal extends BasePojo implements java.io.Serializable {
 
     public void setSellerId(Integer sellerId) {
         this.sellerId = sellerId;
+    }
+
+    public String getNetType() {
+        return netType;
+    }
+
+    public void setNetType(String netType) {
+        this.netType = netType;
     }
 }

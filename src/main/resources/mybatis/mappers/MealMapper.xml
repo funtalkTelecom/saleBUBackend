@@ -94,7 +94,7 @@
             update_date,
             tele_type,
             is_del,
-        seller_id
+        seller_id,net_type
         ) values
         <foreach collection="mealList" item="meal" separator=",">
             (
@@ -110,7 +110,8 @@
                 #{meal.updateDate},
                 #{meal.teleType},
                 0,
-                #{meal.sellerId}
+                #{meal.sellerId},
+                #{meal.netType}
             )
         </foreach>
     </insert>
