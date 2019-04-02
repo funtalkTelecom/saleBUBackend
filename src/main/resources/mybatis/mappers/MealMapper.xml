@@ -66,7 +66,7 @@
         <include refid="col_list"/>
         from tb_meal a
         left join tb_third_city b on a.sale_city=b.city_id
-        left join tb_num c on c.tele_type = a.tele_type  and a.seller_id = c.seller_id
+        left join tb_num c on c.tele_type = a.tele_type and c.net_type = a.net_type  and a.seller_id = c.seller_id
         where a.is_del = 0
         and c.id = #{id} order by a.mid
     </select>
