@@ -158,6 +158,10 @@
 								<div class="col-xs-4">
 									<input type="text" class="form-control" name="teleType" >
 								</div>
+								<label class="col-xs-2 control-label">网络类型</label>
+								<div class="col-xs-4">
+									<input type="text" class="form-control" name="netType" >
+								</div>
 							</div>
 
 							<div class="form-group">

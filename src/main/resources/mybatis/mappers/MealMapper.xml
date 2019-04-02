@@ -13,7 +13,8 @@
         a.update_by as updateBy,
         a.update_date as updateDate,
         a.tele_type as teleType,
-        a.is_del as isDel
+        a.is_del as isDel,
+        a.net_type as netType
     </sql>
     <sql id="ex_col_list">
         b.city_name as saleCityName,
@@ -124,7 +125,8 @@
             a.sale_type = #{saleType},
             a.update_by = #{updateBy},
             a.update_date = #{updateDate},
-            a.tele_type = #{teleType}
+            a.tele_type = #{teleType},
+            a.net_type = #{netType}
         where
             a.mid = #{mid} and a.is_del = 0
     </update>
