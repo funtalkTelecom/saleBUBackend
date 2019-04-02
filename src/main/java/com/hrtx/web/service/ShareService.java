@@ -124,6 +124,8 @@ public class ShareService {
 		Page<Object> page=this.shareMapper.queryShareList(consumer.getId());
 		for(int i=0;i<page.size();i++){
 			Map map=(Map)page.get(i);
+			Date date=(Date)map.get("share_date");
+			map.put("share_date",Utils.getDate(date,"yyyy-MM-dd HH:mm"));
 			Map<String,String> _map_num=findNumPromotionInfo(NumberUtils.toInt(ObjectUtils.toString(map.get("share_num_id"))));
 			map.putAll(_map_num);
 		}
@@ -285,7 +287,8 @@ public class ShareService {
 		Result result=this.findNumPromotionPlan(free_type,num_id);
 		if(result.getCode()==Result.OK){
 			ppbean=(PromotionPlan)result.getData();
-			valid_date=String.valueOf(ppbean.getEndDate().getTime());
+			valid_date=Utils.getDate(ppbean.getEndDate(),"yyyy-MM-dd HH:mm");
+//			valid_date=String.valueOf(ppbean.getEndDate().getTime());
 			if(ppbean.getAwardWay()==Constants.PROMOTION_PLAN_AWARDWAY_1.getIntKey())ppfee=ppbean.getAward().doubleValue();
 			if(ppbean.getAwardWay()==Constants.PROMOTION_PLAN_AWARDWAY_2.getIntKey()){
 				ppfee=Arith.div(Arith.mul(num_price,ppbean.getAward().doubleValue()),100);
@@ -332,6 +335,8 @@ public class ShareService {
 		Num num=numMapper.selectByPrimaryKey(num_id);
 		if(num==null)return new Result(Result.ERROR,"号码不存在");
 		Consumer consumer=apiSessionUtil.getConsumer();
+		Consumer consumer1=this.consumerMapper.selectByPrimaryKey(consumer.getId());
+		if(consumer1.getIsPartner()==null||consumer1.getIsPartner()!=1)return new Result(Result.ERROR,"抱歉您还不是平台合伙人，请先申请");
 		List<Share> _share_list=this.shareMapper.findNumShare(consumer.getId(),num_id);
 		Share bean=null;
 		if(_share_list.size()<=0){
@@ -407,6 +412,8 @@ public class ShareService {
 		Map map_act=Constants.contantsToMap("NUMBROWSE_ACTTYPE");
 		for(int i=0;i<page.size();i++){
 			Map map=(Map)page.get(i);
+			Date date=(Date)map.get("add_date");
+			map.put("add_date",Utils.getDate(date,"yyyy-MM-dd HH:mm"));
 			map.put("act_type",map_act.get(map.get("act_type")));
 		}
 		PageInfo<Object> pm = new PageInfo<Object>(page);
