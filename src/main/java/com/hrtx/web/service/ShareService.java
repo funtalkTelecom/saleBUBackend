@@ -293,10 +293,12 @@ public class ShareService {
 				if(ppbean.getIsLimit()==1)ppfee=ppfee>ppbean.getLimitAward().doubleValue()?ppbean.getLimitAward().doubleValue():ppfee;
 			}
 		}
+		Num num=numMapper.selectByPrimaryKey(num_id);
 		_map.put("is_pp",ppbean==null?"0":"1");//是否进行推广1是0否
 		_map.put("income",ppfee==null?"0":Utils.formatFloatNumber(ppfee));//预期收益
 		_map.put("valid_date",valid_date==null?"":valid_date);//有效期至
 		_map.put("sale_price",Utils.formatFloatNumber(num_price));//号码当前售价
+		_map.put("num_sale",num.getStatus()==Constants.NUM_STATUS_2.getIntKey()?"1":"0");//号码销售状态
 		return _map;
 	}
 
