@@ -1,5 +1,9 @@
 package com.hrtx.web.service;
 
+import com.github.abel533.entity.Example;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hrtx.common.weixin.api.AccessTokenApi;
 import com.hrtx.common.weixin.api.WxConfig;
 import com.hrtx.dto.Result;
@@ -9,6 +13,7 @@ import com.hrtx.web.mapper.ConsumerMapper;
 import com.hrtx.web.mapper.UserMapper;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.ConsumerLog;
+import com.hrtx.web.pojo.PromotionPlan;
 import com.hrtx.web.pojo.User;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -181,5 +186,63 @@ public class ConsumerService extends BaseService {
 		consumerLog.setLoginType(loginType);
 		consumerLog = consumerLogMapper.selectOne(consumerLog);
 		return consumerLog;
+	}
+
+	/**
+	 *
+	 * @param status
+	 * @param num
+	 * @param start
+	 * @param limit
+	 * @return
+	 */
+	public PageInfo partnerPage(int start,int limit,String name,String phone) {
+		Consumer pp=new Consumer();
+		pp.setStart(start);
+		pp.setLimit(limit);
+		pp.setIsPartner(1);
+		Example example=new Example(Consumer.class);
+		Example.Criteria criteria=example.createCriteria();
+		criteria.andEqualTo("isPartner",1);
+		if(StringUtils.isNotEmpty(name))criteria.andLike("name",name);
+		if(StringUtils.isNotEmpty(phone))criteria.andLike("phone",phone);
+		example.setOrderByClause("id desc");
+		PageHelper.startPage(pp.startToPageNum(),pp.getLimit());
+		List<Consumer> _list = consumerMapper.selectByExample(example);
+		PageInfo<Object> pm = new PageInfo(_list);
+		List<Object> mapList=new ArrayList<>();
+		for (Consumer consumer:_list) {
+			Map map=new HashMap();
+			map.put("id",consumer.getId());
+			map.put("name",consumer.getName());
+			if(consumer.getPartnerCheck()==null||consumer.getPartnerCheck().equals(0)){
+				map.put("phone",consumer.getPhone());
+				map.put("idcard",consumer.getIdcard());
+			}else{
+				map.put("phone",Utils.sensitive(consumer.getPhone(),3,4));
+				map.put("idcard",Utils.sensitive(consumer.getIdcard(),4,4));
+			}
+			map.put("idcard_back",consumer.getIdcardBack());
+			map.put("idcard_face",consumer.getIdcardFace());
+			map.put("nick_name",consumer.getNickName());
+			map.put("partner_check",consumer.getPartnerCheck());
+			mapList.add(map);
+		}
+		pm.getList().clear();
+		pm.getList().addAll(mapList);
+		return pm;
+	}
+
+	public Result partnerCheck(int consumer_id,String check_status,String check_remark) {
+		Consumer consumer=this.consumerMapper.selectByPrimaryKey(consumer_id);
+		if(consumer==null)return new Result(Result.ERROR,"数据错误");
+		if(StringUtils.equals(check_status,"1")){
+			consumer.setPartnerCheck(1);
+		}else{
+			consumer.setPartnerCheck(2);
+			Messager.send(consumer.getPhone(),"抱歉，您申请的合伙人资料由于【"+check_remark+"】,请到小程序中重新提交。");
+		}
+		this.consumerMapper.updateByPrimaryKey(consumer);
+		return new Result(Result.OK,"审核已受理");
 	}
 }

@@ -61,6 +61,15 @@ public class ShareController extends BaseReturn{
 	 */
 	@PostMapping("/api/partner/share-url")
 	@Powers({PowerConsts.NOPOWER})
+	public Result delShare(HttpServletRequest request){
+		String share_id=request.getParameter("share_id");
+		return this.shareService.delShare(NumberUtils.toInt(share_id));
+	}
+	/**
+	 * 生成分享地址  由合伙人提交生成分享地址
+	 */
+	@PostMapping("/api/partner/share-url")
+	@Powers({PowerConsts.NOPOWER})
 	public Result shareUrl(HttpServletRequest request){
 		String num_id=request.getParameter("num_id");
 		return this.shareService.shareUrl(NumberUtils.toInt(num_id));
@@ -94,6 +103,7 @@ public class ShareController extends BaseReturn{
 		String chennel=request.getParameter("chennel");
 		return this.shareService.addBrowse(num_id,chennel,open_url,share_id);
 	}
+
 	/**
 	 * 分享浏览记录
 	 */
@@ -136,7 +146,7 @@ public class ShareController extends BaseReturn{
 	/**
 	 * 提现
 	 */
-	@GetMapping("/api/partner/finance-withdraw")
+	@PostMapping("/api/partner/finance-withdraw")
 	@Powers({PowerConsts.NOPOWER})
 	public Result financeWithdraw(HttpServletRequest request){
 		Double amt=NumberUtils.toDouble(request.getParameter("amt"));

@@ -131,7 +131,10 @@ public class BaseReturn {
 		InputStream fis = null;
 		OutputStream os = null;
 		try {
-			File file = new File(SystemParam.get("upload_root_path")+File.separator+path);// path是根据日志路径和文件名拼接出来的
+			String file_path=SystemParam.get("upload_root_path")+File.separator+path;
+			File file = new File(file_path);// path是根据日志路径和文件名拼接出来的
+			log.info("获取文件:"+file_path);
+			if(!file.exists())return new Result(Result.ERROR,"文件不存在");
 			fis = new BufferedInputStream(new FileInputStream(file));
 			byte[] buffer = new byte[fis.available()];
 			fis.read(buffer);

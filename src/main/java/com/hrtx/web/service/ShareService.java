@@ -307,6 +307,21 @@ public class ShareService {
 		Map<String,String> _map=findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(),num_id,num_price);
 		return _map;
 	}
+
+	/**
+	 * 删除分享数据
+	 * @param share_id
+	 * @return
+	 */
+	public Result delShare(Integer share_id){
+		Share share=this.shareMapper.selectByPrimaryKey(share_id);
+		Consumer consumer=this.apiSessionUtil.getConsumer();
+		if(share==null)return new Result(Result.ERROR,"数据错误");
+		if(!share.getConsumerId().equals(consumer.getId()))return new Result(Result.ERROR,"您无法删除他人分享数据");
+		share.setIsDel(1);
+		this.shareMapper.updateByPrimaryKey(share);
+		return new Result(Result.OK,"删除成功");
+	}
 	/**
 	 * 生成分享地址
 	 */
