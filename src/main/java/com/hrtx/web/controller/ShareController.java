@@ -59,7 +59,7 @@ public class ShareController extends BaseReturn{
 	/**
 	 * 生成分享地址  由合伙人提交生成分享地址
 	 */
-	@PostMapping("/api/partner/share-url")
+	@PostMapping("/api/partner/share-del")
 	@Powers({PowerConsts.NOPOWER})
 	public Result delShare(HttpServletRequest request){
 		String share_id=request.getParameter("share_id");
