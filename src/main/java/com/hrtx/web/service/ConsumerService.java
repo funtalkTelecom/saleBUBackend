@@ -78,6 +78,8 @@ public class ConsumerService extends BaseService {
 			userC.setStatus(1);
 			userC.setIsAgent(1);
 			userC.setRegDate(new Date());
+			userC.setIsPartner(0);  //是否合伙人 1是，2否
+			userC.setPartnerCheck(0); //已确认的合伙人 1是0否；是方可提现
 			consumerMapper.insert(userC);
 			Integer userid = userC.getId();
 
@@ -92,6 +94,8 @@ public class ConsumerService extends BaseService {
 
 			this.apiSessionUtil.saveOrUpdate(token,userC);
 			_map.put("consumer_id",String.valueOf(userC.getId()));
+			_map.put("isPartner",String.valueOf(userC.getIsPartner()));//是否合伙人 1是，2否
+			_map.put("partnerCheck",String.valueOf(userC.getPartnerCheck())); //已确认的合伙人 1是0否；是方可提现
 		}else {
 			Consumer Cparam = new Consumer();
 			Integer id = consumerLog.getUserId();
@@ -99,6 +103,8 @@ public class ConsumerService extends BaseService {
 			Consumer consumer = consumerMapper.selectOne(Cparam);
 			this.apiSessionUtil.saveOrUpdate(token,consumer);
 			_map.put("consumer_id",String.valueOf(Cparam.getId()));
+			_map.put("isPartner",String.valueOf(consumer.getIsPartner()));//是否合伙人 1是，2否
+			_map.put("partnerCheck",String.valueOf(Cparam.getPartnerCheck()));//已确认的合伙人 1是0否；是方可提现
 		}
 		return new Result(Result.OK, _map);
 
