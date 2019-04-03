@@ -1,5 +1,6 @@
 package com.hrtx.web.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
@@ -9,6 +10,7 @@ import com.hrtx.web.service.ShareService;
 import com.hrtx.web.service.UserService;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -23,7 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+//@RequestMapping("/api")
 public class ConsumerController extends BaseReturn{
 
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -32,7 +35,7 @@ public class ConsumerController extends BaseReturn{
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private RedisUtil redisUtils;
 
-    @PutMapping(value = "/Consumer")
+    @PutMapping(value = "/api/Consumer")
     @Powers({PowerConsts.NOPOWER})
 	public Result InsertConsumer(@RequestParam(value="loginName",required=false) String loginName,
 								   @RequestParam(value="livePhone",required=false) String livePhone,
@@ -48,7 +51,7 @@ public class ConsumerController extends BaseReturn{
 	/**
 	 * 添加/修改合伙人信息
 	 */
-	@PostMapping("/partner/user-info")
+	@PostMapping("/api/partner/user-info")
 	@Powers({PowerConsts.NOPOWER})
 	public Result addInfo(HttpServletRequest request){
 		String idcard_face=request.getParameter("idcard_face_file_name");
@@ -56,9 +59,9 @@ public class ConsumerController extends BaseReturn{
 		String name=request.getParameter("name");
 		String idcard=request.getParameter("idcard");
 		String phone=request.getParameter("phone");
-		String sub_path=request.getParameter("sub_path");
+//		String sub_path=request.getParameter("sub_path");
 		String check_code=request.getParameter("check_code");
-		String name_ = "^[\\u4E00-\\u9FA5\\uf900-\\ufa2d·s]{2,20}$";//验证姓名正则
+//		String name_ = "^[\\u4E00-\\u9FA5\\uf900-\\ufa2d·s]{2,20}$";//验证姓名正则
 
         String key=this.apiSessionUtil.getTokenStr()+":sms-ack";
         Object object=this.apiSessionUtil.getObject(key);
@@ -73,7 +76,7 @@ public class ConsumerController extends BaseReturn{
 	/**
 	 * 上传文件信息
 	 */
-	@PostMapping("/upload/image")
+	@PostMapping("/api/upload/image")
 	@Powers({PowerConsts.NOPOWER})
 	public Result uploadImage(HttpServletRequest request){
 		String upload_file_name=null;
@@ -106,7 +109,7 @@ public class ConsumerController extends BaseReturn{
 	/**
 	 * 发送短信验证码
 	 */
-	@PostMapping("/sms/ack")
+	@PostMapping("/api/sms/ack")
 	@Powers({PowerConsts.NOPOWER})
 	public Result sendSmsMessage(HttpServletRequest request){
 		String phone=request.getParameter("phone");
@@ -120,4 +123,38 @@ public class ConsumerController extends BaseReturn{
 		return new Result(Result.OK,"验证码发送成功");
 	}
 	//
+
+	/**
+	 * 合伙人管理
+	 */
+	@GetMapping("/partner/partner-index")
+	@Powers({PowerConsts.PARTNER_MOUULE})
+	public ModelAndView partnerIndex(){
+		return new ModelAndView("admin/consumer/partner-query");
+	}
+	/**
+	 * 合伙人列表
+	 */
+	@PostMapping("/partner/partner-list")
+	@Powers({PowerConsts.PARTNER_MOUULE_QUERY})
+	public Result partnerList(HttpServletRequest request){
+		int start=NumberUtils.toInt(request.getParameter("start"),1);
+		int limit=NumberUtils.toInt(request.getParameter("limit"),15);
+		String name=request.getParameter("name");
+		String phone=request.getParameter("phone");
+		PageInfo pageInfo= consumerService.partnerPage(start,limit,name,phone);
+		return new Result(Result.OK, pageInfo);
+	}
+	/**
+	 * 合伙人审核
+	 */
+	@PostMapping("/partner/partner-check")
+	@Powers({PowerConsts.PARTNER_MOUULE_EDIT})
+	public Result partnerCheck(HttpServletRequest request){
+		int consumer_id=NumberUtils.toInt(request.getParameter("id"));
+		String check_status=request.getParameter("check_status");
+		String check_remark=request.getParameter("check_remark");
+		Result r=this.consumerService.partnerCheck(consumer_id,check_status,check_remark);
+		return r;
+	}
 }

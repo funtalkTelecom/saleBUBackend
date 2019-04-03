@@ -1,6 +1,8 @@
 package com.hrtx.web.service;
 
 import com.github.abel533.entity.Example;
+import com.hrtx.common.pay.PayClient;
+import com.hrtx.common.pay.dto.*;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.dto.Result;
@@ -13,6 +15,7 @@ import com.hrtx.web.mapper.*;
 import com.hrtx.web.pay.YzfPayStrategy;
 import com.hrtx.web.pojo.*;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,12 +28,15 @@ import java.util.*;
 public class FundOrderService extends BaseService {
 	@Autowired private FundOrderMapper fundOrderMapper;
 	@Autowired private FundDetailMapper fundDetailMapper;
-	@Autowired private ConsumerLogMapper consumerLogMapper;
+	@Autowired private HrpayAccountService hrpayAccountService;
+	@Autowired private ConsumerService consumerService;
 	@Autowired private PinganService pinganService;
 	@Autowired private ThirdPayService thirdPayService;
 	@Autowired private OrderService orderService;
 	@Autowired private AuctionDepositService auctionDepositService;
 	@Autowired private ApiSessionUtil apiSessionUtil;
+    @Autowired private ShareService shareService;
+    @Autowired private OrderItemMapper orderItemMapper;
 
     /**
      * 平台订单支付（线下支付方式）
@@ -215,7 +221,21 @@ public class FundOrderService extends BaseService {
         this.updatePayCallback(out_no, status);
         return new Result(Result.OK, "success");
     }
+    /**
+     * 更新HR pay 回调结果
+     * @param platrequest
+     * @return
+     */
+    public Result hrPayResult(Map platrequest) {
+        if(!platrequest.containsKey("order_no")||!platrequest.containsKey("status")) return new Result(Result.ERROR,"fail");
+        String busi_type = FundOrder.BUSI_TYPE_PAYORDER;
+        String busi_order_id = ObjectUtils.toString(platrequest.get("order_no"));
+        int pay_status =NumberUtils.toInt(ObjectUtils.toString(platrequest.get("status")));; //状态 2等待付款，3已支付
 
+        Result result= this.updateBusiPayResult(busi_type,NumberUtils.toInt(busi_order_id),pay_status==3);
+
+        return result;
+    }
     /**
      * 更新回调结果
      * @param params
@@ -261,29 +281,35 @@ public class FundOrderService extends BaseService {
 //        String payTime = params.get("pay_time");
         String busiType = fundOrder.getBusi();
         Integer orderId = NumberUtils.toInt(fundOrder.getSourceId());
-        Result result = null;
-        if(FundOrder.BUSI_TYPE_PAYORDER.equals(busiType)) {// 订单支付完成回调
-            if(status == 3) {//支付成功
-                try {
-                    result = orderService.payOrderSuccess(orderId);
-                    if(result.getCode() == Result.OK) {
-                        result = orderService.payDeliverOrder(orderId);
-                    }
-                }catch (Exception e) {
-                    log.error("支付完成，发货失败", e);
+        return this.updateBusiPayResult(busiType,orderId,status == 3);
+    }
+
+    /**
+     * 支付结束后更新业务单据的状态及进行后续的操作
+     * @param busi_type
+     * @param busi_order_id
+     * @param pay_result
+     * @return
+     */
+    private Result updateBusiPayResult(String busi_type,int busi_order_id,boolean pay_result){
+        Result result=null;
+        try {
+            if(FundOrder.BUSI_TYPE_PAYORDER.equals(busi_type)&&pay_result){
+                result = orderService.payOrderSuccess(busi_order_id);
+                if(result.getCode() == Result.OK) {
+                    orderService.payDeliverOrder(busi_order_id);//发货成功与否不与支付结果挂钩
+                    shareService.createOrderSettle(busi_order_id);//2019.3.26 结算费用
                 }
+            }else if(FundOrder.BUSI_TYPE_PAYDEPOSIT.equals(busi_type)){
+                auctionDepositService.newAuctionDepositPay(busi_order_id, pay_result, Utils.getDate(0,"yyyyMMddHHmmss"));//payTime
+                result=new Result(Result.OK,"success");
             }
-        }
-        if(FundOrder.BUSI_TYPE_PAYDEPOSIT.equals(busiType)) {//保证金支付完成 回调
-            try{
-                auctionDepositService.newAuctionDepositPay(orderId, status == 3 ? true : false, Utils.getDate(0,"yyyyMMddHHmmss"));//payTime
-            }catch (Exception e) {
-                log.error("支付完成更新保证金回调信息异常", e);
-            }
+        }catch (Exception e) {
+            log.error(String.format("业务[%s]单据[%s]支付[%s]，更新失败",busi_type,busi_order_id,pay_result), e);
+            result=new Result(Result.ERROR,"fail");
         }
         return result;
     }
-
     /**
      * 平台订单退款
      * @param sourceId 订单号
@@ -382,15 +408,13 @@ public class FundOrderService extends BaseService {
      * @param loginType 登录方式
      * @return
      */
-    private Result getPayer(int loginType){
-        ConsumerLog consumerLog = new ConsumerLog();
-        consumerLog.setUserId(apiSessionUtil.getConsumer() == null ? 0 : apiSessionUtil.getConsumer().getId());
-        consumerLog.setStatus(1);
-        consumerLog.setLoginType(loginType);
-        consumerLog = consumerLogMapper.selectOne(consumerLog);
+    public Result getPayer(int loginType){
+        ConsumerLog consumerLog=consumerService.getConsumerLog(apiSessionUtil.getConsumer() == null ? 0 : apiSessionUtil.getConsumer().getId(),loginType);
         if(consumerLog == null || StringUtils.isBlank(consumerLog.getOpenid())) return new Result(Result.ERROR, "未找到付款账户");
         return new Result(Result.OK, consumerLog.getOpenid());
     }
+
+
 
     /**
      * 查询业务订单支付成功总额
@@ -432,5 +456,218 @@ public class FundOrderService extends BaseService {
         }
         log.info(a+"----------"+u);
         return new Result(Result.OK, "success");
+    }
+    //////////////////////////////////////////////////////////////////
+
+    public Result payHrPayOrder(Order order) {
+        String orderNo=String.valueOf(order.getOrderId());//订单号
+        Result result1=hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,order.getConsumer());
+        if(result1.getCode()!=Result.OK)return new Result(Result.ERROR,"付款账户不存在");
+        String payer=String.valueOf(result1.getData());//用户id
+        Result result_openid = this.getPayer(2);
+        if(result_openid.getCode() != Result.OK) return result_openid;
+        String openid=String.valueOf(result_openid.getData());
+
+        Example example = new Example(OrderItem.class);
+        example.createCriteria().andEqualTo("orderId",order.getOrderId()).andGreaterThan("total",0);//订单大于0
+        List<OrderItem> items = orderItemMapper.selectByExample(example);
+        if(items.size()==0||items.size()>1) return new Result(Result.OK, "订单数据错误");
+        int item_other_amt=Double.valueOf(Utils.mul(order.getShippingTotal()-order.getCommission(),100)).intValue();//每个子单时的额外费用
+        int surplus_amt=0;
+        String orderName=null;
+        String payee=null;
+        List<Map> payeeList= new ArrayList<>();
+        for(int i=0;i<items.size();i++){
+            OrderItem bean=items.get(i);
+            int curr_item_other_amt=Double.valueOf(Arith.div(item_other_amt,items.size(),0)).intValue();//均摊到每个子单时的额外费用
+            if(i==items.size()-1)curr_item_other_amt=item_other_amt-surplus_amt;
+            else surplus_amt+=curr_item_other_amt;
+            int item_amt=Double.valueOf(Utils.mul(bean.getTotal(),100)).intValue();
+            log.info(String.format("订单[%s]子单[%s]支付给[%s]金额为[%s]分,分摊金额[%s]分",bean.getOrderId(),bean.getItemId(),bean.getSellerId(),item_amt,curr_item_other_amt));
+            orderName=String.format("号码[%s]",bean.getNum());
+            result1=hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_corp,bean.getSellerId());
+            if(result1.getCode()!=Result.OK)return new Result(Result.ERROR,"收款账户不存在");
+            payee=String.valueOf(result1.getData());
+            Map map=new HashMap();
+            map.put("payee",payee);
+            map.put("item_amt",order.getTotal());
+            map.put("item_id",order.getOrderId());
+            payeeList.add(map);
+        }
+        return this.payHrPayOrder(orderNo,payer,payeeList,order.getTotal(),openid,orderName,Pay001.PAY_TRADE_TYPE_JSAPI,Pay001.PAY_MENTHOD_TYPE_1,Pay001.ORDER_TRADE_TYPE_1);
+    }
+
+    public Result payHrOrderSettle(int order_id,List<Map> payeeList) {
+        String orderNo=String.valueOf("S"+order_id);//订单号
+        Example example = new Example(OrderItem.class);
+        example.createCriteria().andEqualTo("orderId",order_id).andGreaterThan("total",0);//订单大于0
+        List<OrderItem> items = orderItemMapper.selectByExample(example);
+        if(items.size()==0||items.size()>1) return new Result(Result.OK, "订单数据错误");
+        String payer=null;//原订单收款方结算时则为订单付款
+        double total=0d;
+        for(int i=0;i<items.size();i++){
+            OrderItem bean=items.get(i);
+            Result result=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_corp,bean.getSellerId());
+            if(result.getCode()!=Result.OK)return new Result(Result.ERROR, "付款账户不存在");
+            payer=String.valueOf(result.getData());
+        }
+        for(Map map:payeeList){
+            total=Utils.sum(NumberUtils.toDouble(ObjectUtils.toString(map.get("item_amt"))),total);
+        }
+        String orderName="订单结算";
+        return this.payHrPayOrder(orderNo,payer,payeeList,total,null,orderName,null,Pay001.PAY_MENTHOD_TYPE_5,Pay001.ORDER_TRADE_TYPE_2);
+    }
+    public PayBase createPayBase() {
+        String serial=Utils.randomNoByDateTime();
+        return new PayBase(SystemParam.get("hr-pay-url"),serial,SystemParam.get("hr-pay-merid"),SystemParam.get("hr-pay-key"));
+    }
+
+    /**
+     * 账户查询
+     * @param account_no
+     * @return
+     */
+    public Result payHrPayAccount(String account_no) {
+        PayBase payBase=createPayBase();
+        Pay006 pay006=new Pay006(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),account_no);
+        com.hrtx.common.dto.Result result=PayClient.callPay006(pay006);
+        if(result.getCode()== com.hrtx.common.dto.Result.OK){
+            return new Result(Result.OK,result.getData());
+        }else{
+            return new Result(result.getCode(),result.getDesc());
+        }
+    }
+
+    /**
+     * 账户提现到微信红包
+     * @param account_no    提现账户
+     * @param amt           提现金额(元)
+     * @return
+     */
+    public Result payHrPayWithdrawToWx(String account_no,Double amt) {
+        PayBase payBase=createPayBase();
+        int withdrawType=Pay008.WITHDRAW_TYPE_1;
+        String orderNo=this.fundOrderMapper.getId()+"";
+        String orderName="余额提现";
+        int w_amt=Double.valueOf(Utils.mul(amt,100)).intValue();//单位分
+        String sub_appid = SystemParam.get("wxx_appid");
+        Result result_openid=this.getPayer(2);
+        if(result_openid.getCode()!=Result.OK)return result_openid;
+        String mchWxOpenid=String.valueOf(result_openid.getData());//提现的发放用户
+        Pay008 pay008=new Pay008(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey()
+                ,orderNo,account_no,orderName,w_amt,withdrawType,sub_appid,mchWxOpenid);
+        com.hrtx.common.dto.Result result=PayClient.callPay008(pay008);
+        if(result.getCode()== com.hrtx.common.dto.Result.OK){
+            return new Result(Result.OK,result.getData());
+        }else{
+            return new Result(result.getCode(),result.getDesc());
+        }
+    }
+    /**
+     *
+     * @param page_num
+     * @param limit
+     * @param account_no
+     * @param order_no
+     * @param start_date    yyyy-mm-dd 24:mi:ss
+     * @param end_date      yyyy-mm-dd 24:mi:ss
+     * @return
+     */
+    public Result payHrPayAccountDetail(int page_num,int limit,String order_no,String account_no,String start_date,String end_date) {
+        PayBase payBase=createPayBase();
+        Pay005 pay005 = new Pay005(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),
+                page_num,limit,order_no,account_no,start_date,end_date);
+        com.hrtx.common.dto.Result result = PayClient.callPay005(pay005);
+        if(result.getCode()== com.hrtx.common.dto.Result.OK){
+            return new Result(Result.OK,result.getData());
+        }else{
+            return new Result(result.getCode(),result.getDesc());
+        }
+    }
+    public Result payHrPayOrderSign(String order_id) {
+        PayBase payBase=createPayBase();
+        Pay007 pay007=new Pay007(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),order_id,order_id);
+        com.hrtx.common.dto.Result result=PayClient.callPay007(pay007);
+        if(result.getCode()== com.hrtx.common.dto.Result.OK){
+            return new Result(Result.OK,result.getData());
+        }else{
+            return new Result(result.getCode(),result.getDesc());
+        }
+    }
+
+    /**
+     *  开户
+     * @param account_name
+     * @param phone
+     * @param name
+     * @return
+     */
+    public Result createHrPayAccount(String account_name,String phone,String name) {
+        PayBase payBase=createPayBase();
+        Pay101 pay101=new Pay101(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),
+                account_name,phone,name,Pay101.OP_TYPE_ADD);
+        com.hrtx.common.dto.Result result=PayClient.callPay101(pay101);
+        if(result.getCode()== com.hrtx.common.dto.Result.OK){
+            return new Result(Result.OK,result.getData());
+        }else{
+            return new Result(result.getCode(),result.getDesc());
+        }
+    }
+
+    /**
+     * 支付
+     * @param order_id  订单号
+     * @param payer     付款方
+     * @param payeeList     收款方
+     * @param order_amt 订单金额 元
+     * @param payer_openid  付款方openid（微信支付时需要）
+     * @param orderName     订单名称
+     * @param pay_trade_type    付款方式
+     * @param pay_type          付款类型
+     * @param order_trade_type  订单类型
+     * @return
+     */
+    private Result payHrPayOrder(String order_id,String payer,List<Map> payeeList,double order_amt,String payer_openid,String orderName,String pay_trade_type,int pay_type,int order_trade_type) {
+        PayBase payBase=createPayBase();
+        String beforeUrl=null;//SystemParam.get("domain-full")+"api/pingan-pay-result";
+        String afterUrl=SystemParam.get("domain-full")+"api/hr-pay-result";
+        String subAppId = SystemParam.get("wxx_appid");
+//        String serial=String.valueOf(order.getOrderId());//流水号，原样返回
+        String orderNo=String.valueOf(order_id);//订单号
+        int amt=Double.valueOf(Utils.mul(order_amt,100)).intValue();//单位分
+        if(amt<0) return new Result(Result.ERROR,"订单金额错误");
+        ArrayList<Pay001Payee> arrayList= new ArrayList<>();
+        /*String payTradeType=Pay001.PAY_TRADE_TYPE_JSAPI;
+        int pay_payType=Pay001.PAY_MENTHOD_TYPE_1;
+        int orderTradeType=Pay001.ORDER_TRADE_TYPE_1;
+        Example example = new Example(OrderItem.class);
+        example.createCriteria().andEqualTo("orderId",order.getOrderId()).andGreaterThan("total",0);//订单大于0
+        List<OrderItem> items = orderItemMapper.selectByExample(example);
+        int item_other_amt=Double.valueOf(Utils.mul(order.getShippingTotal()-order.getCommission(),100)).intValue();//每个子单时的额外费用
+        int surplus_amt=0;
+        for(int i=0;i<items.size();i++){
+            OrderItem bean=items.get(i);
+            int curr_item_other_amt=Double.valueOf(Arith.div(item_other_amt,items.size(),0)).intValue();//均摊到每个子单时的额外费用
+            if(i==items.size()-1)curr_item_other_amt=item_other_amt-surplus_amt;
+            else surplus_amt+=curr_item_other_amt;
+            int itme_amt=Double.valueOf(Utils.mul(bean.getTotal(),100)).intValue();
+            log.info(String.format("订单[%s]子单[%s]支付给[%s]金额为[%s]元,分摊金额[%s]分",bean.getOrderId(),bean.getItemId(),bean.getSellerId(),bean.getTotal(),curr_item_other_amt));
+            Pay001Payee pay001Payee=new Pay001Payee(String.valueOf(bean.getItemId()),String.valueOf(bean.getSellerId()),itme_amt+curr_item_other_amt);//收款方公司id  需确保不会存在
+            arrayList.add(pay001Payee);
+            orderName=String.format("号码[%s]",bean.getNum());
+        }*/
+        for(Map map:payeeList){
+            int item_amt=Double.valueOf(Utils.mul(NumberUtils.toDouble(ObjectUtils.toString(map.get("item_amt"))),100)).intValue();//单位分
+            Pay001Payee pay001Payee=new Pay001Payee(ObjectUtils.toString(map.get("item_id")),ObjectUtils.toString(map.get("payee")),item_amt);//收款方公司id  需确保不会存在
+            arrayList.add(pay001Payee);
+        }
+        Pay001 pay001=new Pay001(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(), orderNo, payer,orderName,beforeUrl,afterUrl,subAppId,payer_openid,pay_trade_type,pay_type,amt,order_trade_type);
+        pay001.setOrders(arrayList);
+        com.hrtx.common.dto.Result result=PayClient.callPay001(pay001);
+        if(result.getCode()== com.hrtx.common.dto.Result.OK){
+            return new Result(Result.OK,result.getData());
+        }else{
+            return new Result(result.getCode(),result.getDesc());
+        }
     }
 }

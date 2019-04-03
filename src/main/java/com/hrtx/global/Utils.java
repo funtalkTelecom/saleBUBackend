@@ -333,6 +333,16 @@ public class Utils {
 	}
 
 	/**
+	 * 敏感内容处理
+	 * @param str	需要处理的字符串
+	 * @param start_len		开头保留长度
+	 * @param end_len		结尾保留长度
+	 * @return
+	 */
+	public static String sensitive(String str,int start_len,int end_len){
+		return StringUtils.substring(str,0,start_len)+"****"+StringUtils.substring(str,StringUtils.length(str)-end_len);
+	}
+	/**
 	 * 判断非负数的整数或者携带一位或者两位的小数
 	 *
 	 * @function:

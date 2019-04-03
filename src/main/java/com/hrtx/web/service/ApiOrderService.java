@@ -60,53 +60,31 @@ public class ApiOrderService {
 	@Autowired private ApiOrderService apiOrderService;
 	@Autowired private LyCrmService lyCrmService;
 	@Autowired private DictMapper dictMapper;
+	@Autowired private ShareService shareService;
 
 	public  List<Map> findOrderListByNumId(Integer numId)
 	{
 		return  orderMapper.findOrderListByNumIdAndConsumerId(numId,this.apiSessionUtil.getConsumer().getId());
 	}
 
-	public Result signOrder(Order order,HttpServletRequest request)
-	{
-		Integer orderId=0;
-		orderId=order.getOrderId();
-		int status=0;
-		Integer consumerId=0;
-		if(orderId>0)
-		{
-			Order order2=orderMapper.selectByPrimaryKey(order.getOrderId());
-			if(order2!=null)
-			{
-				consumerId=order2.getConsumer();
-				if(!(this.apiSessionUtil.getConsumer().getId().toString().equals(consumerId.toString())))
-				{
-					return new Result(Result.ERROR, "该订单不属于当前用户");
-				}
-				if(!(order2.getStatus()==5))//5待签收(仓储物流已取件)；6完成
-				{
-					if(order2.getStatus()==6)
-					{
-						return new Result(Result.ERROR, "该订单处于完成状态，请选待签收状态的订单");
-					}else
-					{
-						return new Result(Result.ERROR, "该订单不是待签收状态的订单");
-					}
-				}
-			}else
-			{
-				return new Result(Result.ERROR, "该订单系统不存在");
-			}
-		}else
-		{
-			return new Result(Result.ERROR, "该订单系统不存在");
-		}
-		order.setStatus(6);
-		order.setSignDate(new Date());//签收时间
-		order.setSignType(1);//签收方式1用户自动签收2系统
-		orderMapper.signByOrderid(order);
-		return new Result(Result.OK, "提交成功");
+	public Result signOrder(Order order,HttpServletRequest request){
+		Order order2=orderMapper.selectByPrimaryKey(order.getOrderId());
+		if(order2==null)return new Result(Result.ERROR, "订单不存在");
+		Consumer consumer=this.apiSessionUtil.getConsumer();
+		if(!consumer.getId().equals(order2.getConsumer()))return new Result(Result.ERROR, "您无权签收他人订单");
+		if(order2.getStatus()!=Constants.ORDER_STATUS_5.getIntKey())return new Result(Result.ERROR, "当前订单无法签收");
+		return this.signOrder(order2.getOrderId(),1);
 	}
-
+	private Result signOrder(int order_id,int sign_type){
+		Order order=new Order();
+		order.setOrderId(order_id);
+		order.setStatus(Constants.ORDER_STATUS_6.getIntKey());
+		order.setSignDate(new Date());//签收时间
+		order.setSignType(sign_type);//签收方式1用户自动签收2系统
+		orderMapper.signByOrderid(order);
+		shareService.orderSettle(order_id);
+		return new Result(Result.OK, "签收成功");
+	}
 	/*
 	 订单 已发货待签收>7天
 	 */
@@ -118,20 +96,8 @@ public class ApiOrderService {
 		if(list.isEmpty()){
 			log.info(String.format("暂无已发货未签收的订单"));return;
 		}
-		Integer orderId;
-		Order order=new Order();
-		if(list.size()>0)
-		{
-			for(Map map :list)
-			{
-				orderId=Integer.parseInt(String.valueOf( map.get("orderId")));
-				order.setOrderId(orderId);
-				order.setStatus(6);
-				order.setSignDate(new Date());//签收时间
-				order.setSignType(2);//签收方式1用户自动签收2系统
-				orderMapper.signByOrderid(order);
-				log.info("订单已发货未签收>7天系统自动签收,OrderId:"+orderId);
-			}
+		for(Map map :list){
+			this.signOrder(NumberUtils.toInt(ObjectUtils.toString(map.get("orderId"))),2);
 		}
 	}
 //////////////////////////////////////////////////////////////////////////////////////

@@ -6,10 +6,12 @@ import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -27,7 +29,38 @@ import java.util.*;
 
 public class HttpUtil {
 	private static Logger log = LoggerFactory.getLogger(HttpUtil.class);
-    public static Result doHttpPost(String url, String sendR, String type, String charset) throws Exception{
+
+	/**
+	 *
+	 * @param url
+	 * @param sendR
+	 * @param type
+	 * @param charset
+	 * @param downloadLimit	低于此值则转为字符串，否则转文件
+	 * @return
+	 * @throws Exception
+	 */
+	public static Result doHttpPost2Download(String url, String sendR, String type, String charset,int downloadLimit,String root_path,String suffix) throws Exception{
+		Result result=doHttpPostForBytes(url,sendR,type,charset);
+		if(result.getCode()!=Result.OK)return result;
+		byte[] bytes=(byte[]) result.getData();
+		if(downloadLimit==-1||bytes.length>downloadLimit){
+			String fn=Utils.randomNoByDateTime();
+			String file=root_path+fn+"."+suffix;
+			FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), new File(file));
+			return new Result(Result.OK,file);
+		}else{
+			return new Result(Result.WARN,input2String((new ByteArrayInputStream(bytes)),charset));
+		}
+	}
+
+	public static Result doHttpPost(String url, String sendR, String type, String charset) throws Exception{
+		Result result=doHttpPostForBytes(url,sendR,type,charset);
+		byte[] bytes=(byte[]) result.getData();
+		return new Result(result.getCode(),input2String((new ByteArrayInputStream(bytes)),charset));
+	}
+
+    public static Result doHttpPostForBytes(String url, String sendR, String type, String charset) throws Exception{
         log.info("请求url："+url);
         log.info("请求参数："+sendR);
         log.info("请求contentType："+type);
@@ -40,21 +73,47 @@ public class HttpUtil {
             log.error("Method failed: " + getMethod.getStatusLine() + "\tstatusCode: " + statusCode);
             return new Result(500, "返回码异常["+statusCode+"]");
         }else{
-            return new Result(200, getMethod.getResponseBodyAsString());
+			byte[] bytes=input2byte(getMethod.getResponseBodyAsStream());
+            return new Result(200,bytes);
         }
-
     }
 
+	private static final byte[] input2byte(InputStream inStream)throws IOException {
+		ByteArrayOutputStream swapStream = new ByteArrayOutputStream();
+		byte[] buff = new byte[100];
+		int rc = 0;
+		while ((rc = inStream.read(buff, 0, 100)) > 0) {
+			swapStream.write(buff, 0, rc);
+		}
+		byte[] in2b = swapStream.toByteArray();
+		return in2b;
+	}
+	private static final String input2String(InputStream inStream,String charet)throws IOException {
+		BufferedReader in = new BufferedReader(new InputStreamReader(inStream,charet));
+		String readLine = "";
+		StringBuffer sb = new StringBuffer();
+		while ((readLine = in.readLine()) != null) {
+			sb.append(readLine);
+		}
+		return sb.toString();
+	}
+
     private static HttpMethodBase createMethod(String url, String param, String type, String  charset) throws UnsupportedEncodingException {
-        PostMethod method = null;
-        method = new PostMethod(url);
-        RequestEntity se = new StringRequestEntity(param, type, charset);
-        method.setRequestEntity(se);
+		HttpMethodBase httpMethodBase=null;
+		if(StringUtils.isEmpty(param)){
+			GetMethod method = new GetMethod(url);// 创建GET方法的实例
+			httpMethodBase=method;
+		}else{
+			PostMethod method = new PostMethod(url);
+			RequestEntity se = new StringRequestEntity(param, type, charset);
+			method.setRequestEntity(se);
+			httpMethodBase=method;
+		}
         //使用系统提供的默认的恢复策略
-        method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
+		httpMethodBase.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
         //设置超时的时间
-        method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 30000);
-        return method;
+		httpMethodBase.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 30000);
+        return httpMethodBase;
     }
 	/**
 	 *

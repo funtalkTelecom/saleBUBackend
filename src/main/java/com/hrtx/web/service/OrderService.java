@@ -4,6 +4,10 @@ import com.github.abel533.entity.Example;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hrtx.common.pay.PayClient;
+import com.hrtx.common.pay.dto.Pay001;
+import com.hrtx.common.pay.dto.Pay001Payee;
+import com.hrtx.common.pay.dto.Pay101;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.config.annotation.NoRepeat;
 import com.hrtx.dto.Result;
@@ -226,13 +230,19 @@ public class OrderService extends BaseService {
         order.setPayMenthodId(payType);
         order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payType));
         orderMapper.updateByPrimaryKey(order);
-        if(Constants.PAY_MENTHOD_TYPE_1.getStringKey().equals(payType)) {
+        //转换成支付通道
+        if(Constants.PAY_MENTHOD_TYPE_1.getStringKey().equals(payType)){
+            if(SystemParam.equal("wx-pay-chancel","hrpay")) return fundOrderService.payHrPayOrder(order);
+            else return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
+        }
+        /*if(Constants.PAY_MENTHOD_TYPE_1.getStringKey().equals(payType)) {
             return fundOrderService.payPinganWxxOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
         }
         if(Constants.PAY_MENTHOD_TYPE_4.getStringKey().equals(payType)) {
             return fundOrderService.payYzffqOrder(((Double)Arith.mul(order.getTotal(), 100)).intValue(), "支付号卡订单", String.valueOf(orderId));
         }
-        return new Result(Result.OK, "success");
+        */
+        return new Result(Result.ERROR, "支付方式不存在");
     }
 
     /**
