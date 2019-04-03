@@ -59,6 +59,15 @@ public class ShareController extends BaseReturn{
 	/**
 	 * 生成分享地址  由合伙人提交生成分享地址
 	 */
+	@PostMapping("/api/partner/share-del")
+	@Powers({PowerConsts.NOPOWER})
+	public Result delShare(HttpServletRequest request){
+		String share_id=request.getParameter("share_id");
+		return this.shareService.delShare(NumberUtils.toInt(share_id));
+	}
+	/**
+	 * 生成分享地址  由合伙人提交生成分享地址
+	 */
 	@PostMapping("/api/partner/share-url")
 	@Powers({PowerConsts.NOPOWER})
 	public Result shareUrl(HttpServletRequest request){
@@ -70,8 +79,16 @@ public class ShareController extends BaseReturn{
 	 */
 	@PostMapping("/api/partner/share-card")
 	@Powers({PowerConsts.NOPOWER})
-	public Result shareCard(){
-		return new Result(Result.OK,"");
+	public Result shareCard(HttpServletRequest request){
+		int num_id=NumberUtils.toInt(request.getParameter("num_id"));
+		String head_img_file=request.getParameter("head_img");
+		String nick_name=request.getParameter("nick_name");
+		String promotion_tip=request.getParameter("promotion_tip");
+		String share_page=request.getParameter("share_page");
+		if(StringUtils.isEmpty(share_page))return new Result(Result.ERROR,"分享的地址不能为空");
+		if(StringUtils.isEmpty(promotion_tip))return new Result(Result.ERROR,"说一段分享推荐语吧");
+		Result result=this.shareService.shareCard(num_id,head_img_file,nick_name,promotion_tip,share_page);
+		return result;
 	}
 
 	/**
@@ -86,6 +103,7 @@ public class ShareController extends BaseReturn{
 		String chennel=request.getParameter("chennel");
 		return this.shareService.addBrowse(num_id,chennel,open_url,share_id);
 	}
+
 	/**
 	 * 分享浏览记录
 	 */
@@ -103,23 +121,36 @@ public class ShareController extends BaseReturn{
 	@Powers({PowerConsts.NOPOWER})
 	public Result createOrderSettle(HttpServletRequest request){
 		int order_id=NumberUtils.toInt(request.getParameter("order_id"));
-		return this.shareService.createOrderSettle(order_id);
+		int opt=NumberUtils.toInt(request.getParameter("opt"));
+		if(opt==1)return this.shareService.createOrderSettle(order_id);
+		else return this.shareService.orderSettle(order_id);
 	}
 	/**
 	 * 收支明细
 	 */
 	@GetMapping("/api/partner/finance-list")
 	@Powers({PowerConsts.NOPOWER})
-	public Result financeList(){
-		return new Result(Result.OK,"");
+	public Object financeList(HttpServletRequest request){
+		int pageNum=NumberUtils.toInt(request.getParameter("pageNum"),1);
+		int limit=NumberUtils.toInt(request.getParameter("limit"),15);
+		return this.shareService.financeList(pageNum,limit);
 	}
 	/**
 	 * 提现进度
 	 */
-	@GetMapping("/api/partner/finance-withdraw-progresss")
+	@PostMapping("/api/partner/finance-withdraw-progresss")
 	@Powers({PowerConsts.NOPOWER})
 	public Result financeWithdrawProgresss(){
 		return new Result(Result.OK,"");
+	}
+	/**
+	 * 提现
+	 */
+	@PostMapping("/api/partner/finance-withdraw")
+	@Powers({PowerConsts.NOPOWER})
+	public Result financeWithdraw(HttpServletRequest request){
+		Double amt=NumberUtils.toDouble(request.getParameter("amt"));
+		return this.shareService.financeWithdraw(amt);
 	}
 
 	//////////////////////////////////////////////////////

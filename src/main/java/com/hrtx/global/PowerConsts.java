@@ -25,7 +25,11 @@ public enum PowerConsts {
 //	SYSTEMMOUULE_USERLIST_UPPWD(90205,"修改密码",90200,1,"",3,6),
 
 	SYSTEMMOUULE_UPDATE_PWD(90800,"修改密码",90000,1,"/update-pwd-index",2,2),
-	
+
+	PARTNER_MOUULE(91100,"合伙人管理",90000,0,"partner/partner-index",2,1),
+	PARTNER_MOUULE_QUERY(91101,"查询",91100,1,"",3,1),
+	PARTNER_MOUULE_EDIT(91102,"审核",91100,1,"",3,1),
+
 	/*
 	REPORTMODULE(60000,"报表管理",1,0,"",1,2),
 	REPORTMODULE_DELIVERYITEMINFO(60100,"固网终端查询管理",60000,0,"deliveryItemInfo.htm",2,1),

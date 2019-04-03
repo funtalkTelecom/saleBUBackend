@@ -13,6 +13,7 @@ import com.hrtx.web.service.AgentService;
 import com.hrtx.web.service.ChannelService;
 import com.hrtx.web.service.ConsumerService;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class AgentController {
 	@Autowired
 	ChannelService channelService;
 	@Autowired private ApiSessionUtil apiSessionUtil;
+	@Autowired private ConsumerService consumerService;
 	@Autowired
 	SessionUtil sessionUtil;
     @PostMapping(value = "/api/save-or-update-agent")
@@ -67,6 +69,9 @@ public class AgentController {
 	public Result listAgent(){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		int consumerId =consumer.getId();
+		Consumer consumer2=new Consumer();
+		consumer2.setId(consumer.getId());
+		Consumer consumer1=this.consumerService.getConsumerById(consumer2);
 //		String  a = "1006420771322462209";
 //		long consumerId =Long.valueOf(a);
 		Map map = new HashMap();
@@ -85,7 +90,9 @@ public class AgentController {
                 map.put("tradingImgUrl", SystemParam.get("domain-full") + "/get-img/trading_url/1000/" +ObjectUtils.toString(map.get("trading_img")));
 			}
 		}
-
+		map.put("partnerCheck",consumer1.getPartnerCheck());//合伙人审核结果
+		map.put("isPartner",consumer1.getIsPartner());//是否申请了合伙人
+		map.put("testUser",StringUtils.equals(consumer1.getCommpayName(),"测试")?"1":"0");//临时借用
 		return new Result(Result.OK, map);
 	}
 

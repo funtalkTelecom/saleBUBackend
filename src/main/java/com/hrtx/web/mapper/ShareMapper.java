@@ -17,4 +17,11 @@ public interface ShareMapper extends Mapper<Share>,BaseMapper<Share> {
      */
     public Page<Object> queryShareList(@Param("consumer_id") int consumer_id);
 
+    /**
+     * 统计分享的情况
+     * @param consumer_id
+     * @return
+     */
+    public List<Object> countConsumerShare(@Param("consumer_id") int consumer_id);
+
 }

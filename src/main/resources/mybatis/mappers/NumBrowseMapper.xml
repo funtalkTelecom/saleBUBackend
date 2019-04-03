@@ -6,7 +6,8 @@
     </update>
 
     <select id="queryPartnerNumBrowseList" resultType="java.util.HashMap">
-        select b.id,c.img,c.nick_name,b.act_type,b.num,b.add_date,b.open_count from tb_num_browse b left join tb_consumer c on b.consumer_id=c.id where b.share_consumer_id=#{share_consumer_id} and b.share_first_browse=1 order by b.id desc
+        select b.id,c.img,c.nick_name,b.act_type,b.num,b.add_date,b.open_count from tb_num_browse b left join tb_consumer c on b.consumer_id=c.id
+        where b.share_consumer_id=#{share_consumer_id} and b.share_consumer_id!=b.consumer_id and b.share_first_browse=1 order by b.id desc
     </select>
 
 </mapper>
