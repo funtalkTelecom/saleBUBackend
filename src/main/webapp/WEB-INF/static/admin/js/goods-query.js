@@ -806,10 +806,13 @@ $(function() {
                     break;
                 }
             }
+            var src = "get-img/goodsPics/"+refid+"/"+filename;
             html+='<input style="float:left" type="file" name="file" seq="'+(i+1)+'" onchange="fileChange('+(i+1)+')">';
             html+='<div class="rating inline" onclick="deletePic(this)" style="cursor: pointer;'+(filename?"":"visibility:hidden")+'"><i title="删除图片" class="raty-cancel cancel-off-png" data-alt="x"></i></div>';
-            html+='<br><img style="width:150px;'+style+'" src="'+basePath+'get-img/goodsPics/'+refid+'/'+filename+'">';
 
+            if(filename!=""){
+                html+='<br><img style="width:150px;'+style+'" src="'+basePath+src+'">';
+            }
             html+='</div>';
 
             pcount++;
