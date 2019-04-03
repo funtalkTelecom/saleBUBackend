@@ -69,7 +69,7 @@ public class ApiOrderService {
 
 	public Result signOrder(Order order,HttpServletRequest request){
 		Order order2=orderMapper.selectByPrimaryKey(order.getOrderId());
-		if(order2!=null)return new Result(Result.ERROR, "订单不存在");
+		if(order2==null)return new Result(Result.ERROR, "订单不存在");
 		Consumer consumer=this.apiSessionUtil.getConsumer();
 		if(!consumer.getId().equals(order2.getConsumer()))return new Result(Result.ERROR, "您无权签收他人订单");
 		if(order2.getStatus()!=Constants.ORDER_STATUS_5.getIntKey())return new Result(Result.ERROR, "当前订单无法签收");

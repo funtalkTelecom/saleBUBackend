@@ -507,7 +507,9 @@ public class FundOrderService extends BaseService {
         double total=0d;
         for(int i=0;i<items.size();i++){
             OrderItem bean=items.get(i);
-            payer=String.valueOf(bean.getSellerId());
+            Result result=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_corp,bean.getSellerId());
+            if(result.getCode()!=Result.OK)return new Result(Result.ERROR, "付款账户不存在");
+            payer=String.valueOf(result.getData());
         }
         for(Map map:payeeList){
             total=Utils.sum(NumberUtils.toDouble(ObjectUtils.toString(map.get("item_amt"))),total);
