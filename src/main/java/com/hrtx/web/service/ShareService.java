@@ -204,10 +204,12 @@ public class ShareService {
 		int num_id=-1;
 		for(OrderItem orderItem:_list){//推广人佣金   按循环则规则上运行按号码收费，不按循环只能按订单收费
 			num_id=orderItem.getNumId();//考虑当前的模式下，一个订单只会有一个号码
-			fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();//结算用户
+			/*fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();//结算用户
 			double order_item_price=orderItem.getPrice()*orderItem.getQuantity();
-			initSettleFee(order_id,num_id,fee_type,order_item_price,share_settle_user,false,0d,0,0d);
+			initSettleFee(order_id,num_id,fee_type,order_item_price,share_settle_user,false,0d,0,0d);*/
 		}
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();//结算用户
+		initSettleFee(order_id,num_id,fee_type,order_price,share_settle_user,false,0d,0,0d);
 		//技术服务费
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey();//结算用户
 		Result result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey());
