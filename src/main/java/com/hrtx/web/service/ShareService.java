@@ -72,6 +72,7 @@ public class ShareService {
 		Map<String,String> _map=new HashMap<>();
 		Consumer consumer=apiSessionUtil.getConsumer();
 		Consumer bean=consumerMapper.selectByPrimaryKey(consumer.getId());
+        Result result1=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,consumer.getId());
 		_map.put("is_partner",ObjectUtils.toString(bean.getIsPartner(),"0"));
 		_map.put("partner_check",ObjectUtils.toString(bean.getPartnerCheck(),"0"));
 		_map.put("name",bean.getName());
@@ -90,7 +91,7 @@ public class ShareService {
 		_map.put("share_count",share_count+"");//推广个数
 		_map.put("share_browse",browse_count+"");//浏览量
 		Double sale_count=0d,sale_price=0d,wait_settle=0d,has_settle=0d,all_settle=0d,balance=0d;
-		list=this.orderSettleMapper.countConsumerSettle(consumer.getId());
+		list=this.orderSettleMapper.countConsumerSettle(NumberUtils.toInt(String.valueOf(result1.getData())));
 		if(list.size()>0){
 			Map map=(Map)list.get(0);
 			sale_count=NumberUtils.toDouble(ObjectUtils.toString(map.get("sale_count")));
@@ -104,7 +105,7 @@ public class ShareService {
 		_map.put("wait_balance",Utils.convertFormat(wait_settle,0));//待结算金额
 		_map.put("has_balance",Utils.convertFormat(has_settle,0));//已结算金额
 		_map.put("all_income",Utils.convertFormat(all_settle,0));//总收益
-		Result result1=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,consumer.getId());
+
 		if(result1.getCode()==Result.OK){
 			Result result=this.fundOrderService.payHrPayAccount(String.valueOf(result1.getData()));
 			if(result.getCode()==Result.OK){
