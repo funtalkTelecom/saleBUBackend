@@ -42,7 +42,7 @@ public class ShareService {
 	@Autowired private OrderMapper orderMapper;
 	@Autowired private OrderItemMapper orderItemMapper;
 	@Autowired private FundOrderService fundOrderService;
-	@Autowired private ConsumerService consumerService;
+	@Autowired private HrpayAccountService hrpayAccountService;
 
 	/**
 	 * 添加合伙人信息
@@ -104,11 +104,13 @@ public class ShareService {
 		_map.put("wait_balance",Utils.formatFloatNumber(wait_settle));//待结算金额
 		_map.put("has_balance",Utils.formatFloatNumber(has_settle));//已结算金额
 		_map.put("all_income",Utils.formatFloatNumber(all_settle));//总收益
-
-		Result result=this.fundOrderService.payHrPayAccount(consumer.getId()+"");
-		if(result.getCode()==Result.OK){
-			Map map=(Map)result.getData();
-			balance=NumberUtils.toDouble(ObjectUtils.toString(map.get("balance")));
+		Result result1=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,consumer.getId());
+		if(result1.getCode()==Result.OK){
+			Result result=this.fundOrderService.payHrPayAccount(String.valueOf(result1.getData()));
+			if(result.getCode()==Result.OK){
+				Map map=(Map)result.getData();
+				balance=NumberUtils.toDouble(ObjectUtils.toString(map.get("balance")));
+			}
 		}
 		_map.put("balance",Utils.formatFloatNumber(balance));//可用余额
 		return new Result(Result.OK,_map);
@@ -181,6 +183,7 @@ public class ShareService {
 	 *
 	 */
 	public Result createOrderSettle(int order_id){
+		log.info(String.format("开始创建订单[%s]的结算清单",order_id));
 		int share_settle_user=-1;
 		Order order=orderMapper.selectByPrimaryKey(order_id);
 		double order_price=order.getTotal();
@@ -204,16 +207,24 @@ public class ShareService {
 		}
 		//技术服务费
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey();//结算用户
-		initSettleFee(order_id,num_id,fee_type,order_price,fee_type,true,NumberUtils.toDouble(SystemParam.get("settle_tech_fee"),2),1,NumberUtils.toDouble(SystemParam.get("settle_tech_fee_limit"),50));
+		Result result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey());
+		int settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
+		initSettleFee(order_id,num_id,fee_type,order_price,settle_user,true,NumberUtils.toDouble(SystemParam.get("settle_tech_fee"),2),1,NumberUtils.toDouble(SystemParam.get("settle_tech_fee_limit"),50));
 		//交易费
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_3.getIntKey();//结算用户
-		initSettleFee(order_id,num_id,fee_type,order_price,fee_type,true,NumberUtils.toDouble(SystemParam.get("settle_pay_fee"),0.8),0,0d);
+		result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_3.getIntKey());
+		settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
+		initSettleFee(order_id,num_id,fee_type,order_price,settle_user,true,NumberUtils.toDouble(SystemParam.get("settle_pay_fee"),0.8),0,0d);
 		//发展人员
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_4.getIntKey();//结算用户
-		initSettleFee(order_id,num_id,fee_type,order_price,fee_type,true,NumberUtils.toDouble(SystemParam.get("settle_expand_fee"),0.05),1,NumberUtils.toDouble(SystemParam.get("settle_expand_fee_limit"),500));
+		result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_4.getIntKey());
+		settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
+		initSettleFee(order_id,num_id,fee_type,order_price,settle_user,true,NumberUtils.toDouble(SystemParam.get("settle_expand_fee"),0.05),1,NumberUtils.toDouble(SystemParam.get("settle_expand_fee_limit"),500));
 		//市场人员
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_5.getIntKey();//结算用户
-		initSettleFee(order_id,num_id,fee_type,order_price,fee_type,true,NumberUtils.toDouble(SystemParam.get("settle_market_fee"),5),1,NumberUtils.toDouble(SystemParam.get("settle_market_fee_limit"),500));
+		result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_5.getIntKey());
+		settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
+		initSettleFee(order_id,num_id,fee_type,order_price,settle_user,true,NumberUtils.toDouble(SystemParam.get("settle_market_fee"),5),1,NumberUtils.toDouble(SystemParam.get("settle_market_fee_limit"),500));
 
 		return new Result(Result.OK,"结算创建成功");
 	}
@@ -427,9 +438,9 @@ public class ShareService {
 	 */
 	public Object financeList(int pageNum,int limit){
 		Consumer consumer=apiSessionUtil.getConsumer();
-//		String account_no=consumer.getId()+"";
-		String account_no="2";
-		Result result= this.fundOrderService.payHrPayAccountDetail(pageNum,limit,null,account_no,null,null);
+		Result result1=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,consumer.getId());
+		if(result1.getCode()!=Result.OK)return null;
+		Result result= this.fundOrderService.payHrPayAccountDetail(pageNum,limit,null,String.valueOf(result1.getData()),null,null);
 		boolean _bool=result.getCode()==Result.OK;
 		if(!_bool)return new PageInfo<Object>(null);
 		List<Map> _list=new ArrayList<>();
@@ -460,8 +471,9 @@ public class ShareService {
 		Consumer consumer=apiSessionUtil.getConsumer();
 		Consumer consumer1=this.consumerMapper.selectByPrimaryKey(consumer.getId());
 		if(!(consumer1.getPartnerCheck()!=null&&consumer1.getPartnerCheck()==1))return new Result(Result.OK,"抱歉，您的材料还未审核通过，无法完成提现");
-		String account_no=consumer.getId()+"";
-		Result result=fundOrderService.payHrPayWithdrawToWx(account_no,amt);
+		Result result1=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,consumer.getId());
+		if(result1.getCode()==Result.OK)return result1;
+		Result result=fundOrderService.payHrPayWithdrawToWx(String.valueOf(result1.getData()),amt);
 		if(result.getCode()==Result.OK)return new Result(Result.OK,"提现成功");
 		else return new Result(Result.ERROR,result.getData());
 	}

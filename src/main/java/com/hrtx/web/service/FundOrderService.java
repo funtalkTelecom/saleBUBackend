@@ -28,7 +28,7 @@ import java.util.*;
 public class FundOrderService extends BaseService {
 	@Autowired private FundOrderMapper fundOrderMapper;
 	@Autowired private FundDetailMapper fundDetailMapper;
-	@Autowired private ConsumerLogMapper consumerLogMapper;
+	@Autowired private HrpayAccountService hrpayAccountService;
 	@Autowired private ConsumerService consumerService;
 	@Autowired private PinganService pinganService;
 	@Autowired private ThirdPayService thirdPayService;
@@ -457,9 +457,13 @@ public class FundOrderService extends BaseService {
         log.info(a+"----------"+u);
         return new Result(Result.OK, "success");
     }
+    //////////////////////////////////////////////////////////////////
+
     public Result payHrPayOrder(Order order) {
         String orderNo=String.valueOf(order.getOrderId());//订单号
-        String payer=String.valueOf(order.getConsumer());//用户id
+        Result result1=hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,order.getConsumer());
+        if(result1.getCode()!=Result.OK)return new Result(Result.ERROR,"付款账户不存在");
+        String payer=String.valueOf(result1.getData());//用户id
         Result result_openid = this.getPayer(2);
         if(result_openid.getCode() != Result.OK) return result_openid;
         String openid=String.valueOf(result_openid.getData());
@@ -481,7 +485,9 @@ public class FundOrderService extends BaseService {
             int item_amt=Double.valueOf(Utils.mul(bean.getTotal(),100)).intValue();
             log.info(String.format("订单[%s]子单[%s]支付给[%s]金额为[%s]分,分摊金额[%s]分",bean.getOrderId(),bean.getItemId(),bean.getSellerId(),item_amt,curr_item_other_amt));
             orderName=String.format("号码[%s]",bean.getNum());
-            payee=String.valueOf(bean.getSellerId());
+            result1=hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_corp,bean.getSellerId());
+            if(result1.getCode()!=Result.OK)return new Result(Result.ERROR,"收款账户不存在");
+            payee=String.valueOf(result1.getData());
             Map map=new HashMap();
             map.put("payee",payee);
             map.put("item_amt",order.getTotal());
@@ -580,6 +586,25 @@ public class FundOrderService extends BaseService {
         PayBase payBase=createPayBase();
         Pay007 pay007=new Pay007(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),order_id,order_id);
         com.hrtx.common.dto.Result result=PayClient.callPay007(pay007);
+        if(result.getCode()== com.hrtx.common.dto.Result.OK){
+            return new Result(Result.OK,result.getData());
+        }else{
+            return new Result(result.getCode(),result.getDesc());
+        }
+    }
+
+    /**
+     *  开户
+     * @param account_name
+     * @param phone
+     * @param name
+     * @return
+     */
+    public Result createHrPayAccount(String account_name,String phone,String name) {
+        PayBase payBase=createPayBase();
+        Pay101 pay101=new Pay101(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),
+                account_name,phone,name,Pay101.OP_TYPE_ADD);
+        com.hrtx.common.dto.Result result=PayClient.callPay101(pay101);
         if(result.getCode()== com.hrtx.common.dto.Result.OK){
             return new Result(Result.OK,result.getData());
         }else{
