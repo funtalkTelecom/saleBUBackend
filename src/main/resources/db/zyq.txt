@@ -1,0 +1,4 @@
+ALTER TABLE `egt_hk`.`tb_num_base`
+ADD COLUMN `tele_type` varchar(30) NULL COMMENT '运营商' AFTER `seller_id`;
+ALTER TABLE `egt_hk`.`tb_num_price_agent`
+ADD COLUMN `tele_type` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '运营商' AFTER `activity_price`;

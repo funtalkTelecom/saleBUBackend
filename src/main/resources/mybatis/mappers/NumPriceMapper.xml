@@ -161,9 +161,9 @@
     </insert>
 
   <insert id="insertNumPriceAgent">
-    INSERT INTO `tb_num_price_agent`(`num_price_id`, `sku_id`, `num_id`, `province_code`, `province_name`, `city_code`, `city_name`, `resource`, `base_price`, `net_type`, `feature`, `low_consume`, `corp_id`, `channel`, `ratio_price`, `price`, `agent`, `agent_id`, `add_date`,`status`,with4,is_freeze,num_level,sku_toc_price,sku_tob_price,num_tags,exc_price)
+    INSERT INTO `tb_num_price_agent`(`num_price_id`, `sku_id`, `num_id`, `province_code`, `province_name`, `city_code`, `city_name`, `resource`, `base_price`, `net_type`, `tele_type`, `feature`, `low_consume`, `corp_id`, `channel`, `ratio_price`, `price`, `agent`, `agent_id`, `add_date`,`status`,with4,is_freeze,num_level,sku_toc_price,sku_tob_price,num_tags,exc_price)
     select np.`id`, np.`sku_id`, np.`num_id`, np.`province_code`, np.`province_name`, np.`city_code`, np.`city_name`, np.`resource`, np.`base_price`,
-    np.`net_type`, np.`feature`, np.`low_consume`, np.`corp_id`, np.`channel`, np.`ratio_price`, np.`price`, agent.commpay_name, agent.id agent_id,now(),n.`status`,
+    np.`net_type`, np.`tele_type`, np.`feature`, np.`low_consume`, np.`corp_id`, np.`channel`, np.`ratio_price`, np.`price`, agent.commpay_name, agent.id agent_id,now(),n.`status`,
     n.with4,n.is_freeze,n.num_level,sku.sku_toc_price,sku.sku_tob_price,tags.num_tags, 0
     from tb_num_price np ,tb_corp_agent a, tb_agent agent,
     tb_num n left join (select nr.num_id,Concat(',',group_concat(nr.`value`),',')  num_tags from tb_num_rule nr where nr.rule_type='num_tags' group by nr.num_id) tags on tags.num_id=n.id,
