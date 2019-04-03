@@ -238,7 +238,7 @@ public class ApiNumberService {
 		String chennel=request.getParameter("chennel");
 
 		Map map = numberMapper.getNumSkuGoodsTypeById(id);
-		if(map == null) return new Result(Result.ERROR, "未找到号码");
+		if(map == null) return new Result(Result.OTHER, "未找到号码");
 		String skuGoodsType =String.valueOf(map.get("sku_goods_type"));
 		Map obj = new HashMap();
 		if( skuGoodsType.equals("4")){ //超靓
