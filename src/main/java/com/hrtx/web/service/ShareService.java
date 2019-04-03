@@ -191,7 +191,9 @@ public class ShareService {
 		if(!ArrayUtils.contains(ok_order_status,order.getStatus()))return new Result(Result.ERROR,"订单状态非可结算状态");
 		if(order.getShareId()!=null&&order.getShareId()!=0){
 			Share share=this.shareMapper.selectByPrimaryKey(order.getShareId());
-			share_settle_user=share.getConsumerId();
+			Result result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,share.getConsumerId());
+			if(result_settle.getCode()!=Result.OK)return new Result(Result.ERROR,"收款账号不存在");
+			share_settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
 		}
 
 		Example example = new Example(OrderItem.class);
