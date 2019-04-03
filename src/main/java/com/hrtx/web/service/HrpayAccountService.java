@@ -26,7 +26,7 @@ public class HrpayAccountService {
 			else return new Result(Result.ERROR,"账号不存在");
 		}
 		if(!bean.getStatus()){
-			Result result=this.addPayAccount(hrpayAccount);
+			Result result=this.addPayAccount(bean);
 			if(result.getCode()==Result.OK)return new Result(Result.OK,bean.getId());
 			else return new Result(Result.ERROR,"账号不存在");
 		}
