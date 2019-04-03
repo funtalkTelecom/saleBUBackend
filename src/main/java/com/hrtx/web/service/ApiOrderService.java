@@ -180,7 +180,7 @@ public class ApiOrderService {
 		Result result = numService.findBossNum(number.getCityId(),agent.getId(),number.getSellerId());
 		if(result.getCode() != Result.OK)return result;
 		order_ext_param.put("bossNum",String.valueOf(result.getData()));
-        order_ext_param.put("share_id",share_id);
+        order_ext_param.put("shareId",share_id);
 		return this.submitOrder(Constants.ORDER_TYPE_2.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);
 	}
 
