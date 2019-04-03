@@ -256,7 +256,7 @@ public class ApiNumberService {
 			numPrice.setAgentId(agent.getId());
 			pm = numService.queryNumPrice(numPrice);
 			List ob = pm.getList();
-			if(ob.size()==0) return new Result(Result.ERROR, "未找到号码");
+			if(ob.size()==0) return new Result(Result.OTHER, "未找到号码");
 
 			for (int i = 0; i < ob.size(); i++) {
 				obj= (Map) ob.get(i);
@@ -264,7 +264,7 @@ public class ApiNumberService {
 			}
 		}else if(skuGoodsType.equals("3")){  //普靓
 			obj = numberMapper.getNumInfoById(id);
-			if(obj==null) return new Result(Result.ERROR, "未找到号码");
+			if(obj==null) return new Result(Result.OTHER, "未找到号码");
 			obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
 		}
 		obj.put("newDate",new Date());
