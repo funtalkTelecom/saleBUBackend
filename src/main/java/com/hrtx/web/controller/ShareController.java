@@ -185,8 +185,9 @@ public class ShareController extends BaseReturn{
 		int promotion=NumberUtils.toInt(request.getParameter("promotion"),-1);
 		int award_way=NumberUtils.toInt(request.getParameter("awardWay"),-1);
 		double award=NumberUtils.toDouble(request.getParameter("award"),0d);
-		int is_limit=NumberUtils.toInt(request.getParameter("isLimit"),-1);
-		double limit_award=NumberUtils.toInt(request.getParameter("limitAward"),-1);
+		int is_limit=NumberUtils.toInt(request.getParameter("isLimit"),0);
+		double limit_award=NumberUtils.toDouble(request.getParameter("limitAward"),0);
+		if(is_limit==0)limit_award=0d;
 		double begin_price=NumberUtils.toDouble(request.getParameter("beginPrice"),0d);
 		double end_price=NumberUtils.toDouble(request.getParameter("endPrice"),0d);
 		String begin_date=request.getParameter("beginDate");

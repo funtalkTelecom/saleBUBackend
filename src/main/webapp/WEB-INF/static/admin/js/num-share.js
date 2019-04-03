@@ -169,6 +169,10 @@ $(function() {
         if(!bool)return;
         promotionPlanSubmit(2);
     });
+    $("#isLimit-id").change(function(){
+        var isl=$(this).val();
+        if(isl==0)$("#limitAward-id").val(0);
+    });
     function promotionPlanSubmit(operation){
         $("#operation-id").val(operation);
         var post_data=$("#promotion-plan-form").serializeArray();
