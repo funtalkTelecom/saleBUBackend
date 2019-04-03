@@ -554,8 +554,9 @@ public class FundOrderService extends BaseService {
         Result result_openid=this.getPayer(2);
         if(result_openid.getCode()!=Result.OK)return result_openid;
         String mchWxOpenid=String.valueOf(result_openid.getData());//提现的发放用户
+        String remark="靓号优选费用结算";
         Pay008 pay008=new Pay008(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey()
-                ,orderNo,account_no,orderName,w_amt,withdrawType,sub_appid,mchWxOpenid);
+                ,orderNo,account_no,orderName,w_amt,withdrawType,sub_appid,mchWxOpenid,remark);
         com.hrtx.common.dto.Result result=PayClient.callPay008(pay008);
         if(result.getCode()== com.hrtx.common.dto.Result.OK){
             return new Result(Result.OK,result.getData());
