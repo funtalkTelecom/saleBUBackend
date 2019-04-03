@@ -42,7 +42,7 @@ public class ShareController extends BaseReturn{
 	@GetMapping("/api/partner/user-info")
 	@Powers({PowerConsts.NOPOWER})
 	public Result findInfo(HttpServletRequest request){
-		return this.shareService.findInfo();
+		return this.shareService.partnerInfo();
 	}
 
 	////////////////////////////////////////////////////////

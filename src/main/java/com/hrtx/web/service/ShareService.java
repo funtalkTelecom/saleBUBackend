@@ -67,7 +67,7 @@ public class ShareService {
 	/**
 	 * 查询合伙人信息
 	 */
-	public Result findInfo(){
+	public Result partnerInfo(){
 		String req_path=SessionUtil.getRequestPath(SessionUtil.getRequest());
 		Map<String,String> _map=new HashMap<>();
 		Consumer consumer=apiSessionUtil.getConsumer();
