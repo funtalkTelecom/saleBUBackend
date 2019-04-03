@@ -100,10 +100,10 @@ public class ShareService {
 			all_settle=NumberUtils.toDouble(ObjectUtils.toString(map.get("all_settle")));
 		}
 		_map.put("sale_count",sale_count.intValue()+"");//销售量
-		_map.put("sale_price",Utils.formatFloatNumber(sale_price));//销售额
-		_map.put("wait_balance",Utils.formatFloatNumber(wait_settle));//待结算金额
-		_map.put("has_balance",Utils.formatFloatNumber(has_settle));//已结算金额
-		_map.put("all_income",Utils.formatFloatNumber(all_settle));//总收益
+		_map.put("sale_price",Utils.convertFormat(sale_price,0));//销售额
+		_map.put("wait_balance",Utils.convertFormat(wait_settle,0));//待结算金额
+		_map.put("has_balance",Utils.convertFormat(has_settle,0));//已结算金额
+		_map.put("all_income",Utils.convertFormat(all_settle,0));//总收益
 		Result result1=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,consumer.getId());
 		if(result1.getCode()==Result.OK){
 			Result result=this.fundOrderService.payHrPayAccount(String.valueOf(result1.getData()));
@@ -112,7 +112,7 @@ public class ShareService {
 				balance=NumberUtils.toDouble(ObjectUtils.toString(map.get("balance")));
 			}
 		}
-		_map.put("balance",Utils.formatFloatNumber(balance));//可用余额
+		_map.put("balance",Utils.convertFormat(balance,0));//可用余额
 		return new Result(Result.OK,_map);
 	}
 
@@ -309,9 +309,9 @@ public class ShareService {
 		}
 		Num num=numMapper.selectByPrimaryKey(num_id);
 		_map.put("is_pp",ppbean==null?"0":"1");//是否进行推广1是0否
-		_map.put("income",ppfee==null?"0":Utils.formatFloatNumber(ppfee));//预期收益
+		_map.put("income",ppfee==null?"0":Utils.convertFormat(ppfee,1));//预期收益
 		_map.put("valid_date",valid_date==null?"":valid_date);//有效期至
-		_map.put("sale_price",Utils.formatFloatNumber(num_price));//号码当前售价
+		_map.put("sale_price",Utils.convertFormat(num_price,1));//号码当前售价
 		_map.put("num_sale",num.getStatus()==Constants.NUM_STATUS_2.getIntKey()?"1":"0");//号码销售状态
 		return _map;
 	}
