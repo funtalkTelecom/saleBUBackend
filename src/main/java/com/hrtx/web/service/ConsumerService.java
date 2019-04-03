@@ -105,7 +105,7 @@ public class ConsumerService extends BaseService {
 			this.apiSessionUtil.saveOrUpdate(token,consumer);
 			_map.put("consumer_id",String.valueOf(Cparam.getId()));
 			_map.put("isPartner",String.valueOf(consumer.getIsPartner()));//是否合伙人 1是，2否
-			_map.put("partnerCheck",String.valueOf(Cparam.getPartnerCheck()));//已确认的合伙人 1是0否；是方可提现
+			_map.put("partnerCheck",String.valueOf(consumer.getPartnerCheck()));//已确认的合伙人 1是0否；是方可提现
 			_map.put("testUser",StringUtils.equals(Cparam.getCommpayName(),"测试")?"1":"0"); //临时借用
 		}
 		return new Result(Result.OK, _map);
