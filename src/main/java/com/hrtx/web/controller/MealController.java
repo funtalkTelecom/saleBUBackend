@@ -5,6 +5,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.web.pojo.Meal;
 import com.hrtx.web.service.CityService;
+import com.hrtx.web.service.DictService;
 import com.hrtx.web.service.MealService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -29,6 +30,8 @@ public class MealController extends BaseReturn{
 	MealService mealService;
 	@Autowired
 	CityService cityService;
+	@Autowired
+	DictService dictService;
 
 	@RequestMapping("/list-meal")
 	@Powers({PowerConsts.MEALMOUDULE_COMMON_QUEYR})
@@ -139,7 +142,10 @@ public class MealController extends BaseReturn{
 			mealids.add(arr.get(0));
 			m.setMealDesc(arr.get(2));
 			m.setSaleType(arr.get(4));
+			List teleTypeList = dictService.findDictByValue("tele_type",arr.get(5));
+			if(teleTypeList.size()==0) return returnError("数据错误，系统检测到第" + (i + 1) + "行的运营商名称有误，请确认。");
 			m.setTeleType(arr.get(5));
+
 			m.setNetType(arr.get(6));
 			m.setCreateBy(SessionUtil.getUserId());
 			m.setCreateDate(now);

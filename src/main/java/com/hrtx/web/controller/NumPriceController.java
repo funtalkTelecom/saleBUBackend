@@ -95,7 +95,7 @@ public class NumPriceController extends BaseReturn{
         Map<String,String> headMap = new LinkedHashMap<String,String>();
         headMap.put("cityName", "地市名称");
         headMap.put("resource", "号码");
-        headMap.put("netType", "运营商");
+        headMap.put("netType", "网络制式");
         headMap.put("channel", "渠道");
         headMap.put("price", "价格");
         headMap.put("lowConsume", "最低消费");

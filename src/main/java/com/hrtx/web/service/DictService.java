@@ -147,5 +147,9 @@ public class DictService {
 		return new Result(Result.OK, "成功");
 	}
 
+	public List findDictByValue(String keyGroup,String keyValue) {
+		return dictMapper.findDictByValue(keyGroup,keyValue);
+	}
+
 
 }

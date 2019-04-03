@@ -12,7 +12,7 @@ $(function() {
 					"header" : "号码",
 					"dataIndex" : "resource"
 				},{
-					"header" : "运营商",
+					"header" : "网络制式",
 					"dataIndex" : "netType"
 				},{
 					"header" : "渠道",

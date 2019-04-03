@@ -27,7 +27,7 @@
 
     select a.num_price_id numPriceId, a.resource, case when a.net_type = '电信' then 1 when a.net_type = '联通' then 2 when a.net_type = '移动' then 3 else 0 end net_type,
     a.province_name, a.city_name, a.feature, a.price, a.is_freeze, a.num_id id, a.`status`, a.city_code, a.id num_price_agent_id,
-    a.with4,a.net_type teleType, 0 skuTobPrice,0 skuTocPrice, a.net_type netType, a.num_level numLevel, a.low_consume lowConsume, a.sku_id skuId,a.num_tags tags,
+    a.with4,a.tele_type teleType, 0 skuTobPrice,0 skuTocPrice, a.net_type netType, a.num_level numLevel, a.low_consume lowConsume, a.sku_id skuId,a.num_tags tags,
     a.agent_id, a.corp_id
     ,a.activity_id activityId,a.activity_type activityType,a.activity_sdate activitySdate,a.activity_edate activityEdate,a.activity_price activityPrice
     , case when   a.activity_type !=0 and SYSDATE() BETWEEN a.activity_sdate and a.activity_edate  then a.activity_price else  a.price end as price_range
