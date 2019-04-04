@@ -1392,7 +1392,7 @@ public class ApiOrderService {
 			int status =7;
 			CancelOrderStatus(orderId,status,reason);
 			Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
-			if(ispay.getCode()==200){  //已支付
+			if(ispay.getCode()==Result.OK){  //已支付
 				if(ispay.getData().equals("1")){//线上支付
 					CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 					Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
@@ -1405,9 +1405,11 @@ public class ApiOrderService {
 				}else {//线下支付
 					CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
 				}
-			}else {//未支付
+			}else if(ispay.getCode()==Result.ERROR) {//未支付
 				//上架涉及的表，数量，状态
 				orderType(orderId);
+			}else{//未知结果
+				CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 			}
 		}else {
 			log.info("调用仓储取消订单接口前封装参数");

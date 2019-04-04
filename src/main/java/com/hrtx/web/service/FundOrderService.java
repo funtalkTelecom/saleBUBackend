@@ -37,6 +37,7 @@ public class FundOrderService extends BaseService {
 	@Autowired private ApiSessionUtil apiSessionUtil;
     @Autowired private ShareService shareService;
     @Autowired private OrderItemMapper orderItemMapper;
+    @Autowired private OrderMapper orderMapper;
 
     /**
      * 平台订单支付（线下支付方式）
@@ -317,7 +318,19 @@ public class FundOrderService extends BaseService {
      * @return
      */
     public Result payOrderRefund(String sourceId, String remark){
-        return payRefund(FundOrder.BUSI_TYPE_PAYORDER, sourceId, remark);
+        Result result=this.queryOrderLocalPayInfo(sourceId);
+        //update 2019.4.3 转内部系统进行交易
+        if(result.getCode()==Result.OK){
+            return payRefund(FundOrder.BUSI_TYPE_PAYORDER, sourceId, remark);
+        }else{
+            Order order=orderMapper.selectByPrimaryKey(Integer.valueOf(sourceId));
+            Integer order_id=order.getOrderId();
+            String orderNo=String.valueOf(this.orderMapper.getId());
+            String orgOrderNo=String.valueOf(order_id);
+            String orgOrderNoChild=String.valueOf(order_id);
+            Double refund_amt=order.getTotal();
+            return this.payHrPayRefund(orderNo,orgOrderNo,orgOrderNoChild,refund_amt,remark);
+        }
     }
 
     /**
@@ -433,18 +446,40 @@ public class FundOrderService extends BaseService {
     }
 
     /**
+     * 查询本地支付情况
+     * @param sourceId
+     * @return
+     */
+    private Result queryOrderLocalPayInfo(String sourceId) {
+        Example example = new Example(FundOrder.class);
+        example.createCriteria().andEqualTo("busi", FundOrder.BUSI_TYPE_PAYORDER).andEqualTo("status", 3).andEqualTo("sourceId", sourceId);
+        List<FundOrder> list = fundOrderMapper.selectByExample(example);
+        if(!list.isEmpty()){
+            FundOrder fundOrder=list.get(0);
+            if(FundOrder.THIRD_PAY_OFFLINE.equals(fundOrder.getThird())){
+                return new Result(Result.OK, 2);
+            }else {
+                return new Result(Result.OK, 1);
+            }
+        }
+        return new Result(Result.ERROR, "未知");
+    }
+    /**
      * 查询订单的支付信息
      * @param sourceId 订单号
      * @return result code == 200 已支付 其它 未支付 data= 1线上支付  2线下支付
      */
     public Result queryPayOrderInfo(String sourceId) {
-        Example example = new Example(FundOrder.class);
-        example.createCriteria().andEqualTo("busi", FundOrder.BUSI_TYPE_PAYORDER).andEqualTo("status", 3).andEqualTo("sourceId", sourceId);
-        List<FundOrder> list = fundOrderMapper.selectByExample(example);
-        if(list.size() <= 0) return new Result(Result.ERROR, "未支付");
-        FundOrder fundOrder = list.get(0);
-        if(FundOrder.THIRD_PAY_OFFLINE.equals(fundOrder.getThird())) return new Result(Result.OK, 2);
-        return new Result(Result.OK, 1);
+        Result result=this.queryOrderLocalPayInfo(sourceId);
+        if(result.getCode()==Result.OK)return result;
+
+        result=payHrPayOrderDatil(String.valueOf(sourceId));
+        if(result.getCode()==Result.ERROR)return new Result(Result.ERROR, "未支付");
+        if(result.getCode()==Result.OK){
+            Map map=(Map)result.getData();
+            if(ObjectUtils.equals(map.get("status"),"3"))return new Result(Result.OK, 1);
+        }
+        return new Result(Result.WARN, "未知支付情况");
     }
 
     @NoRepeat
@@ -546,7 +581,7 @@ public class FundOrderService extends BaseService {
      */
     public Result payHrPayWithdrawToWx(String account_no,Double amt) {
         PayBase payBase=createPayBase();
-        int withdrawType=Pay008.WITHDRAW_TYPE_1;
+        int withdrawType=Pay008.WITHDRAW_TYPE_2;
         String orderNo=this.fundOrderMapper.getId()+"";
         String orderName="余额提现";
         int w_amt=Double.valueOf(Utils.mul(amt,100)).intValue();//单位分
@@ -615,6 +650,38 @@ public class FundOrderService extends BaseService {
         }
     }
 
+    /**
+     * 订单退款
+     * @param orderNo   新请求单
+     * @param orgOrderNo    原支付单
+     * @param orgOrderNoChild   原支付单
+     * @param refund_amt   退款金额(元)
+     * @param remark      备注
+     * @return
+     */
+    public Result payHrPayRefund(String orderNo, String orgOrderNo, String orgOrderNoChild, Double refund_amt, String remark) {
+        PayBase payBase=createPayBase();
+        int amt=Double.valueOf(Utils.mul(refund_amt,100)).intValue();//单位分
+        if(amt<0) return new Result(Result.ERROR,"订单金额错误");
+        Pay002 pay002=new Pay002(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),
+                orderNo,orgOrderNo,orgOrderNoChild,amt,remark);
+        com.hrtx.common.dto.Result result=PayClient.callPay002(pay002);
+        if(result.getCode()== com.hrtx.common.dto.Result.OK){
+            return new Result(Result.OK,result.getData());
+        }else{
+            return new Result(result.getCode(),result.getDesc());
+        }
+    }
+    public Result payHrPayOrderDatil(String orderNo) {
+        PayBase payBase=createPayBase();
+        Pay004 pay004=new Pay004(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),orderNo);
+        com.hrtx.common.dto.Result result=PayClient.callPay004(pay004);
+        if(result.getCode()== com.hrtx.common.dto.Result.OK){
+            return new Result(Result.OK,result.getData());
+        }else{
+            return new Result(result.getCode(),result.getDesc());
+        }
+    }
     /**
      * 支付
      * @param order_id  订单号
