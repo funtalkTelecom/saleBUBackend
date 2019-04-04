@@ -208,6 +208,10 @@ public class ShareService {
 			double order_item_price=orderItem.getPrice()*orderItem.getQuantity();
 			initSettleFee(order_id,num_id,fee_type,order_item_price,share_settle_user,false,0d,0,0d);*/
 		}
+		Consumer consumer=this.apiSessionUtil.getConsumer();
+		NumBrowse bean=new NumBrowse(num_id,null,consumer.getId(),null,null,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_2.getIntKey(),order.getShareId());
+		this.addBrowse(bean);
+
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();//结算用户
 		initSettleFee(order_id,num_id,fee_type,order_price,share_settle_user,false,0d,0,0d);
 		//技术服务费
@@ -402,8 +406,10 @@ public class ShareService {
 		long _start=System.currentTimeMillis();
 		Num numbean=this.numMapper.selectByPrimaryKey(bean.getNumId());
 		if(numbean!=null)bean.setNum(numbean.getNumResource());
-		Share share=this.shareMapper.selectByPrimaryKey(bean.getShareId());
-		if(share!=null)bean.setShareConsumerId(share.getConsumerId());
+		if(bean.getShareId()!=null){
+			Share share=this.shareMapper.selectByPrimaryKey(bean.getShareId());
+			if(share!=null)bean.setShareConsumerId(share.getConsumerId());
+		}
 		Example example = new Example(NumBrowse.class);
 		example.createCriteria().andEqualTo("numId",bean.getNumId()).andEqualTo("consumerId",bean.getConsumerId()).andEqualTo("shareId",bean.getShareId());
 		List<?> _list=this.numBrownseMapper.selectByExample(example);
@@ -472,12 +478,12 @@ public class ShareService {
 	 * 提现
 	 */
 	public Result financeWithdraw(Double amt){
-		if(amt<=0.3d)return new Result(Result.OK,"提现金额必须大于等于0.3元");
+		if(amt<0.3d)return new Result(Result.OK,"提现金额必须大于等于0.3元");
 		Consumer consumer=apiSessionUtil.getConsumer();
 		Consumer consumer1=this.consumerMapper.selectByPrimaryKey(consumer.getId());
 		if(!(consumer1.getPartnerCheck()!=null&&consumer1.getPartnerCheck()==1))return new Result(Result.OK,"抱歉，您的材料还未审核通过，无法完成提现");
 		Result result1=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,consumer.getId());
-		if(result1.getCode()==Result.OK)return result1;
+		if(result1.getCode()!=Result.OK)return result1;
 		Result result=fundOrderService.payHrPayWithdrawToWx(String.valueOf(result1.getData()),amt);
 		if(result.getCode()==Result.OK)return new Result(Result.OK,"提现成功");
 		else return new Result(Result.ERROR,result.getData());
@@ -585,7 +591,8 @@ public class ShareService {
 		return promotionPlanSave(bean,nums);
 	}
 	private Result promotionPlanSave(PromotionPlan bean,String[] nums) {
-		if(bean.getId()!=0){
+		boolean update_flag=bean.getId()!=0;
+		if(update_flag){
 			PromotionPlan newBean=this.promotionPlanMapper.selectByPrimaryKey(bean.getId());
 			if(newBean==null)return new Result(Result.ERROR,"数据错误");
 			if(!SessionUtil.getUser().getCorpId().equals(newBean.getCorpId()))return new Result(Result.ERROR,"您无权修改他人推广计划");
@@ -611,7 +618,8 @@ public class ShareService {
 			PromotionPlanNum nbean=new PromotionPlanNum(bean.getId(),StringUtils.trim(num));
 			promotionPlanNumMapper.insert(nbean);
 		}
-		return new Result(Result.OK,"保存成功");
+		if(bean.getStatus()==Constants.PROMOTION_PLAN_STATUS_2.getIntKey())return new Result(Result.OK,"发布成功");
+		else return new Result(Result.OK,"保存成功");
 	}
 	public Result findPromotionPlan(Integer promotion_plan_id){
 		PromotionPlan bean=this.promotionPlanMapper.selectByPrimaryKey(promotion_plan_id);

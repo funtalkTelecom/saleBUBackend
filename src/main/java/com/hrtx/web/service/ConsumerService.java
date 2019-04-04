@@ -212,8 +212,8 @@ public class ConsumerService extends BaseService {
 		Example example=new Example(Consumer.class);
 		Example.Criteria criteria=example.createCriteria();
 		criteria.andEqualTo("isPartner",1);
-		if(StringUtils.isNotEmpty(name))criteria.andLike("name",name);
-		if(StringUtils.isNotEmpty(phone))criteria.andLike("phone",phone);
+		if(StringUtils.isNotEmpty(name))criteria.andLike("name","%"+name+"%");
+		if(StringUtils.isNotEmpty(phone))criteria.andLike("phone","%"+phone+"%");
 		example.setOrderByClause("id desc");
 		PageHelper.startPage(pp.startToPageNum(),pp.getLimit());
 		List<Consumer> _list = consumerMapper.selectByExample(example);

@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.management.StringValueExp;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.*;
@@ -539,7 +540,7 @@ public class OrderService extends BaseService {
         if(cancel_res==1) {
             //确认取消
             Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
-            if(ispay.getCode()==200){
+            if(ispay.getCode()==Result.OK){
                 //已支付
                 if("1".equals(String.valueOf(ispay.getData()))){//线上支付
                     Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
@@ -555,10 +556,12 @@ public class OrderService extends BaseService {
                     apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),reason); //待财务退款
                     return new Result(Result.OK, "线下支付,待财务退款");
                 }
-            }else {//未支付
+            }else if(ispay.getCode()==Result.ERROR) {//未支付
                 apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
                 //上架涉及的表，数量，状态
                 apiOrderService.orderType(orderId);
+            }else{//未知结果
+                this.apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
             }
         }else if (cancel_res==2){//撤销取消,还原订单状态
             apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_3.getIntKey(),reason);

@@ -227,9 +227,11 @@ $(function() {
     }
 
     $('#add-promotion-plan').on('hide.bs.modal', function () {
+
         $(this).find("input,select,textarea").removeAttr("disabled");
         $(this).find(".detail-info").hide();
         $(this).find(".modal-footer").show();
+
     })
 
 });
