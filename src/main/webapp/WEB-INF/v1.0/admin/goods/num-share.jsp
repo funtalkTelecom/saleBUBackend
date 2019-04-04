@@ -30,7 +30,7 @@
 					<div class="breadcrumbs" id="breadcrumbs">
 						<ul class="breadcrumb">
 							<li><i class="ace-icon fa fa-home home-icon"></i><a href="#">主页</a></li>
-							<li><a href="javascript:void(0);">商品管理</a></li>
+							<li><a href="javascript:void(0);">推广管理</a></li>
 							<li class="active"></li>
 						</ul><!-- /.breadcrumb -->
 						<!-- /section:basics/content.searchbox -->
@@ -95,7 +95,7 @@
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
 						<h4 class="modal-title"> 推广计划 </h4>
 					</div>
-					<form role="form" class="form-horizontal" id="promotion-plan-form">
+					<form role="form" class="form-horizontal" id="promotion-plan-form" >
 						<div class="modal-body">
 							<div class="form-group">
 								<label class="col-xs-2 control-label">参与方式</label>

@@ -185,7 +185,9 @@ $(function() {
                 alert(result.data);
                 $("#check_form").hide();
                 $("#query_table").show();
-                window.location.reload();
+                //window.location.reload();
+                dataList.reload();
+                $('#add-promotion-plan').modal('hide');
             }
         });
     }
@@ -231,6 +233,8 @@ $(function() {
         $(this).find("input,select,textarea").removeAttr("disabled");
         $(this).find(".detail-info").hide();
         $(this).find(".modal-footer").show();
+        //$(this).find("form")[0].reset();
+
 
     })
 
