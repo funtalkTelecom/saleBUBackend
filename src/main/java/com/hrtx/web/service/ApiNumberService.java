@@ -358,6 +358,8 @@ public class ApiNumberService {
 			for (int i = 0; i < ob.size(); i++) {
 				Map obj= (Map) ob.get(i);
 				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+				Map<String,String> promotionMap = shareService.findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(), Integer.parseInt(String.valueOf(obj.get("id"))),Double.parseDouble(String.valueOf(obj.get("price_range"))));
+				obj.put("is_pp",promotionMap.get("is_pp")); //是否进行推广1是0否
 			}
 		}
 		pm = new PageInfo<Object>(ob);
