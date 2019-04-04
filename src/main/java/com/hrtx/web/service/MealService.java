@@ -18,6 +18,7 @@ public class MealService {
 	
 	@Autowired SessionUtil sessionUtil;
 	@Autowired private MealMapper mealMapper;
+	@Autowired private DictService dictService;
 
 	public Result pageMeal(Meal meal) {
 		PageHelper.startPage(meal.startToPageNum(),meal.getLimit());
@@ -46,6 +47,8 @@ public class MealService {
 			if (!checkMealIdIsExist(meal)) {
 				meal.setUpdateDate(new Date());
 				meal.setUpdateBy(SessionUtil.getUserId());
+				List teleTypeList = dictService.findDictByValue("tele_type",meal.getTeleType());
+				if(teleTypeList.size()==0) return new Result(Result.ERROR, "运营商名称不正确，请核实");
 				mealMapper.mealEdit(meal);
 			} else {
 				return new Result(Result.ERROR, "套餐ID已存在");
