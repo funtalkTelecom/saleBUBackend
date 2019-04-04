@@ -299,7 +299,7 @@ public class ShareService {
 		return newBean;
 	}
 
-	private Map<String,String> findNumPromotionInfo(int free_type,int num_id,Double num_price){
+	public Map<String,String> findNumPromotionInfo(int free_type,int num_id,Double num_price){
 		Map<String,String> _map=new HashMap<>();
 		PromotionPlan ppbean=null;
 		Double ppfee=null;
@@ -325,7 +325,7 @@ public class ShareService {
 		return _map;
 	}
 
-	private Map<String,String> findNumPromotionInfo(Integer num_id){
+	public Map<String,String> findNumPromotionInfo(Integer num_id){
 		Result curr_price = apiOrderService.findNumSalePrice(num_id);
 		Double num_price=0d;
 		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));

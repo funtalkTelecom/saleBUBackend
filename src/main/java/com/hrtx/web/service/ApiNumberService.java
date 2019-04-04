@@ -4,10 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.dto.Result;
-import com.hrtx.global.ApiSessionUtil;
-import com.hrtx.global.SessionUtil;
-import com.hrtx.global.SystemParam;
-import com.hrtx.global.Utils;
+import com.hrtx.global.*;
 import com.hrtx.web.mapper.AgentMapper;
 import com.hrtx.web.mapper.NumPriceMapper;
 import com.hrtx.web.mapper.NumberMapper;
@@ -21,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.rmi.server.InactiveGroupException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -85,6 +83,8 @@ public class ApiNumberService {
 		for (int i = 0; i < ob.size(); i++) {
 			Map obj= (Map) ob.get(i);
 			obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+			Map<String,String> promotionMap = shareService.findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(), Integer.parseInt(String.valueOf(obj.get("id"))),Double.parseDouble(String.valueOf(obj.get("price_range"))));
+			obj.put("is_pp",promotionMap.get("is_pp")); //是否进行推广1是0否
 		}
 		return new Result(Result.OK, pm);
 	}
@@ -262,6 +262,8 @@ public class ApiNumberService {
 				obj= (Map) ob.get(i);
 				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
 			}
+		 	 Map<String,String> promotionMap =	shareService.findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(),unmId,Double.parseDouble(String.valueOf(obj.get("price_range"))));
+			obj.put("promotionMap",promotionMap);
 		}else if(skuGoodsType.equals("3")){  //普靓
 			obj = numberMapper.getNumInfoById(id);
 			if(obj==null) return new Result(Result.OTHER, "未找到号码");
@@ -356,6 +358,8 @@ public class ApiNumberService {
 			for (int i = 0; i < ob.size(); i++) {
 				Map obj= (Map) ob.get(i);
 				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+				Map<String,String> promotionMap = shareService.findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(), Integer.parseInt(String.valueOf(obj.get("id"))),Double.parseDouble(String.valueOf(obj.get("price_range"))));
+				obj.put("is_pp",promotionMap.get("is_pp")); //是否进行推广1是0否
 			}
 		}
 		pm = new PageInfo<Object>(ob);
