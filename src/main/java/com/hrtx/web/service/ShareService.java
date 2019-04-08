@@ -399,7 +399,7 @@ public class ShareService {
 	 */
 	public Result addBrowse(int num_id,String channel,String open_url,int share_id){
 		Consumer consumer=apiSessionUtil.getConsumer();
-		NumBrowse bean=new NumBrowse(num_id,null,consumer.getId(),channel,open_url,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_1.getIntKey(),share_id);
+		NumBrowse bean=new NumBrowse(num_id,null,consumer==null?-1:consumer.getId(),channel,open_url,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_1.getIntKey(),share_id);
 		return this.addBrowse(bean);
 	}
 	private Result addBrowse(NumBrowse bean){
