@@ -748,8 +748,8 @@ public class ApiOrderService {
 						orderItems.add(orderItem);
 						//修改sku数量
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.parseInt(String.valueOf( sku.get("skuId"))));
-						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-numcount);
-						skuMapper.updateSkuNum(nowSku);
+//						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-numcount);
+						skuMapper.updateSkuNumDown(nowSku.getSkuId(),numcount);
 
 						log.info("冻结号码,添加号码item");
 						//是普号,根据数量冻结号码,添加号码item
@@ -902,8 +902,8 @@ public class ApiOrderService {
 						double twobPrice = 0;//Double.parseDouble(String.valueOf( sku.get("skuTobPrice"));
 						//修改sku数量
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.parseInt(String.valueOf( sku.get("skuId"))));
-						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
-						skuMapper.updateSkuNum(nowSku);
+//						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
+						skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
 						//超级靓号添加卡的item
 						if("4".equals(sku.get("skuGoodsType"))){
 							log.info("超级靓号添加卡体item");
@@ -1392,7 +1392,7 @@ public class ApiOrderService {
 			int status =7;
 			CancelOrderStatus(orderId,status,reason);
 			Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
-			if(ispay.getCode()==200){  //已支付
+			if(ispay.getCode()==Result.OK){  //已支付
 				if(ispay.getData().equals("1")){//线上支付
 					CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 					Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
@@ -1405,9 +1405,11 @@ public class ApiOrderService {
 				}else {//线下支付
 					CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
 				}
-			}else {//未支付
+			}else if(ispay.getCode()==Result.ERROR) {//未支付
 				//上架涉及的表，数量，状态
 				orderType(orderId);
+			}else{//未知结果
+				CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 			}
 		}else {
 			log.info("调用仓储取消订单接口前封装参数");
@@ -1518,8 +1520,8 @@ public class ApiOrderService {
 						int quantitys =Integer.parseInt(String.valueOf( map.get("quantity")));
 						String num_id =String.valueOf( map.get("num_id"));
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.valueOf(skuIds));
-						nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))+quantitys);//修改sku数量
-						skuMapper.updateSkuNum(nowSku);
+//						nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))+quantitys);//修改sku数量
+						skuMapper.updateSkuNum(nowSku.getSkuId(),quantitys);
 						if(isShipment==0){
 							log.info("号码还原销售中");
 							freezeNum(num_id, "2",false);
@@ -1651,8 +1653,8 @@ public class ApiOrderService {
 				double twobPrice =price;
 				//修改sku数量
 				Sku nowSku = skuMapper.getSkuBySkuid(Integer.parseInt(String.valueOf( sku.get("skuId"))));
-				nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
-				skuMapper.updateSkuNum(nowSku);
+//				nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
+				skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
 				log.info("添加卡体item");
 				//添加卡的item
 				orderItem = new OrderItem();

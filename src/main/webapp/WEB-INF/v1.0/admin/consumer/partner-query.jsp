@@ -47,6 +47,7 @@
 											<input type="text" class="form-control" style="width:130px;" name="phone">
 										</div>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
+										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
 									</form><!-- /form-panel -->
 								</div>
 

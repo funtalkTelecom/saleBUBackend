@@ -20,8 +20,8 @@ $(function() {
                     "header" : "证件图",
                     "dataIndex" : "keyValue",
                     "renderer":function(v,record){
-                        var _html="<div><img style='max-height:80px' src='get-img/idcard/1000/"+record.idcard_face+"'/>";
-                        _html+="&nbsp;&nbsp;<img style='max-height:80px' src='get-img/idcard/1000/"+record.idcard_back+"'/></div>";
+                        var _html="<div><a target='_blank' href='get-img/idcard/1000/"+record.idcard_face+"'><img style='max-height:80px' src='get-img/idcard/1000/"+record.idcard_face+"'/></a>";
+                        _html+="&nbsp;&nbsp;<a target='_blank' href='get-img/idcard/1000/"+record.idcard_back+"'><img style='max-height:80px' src='get-img/idcard/1000/"+record.idcard_back+"'/></a></div>";
                         return _html;
                     }
                 },{

@@ -848,8 +848,8 @@ public class GoodsService {
                     numberMapper.updateStatus(number, true);
                 }
             }
-            ss.setSkuNum(ss.getSkuNum()-counts);
-            skuMapper.updateSkuNum(ss);
+//            ss.setSkuNum(ss.getSkuNum()-counts);
+            skuMapper.updateSkuNumDown(ss.getSkuId(),counts);
             numberPriceMapper.updateNumberPrice(ss.getSkuId());
         }
 
@@ -926,8 +926,8 @@ public class GoodsService {
                     }
                 }
                 Sku nowSku = skuMapper.getSkuBySkuid(skuIds);
-                nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-s.getSkuNum());//修改sku数量
-                skuMapper.updateSkuNum(nowSku);
+//                nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-s.getSkuNum());//修改sku数量
+                skuMapper.updateSkuNumDown(nowSku.getSkuId(),s.getSkuNum());//修改sku数量
             }
 
         } catch (WarmException e) {
@@ -1006,8 +1006,9 @@ public class GoodsService {
             //更新 tb_sku 表 sku_num 数量
             int skuids = NumberUtils.toInt(skuid);
             Sku nowSku = skuMapper.getSkuBySkuid(skuids);
-            nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-1);//修改sku数量
-            skuMapper.updateSkuNum(nowSku);
+            int connt = 1;
+//            nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-1);//修改sku数量
+            skuMapper.updateSkuNumDown(nowSku.getSkuId(),connt);
             //调用仓储接口
             param.put("supply_id", skuids);//供货单编码(sku_id)
             Result res;
@@ -1034,8 +1035,9 @@ public class GoodsService {
             //更新 tb_sku 表 sku_num 数量
             int skuids = NumberUtils.toInt(skuid);
             Sku nowSku = skuMapper.getSkuBySkuid(skuids);
-            nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-1);//修改sku数量
-            skuMapper.updateSkuNum(nowSku);
+//            nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))-1);//修改sku数量
+            int count =1;
+            skuMapper.updateSkuNumDown(nowSku.getSkuId(),count);
             if(skuGoodsType!=3){  //普靓,不涉及仓库库存
                 //调用仓储接口
                 param.put("supply_id", skuids);//供货单编码(sku_id)

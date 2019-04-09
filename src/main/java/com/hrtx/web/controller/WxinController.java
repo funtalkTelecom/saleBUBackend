@@ -8,6 +8,7 @@ import com.hrtx.global.SystemParam;
 import com.hrtx.web.service.ConsumerService;
 import com.hrtx.web.service.UserService;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.math.NumberUtils;
 import org.omg.CORBA.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,10 @@ public class WxinController {
 	@Autowired ConsumerService consumerService;
     @GetMapping("/get_open_id")
     @Powers({PowerConsts.NOLOGINPOWER})
-	public Result getOpenid(@RequestParam(value="getcode",required=false)String getcode) {
+	public Result getOpenid(@RequestParam(value="getcode",required=false)String getcode,@RequestParam(value="userId",required=false) String userId) {
 		Result result = this.consumerService.getOpenId(getcode);
-		if(result.getCode()==Result.OK)result= consumerService.isOpenid(String.valueOf(result.getData()));
+		int userid =NumberUtils.toInt(userId);
+		if(result.getCode()==Result.OK)result= consumerService.isOpenid(String.valueOf(result.getData()),userid);
 		return result;
 	}
 

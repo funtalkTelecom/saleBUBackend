@@ -60,7 +60,7 @@ public class ConsumerService extends BaseService {
 		return new Result(Result.ERROR,"无法获取Openid");
 	}
 	
-	public Result isOpenid(String openid) {
+	public Result isOpenid(String openid,int userId) {
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		if(openid==null) return new Result(Result.ERROR, "获取openid 失败");
@@ -80,6 +80,7 @@ public class ConsumerService extends BaseService {
 			userC.setRegDate(new Date());
 			userC.setIsPartner(0);  //是否合伙人 1是，2否
 			userC.setPartnerCheck(0); //已确认的合伙人 1是0否；是方可提现
+			userC.setUpConsumer(userId);
 			consumerMapper.insert(userC);
 			Integer userid = userC.getId();
 
@@ -212,8 +213,8 @@ public class ConsumerService extends BaseService {
 		Example example=new Example(Consumer.class);
 		Example.Criteria criteria=example.createCriteria();
 		criteria.andEqualTo("isPartner",1);
-		if(StringUtils.isNotEmpty(name))criteria.andLike("name",name);
-		if(StringUtils.isNotEmpty(phone))criteria.andLike("phone",phone);
+		if(StringUtils.isNotEmpty(name))criteria.andLike("name","%"+name+"%");
+		if(StringUtils.isNotEmpty(phone))criteria.andLike("phone","%"+phone+"%");
 		example.setOrderByClause("id desc");
 		PageHelper.startPage(pp.startToPageNum(),pp.getLimit());
 		List<Consumer> _list = consumerMapper.selectByExample(example);
