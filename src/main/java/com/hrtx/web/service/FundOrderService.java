@@ -546,7 +546,7 @@ public class FundOrderService extends BaseService {
      */
     public Result payHrPayWithdrawToWx(String account_no,Double amt) {
         PayBase payBase=createPayBase();
-        int withdrawType=Pay008.WITHDRAW_TYPE_1;
+        int withdrawType=Pay008.WITHDRAW_TYPE_2;
         String orderNo=this.fundOrderMapper.getId()+"";
         String orderName="余额提现";
         int w_amt=Double.valueOf(Utils.mul(amt,100)).intValue();//单位分

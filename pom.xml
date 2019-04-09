@@ -269,7 +269,7 @@
         <dependency>
             <groupId>com.hrtx</groupId>
             <artifactId>common-util</artifactId>
-            <version>0.1.15</version>
+            <version>0.1.14</version>
         </dependency>
     </dependencies>
 
