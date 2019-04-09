@@ -19,7 +19,9 @@ public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
 
     Sku getSkuBySkuid(@Param("skuid") Integer skuId);
 
-    void updateSkuNum(Sku nowSku);
+    void updateSkuNum(@Param("skuId") Integer skuId,@Param("quantity") Integer quantity);
+
+    void updateSkuNumDown(@Param("skuId") Integer skuId,@Param("quantity") Integer quantity);
 
     int updateSkuNumWithDataNum(@Param("order_amount") Integer order_amount,@Param("sku_id") Integer sku_id);
 
