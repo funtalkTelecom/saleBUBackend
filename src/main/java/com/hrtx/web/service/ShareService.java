@@ -411,7 +411,7 @@ public class ShareService {
 			if(share!=null)bean.setShareConsumerId(share.getConsumerId());
 		}
 		Example example = new Example(NumBrowse.class);
-		example.createCriteria().andEqualTo("numId",bean.getNumId()).andEqualTo("consumerId",bean.getConsumerId()).andEqualTo("shareId",bean.getShareId());
+		example.createCriteria().andEqualTo("actType",bean.getActType()).andEqualTo("numId",bean.getNumId()).andEqualTo("consumerId",bean.getConsumerId()).andEqualTo("shareId",bean.getShareId());
 		List<?> _list=this.numBrownseMapper.selectByExample(example);
 		if(_list.isEmpty())bean.setShareFirstBrowse(1);
 		this.numBrownseMapper.insert(bean);//每次都添加浏览记录
