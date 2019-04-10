@@ -208,8 +208,8 @@ public class ShareService {
 			double order_item_price=orderItem.getPrice()*orderItem.getQuantity();
 			initSettleFee(order_id,num_id,fee_type,order_item_price,share_settle_user,false,0d,0,0d);*/
 		}
-		Consumer consumer=this.apiSessionUtil.getConsumer();
-		NumBrowse bean=new NumBrowse(num_id,null,consumer.getId(),null,null,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_2.getIntKey(),order.getShareId());
+
+		NumBrowse bean=new NumBrowse(num_id,null,order.getConsumer(),null,null,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_2.getIntKey(),order.getShareId());
 		this.addBrowse(bean);
 
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();//结算用户

@@ -231,7 +231,7 @@ public class FundOrderService extends BaseService {
         if(!platrequest.containsKey("order_no")||!platrequest.containsKey("status")) return new Result(Result.ERROR,"fail");
         String busi_type = FundOrder.BUSI_TYPE_PAYORDER;
         String busi_order_id = ObjectUtils.toString(platrequest.get("order_no"));
-        int pay_status =NumberUtils.toInt(ObjectUtils.toString(platrequest.get("status")));; //状态 2等待付款，3已支付
+        int pay_status =NumberUtils.toInt(ObjectUtils.toString(platrequest.get("status"))); //状态 2等待付款，3已支付
 
         Result result= this.updateBusiPayResult(busi_type,NumberUtils.toInt(busi_order_id),pay_status==3);
 
@@ -325,7 +325,8 @@ public class FundOrderService extends BaseService {
         }else{
             Order order=orderMapper.selectByPrimaryKey(Integer.valueOf(sourceId));
             Integer order_id=order.getOrderId();
-            String orderNo=String.valueOf(this.orderMapper.getId());
+//            String orderNo=String.valueOf(this.orderMapper.getId());
+            String orderNo=String.valueOf(order_id);
             String orgOrderNo=String.valueOf(order_id);
             String orgOrderNoChild=String.valueOf(order_id);
             Double refund_amt=order.getTotal();
@@ -477,7 +478,7 @@ public class FundOrderService extends BaseService {
         if(result.getCode()==Result.ERROR)return new Result(Result.ERROR, "未支付");
         if(result.getCode()==Result.OK){
             Map map=(Map)result.getData();
-            if(ObjectUtils.equals(map.get("status"),"3"))return new Result(Result.OK, 1);
+            if(StringUtils.equals(String.valueOf(map.get("status")),"3"))return new Result(Result.OK, 1);
         }
         return new Result(Result.WARN, "未知支付情况");
     }
@@ -529,7 +530,7 @@ public class FundOrderService extends BaseService {
             map.put("item_id",order.getOrderId());
             payeeList.add(map);
         }
-        return this.payHrPayOrder(orderNo,payer,payeeList,order.getTotal(),openid,orderName,Pay001.PAY_TRADE_TYPE_JSAPI,Pay001.PAY_MENTHOD_TYPE_1,Pay001.ORDER_TRADE_TYPE_1);
+        return this.payHrPayOrder(orderNo,payer,payeeList,order.getTotal(),openid,orderName,Pay001.PAY_TRADE_TYPE_XCX,Pay001.PAY_MENTHOD_TYPE_1,Pay001.ORDER_TRADE_TYPE_1);
     }
 
     public Result payHrOrderSettle(int order_id,List<Map> payeeList) {
