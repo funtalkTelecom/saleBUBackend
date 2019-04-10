@@ -304,7 +304,7 @@ public class ShareService {
 		PromotionPlan ppbean=null;
 		Double ppfee=null;
 		String valid_date=null;
-		Result result=this.findNumPromotionPlan(free_type,num_id);
+		Result result=this.findNumPromotionPlan(free_type,num_id,num_price);
 		if(result.getCode()==Result.OK){
 			ppbean=(PromotionPlan)result.getData();
 			valid_date=Utils.getDate(ppbean.getEndDate(),"yyyy-MM-dd HH:mm");
@@ -651,7 +651,7 @@ public class ShareService {
 	 * @param num_id
 	 * @return
 	 */
-	public Result findNumPromotionPlan(int fee_type,Integer num_id){
+	public Result findNumPromotionPlan(int fee_type,Integer num_id,Double num_price){
 		//1.按号码查
 		Num num=numMapper.selectByPrimaryKey(num_id);
 		PromotionPlan ppbean=null;
@@ -661,13 +661,13 @@ public class ShareService {
 		log.info(String.format("查得以号码[编码%s]的推广计划[%s]条",num_id,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));
 		//2.按价格查
-		Result curr_price = apiOrderService.findNumSalePrice(num_id);
-		Double num_price=-1d;
-		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
+//		Result curr_price = apiOrderService.findNumSalePrice(num_id);
+//		Double num_price=-1d;
+//		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_1.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),num_price,null);
 		ppbean.setFeeType(fee_type);
 		list= this.promotionPlanMapper.queryPageList(ppbean);
-		log.info(String.format("查得以号码[编码%s]销售价[%s]的推广计划[%s]条",num_id,curr_price,list.size()));
+		log.info(String.format("查得以号码[编码%s]销售价[%s]的推广计划[%s]条",num_id,num_price,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));
 		//3.按全号码查
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_0.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),null,null);
