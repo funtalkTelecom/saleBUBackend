@@ -1,7 +1,6 @@
 package com.hrtx.web.service;
 
 import com.github.abel533.entity.Example;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.common.weixin.api.AccessTokenApi;
@@ -13,7 +12,6 @@ import com.hrtx.web.mapper.ConsumerMapper;
 import com.hrtx.web.mapper.UserMapper;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.ConsumerLog;
-import com.hrtx.web.pojo.PromotionPlan;
 import com.hrtx.web.pojo.User;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
