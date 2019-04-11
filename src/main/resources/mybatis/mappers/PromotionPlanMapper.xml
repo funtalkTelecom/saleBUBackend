@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hrtx.web.mapper.PromotionPlanMapper" >
+    <!--需加缓存，查询比较频繁-->
     <sql id="col_list">
         select p.id,p.promotion,p.award_way,p.award,p.is_limit,p.limit_award,p.begin_price,p.end_price,p.begin_date,p.end_date,p.`status`
         from tb_promotion_plan p where p.fee_type=#{param.feeType} and p.corp_id=#{param.corpId}
     </sql>
     <select id="queryPageList" resultType="PromotionPlan">
         <include refid="col_list"/>
+        <if test="param.promotion!=null and param.promotion >=0">and p.promotion=#{param.promotion}</if><!---->
         <if test="param.status!=null and param.status >=0">and p.status=#{param.status}</if>
         <if test="param.num!=null and param.num!=''">and p.id in (select n.promotion_plan_id from tb_promotion_plan_num n where n.num=#{param.num}) </if>
         <if test="param.nowDate!=null">and #{param.nowDate} between p.begin_date and p.end_date</if>

@@ -208,8 +208,8 @@ public class ShareService {
 			double order_item_price=orderItem.getPrice()*orderItem.getQuantity();
 			initSettleFee(order_id,num_id,fee_type,order_item_price,share_settle_user,false,0d,0,0d);*/
 		}
-		Consumer consumer=this.apiSessionUtil.getConsumer();
-		NumBrowse bean=new NumBrowse(num_id,null,consumer.getId(),null,null,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_2.getIntKey(),order.getShareId());
+
+		NumBrowse bean=new NumBrowse(num_id,null,order.getConsumer(),null,null,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_2.getIntKey(),order.getShareId());
 		this.addBrowse(bean);
 
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();//结算用户
@@ -304,7 +304,7 @@ public class ShareService {
 		PromotionPlan ppbean=null;
 		Double ppfee=null;
 		String valid_date=null;
-		Result result=this.findNumPromotionPlan(free_type,num_id);
+		Result result=this.findNumPromotionPlan(free_type,num_id,num_price);
 		if(result.getCode()==Result.OK){
 			ppbean=(PromotionPlan)result.getData();
 			valid_date=Utils.getDate(ppbean.getEndDate(),"yyyy-MM-dd HH:mm");
@@ -411,7 +411,7 @@ public class ShareService {
 			if(share!=null)bean.setShareConsumerId(share.getConsumerId());
 		}
 		Example example = new Example(NumBrowse.class);
-		example.createCriteria().andEqualTo("numId",bean.getNumId()).andEqualTo("consumerId",bean.getConsumerId()).andEqualTo("shareId",bean.getShareId());
+		example.createCriteria().andEqualTo("actType",bean.getActType()).andEqualTo("numId",bean.getNumId()).andEqualTo("consumerId",bean.getConsumerId()).andEqualTo("shareId",bean.getShareId());
 		List<?> _list=this.numBrownseMapper.selectByExample(example);
 		if(_list.isEmpty())bean.setShareFirstBrowse(1);
 		this.numBrownseMapper.insert(bean);//每次都添加浏览记录
@@ -651,7 +651,7 @@ public class ShareService {
 	 * @param num_id
 	 * @return
 	 */
-	public Result findNumPromotionPlan(int fee_type,Integer num_id){
+	public Result findNumPromotionPlan(int fee_type,Integer num_id,Double num_price){
 		//1.按号码查
 		Num num=numMapper.selectByPrimaryKey(num_id);
 		PromotionPlan ppbean=null;
@@ -661,13 +661,13 @@ public class ShareService {
 		log.info(String.format("查得以号码[编码%s]的推广计划[%s]条",num_id,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));
 		//2.按价格查
-		Result curr_price = apiOrderService.findNumSalePrice(num_id);
-		Double num_price=-1d;
-		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
+//		Result curr_price = apiOrderService.findNumSalePrice(num_id);
+//		Double num_price=-1d;
+//		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_1.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),num_price,null);
 		ppbean.setFeeType(fee_type);
 		list= this.promotionPlanMapper.queryPageList(ppbean);
-		log.info(String.format("查得以号码[编码%s]销售价[%s]的推广计划[%s]条",num_id,curr_price,list.size()));
+		log.info(String.format("查得以号码[编码%s]销售价[%s]的推广计划[%s]条",num_id,num_price,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));
 		//3.按全号码查
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_0.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),null,null);

@@ -7,7 +7,7 @@
         sum(CASE WHEN o.status=1 THEN o.settle_amt	ELSE 0 END ) wait_settle,
         sum(CASE WHEN o.status=2 THEN o.settle_amt	ELSE 0 END) has_settle
         from tb_order_settle o left join tb_order od on od.order_id=o.order_id
-        where o.`status` in (1,2) and o.fee_type=1 and o.settle_user=#{consumer_id}
+        where o.`status` in (1,2) and o.fee_type=1 and o.settle_user=#{consumer_id} and od.`status` not in (7)
     </select>
 
 </mapper>

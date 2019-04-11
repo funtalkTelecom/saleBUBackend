@@ -31,7 +31,7 @@ public class ApiOrderController extends BaseReturn {
     UserService userService;
 
     @PostMapping("/order")
-    @Powers(PowerConsts.NOLOGINPOWER)
+    @Powers(PowerConsts.NOPOWER)
     @ResponseBody
     public Result createOrder(HttpServletRequest request) {
         Integer skuid = NumberUtils.toInt(request.getParameter("skuid"));
