@@ -68,6 +68,15 @@
 										<div class="col-xs-4">
 											<input type="text" class="form-control" name="phoneConsumer">
 										</div>
+                                        <label class="col-xs-2 control-label">寄送物流</label>
+                                        <div class="col-xs-4">
+                                            <select class="form-control" name="logisticType">
+                                                <option value="">请选择...</option>
+                                                <c:forEach items="${logistics}" var="item">
+                                                    <option value="${item.keyId}">${item.keyValue}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
 									</div>
 									<div class="form-group">
 										<label class="col-xs-2 control-label">客户证件类型</label>

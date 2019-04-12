@@ -79,6 +79,7 @@ public class LiangHaoController extends BaseReturn{
                 .addObject("numPriceAgent", numPriceAgent)
                 .addObject("types", dictService.findDictByGroup("phone_consumer_id_type"))
                 .addObject("mealList", mealList)
+                .addObject("logistics", dictService.findDictByGroup("express-type"))
                 .addObject("bossNum", bossNum);
     }
 
@@ -106,7 +107,7 @@ public class LiangHaoController extends BaseReturn{
             int mealId = NumberUtils.toInt(request.getParameter("mealId"));
             return apiOrderService.submitCustomOrder(numPriceAgent.getNumId(), mealId,request.getParameter("personName"),request.getParameter("personTel"),
                     request.getParameter("address"),request.getParameter("conment"),request.getParameter("thirdOrder"),request.getParameter("bossNum"),
-                    request.getParameter("phoneConsumer"),request.getParameter("phoneConsumerIdType"),request.getParameter("phoneConsumerIdNum"));
+                    request.getParameter("phoneConsumer"),request.getParameter("phoneConsumerIdType"),request.getParameter("phoneConsumerIdNum"), request.getParameter("logisticType"));
         }finally {
             LockUtils.unLock("kfadd"+id);
         }
@@ -291,7 +292,7 @@ public class LiangHaoController extends BaseReturn{
                         continue;
                     }
                     Result result1 = apiOrderService.submitCustomOrder(NumberUtils.toInt(String.valueOf(np.get("id"))), mealId,
-                            personName, personTel, address, conment, thirdOrder, bossNum, phoneConsumer,phoneConsumerIdType.split("#")[0],phoneConsumerIdNum);
+                            personName, personTel, address, conment, thirdOrder, bossNum, phoneConsumer,phoneConsumerIdType.split("#")[0],phoneConsumerIdNum, "");
                     if(result1.getCode() == Result.OK || result1.getCode() == Result.OTHER) {
                         arr.add("成功");arr.add("");
                         errors.add(arr.toArray());

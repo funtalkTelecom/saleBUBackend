@@ -197,9 +197,10 @@ public class ApiOrderService {
 	 * @param phoneConsumer	客户（使用此号码的人）姓名(选填)
 	 * @param phoneConsumerIdType	客户证件类型(选填) 目前只支持身份证
 	 * @param phoneConsumerIdNum	客户证件号码(选填)
+	 * @param logisticType	推荐物流(选填)
 	 * @return 返回result code=200成功；=888订单已生成，仓储异常；=500失败
 	 */
-	public Result submitCustomOrder(Integer num_id,Integer mead_id,String addr_name,String addr_phone,String addr,String conment,String thirdOrder,String bossNum,String phoneConsumer,String phoneConsumerIdType,String phoneConsumerIdNum){
+	public Result submitCustomOrder(Integer num_id,Integer mead_id,String addr_name,String addr_phone,String addr,String conment,String thirdOrder,String bossNum,String phoneConsumer,String phoneConsumerIdType,String phoneConsumerIdNum, String logisticType){
 		Number number=this.numberMapper.selectByPrimaryKey(num_id);
 		if(number==null)return new Result(Result.OTHER,"抱歉，尚未找到您提交的号码");
 		Integer sku_id=number.getSkuId();
@@ -224,6 +225,7 @@ public class ApiOrderService {
 		order_ext_param.put("phoneConsumer",phoneConsumer);
 		order_ext_param.put("phoneConsumerIdType",phoneConsumerIdType);
 		order_ext_param.put("phoneConsumerIdNum",phoneConsumerIdNum);
+		order_ext_param.put("logisticType",logisticType);
 		Result result= this.submitOrder(Constants.ORDER_TYPE_4.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);
 		return result;
     }
