@@ -1454,7 +1454,7 @@ public class ApiOrderService {
 					orderType(orderId);
 				}
 			}else { //异常或者超时
-				return new Result(Result.ERROR, "超时或者异常，请稍后再试");
+				return new Result(Result.ERROR, desc);
 			}
 		}
 		return new Result(Result.OK, "取消成功");
