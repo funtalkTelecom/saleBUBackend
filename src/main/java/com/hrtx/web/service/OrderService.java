@@ -124,7 +124,7 @@ public class OrderService extends BaseService {
         }
 
         Map param = CommonMap.create("receiver", order.getPersonName()).put("phone",order.getPersonTel()).put("address",order.getAddress())
-                .put("receiver_company", order.getOrderType() == 4 ? "jd乐语线上" : order.getConsumerName()).put("remark",order.getConment()+"#"+StringUtils.join(phones,"#"))
+                .put("receiver_company", order.getOrderType() == 4 ? "jd乐语线上" : order.getConsumerName()).put("remark",order.getConment())
                 .put("callback_url",SystemParam.get("domain-full")+"/order/deliver-order-callback").put("logistic_type", order.getLogisticType())
                 .put("commodities", commodities).put("order_id",order.getOrderId()).getData();
         Result result = StorageApiCallUtil.storageApiCall(param, "HK0004");
