@@ -1395,7 +1395,7 @@ public class ApiOrderService {
 			CancelOrderStatus(orderId,status,reason);
 			Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 			if(ispay.getCode()==Result.OK){  //已支付
-				if(ispay.getData().equals("1")){//线上支付
+				if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){//线上支付
 					CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 					Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
 					if(payR.getCode()==200){  //退款成功
@@ -1438,7 +1438,7 @@ public class ApiOrderService {
 				CancelOrderStatus(orderId,status,reason);
 				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 				if(ispay.getCode()==200){  //已支付
-					if(ispay.getData().equals("1")){ //线上支付
+					if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){ //线上支付
 						CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
 						if(payR.getCode()==Result.OK){  //退款成功
@@ -1454,7 +1454,7 @@ public class ApiOrderService {
 					orderType(orderId);
 				}
 			}else { //异常或者超时
-				return new Result(Result.ERROR, "超时或者异常，请稍后再试");
+				return new Result(Result.ERROR, desc);
 			}
 		}
 		return new Result(Result.OK, "取消成功");
