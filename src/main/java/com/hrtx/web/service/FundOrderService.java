@@ -38,6 +38,7 @@ public class FundOrderService extends BaseService {
     @Autowired private ShareService shareService;
     @Autowired private OrderItemMapper orderItemMapper;
     @Autowired private OrderMapper orderMapper;
+    @Autowired private OrderSettleMapper orderSettleMapper;
 
     /**
      * 平台订单支付（线下支付方式）
@@ -533,25 +534,27 @@ public class FundOrderService extends BaseService {
         return this.payHrPayOrder(orderNo,payer,payeeList,order.getTotal(),openid,orderName,Pay001.PAY_TRADE_TYPE_XCX,Pay001.PAY_MENTHOD_TYPE_1,Pay001.ORDER_TRADE_TYPE_1);
     }
 
-    public Result payHrOrderSettle(int order_id,List<Map> payeeList) {
-        String orderNo=String.valueOf("S"+order_id);//订单号
-        Example example = new Example(OrderItem.class);
-        example.createCriteria().andEqualTo("orderId",order_id).andGreaterThan("total",0);//订单大于0
-        List<OrderItem> items = orderItemMapper.selectByExample(example);
-        if(items.size()==0||items.size()>1) return new Result(Result.OK, "订单数据错误");
-        String payer=null;//原订单收款方结算时则为订单付款
-        double total=0d;
-        for(int i=0;i<items.size();i++){
-            OrderItem bean=items.get(i);
-            Result result=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_corp,bean.getSellerId());
-            if(result.getCode()!=Result.OK)return new Result(Result.ERROR, "付款账户不存在");
-            payer=String.valueOf(result.getData());
+    public Result payHrOrderSettle(Integer settle_id) {
+        OrderSettle orderSettle= orderSettleMapper.selectByPrimaryKey(settle_id);
+        String orderNo=String.valueOf(orderSettle.getOrderId()+"-"+orderSettle.getFeeType());//订单号
+        String payer=String.valueOf(orderSettle.getSettler());//支付方
+        List<Map> payeeList= new ArrayList<>();
+        Map map=new HashMap();
+        map.put("payee",orderSettle.getSettleUser());//收款分
+        map.put("item_amt",orderSettle.getSettleAmt().doubleValue());//结算金额
+        map.put("item_id",orderSettle.getId());//结算单
+        Double total=orderSettle.getSettleAmt().doubleValue();
+        payeeList.add(map);
+        String orderName=Constants.contantsToMap("PROMOTION_PLAN_FEETYPE").get(orderSettle.getFeeType());
+        log.info(String.format("结算单[%s]正式结算[%s],[%s],[%s],[%s]",orderSettle.getId(),orderNo,payer,total,orderName));
+        Result result=this.payHrPayOrder(orderNo,payer,payeeList,total,null,orderName,null,Pay001.PAY_MENTHOD_TYPE_5,Pay001.ORDER_TRADE_TYPE_2);
+        log.info(String.format("结算单[%s]结算结果[%s],[%s]",orderSettle.getId(),result.getCode(),result.getData()));
+        if(result.getCode()==Result.OK){
+            orderSettle.setStatus(Constants.ORDERSETTLE_STATUS_2.getIntKey());
+            orderSettle.setSettleDate(new Date());
+            this.orderSettleMapper.updateByPrimaryKey(orderSettle);
         }
-        for(Map map:payeeList){
-            total=Utils.sum(NumberUtils.toDouble(ObjectUtils.toString(map.get("item_amt"))),total);
-        }
-        String orderName="订单结算";
-        return this.payHrPayOrder(orderNo,payer,payeeList,total,null,orderName,null,Pay001.PAY_MENTHOD_TYPE_5,Pay001.ORDER_TRADE_TYPE_2);
+        return result;
     }
     public PayBase createPayBase() {
         String serial=Utils.randomNoByDateTime();

@@ -383,7 +383,7 @@ public class ApiOrderService {
 		double shippingTotal=0d;
 		double subTotal=0d;
 		List<OrderItem> itemNums=new ArrayList<>();
-		Order order=this.createOrderBean(order_type,sku.getSkuGoodsType(),user,user_agent,req_ip,address,shippingMenthodId,shippingMenthod,commission,shippingTotal,subTotal,conment);
+		Order order=this.createOrderBean(order_type,sku.getSkuGoodsType(),user,goods.getgSellerId(),user_agent,req_ip,address,shippingMenthodId,shippingMenthod,commission,shippingTotal,subTotal,conment);
 		try {
 			if(order_ext_param!=null){
 				log.info("存储订单额外参数信息");
@@ -562,7 +562,7 @@ public class ApiOrderService {
 		return bean;
 	}
 
-	private Order createOrderBean(int orderType,String skuGoodsType,Consumer user,String user_agent,String req_ip,DeliveryAddress address,String shippingMenthodId,String shippingMenthod,double commission, double shippingTotal, double subTotal,String conment){
+	private Order createOrderBean(int orderType,String skuGoodsType,Consumer user,int sellerId,String user_agent,String req_ip,DeliveryAddress address,String shippingMenthodId,String shippingMenthod,double commission, double shippingTotal, double subTotal,String conment){
 		int status=Constants.ORDER_STATUS_0.getIntKey();
 		String address1=address.getAddress();
 		if(address.getDistrictId()>0){
@@ -572,6 +572,7 @@ public class ApiOrderService {
 		Order order=new Order(user.getId(),user.getName(),status,StringUtils.substring(user_agent,0,300),req_ip,
 				orderType,shippingMenthodId,shippingMenthod,address.getId(),address.getPersonName(),address.getPersonTel(),
 				address1, commission, shippingTotal, subTotal,conment,skuGoodsType);
+		order.setSellerId(sellerId);
 		return order;
 	}
 //////////////////////////////////////////////////////////////////////////////////////

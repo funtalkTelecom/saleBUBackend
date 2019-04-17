@@ -10,18 +10,27 @@ import java.util.Date;
 public class OrderSettle  extends BasePojo{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    public static Double busi_pp_cost_fee=0.1d;//商家推广梧桐期望收取的费率
+    public static Double base_pp_price=1000d;//基础推广 销售价格点
+    public static Double base_pp_price_low_fee=0.2d;//基础推广  低于等于销售价格点的费率
+    public static Double base_pp_price_more_fee=0.1d;//基础推广  大于销售价格点的费率
+    public static int base_pp_price_month_count=5;//基础推广  每月最低单数
+
     private Integer id;
     private Integer orderId;
+    private Integer settler;//支付方
     private Integer feeType;
-    private Integer settleUser;
+    private Integer settleUser;//收款分
     private BigDecimal settleAmt;
     private Integer status;
     private Date addDate;
     private Date settleDate;
 
-    public OrderSettle(Integer orderId, Integer feeType, Integer settleUser,Double settleAmt, Integer status) {
+    public OrderSettle(Integer orderId, Integer feeType, Integer settler, Integer settleUser,Double settleAmt, Integer status) {
         this.orderId = orderId;
         this.feeType = feeType;
+        this.settler=settler;
         this.settleUser = settleUser;
         this.settleAmt = BigDecimal.valueOf(settleAmt);
         this.status = status;
@@ -105,5 +114,13 @@ public class OrderSettle  extends BasePojo{
 
     public void setSettleDate(Date settleDate) {
         this.settleDate = settleDate;
+    }
+
+    public Integer getSettler() {
+        return settler;
+    }
+
+    public void setSettler(Integer settler) {
+        this.settler = settler;
     }
 }
