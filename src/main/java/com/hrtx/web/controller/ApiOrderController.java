@@ -46,8 +46,9 @@ public class ApiOrderController extends BaseReturn {
             Integer numid = NumberUtils.toInt(request.getParameter("numid"));
             Integer mealid = Integer.valueOf(request.getParameter("mealid"));
             Integer share_id =NumberUtils.toInt(request.getParameter("share_id"));
+            String logisticType =request.getParameter("logistic_type");//期望使用的物流类型
             if ( numid==0 || mealid==0) return new Result(Result.ERROR, "参数有误");
-            return apiOrderService.submitNumOrder(skuid, numid, mealid, addrid, "",share_id);
+            return apiOrderService.submitNumOrder(skuid, numid, mealid, addrid, "",share_id,logisticType);
         }
     }
     @GetMapping("/order-express")

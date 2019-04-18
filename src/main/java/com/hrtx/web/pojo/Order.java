@@ -78,6 +78,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     private String phoneConsumerIdNum; //客户证件编码
     private String logisticType; //客户选择的寄送物流
     private Integer shareId; //下单编码
+    private Integer sellerId; //卖家编码
 
     @Transient
     private String num;
@@ -504,6 +505,14 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public void setShareId(Integer shareId) {
         this.shareId = shareId;
+    }
+
+    public Integer getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Integer sellerId) {
+        this.sellerId = sellerId;
     }
 
     public String getLogisticType() {

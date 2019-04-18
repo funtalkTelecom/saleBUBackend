@@ -164,7 +164,7 @@ public class ApiOrderService {
      * @param share_id	分享的编码
 	 * @return 返回result code=200成功；=888订单已生成，仓储异常；=500失败
 	 */
-	public Result submitNumOrder(Integer sku_id,Integer num_id,Integer mead_id,Integer address_id,String conment,int share_id){
+	public Result submitNumOrder(Integer sku_id,Integer num_id,Integer mead_id,Integer address_id,String conment,int share_id,String logisticType){
 		Consumer user = apiSessionUtil.getConsumer();
 		Result adresult=this.checkAddress(address_id,user.getId());
 		if(adresult.getCode()!=Result.OK)return adresult;
@@ -181,6 +181,7 @@ public class ApiOrderService {
 		if(result.getCode() != Result.OK)return result;
 		order_ext_param.put("bossNum",String.valueOf(result.getData()));
         order_ext_param.put("shareId",share_id);
+        order_ext_param.put("logisticType",logisticType);
 		return this.submitOrder(Constants.ORDER_TYPE_2.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);
 	}
 
@@ -385,7 +386,7 @@ public class ApiOrderService {
 		double shippingTotal=0d;
 		double subTotal=0d;
 		List<OrderItem> itemNums=new ArrayList<>();
-		Order order=this.createOrderBean(order_type,sku.getSkuGoodsType(),user,user_agent,req_ip,address,shippingMenthodId,shippingMenthod,commission,shippingTotal,subTotal,conment);
+		Order order=this.createOrderBean(order_type,sku.getSkuGoodsType(),user,goods.getgSellerId(),user_agent,req_ip,address,shippingMenthodId,shippingMenthod,commission,shippingTotal,subTotal,conment);
 		try {
 			if(order_ext_param!=null){
 				log.info("存储订单额外参数信息");
@@ -564,7 +565,7 @@ public class ApiOrderService {
 		return bean;
 	}
 
-	private Order createOrderBean(int orderType,String skuGoodsType,Consumer user,String user_agent,String req_ip,DeliveryAddress address,String shippingMenthodId,String shippingMenthod,double commission, double shippingTotal, double subTotal,String conment){
+	private Order createOrderBean(int orderType,String skuGoodsType,Consumer user,int sellerId,String user_agent,String req_ip,DeliveryAddress address,String shippingMenthodId,String shippingMenthod,double commission, double shippingTotal, double subTotal,String conment){
 		int status=Constants.ORDER_STATUS_0.getIntKey();
 		String address1=address.getAddress();
 		if(address.getDistrictId()>0){
@@ -574,6 +575,7 @@ public class ApiOrderService {
 		Order order=new Order(user.getId(),user.getName(),status,StringUtils.substring(user_agent,0,300),req_ip,
 				orderType,shippingMenthodId,shippingMenthod,address.getId(),address.getPersonName(),address.getPersonTel(),
 				address1, commission, shippingTotal, subTotal,conment,skuGoodsType);
+		order.setSellerId(sellerId);
 		return order;
 	}
 //////////////////////////////////////////////////////////////////////////////////////

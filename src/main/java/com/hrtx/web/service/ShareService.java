@@ -129,7 +129,7 @@ public class ShareService {
 			Map map=(Map)page.get(i);
 			Date date=(Date)map.get("share_date");
 			map.put("share_date",Utils.getDate(date,"yyyy-MM-dd HH:mm"));
-			Map<String,String> _map_num=findNumPromotionInfo(NumberUtils.toInt(ObjectUtils.toString(map.get("share_num_id"))));
+			Map<String,String> _map_num=findNumPromotionInfoToSharer(NumberUtils.toInt(ObjectUtils.toString(map.get("share_num_id"))));
 			map.putAll(_map_num);
 		}
 		PageInfo<Object> pm = new PageInfo<Object>(page);
@@ -176,17 +176,23 @@ public class ShareService {
 	/**
 	 * 创建订单结算数据(只生成数据不实际结算)
 	 * 需要结算的群体有
-	 * 	1.推广人佣金
-	 * 	2.服务费
-	 * 	3.交易费
-	 * 	4.发展人员
-	 * 	5.市场人员
-	 *
+	 *  卖家结算给
+	 *  	1、梧桐
+	 *  	2、合伙人推广费用
+	 *  梧桐结算给：
+	 * 		1.推广人佣金
+	 * 		2.服务费
+	 * 		3.交易费
+	 * 		4.发展人员
 	 */
 	public Result createOrderSettle(int order_id){
 		log.info(String.format("开始创建订单[%s]的结算清单",order_id));
 		int share_settle_user=-1;
 		Order order=orderMapper.selectByPrimaryKey(order_id);
+		Result result=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_corp,order.getSellerId());
+		if(result.getCode()!=Result.OK)return new Result(Result.ERROR, "付款账户不存在");
+		int order_payer=NumberUtils.toInt(ObjectUtils.toString(result.getData()));
+
 		double order_price=order.getTotal();
 		int[] ok_order_status=new int[]{Constants.ORDER_STATUS_2.getIntKey(),Constants.ORDER_STATUS_3.getIntKey()};
 		if(!ArrayUtils.contains(ok_order_status,order.getStatus()))return new Result(Result.ERROR,"订单状态非可结算状态");
@@ -211,77 +217,159 @@ public class ShareService {
 
 		NumBrowse bean=new NumBrowse(num_id,null,order.getConsumer(),null,null,SessionUtil.getUserIp(),Constants.NUMBROWSE_ACTTYPE_2.getIntKey(),order.getShareId());
 		this.addBrowse(bean);
+		//市场人员(梧桐)
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_5.getIntKey();
+		Result result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_5.getIntKey());
+		int cost_payer=NumberUtils.toInt(String.valueOf(result_settle.getData()));
+		initSettleFee(order_id,num_id,fee_type,order_price,order_payer,cost_payer,cost_payer,true,NumberUtils.toDouble(SystemParam.get("settle_market_fee"),5),1,NumberUtils.toDouble(SystemParam.get("settle_market_fee_limit"),500));
 
-		fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();//结算用户
-		initSettleFee(order_id,num_id,fee_type,order_price,share_settle_user,false,0d,0,0d);
+		//商家推广费用
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();
+		initSettleFee(order_id,num_id,fee_type,order_price,order_payer,share_settle_user,cost_payer,false,0d,0,0d);
+
+		//基础推广费用
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey();
+		initSettleFee(order_id,num_id,fee_type,order_price,cost_payer,share_settle_user,cost_payer,false,0d,0,0d);
+
 		//技术服务费
-		fee_type=Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey();//结算用户
-		Result result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey());
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey();
+		result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey());
 		int settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
-		initSettleFee(order_id,num_id,fee_type,order_price,settle_user,true,NumberUtils.toDouble(SystemParam.get("settle_tech_fee"),2),1,NumberUtils.toDouble(SystemParam.get("settle_tech_fee_limit"),50));
+		initSettleFee(order_id,num_id,fee_type,order_price,cost_payer,settle_user,cost_payer,true,NumberUtils.toDouble(SystemParam.get("settle_tech_fee"),2),1,NumberUtils.toDouble(SystemParam.get("settle_tech_fee_limit"),50));
 		//交易费
-		fee_type=Constants.PROMOTION_PLAN_FEETYPE_3.getIntKey();//结算用户
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_3.getIntKey();
 		result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_3.getIntKey());
 		settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
-		initSettleFee(order_id,num_id,fee_type,order_price,settle_user,true,NumberUtils.toDouble(SystemParam.get("settle_pay_fee"),0.8),0,0d);
+		initSettleFee(order_id,num_id,fee_type,order_price,cost_payer,settle_user,cost_payer,true,NumberUtils.toDouble(SystemParam.get("settle_pay_fee"),0.8),0,0d);
 		//发展人员
-		fee_type=Constants.PROMOTION_PLAN_FEETYPE_4.getIntKey();//结算用户
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_4.getIntKey();
 		result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_4.getIntKey());
 		settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
-		initSettleFee(order_id,num_id,fee_type,order_price,settle_user,true,NumberUtils.toDouble(SystemParam.get("settle_expand_fee"),0.05),1,NumberUtils.toDouble(SystemParam.get("settle_expand_fee_limit"),500));
-		//市场人员
-		fee_type=Constants.PROMOTION_PLAN_FEETYPE_5.getIntKey();//结算用户
-		result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_5.getIntKey());
-		settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
-		initSettleFee(order_id,num_id,fee_type,order_price,settle_user,true,NumberUtils.toDouble(SystemParam.get("settle_market_fee"),5),1,NumberUtils.toDouble(SystemParam.get("settle_market_fee_limit"),500));
+		initSettleFee(order_id,num_id,fee_type,order_price,cost_payer,settle_user,cost_payer,true,NumberUtils.toDouble(SystemParam.get("settle_expand_fee"),0.05),1,NumberUtils.toDouble(SystemParam.get("settle_expand_fee_limit"),500));
 
 		return new Result(Result.OK,"结算创建成功");
 	}
 
 	/**
 	 * 订单正式结算(进行确认支付，费用、佣金等结算)
+	 *  卖家结算给
+	 *  	1、梧桐
+	 *  	2、合伙人推广费用
+	 *  梧桐结算给：
+	 * 		1.推广人佣金  支付月份，订单签收不足5个不予结算，超过后全部结算
+	 * 		2.服务费
+	 * 		3.交易费
+	 * 		4.发展人员
 	 * @param order_id	订单号
 	 * @return
 	 */
 	public Result orderSettle(int order_id){
+		//结算需要有先后顺序(重要)
 		Result result=fundOrderService.payHrPayOrderSign(order_id+"");
 		log.info(String.format("订单签收结果[%s],[%s]",result.getCode(),result.getData()));
 		Example example = new Example(OrderSettle.class);
 		example.createCriteria().andEqualTo("orderId",order_id).andEqualTo("status",Constants.ORDERSETTLE_STATUS_1.getIntKey());
 		List<OrderSettle> _list=this.orderSettleMapper.selectByExample(example);
 		if(_list.isEmpty()) return new Result(Result.ERROR,"暂无需要结算的费用");
-		List<Map> payeeList= new ArrayList<>();
-		for(OrderSettle orderSettle:_list){
-			Map map=new HashMap();
-			map.put("payee",orderSettle.getSettleUser());
-			map.put("item_amt",orderSettle.getSettleAmt().doubleValue());
-			map.put("item_id",orderSettle.getId());
-			payeeList.add(map);
+		int fee_type_seller[]=new int[]{Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(),Constants.PROMOTION_PLAN_FEETYPE_5.getIntKey()};
+		int fee_type_cost[]=new int[]{Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey(),Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey(),Constants.PROMOTION_PLAN_FEETYPE_4.getIntKey()};
+		int fee_type_pp[]=new int[]{Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey()};
+		int has_success=0;
+		for(OrderSettle orderSettle:_list){//结算卖家应支付的
+			if(!ArrayUtils.contains(fee_type_seller,orderSettle.getFeeType()))continue;
+			result=this.fundOrderService.payHrOrderSettle(orderSettle.getId());
+			if(result.getCode()==Result.OK)has_success+=1;
 		}
-		OrderSettle settle=new OrderSettle();
-		settle.setStatus(Constants.ORDERSETTLE_STATUS_2.getIntKey());
-		settle.setSettleDate(new Date());
-		result=this.fundOrderService.payHrOrderSettle(order_id,payeeList);
-		log.info(String.format("订单结算结果[%s],[%s]",result.getCode(),result.getData()));
-		if(result.getCode()==Result.OK)this.orderSettleMapper.updateByExampleSelective(settle,example);
-		return result;
+		for(OrderSettle orderSettle:_list){//结算市场方应支付的
+			if(!ArrayUtils.contains(fee_type_cost,orderSettle.getFeeType()))continue;
+			result=this.fundOrderService.payHrOrderSettle(orderSettle.getId());
+			if(result.getCode()==Result.OK)has_success+=1;
+		}
+		for(OrderSettle orderSettle:_list){//结算市场方应支付的基础推广
+			if(!ArrayUtils.contains(fee_type_pp,orderSettle.getFeeType()))continue;
+			//检查此结算单当月是否有完成5单(此单亦会被统计)
+			String month=Utils.getDate(orderSettle.getAddDate(),"yyyyMM");
+			List<Map> month_sign=this.orderSettleMapper.settleUserMonthSignCount(orderSettle.getFeeType(),orderSettle.getSettleUser(),month);
+			if(month_sign.size()<OrderSettle.base_pp_price_month_count)continue;
+			result=this.fundOrderService.payHrOrderSettle(orderSettle.getId());
+			if(result.getCode()==Result.OK)has_success+=1;
+			log.info("结算因对应月份单数不足而无法结算的推广佣金");
+			for(Map map:month_sign){
+				int settle_id=NumberUtils.toInt(ObjectUtils.toString(map.get("id")));
+				int status=NumberUtils.toInt(ObjectUtils.toString(map.get("status")));
+				if(settle_id==0)continue;
+				if(status!=Constants.ORDERSETTLE_STATUS_1.getIntKey())continue;
+				result=this.fundOrderService.payHrOrderSettle(settle_id);
+				if(result.getCode()==Result.OK)has_success+=1;
+			}
+			//TODO 处理绝对满足不了的单据
+		}
+		return new Result(Result.OK,String.format("订单结算结束,应结算[%s]单，实结算(含其他基础佣金待结算的)[%s]",_list.size(),has_success));
 	}
 
-	private Result initSettleFee(int order_id,int num_id,int fee_type,double order_price,int settle_user,boolean emptyAndInit,double init_award,int init_limit,double init_limit_award){
+	public Result clearOrderSettle(String month){
+		Calendar calendar=Calendar.getInstance();
+		String curr_month=Utils.getDate(calendar.getTime(),"yyyyMM");
+		if(StringUtils.equals(curr_month,month))return new Result(Result.ERROR,"本月尚未结束禁止清除");
+		if(StringUtils.isEmpty(month)){
+			calendar.set(Calendar.MONTH,calendar.get(Calendar.MONTH)-1);//减去一个月
+			month=Utils.getDate(calendar.getTime(),"yyyyMM");
+		}
+		List<Map> list=this.orderSettleMapper.queryMonthSettle(Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey(),month,OrderSettle.base_pp_price_month_count);
+
+		//settle_user,date_format(os.add_date,'%Y%m') settle_month,count(1) sign_count,group_concat(os.id) settle_ids
+		for(Map map:list) {
+			String settle_user=ObjectUtils.toString(map.get("settle_user"));
+			String settle_month=ObjectUtils.toString(map.get("settle_month"));
+			String settle_ids=ObjectUtils.toString(map.get("settle_ids"));
+			String sign_count=ObjectUtils.toString(map.get("sign_count"));
+			log.info(String.format("结算用户[%s]上个月[%s]仅推广[%s]单,由于数量不足，该月结算将设置为失效,涉及结算单号[%s]",settle_user,settle_month,sign_count,settle_ids));
+
+			List<Object> os_ids=new ArrayList<>();
+			String[] ids=settle_ids.split(",");
+			for(String id:ids){
+				os_ids.add(NumberUtils.toInt(id));
+			}
+			Example example = new Example(OrderSettle.class);
+			example.createCriteria().andIn("id",os_ids).andEqualTo("status",Constants.ORDERSETTLE_STATUS_1.getIntKey());
+			OrderSettle orderSettle=new OrderSettle();
+			orderSettle.setStatus(Constants.ORDERSETTLE_STATUS_3.getIntKey());
+			this.orderSettleMapper.updateByExampleSelective(orderSettle,example);
+		}
+
+		return new Result(Result.OK,"ok");
+	}
+
+	private Result initSettleFee(int order_id,int num_id,int fee_type,double order_price,int settler,int settle_user,int cost_settler,boolean emptyAndInit,double init_award,int init_limit,double init_limit_award){
         if(settle_user==-1)return new Result(Result.OK,"结算用户不存在");
         Example example = new Example(OrderSettle.class);
         example.createCriteria().andEqualTo("orderId",order_id).andEqualTo("feeType",fee_type).andIn("status",Arrays.asList(new Object[]{Constants.ORDERSETTLE_STATUS_1.getIntKey(),Constants.ORDERSETTLE_STATUS_2.getIntKey()}));
         List<OrderSettle> _list=this.orderSettleMapper.selectByExample(example);
         if(!_list.isEmpty())return new Result(Result.OK,"该订单类型已经结算");
 		Map<String,String> _map=findNumPromotionInfo(fee_type,num_id,order_price);
-		if(emptyAndInit&&StringUtils.equals(_map.get("is_pp"),"0")){
-			Num num=numMapper.selectByPrimaryKey(num_id);
-			initSettlePromotionPlan(num.getSellerId(),fee_type,init_award,init_limit,init_limit_award);
-			_map=findNumPromotionInfo(fee_type,num_id,order_price);
+		Double income=0d;
+		if(fee_type==Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey()){//基础推广，订单金额小于等于1000 按10%；大于1000 按10%； 且无上限
+			income=NumberUtils.toDouble(_map.get("income"));
+			income=Arith.mul(income,order_price>OrderSettle.base_pp_price?OrderSettle.base_pp_price_more_fee:OrderSettle.base_pp_price_low_fee);
+		}else{
+			if(emptyAndInit&&StringUtils.equals(_map.get("is_pp"),"0")){
+				Num num=numMapper.selectByPrimaryKey(num_id);
+				initSettlePromotionPlan(num.getSellerId(),fee_type,init_award,init_limit,init_limit_award);
+				_map=findNumPromotionInfo(fee_type,num_id,order_price);
+			}
+			income=NumberUtils.toDouble(_map.get("income"));
 		}
-		OrderSettle orderSettle=new OrderSettle(order_id,fee_type,settle_user,NumberUtils.toDouble(_map.get("income")),Constants.ORDERSETTLE_STATUS_1.getIntKey());
-        this.orderSettleMapper.insert(orderSettle);
-        log.info(String.format("订单[%s]结算[%s]给用户[%s]费用[%s]",order_id,fee_type,settle_user,_map.get("income")));
+		OrderSettle orderSettle=null;
+		if(fee_type==Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey()){//&&income>0d 若是商家的推广费用，梧桐需要收取10%费用
+			Double sss_fee=Arith.mul(income,Arith.sub(1,OrderSettle.busi_pp_cost_fee));
+			orderSettle=new OrderSettle(order_id,fee_type,settler,cost_settler,Arith.sub(income,sss_fee),Constants.ORDERSETTLE_STATUS_1.getIntKey());
+			this.orderSettleMapper.insert(orderSettle);
+			orderSettle=new OrderSettle(order_id,fee_type,settler,settle_user,sss_fee,Constants.ORDERSETTLE_STATUS_1.getIntKey());
+		}else{
+			orderSettle=new OrderSettle(order_id,fee_type,settler,settle_user,income,Constants.ORDERSETTLE_STATUS_1.getIntKey());
+		}
+		this.orderSettleMapper.insert(orderSettle);
+        log.info(String.format("订单[%s]结算[%s]给用户[%s]费用[%s],支出方[%s]",order_id,fee_type,settle_user,income,settler));
 		return new Result(Result.OK,"结算创建成功");
 	}
 	private PromotionPlan initSettlePromotionPlan(int corp_id,int feeType,Double award,int isLimit,Double limit_award){
@@ -325,11 +413,18 @@ public class ShareService {
 		return _map;
 	}
 
-	public Map<String,String> findNumPromotionInfo(Integer num_id){
+	/**
+	 * 提供给分享者 查阅预期收益
+	 * @param num_id
+	 * @return
+	 */
+	public Map<String,String> findNumPromotionInfoToSharer(Integer num_id){
 		Result curr_price = apiOrderService.findNumSalePrice(num_id);
 		Double num_price=0d;
 		if(curr_price.getCode()==Result.OK)num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
 		Map<String,String> _map=findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(),num_id,num_price);
+		//_map.put("income",ppfee==null?"0":Utils.convertFormat(ppfee,1));//预期收益
+		_map.put("income",Utils.convertFormat(Arith.mul(NumberUtils.toDouble(_map.get("income")),Arith.sub(1,OrderSettle.busi_pp_cost_fee)),1));//预期收益
 		return _map;
 	}
 
@@ -375,7 +470,7 @@ public class ShareService {
 			bean=_share_list.get(0);
 		}
 		Map<String,String> _map=new HashMap<>();
-		Map<String,String> _map_num=findNumPromotionInfo(num_id);
+		Map<String,String> _map_num=findNumPromotionInfoToSharer(num_id);
 		_map.put("num_id",num.getId()+"");//号码编码
 		_map.put("num_resource",num.getNumResource());//号码
 		_map.put("city_name",num.getCityName());//地市
@@ -658,7 +753,7 @@ public class ShareService {
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_2.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),null,num.getNumResource());
 		ppbean.setFeeType(fee_type);
 		List<?> list= this.promotionPlanMapper.queryPageList(ppbean);
-		log.info(String.format("查得以号码[编码%s]的推广计划[%s]条",num_id,list.size()));
+		log.debug(String.format("查得以号码[编码%s]的推广计划[%s]条",num_id,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));
 		//2.按价格查
 //		Result curr_price = apiOrderService.findNumSalePrice(num_id);
@@ -667,13 +762,13 @@ public class ShareService {
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_1.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),num_price,null);
 		ppbean.setFeeType(fee_type);
 		list= this.promotionPlanMapper.queryPageList(ppbean);
-		log.info(String.format("查得以号码[编码%s]销售价[%s]的推广计划[%s]条",num_id,num_price,list.size()));
+		log.debug(String.format("查得以号码[编码%s]销售价[%s]的推广计划[%s]条",num_id,num_price,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));
 		//3.按全号码查
 		ppbean=new PromotionPlan(num.getSellerId(),Constants.PROMOTION_PLAN_PROMOTION_0.getIntKey(),Constants.PROMOTION_PLAN_STATUS_2.getIntKey(),new Date(),null,null);
 		ppbean.setFeeType(fee_type);
 		list= this.promotionPlanMapper.queryPageList(ppbean);
-		log.info(String.format("查得全号码[号码编码%s]的推广计划[%s]条",num_id,list.size()));
+		log.debug(String.format("查得全号码[号码编码%s]的推广计划[%s]条",num_id,list.size()));
 		if(list.size()>0)return new Result(Result.OK,list.get(0));
 		//4.未参与推广
 		return new Result(Result.ERROR,"号码未参与推广");
