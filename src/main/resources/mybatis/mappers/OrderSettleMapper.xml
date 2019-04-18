@@ -3,7 +3,9 @@
 <mapper namespace="com.hrtx.web.mapper.OrderSettleMapper" >
 
     <select id="countConsumerSettle" resultType="java.util.HashMap">
-        select sum(o.settle_amt) all_settle,sum(od.sub_total) sale_price,count(1) sale_count,
+        select sum(o.settle_amt) all_settle,
+        sum(CASE WHEN o.fee_type=6 THEN od.sub_total	ELSE 0 END ) sale_price,
+	    sum(CASE WHEN o.fee_type=6 THEN 1	ELSE 0 END) sale_count,
         sum(CASE WHEN o.status=1 THEN o.settle_amt	ELSE 0 END ) wait_settle,
         sum(CASE WHEN o.status=2 THEN o.settle_amt	ELSE 0 END) has_settle
         from tb_order_settle o left join tb_order od on od.order_id=o.order_id
