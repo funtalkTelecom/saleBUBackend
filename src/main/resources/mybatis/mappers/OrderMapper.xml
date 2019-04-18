@@ -139,10 +139,9 @@
     </select>
 
     <select id="queryPageList" resultType="Order">
-        select distinct
+        select
         <include refid="col_list"/>
-        from tb_order a left join tb_order_item m on a.order_id = m.order_id
-        where 1=1 and a.is_del=0
+        from tb_order a where 1=1 and a.is_del=0
         <if test="param.orderId!=null and param.orderId!=''">
             and a.order_id = #{param.orderId}
         </if>
@@ -153,7 +152,7 @@
             and a.third_order = #{param.thirdOrder}
         </if>
         <if test="param.num!=null and param.num!=''">
-            and m.num =#{param.num}
+            and exists (select 1 from tb_order_item where a.order_id = m.order_id and m.num = #{param.num})
         </if>
         <if test="param.personName!=null and param.personName!=''">
             and a.person_name like "%"#{param.personName}"%"
