@@ -29,5 +29,5 @@ public interface OrderSettleMapper  extends Mapper<OrderSettle>,BaseMapper<Order
      * @param settle_month
      * @return
      */
-    public List<Map> queryMonthSettle(@Param("fee_type") int fee_type,@Param("settle_month") String settle_month,@Param("settle_month") int limit_count);
+    public List<Map> queryMonthSettle(@Param("fee_type") int fee_type,@Param("settle_month") String settle_month,@Param("limit_count") int limit_count);
 }

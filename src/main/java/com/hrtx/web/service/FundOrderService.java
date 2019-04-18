@@ -546,7 +546,7 @@ public class FundOrderService extends BaseService {
         Double total=orderSettle.getSettleAmt().doubleValue();
         payeeList.add(map);
         String orderName=Constants.contantsToMap("PROMOTION_PLAN_FEETYPE").get(orderSettle.getFeeType());
-        log.info(String.format("结算单[%s]正式结算[%s],[%s],[%s],[%s]",orderSettle.getId(),orderNo,payer,total,orderName));
+        log.info(String.format("结算单[%s]正式结算[%s],[%s],[%s],[%s],[%s]",orderSettle.getId(),orderNo,payer,orderSettle.getSettleUser(),total,orderName));
         Result result=this.payHrPayOrder(orderNo,payer,payeeList,total,null,orderName,null,Pay001.PAY_MENTHOD_TYPE_5,Pay001.ORDER_TRADE_TYPE_2);
         log.info(String.format("结算单[%s]结算结果[%s],[%s]",orderSettle.getId(),result.getCode(),result.getData()));
         if(result.getCode()==Result.OK){
