@@ -591,13 +591,13 @@ public class OrderService extends BaseService {
 //    @Scheduled(fixedRate=6000)update by zjc 2018.12.20  统一关闭应用定时器，由外部调用
     public void TowHoursCancelOrderStatusTimer(){
         if(!"true".equals(SystemParam.get("twoHours_timer"))) return;
-        log.info("开始执行2个小时未付款订单期定时器");
+        log.info("开始执行1个小时未付款订单期定时器");//update by zjc 2019.4.18 缩小到1小时
         List list = orderMapper.getTwoHoursOrderList();
         if(list.size()>0){
             for(int i=0; i<list.size(); i++){
                 Map map = (Map) list.get(i);
                 String orderid = String.valueOf(map.get("orderid"));
-                String note ="系统取消，原因：2小时未付款";
+                String note ="系统取消，原因：超时未付款";
                 try {
                     log.info("取消订单号:"+orderid);
                     apiOrderService.CancelOrder(orderid,note);
