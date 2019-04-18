@@ -223,7 +223,7 @@ public class TestController {
     @Powers({PowerConsts.NOLOGINPOWER})
     @ResponseBody
     public Result helloworld12() {
-        Integer sku_id=500;
+        /*Integer sku_id=500;
         Integer goods_id=498;
         Integer num_id=23;
         Integer mead_id=501;
@@ -233,9 +233,9 @@ public class TestController {
 //        System.out.println(result.getData());
 //        Result result= this.apiOrderService.submitCustomOrder(num_id,mead_id,"张先生","18965902602","福建福州仓山工农街36-91",conment,"20181218001","LYB8019","张进春","身份证","35222919112341");
         System.out.println(result.getData());
-        return result;
+        return result;*/
 //        this.apiOrderService.test();
-//        return null;
+        return null;
     }
 
 
