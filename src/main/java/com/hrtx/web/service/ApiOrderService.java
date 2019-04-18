@@ -197,9 +197,10 @@ public class ApiOrderService {
 	 * @param phoneConsumer	客户（使用此号码的人）姓名(选填)
 	 * @param phoneConsumerIdType	客户证件类型(选填) 目前只支持身份证
 	 * @param phoneConsumerIdNum	客户证件号码(选填)
+	 * @param logisticType	推荐物流(选填)
 	 * @return 返回result code=200成功；=888订单已生成，仓储异常；=500失败
 	 */
-	public Result submitCustomOrder(Integer num_id,Integer mead_id,String addr_name,String addr_phone,String addr,String conment,String thirdOrder,String bossNum,String phoneConsumer,String phoneConsumerIdType,String phoneConsumerIdNum){
+	public Result submitCustomOrder(Integer num_id,Integer mead_id,String addr_name,String addr_phone,String addr,String conment,String thirdOrder,String bossNum,String phoneConsumer,String phoneConsumerIdType,String phoneConsumerIdNum, String logisticType){
 		Number number=this.numberMapper.selectByPrimaryKey(num_id);
 		if(number==null)return new Result(Result.OTHER,"抱歉，尚未找到您提交的号码");
 		Integer sku_id=number.getSkuId();
@@ -224,6 +225,7 @@ public class ApiOrderService {
 		order_ext_param.put("phoneConsumer",phoneConsumer);
 		order_ext_param.put("phoneConsumerIdType",phoneConsumerIdType);
 		order_ext_param.put("phoneConsumerIdNum",phoneConsumerIdNum);
+		order_ext_param.put("logisticType",logisticType);
 		Result result= this.submitOrder(Constants.ORDER_TYPE_4.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);
 		return result;
     }
@@ -1394,7 +1396,7 @@ public class ApiOrderService {
 			CancelOrderStatus(orderId,status,reason);
 			Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 			if(ispay.getCode()==Result.OK){  //已支付
-				if(ispay.getData().equals("1")){//线上支付
+				if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){//线上支付
 					CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 					Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
 					if(payR.getCode()==200){  //退款成功
@@ -1437,7 +1439,7 @@ public class ApiOrderService {
 				CancelOrderStatus(orderId,status,reason);
 				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 				if(ispay.getCode()==200){  //已支付
-					if(ispay.getData().equals("1")){ //线上支付
+					if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){ //线上支付
 						CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
 						if(payR.getCode()==Result.OK){  //退款成功
@@ -1453,7 +1455,7 @@ public class ApiOrderService {
 					orderType(orderId);
 				}
 			}else { //异常或者超时
-				return new Result(Result.ERROR, "超时或者异常，请稍后再试");
+				return new Result(Result.ERROR, desc);
 			}
 		}
 		return new Result(Result.OK, "取消成功");
