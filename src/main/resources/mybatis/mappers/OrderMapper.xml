@@ -152,7 +152,7 @@
             and a.third_order = #{param.thirdOrder}
         </if>
         <if test="param.num!=null and param.num!=''">
-            and exists (select 1 from tb_order_item where a.order_id = m.order_id and m.num = #{param.num})
+            and exists (select 1 from tb_order_item m where a.order_id = m.order_id and m.num = #{param.num})
         </if>
         <if test="param.personName!=null and param.personName!=''">
             and a.person_name like "%"#{param.personName}"%"
