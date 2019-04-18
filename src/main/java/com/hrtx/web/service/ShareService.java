@@ -313,6 +313,7 @@ public class ShareService {
 		String curr_month=Utils.getDate(calendar.getTime(),"yyyyMM");
 		if(StringUtils.equals(curr_month,month))return new Result(Result.ERROR,"本月尚未结束禁止清除");
 		if(StringUtils.isEmpty(month)){
+			if(calendar.get(Calendar.DAY_OF_MONTH)>2)return new Result(Result.ERROR,"默认仅每月1号执行");
 			calendar.set(Calendar.MONTH,calendar.get(Calendar.MONTH)-1);//减去一个月
 			month=Utils.getDate(calendar.getTime(),"yyyyMM");
 		}
@@ -358,7 +359,8 @@ public class ShareService {
 				initSettlePromotionPlan(num.getSellerId(),fee_type,init_award,init_limit,init_limit_award);
 				_map=findNumPromotionInfo(fee_type,num_id,order_price);
 			}
-			income=NumberUtils.toDouble(_map.get("income"));
+			String income_m=_map.get("income_f");
+			income=NumberUtils.toDouble(income_m);
 		}
 		OrderSettle orderSettle=null;
 		if(fee_type==Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey()){//&&income>0d 若是商家的推广费用，梧桐需要收取10%费用
@@ -408,6 +410,7 @@ public class ShareService {
 		Num num=numMapper.selectByPrimaryKey(num_id);
 		_map.put("is_pp",ppbean==null?"0":"1");//是否进行推广1是0否
 		_map.put("income",ppfee==null?"0":Utils.convertFormat(ppfee,1));//预期收益
+		_map.put("income_f",ppfee==null?"0":String.valueOf(ppfee));//预期收益
 		_map.put("valid_date",valid_date==null?"":valid_date);//有效期至
 		_map.put("sale_price",Utils.convertFormat(num_price,1));//号码当前售价
 		_map.put("num_sale",num.getStatus()==Constants.NUM_STATUS_2.getIntKey()?"1":"0");//号码销售状态
