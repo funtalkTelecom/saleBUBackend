@@ -20,10 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class BaseReturn {
@@ -189,7 +186,8 @@ public class BaseReturn {
 		}
 		// ==========验证文件后缀end==========//
 		Map<String, Object> map = new HashMap<>();
-		String bname = Utils.randomNoByDateTime();
+//		String bname = Utils.randomNoByDateTime();
+		String bname = UUID.randomUUID().toString();
 		String sourceServerFileName = bname + "."+suffix_v;
 		map.put("sourceServerFileName", sourceServerFileName);  //服务器原文件名称
 		map.put("sourceFileName", originalFilename);			//上传文件名
