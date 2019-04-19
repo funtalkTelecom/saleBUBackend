@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public interface ConsumerMapper extends Mapper<Consumer>,BaseMapper<Consumer>{
 
-    void insertConsumer (@Param("userid") Integer userid, @Param("name") String name,
-                           @Param("phone") String phone, @Param("nickName") String nickName,
+    void insertConsumer (@Param("userid") Integer userid, @Param("nickName") String nickName,
                            @Param("img") String img, @Param("province") String province, @Param("city") String city);
 
     /***
