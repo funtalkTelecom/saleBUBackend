@@ -8,8 +8,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 @Table(name = "tb_order_settle")
 public class OrderSettle  extends BasePojo{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     public static Double busi_pp_cost_fee=0.1d;//商家推广梧桐期望收取的费率
     public static Double base_pp_price=1000d;//基础推广 销售价格点
@@ -17,6 +15,8 @@ public class OrderSettle  extends BasePojo{
     public static Double base_pp_price_more_fee=0.1d;//基础推广  大于销售价格点的费率
     public static int base_pp_price_month_count=5;//基础推广  每月最低单数
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer orderId;
     private Integer settler;//支付方

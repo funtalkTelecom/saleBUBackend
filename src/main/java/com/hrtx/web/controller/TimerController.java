@@ -88,7 +88,7 @@ public class TimerController extends BaseReturn{
 			int sellerId= NumberUtils.toInt(request.getParameter("sellerId"));
 			if(sellerId == 0) return new Result(Result.ERROR,"请传入虚商id");
 			this.lyCrmService.synchBaseToNum(sellerId);
-		}else if(StringUtils.equals(task,"base-to-num")){//删除对应月份结算数据,一般每月1号执行
+		}else if(StringUtils.equals(task,"clear-settle")){//删除对应月份结算数据,一般每月1号执行
 			String month=request.getParameter("month");
 			this.shareService.clearOrderSettle(month);
 		}

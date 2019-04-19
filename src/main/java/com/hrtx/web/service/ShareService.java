@@ -33,8 +33,6 @@ public class ShareService {
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private ShareMapper shareMapper;
 	@Autowired private NumBrowseMapper numBrownseMapper;
-	@Autowired private AgentService agentService;
-	@Autowired private NumPriceMapper numPriceMapper;
 	@Autowired private ApiOrderService apiOrderService;
 	@Autowired private NumMapper numMapper;
 	@Autowired private ImageService imageService;
@@ -92,7 +90,7 @@ public class ShareService {
 		_map.put("share_browse",browse_count+"");//浏览量
 		Double sale_count=0d,sale_price=0d,wait_settle=0d,has_settle=0d,all_settle=0d,balance=0d;
 		list=this.orderSettleMapper.countConsumerSettle(NumberUtils.toInt(String.valueOf(result1.getData())));
-		if(list.size()>0){
+		if(list.size()>0&&list.get(0)!=null){
 			Map map=(Map)list.get(0);
 			sale_count=NumberUtils.toDouble(ObjectUtils.toString(map.get("sale_count")));
 			sale_price=NumberUtils.toDouble(ObjectUtils.toString(map.get("sale_price")));
@@ -271,8 +269,9 @@ public class ShareService {
 		example.createCriteria().andEqualTo("orderId",order_id).andEqualTo("status",Constants.ORDERSETTLE_STATUS_1.getIntKey());
 		List<OrderSettle> _list=this.orderSettleMapper.selectByExample(example);
 		if(_list.isEmpty()) return new Result(Result.ERROR,"暂无需要结算的费用");
+		//新增的类型若此处为配置或错误亦会导致费用无法结算
 		int fee_type_seller[]=new int[]{Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(),Constants.PROMOTION_PLAN_FEETYPE_5.getIntKey()};
-		int fee_type_cost[]=new int[]{Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey(),Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey(),Constants.PROMOTION_PLAN_FEETYPE_4.getIntKey()};
+		int fee_type_cost[]=new int[]{Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey(),Constants.PROMOTION_PLAN_FEETYPE_3.getIntKey(),Constants.PROMOTION_PLAN_FEETYPE_4.getIntKey()};
 		int fee_type_pp[]=new int[]{Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey()};
 		int has_success=0;
 		for(OrderSettle orderSettle:_list){//结算卖家应支付的
@@ -312,6 +311,7 @@ public class ShareService {
 		String curr_month=Utils.getDate(calendar.getTime(),"yyyyMM");
 		if(StringUtils.equals(curr_month,month))return new Result(Result.ERROR,"本月尚未结束禁止清除");
 		if(StringUtils.isEmpty(month)){
+			if(calendar.get(Calendar.DAY_OF_MONTH)>2)return new Result(Result.ERROR,"默认仅每月1号执行");
 			calendar.set(Calendar.MONTH,calendar.get(Calendar.MONTH)-1);//减去一个月
 			month=Utils.getDate(calendar.getTime(),"yyyyMM");
 		}
@@ -333,6 +333,7 @@ public class ShareService {
 			Example example = new Example(OrderSettle.class);
 			example.createCriteria().andIn("id",os_ids).andEqualTo("status",Constants.ORDERSETTLE_STATUS_1.getIntKey());
 			OrderSettle orderSettle=new OrderSettle();
+			orderSettle.setSettleDate(new Date());
 			orderSettle.setStatus(Constants.ORDERSETTLE_STATUS_3.getIntKey());
 			this.orderSettleMapper.updateByExampleSelective(orderSettle,example);
 		}
@@ -349,15 +350,15 @@ public class ShareService {
 		Map<String,String> _map=findNumPromotionInfo(fee_type,num_id,order_price);
 		Double income=0d;
 		if(fee_type==Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey()){//基础推广，订单金额小于等于1000 按10%；大于1000 按10%； 且无上限
-			income=NumberUtils.toDouble(_map.get("income"));
-			income=Arith.mul(income,order_price>OrderSettle.base_pp_price?OrderSettle.base_pp_price_more_fee:OrderSettle.base_pp_price_low_fee);
+			income=Arith.mul(order_price,order_price>OrderSettle.base_pp_price?OrderSettle.base_pp_price_more_fee:OrderSettle.base_pp_price_low_fee);
 		}else{
 			if(emptyAndInit&&StringUtils.equals(_map.get("is_pp"),"0")){
 				Num num=numMapper.selectByPrimaryKey(num_id);
 				initSettlePromotionPlan(num.getSellerId(),fee_type,init_award,init_limit,init_limit_award);
 				_map=findNumPromotionInfo(fee_type,num_id,order_price);
 			}
-			income=NumberUtils.toDouble(_map.get("income"));
+			String income_m=_map.get("income_f");
+			income=NumberUtils.toDouble(income_m);
 		}
 		OrderSettle orderSettle=null;
 		if(fee_type==Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey()){//&&income>0d 若是商家的推广费用，梧桐需要收取10%费用
@@ -407,6 +408,7 @@ public class ShareService {
 		Num num=numMapper.selectByPrimaryKey(num_id);
 		_map.put("is_pp",ppbean==null?"0":"1");//是否进行推广1是0否
 		_map.put("income",ppfee==null?"0":Utils.convertFormat(ppfee,1));//预期收益
+		_map.put("income_f",ppfee==null?"0":String.valueOf(ppfee));//预期收益
 		_map.put("valid_date",valid_date==null?"":valid_date);//有效期至
 		_map.put("sale_price",Utils.convertFormat(num_price,1));//号码当前售价
 		_map.put("num_sale",num.getStatus()==Constants.NUM_STATUS_2.getIntKey()?"1":"0");//号码销售状态
