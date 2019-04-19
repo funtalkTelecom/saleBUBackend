@@ -536,7 +536,8 @@ public class FundOrderService extends BaseService {
 
     public Result payHrOrderSettle(Integer settle_id) {
         OrderSettle orderSettle= orderSettleMapper.selectByPrimaryKey(settle_id);
-        String orderNo=String.valueOf(orderSettle.getOrderId()+"-"+orderSettle.getFeeType());//订单号
+        if(orderSettle.getStatus()!=Constants.ORDERSETTLE_STATUS_1.getIntKey())return new Result(Result.ERROR,"抱歉此单无法结算");
+        String orderNo=String.valueOf(orderSettle.getOrderId()+"-"+orderSettle.getId());//订单号 由于一个订单存在多种类型
         String payer=String.valueOf(orderSettle.getSettler());//支付方
         List<Map> payeeList= new ArrayList<>();
         Map map=new HashMap();
