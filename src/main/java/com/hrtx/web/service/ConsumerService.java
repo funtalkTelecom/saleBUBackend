@@ -112,8 +112,8 @@ public class ConsumerService extends BaseService {
 
 	}
 
-	public Result insertConsumer(String loginName,String livePhone,String nickName,long sex,String img,String province,String city){
-		//姓名,电话,昵称,性别 1男2女0未知,// 头像,//省份,//地市
+	public Result insertConsumer(String nickName,long sex,String img,String province,String city){
+		//昵称,性别 1男2女0未知,// 头像,//省份,//地市
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		Integer userid = consumer.getId();
 		ConsumerLog param = new ConsumerLog();
