@@ -64,7 +64,6 @@ public final class Messager {
 	
 	public final static void send(String phoneNum, String message){
 		try {
-			message=URLEncoder.encode(message, "UTF-8");
 			if(StringUtils.isBlank(phoneNum)){
 				log.error("要短信通知的手机号码为空");
 				return;
@@ -81,6 +80,7 @@ public final class Messager {
 					return;
 				}
 				log.info("向手机号【"+phone+"】发送信息【"+message+"】");
+				message=URLEncoder.encode(message, "UTF-8");
 				pool.execute(new MessageTask(phone, message));
 			}
 		} catch (Exception e) {
