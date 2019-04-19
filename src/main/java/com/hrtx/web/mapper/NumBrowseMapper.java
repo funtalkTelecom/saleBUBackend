@@ -5,9 +5,10 @@ import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.NumBrowse;
 import com.hrtx.web.pojo.PromotionPlan;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
-
+@Component
 public interface NumBrowseMapper extends Mapper<NumBrowse>,BaseMapper<NumBrowse> {
     public int updateOpenCount(@Param("consumer_id") int consumer_id,@Param("num_id") int num_id);
 

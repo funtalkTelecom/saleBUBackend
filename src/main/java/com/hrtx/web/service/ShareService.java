@@ -33,8 +33,6 @@ public class ShareService {
 	@Autowired private ApiSessionUtil apiSessionUtil;
 	@Autowired private ShareMapper shareMapper;
 	@Autowired private NumBrowseMapper numBrownseMapper;
-	@Autowired private AgentService agentService;
-	@Autowired private NumPriceMapper numPriceMapper;
 	@Autowired private ApiOrderService apiOrderService;
 	@Autowired private NumMapper numMapper;
 	@Autowired private ImageService imageService;
@@ -92,7 +90,7 @@ public class ShareService {
 		_map.put("share_browse",browse_count+"");//浏览量
 		Double sale_count=0d,sale_price=0d,wait_settle=0d,has_settle=0d,all_settle=0d,balance=0d;
 		list=this.orderSettleMapper.countConsumerSettle(NumberUtils.toInt(String.valueOf(result1.getData())));
-		if(list.size()>0){
+		if(list.size()>0&&list.get(0)!=null){
 			Map map=(Map)list.get(0);
 			sale_count=NumberUtils.toDouble(ObjectUtils.toString(map.get("sale_count")));
 			sale_price=NumberUtils.toDouble(ObjectUtils.toString(map.get("sale_price")));
