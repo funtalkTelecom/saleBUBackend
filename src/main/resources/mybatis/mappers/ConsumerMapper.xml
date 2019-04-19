@@ -3,8 +3,6 @@
 <mapper namespace="com.hrtx.web.mapper.ConsumerMapper">
     <update id="insertConsumer">
         update tb_consumer t set
-         t.name =#{name},
-         t.phone=#{phone},
          t.nick_name =#{nickName},
          t.img = #{img},
          t.province =#{province},

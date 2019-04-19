@@ -120,14 +120,14 @@ public class ConsumerService extends BaseService {
 		param.setUserId(userid);
 		ConsumerLog log = consumerLogMapper.selectOne(param);
 		if(log!=null){
-			consumerLogMapper.insertConsumerLog(userid,loginName,livePhone,nickName,sex);
+			consumerLogMapper.insertConsumerLog(userid,nickName,sex);
 		}
 		Consumer userC=new Consumer();
 		userC.setId(userid);
 		Consumer user = consumerMapper.selectOne(userC);
 		if(user!=null){
 			//更新userClient
-			consumerMapper.insertConsumer(userid,loginName,livePhone,nickName,img,province,city);
+			consumerMapper.insertConsumer(userid,nickName,img,province,city);
 		}
 		return new Result(Result.OK, "注册成功");
 	}
@@ -197,8 +197,6 @@ public class ConsumerService extends BaseService {
 
 	/**
 	 *
-	 * @param status
-	 * @param num
 	 * @param start
 	 * @param limit
 	 * @return
