@@ -6,3 +6,7 @@ ADD COLUMN `tele_type` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NU
 --2019.04.11
 ALTER TABLE `egt_hk`.`tb_order`
 ADD COLUMN `logistic_type` varchar(20) NULL COMMENT '推荐物流' AFTER `share_id`;
+
+
+--2019.04.25
+INSERT INTO `egt_hk`.`tb_system`(`id`, `key_id`, `key_value`, `temp_key_value`, `remark`, `is_audit`) VALUES (1173, 'num_count_abs', '100000', NULL, 'ftp号码数量与数据库号码数量差异值', '1');
