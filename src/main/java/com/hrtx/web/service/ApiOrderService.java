@@ -1535,7 +1535,7 @@ public class ApiOrderService {
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.valueOf(skuIds));
 						if(isShipment==0){
 							log.info("号码还原销售中");
-							Integer count= numberMapper.freezeNumbyStatus(num_id, "2","3");
+							Integer count= numberMapper.freezeNumbyStatus(num_id, "2","3,4");//冻结，待配卡
 							if(count!=quantitys) quantitys=count;
 						}
 						skuMapper.updateSkuNum(nowSku.getSkuId(),quantitys);

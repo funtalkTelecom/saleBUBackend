@@ -321,7 +321,12 @@
     </update>
     <update id="freezeNumbyStatus">
         update tb_num a set a.status = #{status}
-         where  a.status = #{newStatus} and a.id = #{id}
+         where a.id = #{id}
+          and  a.status in (
+        <foreach collection="newStatus.split(',')" item="newstatus" separator=",">
+            #{newstatus}
+        </foreach>
+        )
     </update>
 
     <update id="freezeNumByIds">
