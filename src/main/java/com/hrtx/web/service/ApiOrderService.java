@@ -22,17 +22,14 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletRequest;
-import java.awt.*;
 import java.lang.System;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 
 
 @Service
@@ -308,9 +305,14 @@ public class ApiOrderService {
 			log.info(String.format("订单[%s]库存冻结由于[%s]无法获得最后结果,将挂起此单，下次继续冻结",order_id,sir.getDesc()));
 			return new Result(Result.ERROR, "库存冻结接口失败");
 		}
-		if(!StringUtils.equals("00000",String.valueOf(sir.getCode()))){//00000成功；99999未知；其他失败
+		if(!StringUtils.equals("00000",String.valueOf(sir.getCode()))){
 			log.info(String.format("订单[%s]库存冻结由于[%s]失败,将取消此订单",order_id,sir.getDesc()));
-			//TODO 取消当前的订单
+			Result order_cancel=this.orderType(order_id);//取消当前的订单
+			if(order_cancel.getCode()==Result.OK){
+				order.setStatus(Constants.ORDER_STATUS_7.getIntKey());
+				order.setIsDel(1);
+				this.orderMapper.updateByPrimaryKey(order);
+			}
 			return new Result(Result.OTHER, "抱歉，产品库存不足，无法提交");
 		}
 
