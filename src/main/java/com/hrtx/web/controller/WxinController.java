@@ -3,6 +3,7 @@ package com.hrtx.web.controller;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.HttpUtil;
+import com.hrtx.global.LockUtils;
 import com.hrtx.global.PowerConsts;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.service.ConsumerService;
@@ -32,7 +33,16 @@ public class WxinController {
 	public Result getOpenid(@RequestParam(value="getcode",required=false)String getcode,@RequestParam(value="userId",required=false) String userId) {
 		Result result = this.consumerService.getOpenId(getcode);
 		int userid =NumberUtils.toInt(userId);
-		if(result.getCode()==Result.OK)result= consumerService.isOpenid(String.valueOf(result.getData()),userid);
+		if(result.getCode()==Result.OK){
+			String openid  =String.valueOf(result.getData());
+			if(!LockUtils.tryLock("goi"+openid)) return new Result(Result.ERROR,"授权异常");
+			try{
+				result= consumerService.isOpenid(openid,userid);
+			}finally {
+				LockUtils.unLock("goi"+openid);
+			}
+
+		}
 		return result;
 	}
 

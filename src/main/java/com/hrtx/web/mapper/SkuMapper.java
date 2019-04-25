@@ -35,5 +35,7 @@ public interface SkuMapper extends Mapper<Sku>,BaseMapper<Sku>{
 
     List queryStatusList(@Param("gId") Integer gId,@Param("statusArry") String statusArry);
 
+    List querySkuList(@Param("statusArry") String statusArry);
+
 
 }

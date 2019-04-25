@@ -91,21 +91,24 @@ public class GoodsController extends BaseReturn{
 			if(goodsService.checkGnameIsExist(goods)) return (new Result(Result.OTHER, "商品名称已存在"));
 		}
 
-        return (goodsService.paygoodsEdit(goods, request, files));
+        return (goodsService.goodsEdit(goods, request, files));
 	}
 
 	@RequestMapping("/goods-unsale")
 	@Powers({PowerConsts.GOODSMOUDULE_COMMON_EDIT})
 	public void goodsUnsale(Goods goods, HttpServletRequest request){
-//        returnResult(goodsService.goodsUnsale(goods, request));
-        returnResult(goodsService.payGoodsUnsale(goods, request));
+        returnResult(goodsService.goodsUnsale(goods, request));
 	}
 
-//	@RequestMapping("/goods-delete")
-//	@Powers({PowerConsts.GOODSMOUDULE_COMMON_DELETE})
-//	public void goodsDelete(Goods goods){
-//		returnResult(goodsService.goodsDelete(goods));
-//	}
+	/**
+	 * 批量下架
+	 * @param request
+	 */
+	@RequestMapping("/goods-all-unsale")
+	@Powers({PowerConsts.NOPOWER})
+	public void goodsAllUnsale( HttpServletRequest request){
+		returnResult(goodsService.goodsAllUnsale( request));
+	}
 
 	@RequestMapping("/goods-repoGoods")
 	@Powers({PowerConsts.GOODSMOUDULE_COMMON_QUEYR})

@@ -27,6 +27,8 @@ public interface NumberMapper extends Mapper<Number>,BaseMapper<Number>{
 
     void freezeNum(@Param("id") String numid, @Param("status") String status,@Param("isUpdateSukid") boolean isUpdateSukid);
 
+    int freezeNumbyStatus(@Param("id") String numid, @Param("status") String status,@Param("newStatus") String newStatus);
+
     List<Number> getListBySkuid(@Param("skuid")String skuid);
 
     void freezeNumByIds(@Param("numberList") List<Number> nlist, @Param("status") String status);
