@@ -253,18 +253,7 @@ public class ApiOrderService {
 		Integer order_id=NumberUtils.toInt(ObjectUtils.toString(result.getData()));
 		Result result1 = this.apiOrderService.payPushOrderToStorage(order_id);
 		if(result1.getCode()==Result.OK)return result;//若成功,返回原生成订单的数据(主要含了订单号)
-		log.info("冻结仓储库存失败，5分钟后再次调用");
-		new Thread(){
-			//TODO 到时调整到统一队列中
-			public void run() {
-				try{
-					Thread.sleep(5*60*1000);
-				}catch (Exception e){
-					log.error("",e);
-				}
-				apiOrderService.payPushOrderToStorage(order_id);
-			}
-		}.start();
+		log.info("冻结仓储库存失败,订单取消或到订单列表中继续推送");
 		return new Result(Result.OTHER,result1.getData());
 	}
 
@@ -302,12 +291,29 @@ public class ApiOrderService {
 		}
 		iparam.put("commodities",items);
 
-		log.info("准备调用存储，冻结订单库存");
+		log.info("准备调用仓储，冻结订单库存");
+		/*update 2019.4.25 提高库存利用率，上架不冻结库存，在下单时冻结库存，若失败可能是库存不足，则取消订单
 		Result res = StorageApiCallUtil.storageApiCall(iparam, "HK0003");
 		log.info(String.format("仓储库存返回结果[%s]",ObjectUtils.toString(res.getData())));
 		if(!StringUtils.equals("200",String.valueOf(res.getCode())))return new Result(Result.ERROR, "库存冻结接口失败");
 		StorageInterfaceResponse sir = StorageInterfaceResponse.create(ObjectUtils.toString(res.getData()), SystemParam.get("key"));
-		if(!StringUtils.equals("00000",String.valueOf(sir.getCode())))return new Result(Result.ERROR, "库存冻结由于["+sir.getDesc()+"]失败");
+		if(!StringUtils.equals("00000",String.valueOf(sir.getCode())))return new Result(Result.ERROR, "库存冻结由于["+sir.getDesc()+"]失败");*/
+
+		Result res = StorageApiCallUtil.storageApiCall(iparam, "HK0006");
+		log.info(String.format("仓储库存返回结果[%s]",ObjectUtils.toString(res.getData())));
+		if(res.getCode()!=Result.OK)return new Result(Result.ERROR, "库存冻结接口失败");
+		StorageInterfaceResponse sir = StorageInterfaceResponse.create(ObjectUtils.toString(res.getData()), SystemParam.get("key"));
+		//sir.getCode() 00000成功；99999未知；其他失败
+		if(StringUtils.equals("99999",String.valueOf(sir.getCode()))){
+			log.info(String.format("订单[%s]库存冻结由于[%s]无法获得最后结果,将挂起此单，下次继续冻结",order_id,sir.getDesc()));
+			return new Result(Result.ERROR, "库存冻结接口失败");
+		}
+		if(!StringUtils.equals("00000",String.valueOf(sir.getCode()))){//00000成功；99999未知；其他失败
+			log.info(String.format("订单[%s]库存冻结由于[%s]失败,将取消此订单",order_id,sir.getDesc()));
+			//TODO 取消当前的订单
+			return new Result(Result.OTHER, "抱歉，产品库存不足，无法提交");
+		}
+
 		order.setStatus(Constants.ORDER_STATUS_1.getIntKey());
         this.orderMapper.updateByPrimaryKey(order);
 		if(order.getOrderType()==Constants.ORDER_TYPE_4.getIntKey()){//客服单  code=other虽订单已提交，但存储未冻结，存储成功后进入待审核
