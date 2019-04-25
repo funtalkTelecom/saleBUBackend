@@ -109,10 +109,10 @@
     </update>
 
     <update id="updateSkuNum">
-        update tb_sku set sku_num = sku_num+ #{quantity} where sku_id = #{skuId}
+        update tb_sku set sku_num = sku_num+ #{quantity} where  sku_id = #{skuId}
     </update>
     <update id="updateSkuNumDown">
-        update tb_sku set sku_num = sku_num - #{quantity} where sku_id = #{skuId}
+        update tb_sku set sku_num = sku_num - #{quantity} where sku_num >=  #{quantity} and sku_id = #{skuId}
     </update>
 
     <update id="updateSkuStatus">
@@ -157,5 +157,16 @@
     <update id="updateSkuNumWithDataNum">
         update tb_sku s set s.sku_num=s.sku_num-#{order_amount} where s.sku_num>=#{order_amount} and s.sku_id=#{sku_id}
     </update>
+
+
+    <select id="querySkuList" resultType="Sku">
+        select
+        <include refid="col_list"/>
+        from tb_sku a left join  tb_goods g on  a.g_id= g.g_id  where g.`status`=1 and a.`status` in(
+        <foreach collection="statusArry.split(',')" item="status" separator=",">
+            #{status}
+        </foreach>
+        )
+    </select>
 
 </mapper>

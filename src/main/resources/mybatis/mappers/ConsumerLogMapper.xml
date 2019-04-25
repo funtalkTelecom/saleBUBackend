@@ -3,11 +3,16 @@
 <mapper namespace="com.hrtx.web.mapper.ConsumerLogMapper">
     <update id="insertConsumerLog">
         update tb_consumer_log t set
-         t.login_name=#{loginName},
-         t.live_phone =#{livePhone},
          t.nick_name=#{nickName},
          t.sex=#{sex}
          where
          t.user_id=#{userid}
     </update>
+
+
+    <select id="findConsumerLogByOpenId" resultType="java.util.HashMap">
+        SELECT g.id id,g.login_type loginType,g.user_id userId,g.login_name loginName,g.live_phone livePhone,g.openid openid
+        FROM tb_consumer_log g where  g.`status`=1 and g.openid=#{openid}
+        order by g.id
+    </select>
 </mapper>

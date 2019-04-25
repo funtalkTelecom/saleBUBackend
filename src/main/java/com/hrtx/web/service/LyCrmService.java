@@ -11,6 +11,7 @@ import com.hrtx.webservice.crmsps.CrmSpsServiceLocator;
 import com.hrtx.webservice.crmsps.CrmSpsServicePortType;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -373,7 +374,15 @@ public class LyCrmService {
         File file = new File(tFileName);
         if(!file.exists()) this.downloadFileToSftp("phone_boss2hr", "phone_boss2hr", fileName);
         List<String> datas = this.readFile(tFileName);
+        Example example = new Example(Num.class);
+        List<Object> statuss = new ArrayList<>();
+        statuss.add(Constants.NUM_STATUS_1.getIntKey());
+        statuss.add(Constants.NUM_STATUS_2.getIntKey());
         int sellerId = 10;//乐语
+        example.createCriteria().andIn("status", statuss).andEqualTo("sellerId", sellerId);
+        int count = numMapper.selectCountByExample(example);
+        int abs = NumberUtils.toInt(SystemParam.get("num_count_abs"), 100000);
+        if(Math.abs((count-datas.size())) > abs) throw new ServiceException("当前ftp下载量["+datas.size()+"],数据库在库量["+count+"],差异过大，导入失败。");
         NumBase nb = new NumBase();
         nb.setSellerId(sellerId);
         numBaseMapper.delete(nb);

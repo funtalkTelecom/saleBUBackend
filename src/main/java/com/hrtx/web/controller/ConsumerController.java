@@ -37,16 +37,15 @@ public class ConsumerController extends BaseReturn{
 
     @PutMapping(value = "/api/Consumer")
     @Powers({PowerConsts.NOPOWER})
-	public Result InsertConsumer(@RequestParam(value="loginName",required=false) String loginName,
-								   @RequestParam(value="livePhone",required=false) String livePhone,
+	public Result InsertConsumer(
 								   @RequestParam(value="nickName",required=false) String nickName,
 								   @RequestParam(value="sex",required=false) Long sex,
 								   @RequestParam(value="img",required=false) String img,
 								   @RequestParam(value="province",required=false) String province,
 								   @RequestParam(value="city",required=false) String city) {
-		if(loginName==null || livePhone==null  || nickName==null || sex==null || img==null || province==null  || city==null )
+		if( nickName==null || sex==null || img==null || province==null  || city==null )
 			return new Result(Result.ERROR, "请确认参数是否正确。");
-		return consumerService.insertConsumer(loginName,livePhone,nickName,sex,img,province,city);
+		return consumerService.insertConsumer(nickName,sex,img,province,city);
 	}
 	/**
 	 * 添加/修改合伙人信息

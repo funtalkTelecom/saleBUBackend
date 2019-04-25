@@ -267,7 +267,9 @@ public class ActivityService {
     public Result activityCancel(Activity activity) {
         Integer activityId = activity.getId();
         Activity ac = activityMapper.findActivityById(activityId);
-        if(SessionUtil.getUser().getCorpId()!=ac.getAddSellerId()) return new Result(Result.OTHER, "该活不可以取消");
+        int  sellid = SessionUtil.getUser().getCorpId();
+        int sellerid = ac.getAddSellerId();
+        if(sellid != sellerid) return new Result(Result.OTHER, "该活动不可以取消");
         activityMapper.activityUnsale(activity);
         activityItemMapper.updateItem(activityId);
         numPriceAgentMapper.updateNumPriceAgentByActivityId(activityId);

@@ -759,7 +759,8 @@ public class ApiOrderService {
 						//修改sku数量
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.parseInt(String.valueOf( sku.get("skuId"))));
 //						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-numcount);
-						skuMapper.updateSkuNumDown(nowSku.getSkuId(),numcount);
+						int update_num=  skuMapper.updateSkuNumDown(nowSku.getSkuId(),numcount);
+						if(update_num==0)return new Result(Result.ERROR,"抱歉，上架数不足");
 
 						log.info("冻结号码,添加号码item");
 						//是普号,根据数量冻结号码,添加号码item
@@ -913,7 +914,8 @@ public class ApiOrderService {
 						//修改sku数量
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.parseInt(String.valueOf( sku.get("skuId"))));
 //						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
-						skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
+						int update_num= skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
+						if(update_num==0)return new Result(Result.ERROR,"抱歉，上架数不足");
 						//超级靓号添加卡的item
 						if("4".equals(sku.get("skuGoodsType"))){
 							log.info("超级靓号添加卡体item");
@@ -1248,6 +1250,7 @@ public class ApiOrderService {
 		numberMapper.freezeNum(numid, status,isUpdateSukid);
 	}
 
+
 	private void freezeNumByIds(List<com.hrtx.web.pojo.Number> nlist , String status) throws  Exception{
 		numberMapper.freezeNumByIds(nlist, status);
 	}
@@ -1399,8 +1402,7 @@ public class ApiOrderService {
 		Order order = orderMapper.findOrderInfo(orderId);
 		if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
 			log.info("更新订单状态为7:已取消");
-			int status =7;
-			CancelOrderStatus(orderId,status,reason);
+			CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
 			Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 			if(ispay.getCode()==Result.OK){  //已支付
 				if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){//线上支付
@@ -1408,9 +1410,9 @@ public class ApiOrderService {
 					Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
 					if(payR.getCode()==200){  //退款成功
 						orderType(orderId);
+						CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);  //已取消
 					}else { //退款失败
 						CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
-
 					}
 				}else {//线下支付
 					CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
@@ -1442,8 +1444,7 @@ public class ApiOrderService {
 			}else if ("00000".equals(code)){
 				log.info("成功");
 				log.info("更新订单状态为7:已取消");
-				int status =7;
-				CancelOrderStatus(orderId,status,reason);
+				CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
 				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
 				if(ispay.getCode()==200){  //已支付
 					if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){ //线上支付
@@ -1451,6 +1452,7 @@ public class ApiOrderService {
 						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
 						if(payR.getCode()==Result.OK){  //退款成功
 							orderType(orderId);
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);  //已取消
 						}else { //退款失败
 							CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
 						}
@@ -1497,7 +1499,6 @@ public class ApiOrderService {
 				String sku_Id =String.valueOf( map.get("sku_id"));
 				int quantity = Integer.parseInt(String.valueOf(map.get("quantity")));
 				log.info("号码还原在库");
-//				freezeNum(num_id, "1",true);
 				goodsMapper.updateNumStatus(num_id,sku_Id,num);
 			}
 		}else {
@@ -1530,39 +1531,39 @@ public class ApiOrderService {
 						int quantitys =Integer.parseInt(String.valueOf( map.get("quantity")));
 						String num_id =String.valueOf( map.get("num_id"));
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.valueOf(skuIds));
-//						nowSku.setSkuNum(Integer.parseInt((String.valueOf(nowSku.getSkuNum())))+quantitys);//修改sku数量
-						skuMapper.updateSkuNum(nowSku.getSkuId(),quantitys);
 						if(isShipment==0){
 							log.info("号码还原销售中");
-							freezeNum(num_id, "2",false);
+							Integer count= numberMapper.freezeNumbyStatus(num_id, "2","3");
+							if(count!=quantitys) quantitys=count;
 						}
+						skuMapper.updateSkuNum(nowSku.getSkuId(),quantitys);
 
 					}
-					//调用仓储接口
-					Map param = new HashMap();
-					//获取目前sku信息
-					Sku nowSku = skuMapper.getSkuBySkuid(skuId);
-					if(!nowSku.getSkuGoodsType().equals("3")){
-						param.put("supply_id", orderId);//供货单编码(sku_id)
-						Result res;
-						//再冻结新库存
-						param.put("type", "1");//处理类型1上架；2下架
-						param.put("quantity", quantity);//数量
-						param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
-						if(!"0".equals(param.get("quantity").toString())) {
-							res = StorageApiCallUtil.storageApiCall(param, "HK0002");
-							if(res.getCode()!=200){
-								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-								return new Result(Result.ERROR, "库存验证失败");
-							}else {
-								StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-								if (!"00000".equals(sir.getCode())) {
-									TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-									return new Result(Result.ERROR, "冻结库存失败\n"+sir.getDesc());
-								}
-							}
-						}
-					}
+//					//调用仓储接口
+//					Map param = new HashMap();
+//					//获取目前sku信息
+//					Sku nowSku = skuMapper.getSkuBySkuid(skuId);
+//					if(!nowSku.getSkuGoodsType().equals("3")){
+//						param.put("supply_id", orderId);//供货单编码(sku_id)
+//						Result res;
+//						//再冻结新库存
+//						param.put("type", "1");//处理类型1上架；2下架
+//						param.put("quantity", quantity);//数量
+//						param.put("companystock_id", nowSku.getSkuRepoGoods());//库存编码(skuRepoGoods)
+//						if(!"0".equals(param.get("quantity").toString())) {
+//							res = StorageApiCallUtil.storageApiCall(param, "HK0002");
+//							if(res.getCode()!=200){
+//								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+//								return new Result(Result.ERROR, "库存验证失败");
+//							}else {
+//								StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+//								if (!"00000".equals(sir.getCode())) {
+//									TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+//									return new Result(Result.ERROR, "冻结库存失败\n"+sir.getDesc());
+//								}
+//							}
+//						}
+//					}
 				}else {
 					if(isShipment==0){
 						for (int b = 0; b < bklist.size(); b++) {
@@ -1664,7 +1665,8 @@ public class ApiOrderService {
 				//修改sku数量
 				Sku nowSku = skuMapper.getSkuBySkuid(Integer.parseInt(String.valueOf( sku.get("skuId"))));
 //				nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
-				skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
+				int update_num= skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
+				if(update_num==0)return new Result(Result.ERROR,"抱歉，上架数不足");
 				log.info("添加卡体item");
 				//添加卡的item
 				orderItem = new OrderItem();
