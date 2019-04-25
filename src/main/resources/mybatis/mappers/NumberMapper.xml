@@ -319,6 +319,10 @@
         </if>
          where a.id = #{id}
     </update>
+    <update id="freezeNumbyStatus">
+        update tb_num a set a.status = #{status}
+         where  a.status = #{newStatus} and a.id = #{id}
+    </update>
 
     <update id="freezeNumByIds">
         update tb_num a set a.status = #{status} where a.id in (

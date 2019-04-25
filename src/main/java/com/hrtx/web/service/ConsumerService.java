@@ -15,6 +15,7 @@ import com.hrtx.web.pojo.ConsumerLog;
 import com.hrtx.web.pojo.User;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,13 +64,15 @@ public class ConsumerService extends BaseService {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		if(openid==null) return new Result(Result.ERROR, "获取openid 失败");
 		String token=TokenGenerator.generateValue();
-		ConsumerLog consumerLog =null;
-		ConsumerLog param = new ConsumerLog();
-		param.setOpenid(openid);
-		consumerLog = consumerLogMapper.selectOne(param);
+//		ConsumerLog consumerLog =null;
+//		ConsumerLog param = new ConsumerLog();
+//		param.setOpenid(openid);
+//		consumerLog = consumerLogMapper.selectOne(param);
+
+		List cuLog = consumerLogMapper.findConsumerLogByOpenId(openid);
 		Map<String,String> _map=new HashMap<>();
 		_map.put("__sessid",token);
-		if(consumerLog == null){
+		if(cuLog.size()==0){
 			//向userclient，userclientlog存数据
 			Consumer userC = new Consumer();
 //			userC.setId(userC.getGeneralId());
@@ -96,9 +99,11 @@ public class ConsumerService extends BaseService {
 			_map.put("isPartner",String.valueOf(userC.getIsPartner()));//是否合伙人 1是，2否
 			_map.put("partnerCheck",String.valueOf(userC.getPartnerCheck())); //已确认的合伙人 1是0否；是方可提现
 			_map.put("testUser",StringUtils.equals(userC.getCommpayName(),"测试")?"1":"0"); //临时借用
-		}else {
+
+		}else{
+			Map map = (Map) cuLog.get(0);
 			Consumer Cparam = new Consumer();
-			Integer id = consumerLog.getUserId();
+			Integer id = NumberUtils.toInt(String.valueOf(map.get("userId"))) ;
 			Cparam.setId(id);
 			Consumer consumer = consumerMapper.selectOne(Cparam);
 			this.apiSessionUtil.saveOrUpdate(token,consumer);
@@ -108,8 +113,6 @@ public class ConsumerService extends BaseService {
 			_map.put("testUser",StringUtils.equals(consumer.getCommpayName(),"测试")?"1":"0"); //临时借用
 		}
 		return new Result(Result.OK, _map);
-
-
 	}
 
 	public Result insertConsumer(String nickName,long sex,String img,String province,String city){
