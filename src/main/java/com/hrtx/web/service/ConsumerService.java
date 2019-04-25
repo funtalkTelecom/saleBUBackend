@@ -112,22 +112,22 @@ public class ConsumerService extends BaseService {
 
 	}
 
-	public Result insertConsumer(String loginName,String livePhone,String nickName,long sex,String img,String province,String city){
-		//姓名,电话,昵称,性别 1男2女0未知,// 头像,//省份,//地市
+	public Result insertConsumer(String nickName,long sex,String img,String province,String city){
+		//昵称,性别 1男2女0未知,// 头像,//省份,//地市
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		Integer userid = consumer.getId();
 		ConsumerLog param = new ConsumerLog();
 		param.setUserId(userid);
 		ConsumerLog log = consumerLogMapper.selectOne(param);
 		if(log!=null){
-			consumerLogMapper.insertConsumerLog(userid,loginName,livePhone,nickName,sex);
+			consumerLogMapper.insertConsumerLog(userid,nickName,sex);
 		}
 		Consumer userC=new Consumer();
 		userC.setId(userid);
 		Consumer user = consumerMapper.selectOne(userC);
 		if(user!=null){
 			//更新userClient
-			consumerMapper.insertConsumer(userid,loginName,livePhone,nickName,img,province,city);
+			consumerMapper.insertConsumer(userid,nickName,img,province,city);
 		}
 		return new Result(Result.OK, "注册成功");
 	}
@@ -197,8 +197,6 @@ public class ConsumerService extends BaseService {
 
 	/**
 	 *
-	 * @param status
-	 * @param num
 	 * @param start
 	 * @param limit
 	 * @return

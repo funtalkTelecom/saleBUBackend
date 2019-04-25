@@ -5,10 +5,13 @@ import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.Auction;
 import com.hrtx.web.pojo.Num;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
 
+import java.beans.Transient;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public interface AuctionMapper extends Mapper<Auction>,BaseMapper<Auction>{
 
     List<Map> findAuctionSumEPSaleGoodsByNumId(@Param("numId") Integer numId);

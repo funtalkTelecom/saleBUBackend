@@ -109,10 +109,10 @@
     </update>
 
     <update id="updateSkuNum">
-        update tb_sku set sku_num = sku_num+ #{quantity} where sku_id = #{skuId}
+        update tb_sku set sku_num = sku_num+ #{quantity} where  sku_id = #{skuId}
     </update>
     <update id="updateSkuNumDown">
-        update tb_sku set sku_num = sku_num - #{quantity} where sku_id = #{skuId}
+        update tb_sku set sku_num = sku_num - #{quantity} where sku_num >=  #{quantity} and sku_id = #{skuId}
     </update>
 
     <update id="updateSkuStatus">

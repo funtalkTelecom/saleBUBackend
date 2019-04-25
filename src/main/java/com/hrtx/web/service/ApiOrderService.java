@@ -753,7 +753,8 @@ public class ApiOrderService {
 						//修改sku数量
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.parseInt(String.valueOf( sku.get("skuId"))));
 //						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-numcount);
-						skuMapper.updateSkuNumDown(nowSku.getSkuId(),numcount);
+						int update_num=  skuMapper.updateSkuNumDown(nowSku.getSkuId(),numcount);
+						if(update_num==0)return new Result(Result.ERROR,"抱歉，上架数不足");
 
 						log.info("冻结号码,添加号码item");
 						//是普号,根据数量冻结号码,添加号码item
@@ -907,7 +908,8 @@ public class ApiOrderService {
 						//修改sku数量
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.parseInt(String.valueOf( sku.get("skuId"))));
 //						nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
-						skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
+						int update_num= skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
+						if(update_num==0)return new Result(Result.ERROR,"抱歉，上架数不足");
 						//超级靓号添加卡的item
 						if("4".equals(sku.get("skuGoodsType"))){
 							log.info("超级靓号添加卡体item");
@@ -1658,7 +1660,8 @@ public class ApiOrderService {
 				//修改sku数量
 				Sku nowSku = skuMapper.getSkuBySkuid(Integer.parseInt(String.valueOf( sku.get("skuId"))));
 //				nowSku.setSkuNum(Integer.parseInt((String.valueOf(sku.get("skuNum"))))-num);
-				skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
+				int update_num= skuMapper.updateSkuNumDown(nowSku.getSkuId(),num);
+				if(update_num==0)return new Result(Result.ERROR,"抱歉，上架数不足");
 				log.info("添加卡体item");
 				//添加卡的item
 				orderItem = new OrderItem();
