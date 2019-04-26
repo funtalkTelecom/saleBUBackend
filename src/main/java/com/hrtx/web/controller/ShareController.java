@@ -57,6 +57,16 @@ public class ShareController extends BaseReturn{
 		return this.shareService.queryShareList(start,limit);
 	}
 	/**
+	 * 查看推广订单记录
+	 */
+	@GetMapping("/api/order-settle/list")
+	@Powers({PowerConsts.NOPOWER})
+	public PageInfo queryOrderSettleList(HttpServletRequest request){
+		int start=NumberUtils.toInt(request.getParameter("pageNum"));
+		int limit=NumberUtils.toInt(request.getParameter("limit"));
+		return this.shareService.queryOrderSettle(start,limit);
+	}
+	/**
 	 * 生成分享地址  由合伙人提交生成分享地址
 	 */
 	@PostMapping("/api/partner/share-del")

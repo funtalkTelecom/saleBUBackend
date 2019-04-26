@@ -1,6 +1,7 @@
 package com.hrtx.web.mapper;
 
 import com.github.abel533.mapper.Mapper;
+import com.github.pagehelper.Page;
 import com.hrtx.web.pojo.OrderSettle;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
@@ -31,4 +32,11 @@ public interface OrderSettleMapper  extends Mapper<OrderSettle>,BaseMapper<Order
      * @return
      */
     public List<Map> queryMonthSettle(@Param("fee_type") int fee_type,@Param("settle_month") String settle_month,@Param("limit_count") int limit_count);
+
+    /**
+     * 查询用户推广订单
+     * @param consumer_id
+     * @return
+     */
+    public Page<Object> queryOrderSettle(@Param("consumer_id") int consumer_id);
 }
