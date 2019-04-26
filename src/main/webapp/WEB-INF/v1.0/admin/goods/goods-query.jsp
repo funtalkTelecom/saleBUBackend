@@ -61,6 +61,10 @@
 											<select class="form-control" name="gIsAuc" id="gIsAuc">
 											</select>
 										</div>
+										<div class="form-group">
+											<label class="control-label">号码</label>
+											<input type="text" class="form-control" style="width:130px;" name="numResource">
+										</div>
 										<c:if test="<%=SessionUtil.hasPower(PowerConsts.GOODSMOUDULE_COMMON_ADD)%>">
 											<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" data-toggle="modal" id="opengoodsInfo" data-target="#goodsInfo" >上架商品</button>
 										</c:if>
