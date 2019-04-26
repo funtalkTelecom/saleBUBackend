@@ -50,6 +50,7 @@ $(function() {
                                 alert('请输入大于1的数');
                                 return false
 							}
+							$(this).attr("disabled",true);
                             if (confirm("提交后将按最新的价格规则同步更新当前在售的号码价格，请确认是否提交？")) {
                                 $.post("channel/channel-edit", {
                                     id: record.id,
@@ -60,6 +61,8 @@ $(function() {
                                     }
                                     channlList.reload();
                                 }, "json");
+                            }else {
+                                $(this).attr("disabled",false);
                             }
                         })
 
@@ -137,6 +140,7 @@ $(function() {
                         alert('请输入大于0的数');
                         return false
                     }
+                    $(this).attr("disabled",true);
                     if (confirm("提交后将按最新的价格规则同步更新当前在售的号码价格，请确认是否提交？")) {
                         $.post("channel/feather-price-edit", {id: record.id, ext1: ext1, ext2: ext2}, function (data) {
                             if (data.code != 200) {
@@ -144,14 +148,19 @@ $(function() {
                             }
                             dataList.reload();
                         }, "json");
+                    }else {
+                        $(this).attr("disabled",false);
                     }
                 });
                 $operate.find(".del").click(function () {
+                    $(this).attr("disabled",true);
                     if (confirm("提交后将按最新的价格规则同步更新当前在售的号码价格，请确认是否删除？")) {
                         $.post("channel/feather-delete", {id:  record.id}, function (data) {
                             dataList.reload();
                             alert(data.data);
                         }, "json");
+                    }else {
+                        $(this).attr("disabled",false);
                     }
                 });
 
