@@ -290,7 +290,9 @@ public class GoodsService {
 
             goods.setStatus(5);   //价格更新失败
             goodsMapper.updateGoodStatus(goods);
-            numPriceMapper.matchNumPrice(goods.getgSellerId());
+
+            List<Map> maps = numPriceMapper.queryNewestNumPrice(goods.getgSellerId());
+            if(maps.size()>0) numPriceMapper.matchNumPriceByBatch(maps);
             List isWz = skuMapper.queryStatusList(goods.getgId(),"90,91");
             if(isWz.size()>0){
                 goods.setStatus(2); //部分上架

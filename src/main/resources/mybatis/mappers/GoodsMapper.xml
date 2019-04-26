@@ -31,6 +31,36 @@
         else '未知'
         end as statusText
     </sql>
+    <sql id="distinct_col_list">
+        distinct a.g_id as gId,
+        a.g_type1 as gType1,
+        a.g_type2 as gType2,
+        a.g_name as gName,
+        a.g_ad as gAd,
+        a.g_start_time as gStartTime,
+        a.g_end_time as gEndTime,
+        a.g_sale_city as gSaleCity,
+        a.g_is_auc as gIsAuc,
+        a.g_active as gActive,
+        a.g_is_pack as gIsPack,
+        a.g_loop_time as gLoopTime,
+        a.g_deposit as gDeposit,
+        a.g_start_num as gStartNum,
+        a.g_price_up as gPriceUp,
+        a.g_seller_id as gSellerId,
+        a.g_seller_name as gSellerName,
+        a.g_is_sale as gIsSale,
+        a.status as status,
+        case
+        when a.status =0 then '初始'
+        when a.status =1 then '上架'
+        when  a.status =2 then '部分上架'
+        when  a.status =3 then '下架'
+        when  a.status =4 then '部分下架'
+        when  a.status =5 then '价格更新失败'
+        else '未知'
+        end as statusText
+    </sql>
     <select id="findGoodsInfo" resultType="Goods">
         select
         <include refid="col_list"/>
@@ -46,9 +76,9 @@
 
     <select id="queryPageList" resultType="Goods">
         select
-        <include refid="col_list"/>
-        from tb_goods a
-        where 1=1
+        <include refid="distinct_col_list"/>
+        from tb_goods a ,tb_sku s ,tb_num m
+        where a.g_id = s.g_id and s.sku_id = m.sku_id
         <if test="param.gName !=null and param.gName!=''">
             and a.g_name like "%"#{param.gName}"%"
         </if>
@@ -60,6 +90,9 @@
         </if>
         <if test="param.gSellerId !=null and param.gSellerId!='' and param.gSellerId!='-1'">
             and a.g_seller_id = #{param.gSellerId}
+        </if>
+        <if test="param.numResource !=null and param.numResource!='' ">
+            and m.num_resource  = #{param.numResource}
         </if>
         order by a.g_id desc
     </select>

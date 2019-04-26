@@ -10,7 +10,9 @@ import com.hrtx.global.SessionUtil;
 import com.hrtx.global.SystemParam;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
+import com.hrtx.web.pojo.System;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -51,7 +53,8 @@ public class ChannelService {
         channelMapper.insert(cl);
         c.setIsDel(1);
         channelMapper.updateByPrimaryKey(c);
-        numPriceMapper.matchNumPrice(c.getCorpId());
+        List<Map> maps = numPriceMapper.queryNewestNumPrice(c.getCorpId());
+        if(maps.size()>0) numPriceMapper.matchNumPriceByBatch(maps);
         return new Result(Result.OK, "成功");
     }
 

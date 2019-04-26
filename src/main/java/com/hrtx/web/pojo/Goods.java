@@ -42,6 +42,8 @@ public class Goods extends BasePojo implements java.io.Serializable {
 
     @Transient
     private String statusText;
+    @Transient
+    private String numResource;
 
     public Goods() {
     }
@@ -230,4 +232,11 @@ public class Goods extends BasePojo implements java.io.Serializable {
         this.statusText = statusText;
     }
 
+    public String getNumResource() {
+        return numResource;
+    }
+
+    public void setNumResource(String numResource) {
+        this.numResource = numResource;
+    }
 }

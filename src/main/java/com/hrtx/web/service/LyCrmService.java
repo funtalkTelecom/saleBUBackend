@@ -485,7 +485,10 @@ public class LyCrmService {
         }
         if(batch.size() > 0) this.insertNumRule(batch, dict);
 
-        if("feather_price".equals(type)) numPriceMapper.matchNumPrice(dict.getCorpId());
+        if("feather_price".equals(type)) {
+            List<Map> maps = numPriceMapper.queryNewestNumPrice(dict.getCorpId());
+            if(maps.size()>0) numPriceMapper.matchNumPriceByBatch(maps);
+        }
     }
 
     private void insertNumRule(List<NumRule> batch, Dict dict) {
@@ -502,7 +505,10 @@ public class LyCrmService {
         numRule.setRuleType(dict.getKeyGroup());
         numRuleMapper.delete(numRule);
 
-        if("feather_price".equals(type)) numPriceMapper.matchNumPrice(dict.getCorpId());
+        if("feather_price".equals(type)) {
+            List<Map> maps = numPriceMapper.queryNewestNumPrice(dict.getCorpId());
+            if(maps.size()>0) numPriceMapper.matchNumPriceByBatch(maps);
+        }
         if("FEATHER_TYPE".equals(type)) {
             numPriceMapper.updateFeature(","+dict.getKeyValue()+",");
         }
