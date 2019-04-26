@@ -15,7 +15,13 @@ import java.util.Set;
 public interface NumPriceMapper extends BaseMapper<NumPrice>,Mapper<NumPrice> {
     long countList(@Param("param") NumPrice numPrice);
 
+    List<Map> queryNewestNumPrice(@Param("corpId") Integer corpId);
+
+    long matchNumPriceByBatch(@Param("batch") List<Map> batch);
+
     long matchNumPrice(@Param("corpId") Integer corpId);
+
+    long matchNumPriceBySku(@Param("corpId") Integer corpId, @Param("skuId") Integer skuId);
 
     void batchUpateFeature(@Param("batch") List<NumRule> batch, @Param("feature") String feature);
 

@@ -120,7 +120,8 @@ public class DictService {
 				dict1.setExt2(dict.getExt2());
 				dictMapper.updateByPrimaryKey(dict1);
 				log.info("号码规则["+dict1.getKeyValue()+"]更改后的不带4价为["+dict.getExt1()+"],带4价为["+dict.getExt2()+"]");
-				numPriceMapper.matchNumPrice(dict1.getCorpId());
+				List<Map> maps = numPriceMapper.queryNewestNumPrice(dict1.getCorpId());
+				if(maps.size()>0) numPriceMapper.matchNumPriceByBatch(maps);
 			}else {
 				return new Result(Result.ERROR, "没有权限");
 			}
