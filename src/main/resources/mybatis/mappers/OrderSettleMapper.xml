@@ -23,4 +23,17 @@
         group by os.settle_user,date_format(os.add_date,'%Y%m') having count(1)&lt;#{limit_count};
     </select>
 
+    <select id="queryOrderSettle" resultType="java.util.HashMap">
+        select od.order_id,od.total order_amt,od.`status` as order_status,o6.`status` settle_status,date_format(od.pay_date,'%Y-%m-%d') as pay_date,date_format(od.sign_date,'%Y-%m-%d') as sign_date
+        ,oi.num,s.consumer_id,d.key_value order_status_text,o6.settle_amt as palt_amt,o1.settle_amt as seller_amt,c.nick_name
+        from tb_order od left join tb_order_settle o6 on od.order_id=o6.order_id and o6.fee_type=6
+        left join tb_order_settle o1 on od.order_id=o1.order_id and o1.fee_type=1
+        left join tb_order_item oi on oi.order_id=od.order_id and oi.is_shipment=0
+        left join tb_share s on s.id=od.share_id
+        left join tb_dict d on d.key_id=od.`status` and d.key_group='orderStatus'
+        left join tb_consumer c on c.id=od.consumer
+        where o6.`status` in (1,2,3) and s.consumer_id=#{consumer_id}
+        order by od.order_id desc
+    </select>
+
 </mapper>

@@ -112,6 +112,14 @@ public class ShareService {
 			}
 		}
 		_map.put("balance",Utils.convertFormat(balance,0));//可用余额
+
+		//查询当月推广
+		String curr_month=Utils.getDate(new Date(),"yyyyMM");
+		List<Map> month_settle_List=this.orderSettleMapper.queryMonthSettle(Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey(),curr_month,OrderSettle.base_pp_price_month_count);
+		_map.put("month_flag",month_settle_List.isEmpty()?"0":month_settle_List.size()<OrderSettle.base_pp_price_month_count?"1":"2");//是否显示提示 0 不提示 1 提示剩余，2提示完成
+		_map.put("month_has_amount",month_settle_List.size()+"");//本月已完成量
+		_map.put("month_sur_amount",(OrderSettle.base_pp_price_month_count-month_settle_List.size())+"");//本月剩余完成量
+
 		return new Result(Result.OK,_map);
 	}
 
@@ -129,6 +137,25 @@ public class ShareService {
 			map.put("share_date",Utils.getDate(date,"yyyy-MM-dd HH:mm"));
 			Map<String,String> _map_num=findNumPromotionInfoToSharer(NumberUtils.toInt(ObjectUtils.toString(map.get("share_num_id"))));
 			map.putAll(_map_num);
+		}
+		PageInfo<Object> pm = new PageInfo<Object>(page);
+		return pm;
+	}
+
+	/**
+	 * 查看推广的订单记录
+	 * @param start
+	 * @param limit
+	 * @return
+	 */
+	public PageInfo queryOrderSettle(int start,int limit){
+		Consumer consumer=apiSessionUtil.getConsumer();
+		PageHelper.startPage(start,limit);
+		Page<Object> page=this.orderSettleMapper.queryOrderSettle(consumer.getId());
+		Map<Object, String> status_map=Constants.contantsToMap("ORDERSETTLE_STATUS");
+		for(int i=0;i<page.size();i++){
+			Map map=(Map)page.get(i);
+			map.put("settle_status_text",status_map.get(map.get("settle_status")));
 		}
 		PageInfo<Object> pm = new PageInfo<Object>(page);
 		return pm;
@@ -301,7 +328,7 @@ public class ShareService {
 				result=this.fundOrderService.payHrOrderSettle(settle_id);
 				if(result.getCode()==Result.OK)has_success+=1;
 			}
-			//TODO 处理绝对满足不了的单据
+			// 处理绝对满足不了的单据  由定时器清理
 		}
 		return new Result(Result.OK,String.format("订单结算结束,应结算[%s]单，实结算(含其他基础佣金待结算的)[%s]",_list.size(),has_success));
 	}

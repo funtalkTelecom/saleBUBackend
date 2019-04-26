@@ -163,6 +163,11 @@ public class ApiOrderService {
 	 */
 	public Result submitNumOrder(Integer sku_id,Integer num_id,Integer mead_id,Integer address_id,String conment,int share_id,String logisticType){
 		Consumer user = apiSessionUtil.getConsumer();
+		Example example = new Example(Order.class);
+		example.createCriteria().andEqualTo("status",Constants.ORDER_STATUS_1.getIntKey()).andEqualTo("isDel",0).andEqualTo("consumer",user.getId());
+		List<Order> orderList=this.orderMapper.selectByExample(example);
+		if(orderList.size()>5)return new Result(Result.OTHER,"抱歉，您待支付的订单超限，请先支付后再下单");
+
 		Result adresult=this.checkAddress(address_id,user.getId());
 		if(adresult.getCode()!=Result.OK)return adresult;
 		DeliveryAddress address=(DeliveryAddress)adresult.getData();

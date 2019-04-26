@@ -15,7 +15,10 @@ $(function() {
 	dataList = new $.DSTable({
 		"url" : 'goods/goods-list',
 		"ct" : "#result",
-		"cm" : [{
+                "cm" : [{
+                    "header" : "编号",
+                    "dataIndex" : "gId"
+                },{
                     "header" : "商品名称",
                     "dataIndex" : "gName"
                 },{
