@@ -247,6 +247,9 @@ public class LiangHaoController extends BaseReturn{
                 }
                 normalList.add(arr);
             }
+            result = agentService.queryCurrAgent();
+            if(result.getCode() != Result.OK) return result;
+            Agent agent = (Agent) result.getData();
             if(normalList.size() > 0) {
                 for (ArrayList<String> arr:normalList) {
                     String phone = arr.get(0);
@@ -262,6 +265,7 @@ public class LiangHaoController extends BaseReturn{
                     String conment = arr.get(9);
                     NumPrice numPrice = new NumPrice();
                     numPrice.setResource(phone);
+                    numPrice.setAgentId(agent.getId());
                     List nps = numService.queryNumPriceList(numPrice);
                     if(nps.size() <= 0) {
                         arr.add("失败");arr.add("未找到号码");
