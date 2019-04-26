@@ -43,7 +43,7 @@
 										<div class="col-xs-4">
 											<input type="text" class="form-control" name="phone" disabled="disabled" value="${numPriceAgent.resource}">
 										</div>
-										<label class="col-xs-2 control-label">套餐名称</label>
+										<label class="col-xs-2 control-label">套餐名称<i style="color:red">*</i></label>
 										<div class="col-xs-4">
 											<select class="form-control" name="mealId">
 												<option value="">请选择...</option>
@@ -54,17 +54,17 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-xs-2 control-label">第三方订单号</label>
+										<label class="col-xs-2 control-label">第三方订单号<i style="color:red">*</i></label>
 										<div class="col-xs-4">
 											<input type="text" class="form-control" name="thirdOrder">
 										</div>
-										<label class="col-xs-2 control-label">BOSS开户工号</label>
+										<label class="col-xs-2 control-label">BOSS开户工号<i style="color:red">*</i></label>
 										<div class="col-xs-4">
 											<input type="text" class="form-control" name="bossNum" value="${bossNum}">
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-xs-2 control-label">客户名称</label>
+										<label class="col-xs-2 control-label">客户名称<i style="color:red">*</i></label>
 										<div class="col-xs-4">
 											<input type="text" class="form-control" name="phoneConsumer">
 										</div>
@@ -93,17 +93,17 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-xs-2 control-label">邮寄联系人</label>
+										<label class="col-xs-2 control-label">邮寄联系人<i style="color:red">*</i></label>
 										<div class="col-xs-4">
 											<input type="text" class="form-control" name="personName">
 										</div>
-										<label class="col-xs-2 control-label">邮寄联系电话</label>
+										<label class="col-xs-2 control-label">邮寄联系电话<i style="color:red">*</i></label>
 										<div class="col-xs-4">
 											<input type="text" class="form-control" name="personTel">
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-xs-2 control-label">邮寄地址</label>
+										<label class="col-xs-2 control-label">邮寄地址<i style="color:red">*</i></label>
 										<div class="col-xs-10">
 											<input type="text" class="form-control" name="address">
 										</div>
