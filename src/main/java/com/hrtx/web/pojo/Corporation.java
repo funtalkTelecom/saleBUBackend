@@ -24,6 +24,7 @@ public class Corporation extends BasePojo implements java.io.Serializable{
     private boolean isDel;
     private Integer storageId;
     private Integer companyId;
+    private Integer isValidIccid;
 
     public Corporation() {
     }
@@ -152,5 +153,13 @@ public class Corporation extends BasePojo implements java.io.Serializable{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getIsValidIccid() {
+        return isValidIccid;
+    }
+
+    public void setIsValidIccid(Integer isValidIccid) {
+        this.isValidIccid = isValidIccid;
     }
 }
