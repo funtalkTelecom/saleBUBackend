@@ -1383,6 +1383,7 @@ public class ApiOrderService {
 //		String a = "1014426510456520704";
 //		long consumerId = Long.valueOf(a);
 		Example example = new Example(Order.class);
+		if("null".equals(orderIds)) return new Result(Result.ERROR, "参数异常");
 		Long orderId =Long.parseLong(orderIds);
 		example.createCriteria().andEqualTo("consumer",consumerId).andEqualTo("orderId", orderId);
 		List<Order> orders=orderMapper.selectByExample(example);
