@@ -79,7 +79,7 @@ public class NumService {
                 OrderItem orderItem = orderItemMapper.selectByPrimaryKey(item_id);
                 if(orderItem == null) throw new ServiceException("未找到仓库回调的itemId["+item_id+"]");
                 if(orderItem.getIsShipment() != 1) throw new ServiceException("仓库回调的itemId["+item_id+"]在平台为不需发货，数据异常");
-                Example example = new Example(OrderItem.class);
+                example = new Example(OrderItem.class);
                 example.createCriteria().andEqualTo("pItemId", item_id);
                 List<OrderItem> list = orderItemMapper.selectByExample(example);
                 if(count != list.size()) throw new ServiceException("仓库回调的itemId["+item_id+"]数量["+count+"]与平台数量["+list.size()+"]不一致");
