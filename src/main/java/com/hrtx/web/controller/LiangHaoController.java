@@ -156,7 +156,10 @@ public class LiangHaoController extends BaseReturn{
     @PostMapping("/batch-add-order")
     @Powers( {PowerConsts.LIANGHAOMOUDULE_COMMON_ADD })
     public Result importRecCard(@RequestParam(name = "file",required = false) MultipartFile file) throws Exception {
-        Result result = this.uploadFile("batch_add_order/", "xls,xlsx", file, false, false);
+        Result result = agentService.queryCurrAgent();
+        if(result.getCode() != Result.OK) return result;
+        Agent agent = (Agent) result.getData();
+        result = this.uploadFile("batch_add_order/", "xls,xlsx", file, false, false);
         if(result.getCode() != Result.OK) return result;
         String sourceServerFileName = (String) ((Map)result.getData()).get("sourceServerFileName");
 
@@ -262,8 +265,9 @@ public class LiangHaoController extends BaseReturn{
                     String conment = arr.get(9);
                     NumPrice numPrice = new NumPrice();
                     numPrice.setResource(phone);
+                    numPrice.setAgentId(agent.getId());
                     List nps = numService.queryNumPriceList(numPrice);
-                    if(nps.size() <= 0) {
+                    if(nps.size() != 1) {
                         arr.add("失败");arr.add("未找到号码");
                         errors.add(arr.toArray());
                         continue;
