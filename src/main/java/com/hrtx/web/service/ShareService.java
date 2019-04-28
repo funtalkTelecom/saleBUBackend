@@ -118,7 +118,7 @@ public class ShareService {
 		String curr_month=Utils.getDate(new Date(),"yyyyMM");
 		List<Map> month_settle_List=this.orderSettleMapper.queryMonthSettle(Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey(),curr_month,curr_account,-1);
 		int tt_amount=0;
-		if(month_settle_List.size()>1){
+		if(month_settle_List.size()>=1){
 			tt_amount=NumberUtils.toInt(String.valueOf(month_settle_List.get(0).get("sign_count")));
 		}
 		_map.put("month_flag",tt_amount==0?"0":tt_amount<OrderSettle.base_pp_price_month_count?"1":"2");//是否显示提示 0 不提示 1 提示剩余，2提示完成
