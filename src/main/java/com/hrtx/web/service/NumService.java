@@ -50,8 +50,11 @@ public class NumService {
         if(order == null) return new Result(Result.ERROR, "绑卡订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != Constants.ORDER_STATUS_4.getIntKey()) return new Result(Result.ERROR, "订单状态异常");
         Integer sellerId = order.getSellerId();
-        Corporation corporation = corporationMapper.selectByPrimaryKey(sellerId);
-        if(corporation == null) return new Result(Result.ERROR, "绑卡订单未找到卖家");
+        Example example = new Example(Corporation.class);
+        example.createCriteria().andEqualTo("id", sellerId);
+        List<Corporation> corporations = corporationMapper.selectByExample(example);
+        if(corporations.size() != 1) return new Result(Result.ERROR, "绑卡订单未找到卖家");
+        Corporation corporation = corporations.get(0);
         int isValidIccid = corporation.getIsValidIccid() == null ? 0 : 1;
         int insertCount = 0;
         List<Map> items = iccidMapper.queryTempItemsByBatchNum(orderId);
