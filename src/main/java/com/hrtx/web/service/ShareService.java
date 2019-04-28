@@ -89,7 +89,8 @@ public class ShareService {
 		_map.put("share_count",share_count+"");//推广个数
 		_map.put("share_browse",browse_count+"");//浏览量
 		Double sale_count=0d,sale_price=0d,wait_settle=0d,has_settle=0d,all_settle=0d,balance=0d;
-		list=this.orderSettleMapper.countConsumerSettle(NumberUtils.toInt(String.valueOf(result1.getData())));
+		int curr_account=NumberUtils.toInt(String.valueOf(result1.getData()));
+		list=this.orderSettleMapper.countConsumerSettle(curr_account);
 		if(list.size()>0&&list.get(0)!=null){
 			Map map=(Map)list.get(0);
 			sale_count=NumberUtils.toDouble(ObjectUtils.toString(map.get("sale_count")));
@@ -115,10 +116,14 @@ public class ShareService {
 
 		//查询当月推广
 		String curr_month=Utils.getDate(new Date(),"yyyyMM");
-		List<Map> month_settle_List=this.orderSettleMapper.queryMonthSettle(Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey(),curr_month,OrderSettle.base_pp_price_month_count);
-		_map.put("month_flag",month_settle_List.isEmpty()?"0":month_settle_List.size()<OrderSettle.base_pp_price_month_count?"1":"2");//是否显示提示 0 不提示 1 提示剩余，2提示完成
-		_map.put("month_has_amount",month_settle_List.size()+"");//本月已完成量
-		_map.put("month_sur_amount",(OrderSettle.base_pp_price_month_count-month_settle_List.size())+"");//本月剩余完成量
+		List<Map> month_settle_List=this.orderSettleMapper.queryMonthSettle(Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey(),curr_month,curr_account,-1);
+		int tt_amount=0;
+		if(month_settle_List.size()>=1){
+			tt_amount=NumberUtils.toInt(String.valueOf(month_settle_List.get(0).get("sign_count")));
+		}
+		_map.put("month_flag",tt_amount==0?"0":tt_amount<OrderSettle.base_pp_price_month_count?"1":"2");//是否显示提示 0 不提示 1 提示剩余，2提示完成
+		_map.put("month_has_amount",tt_amount+"");//本月已完成量
+		_map.put("month_sur_amount",(tt_amount>OrderSettle.base_pp_price_month_count?0:(OrderSettle.base_pp_price_month_count-tt_amount))+"");//本月剩余完成量
 
 		return new Result(Result.OK,_map);
 	}
@@ -342,7 +347,7 @@ public class ShareService {
 			calendar.set(Calendar.MONTH,calendar.get(Calendar.MONTH)-1);//减去一个月
 			month=Utils.getDate(calendar.getTime(),"yyyyMM");
 		}
-		List<Map> list=this.orderSettleMapper.queryMonthSettle(Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey(),month,OrderSettle.base_pp_price_month_count);
+		List<Map> list=this.orderSettleMapper.queryMonthSettle(Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey(),month,0,OrderSettle.base_pp_price_month_count);
 
 		//settle_user,date_format(os.add_date,'%Y%m') settle_month,count(1) sign_count,group_concat(os.id) settle_ids
 		for(Map map:list) {
