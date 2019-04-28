@@ -25,4 +25,10 @@ public interface ActivityMapper extends Mapper<Activity>,BaseMapper<Activity>{
 
     void activityUnsale(Activity activity);
 
+    /**
+     * 查询过期的活动
+     * @return
+     */
+    List<Activity> findActivityIsFaile();
+
 }
