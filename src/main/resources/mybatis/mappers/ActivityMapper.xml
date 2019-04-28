@@ -55,4 +55,11 @@
         where a.id = #{id}
     </update>
 
+    <select id="findActivityIsFaile" resultType="Activity">
+        select y.id id ,y.type type,y.begin_date beginDate,y.end_date endDate,
+        y.add_date addDate,y.add_seller_id addSellerId,y.add_user_id addUserId,y.agent_id agentId,y.title title
+        from tb_activity y
+        where y.`status`=1 and y.is_del=0 and SYSDATE()>y.end_date
+    </select>
+
 </mapper>

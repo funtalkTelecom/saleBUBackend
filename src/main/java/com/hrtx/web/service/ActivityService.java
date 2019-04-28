@@ -9,6 +9,7 @@ import com.hrtx.config.utils.RedisUtil;
 import com.hrtx.dto.Result;
 import com.hrtx.global.MapJsonUtils;
 import com.hrtx.global.SessionUtil;
+import com.hrtx.global.SystemParam;
 import com.hrtx.global.Utils;
 import com.hrtx.web.mapper.*;
 import com.hrtx.web.pojo.*;
@@ -274,6 +275,27 @@ public class ActivityService {
         activityItemMapper.updateItem(activityId);
         numPriceAgentMapper.updateNumPriceAgentByActivityId(activityId);
         return new Result(Result.OK, "活动取消成功");
+    }
+
+
+    public void activityIsFaileTimer(){
+        if(!"true".equals(SystemParam.get("activity_timer"))) return;
+        log.info("开始执行判断活动是否过期定时器");
+        List<Activity> list = activityMapper.findActivityIsFaile();
+        if(list.size()==0){
+        }else {
+            for(Activity a : list){
+                try {
+                    log.info("活动ID:"+a.getId());
+                    activityMapper.activityUnsale(a);
+                    activityItemMapper.updateItem(a.getId());
+                    numPriceAgentMapper.updateNumPriceAgentByActivityId(a.getId());
+                }catch (Exception e) {
+                    log.error("未知异常", e);
+                }
+            }
+        }
+
     }
 
 }

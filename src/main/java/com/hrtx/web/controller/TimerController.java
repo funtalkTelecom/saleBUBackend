@@ -39,6 +39,7 @@ public class TimerController extends BaseReturn{
 	@Autowired private OrderService orderService;
 	@Autowired private LyCrmService lyCrmService;
 	@Autowired private ShareService shareService;
+	@Autowired private ActivityService activityService;
 	/**
 	 * unFreezeSystem 定时器
 	 *
@@ -91,6 +92,8 @@ public class TimerController extends BaseReturn{
 		}else if(StringUtils.equals(task,"clear-settle")){//删除对应月份结算数据,一般每月1号执行
 			String month=request.getParameter("month");
 			this.shareService.clearOrderSettle(month);
+		}else if (StringUtils.equals(task,"activity_timer")){//活动过期执行定时器
+			activityService.activityIsFaileTimer();
 		}
 		return new Result(Result.OK,task+"在"+Utils.getCurrentDate("yyyy-MM-dd HH:mm:ss") +"执行成功");
 	}
