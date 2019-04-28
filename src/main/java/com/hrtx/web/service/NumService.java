@@ -55,7 +55,7 @@ public class NumService {
         List<Corporation> corporations = corporationMapper.selectByExample(example);
         if(corporations.size() != 1) return new Result(Result.ERROR, "绑卡订单未找到卖家");
         Corporation corporation = corporations.get(0);
-        int isValidIccid = corporation.getIsValidIccid() == null ? 0 : 1;
+        int isValidIccid = corporation.getIsValidIccid() == null ? 0 : corporation.getIsValidIccid();
         int insertCount = 0;
         List<Map> items = iccidMapper.queryTempItemsByBatchNum(orderId);
         for (Map item:items) {
