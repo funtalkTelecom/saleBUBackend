@@ -359,4 +359,12 @@
         update tb_goods set status=#{status}
         where g_id = #{gId}
     </update>
+
+
+    <select id="findSkuNumCount" resultType="java.util.HashMap">
+        select n.id id,sum(s.sku_num) skuNum,n.storage_id storageId,n.company_id companyId,max(n.email) email
+        from tb_goods g,tb_sku s,tb_corporation n   where g.g_id = s.g_id and g.g_seller_id = n.id  and g.`status`=1 and s.`status`=1
+        GROUP BY n.id ,n.storage_id,n.company_id
+    </select>
+
 </mapper>
