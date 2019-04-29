@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.advice.ServiceException;
 import com.hrtx.config.advice.WarmException;
+import com.hrtx.dto.Parameter;
 import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
 import com.hrtx.global.*;
@@ -984,7 +985,6 @@ public class GoodsService {
     public Result repoGoods(HttpServletRequest request) {
         Result res = new Result(Result.ERROR, "请求异常");
         try {
-
             Map param = new HashMap();
             Corporation corporation = (Corporation) SessionUtil.getSession().getAttribute("corporation");
             param.put("storage_id", corporation.getStorageId());
@@ -1101,5 +1101,50 @@ public class GoodsService {
             }
         }
         return new Result(Result.OK, "该号码已释放");
+    }
+
+
+    public void skuNumTimer(){
+        if(!"true".equals(SystemParam.get("skunum_timer"))) return;
+        log.info("开始执行判断商品是否过期定时器");
+        List list = goodsMapper.findSkuNumCount();
+        if(list.size()==0){
+//            log.info(String.format("暂无过期的上架商品"));return;
+        }else {
+            int sku_um=NumberUtils.toInt(SystemParam.get("sku_um")) ;//系统规定数值
+            for(int i=0;i<list.size();i++){
+                Map map = (Map) list.get(i);
+                String company_id = String.valueOf(map.get("companyId"));
+                String storage_id = String.valueOf(map.get("storageId"));
+                String email = String.valueOf(map.get("email"));
+                Result res = new Result(Result.ERROR, "请求异常");
+                try {
+                    Map param = new HashMap();
+                    param.put("storage_id", storage_id);
+                    param.put("company_id", company_id);
+                    res = StorageApiCallUtil.storageApiCall(param, "HK0001");
+                    if(res.getCode()==200){
+                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                        if ("00000".equals(sir.getCode())) {
+                            List li  =(List)sir.getPlatresponse();
+                            int quantity =0;
+                            for(int j=0; j<li.size(); j++){
+                                Map m = (Map) li.get(j);
+                                quantity =NumberUtils.toInt(String.valueOf(m.get("active_quantity"))) ;
+                                quantity++;
+                            }
+                            if(quantity<sku_um){//可用库存小于配置值，发邮件通知
+                                Parameter receiver=new Parameter(email,email.substring(0,email.indexOf("@")));
+                                SendMailUtils.sendEmail("库存提醒","您仓库可用库存数小于"+sku_um+"台，请注意。",receiver,null);
+                            }
+//
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
     }
 }

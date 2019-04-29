@@ -92,8 +92,10 @@ public class TimerController extends BaseReturn{
 		}else if(StringUtils.equals(task,"clear-settle")){//删除对应月份结算数据,一般每月1号执行
 			String month=request.getParameter("month");
 			this.shareService.clearOrderSettle(month);
-		}else if (StringUtils.equals(task,"activity_timer")){//活动过期执行定时器
+		}else if (StringUtils.equals(task,"activity-timer")){//活动过期执行定时器
 			activityService.activityIsFaileTimer();
+		}else if (StringUtils.equals(task,"skunum-timer")){//库存不足配置的数量，邮箱通知
+			goodsService.skuNumTimer();
 		}
 		return new Result(Result.OK,task+"在"+Utils.getCurrentDate("yyyy-MM-dd HH:mm:ss") +"执行成功");
 	}
