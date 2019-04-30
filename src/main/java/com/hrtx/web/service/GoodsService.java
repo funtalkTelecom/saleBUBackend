@@ -1106,7 +1106,7 @@ public class GoodsService {
 
     public void skuNumTimer(){
         if(!"true".equals(SystemParam.get("skunum_timer"))) return;
-        log.info("开始执行判断商品是否过期定时器");
+        log.info("开始执行判上架中的商品可用库存定时器");
         List corpList = goodsMapper.isPutAwayGoodsCorpList();
         if(corpList.size()==0){
         }else {
@@ -1121,7 +1121,6 @@ public class GoodsService {
                 Result res = new Result(Result.ERROR, "请求异常");
                 Parameter receiver=new Parameter(email,email.substring(0,email.indexOf("@")));
                 List contexts = new ArrayList();
-                StringBuffer sb = new StringBuffer();
                 Map param = new HashMap();
                 param.put("storage_id", storage_id);
                 param.put("company_id", company_id);
@@ -1144,7 +1143,6 @@ public class GoodsService {
                                     if(commodityName.equals(skuRepoGoodsName) ){
                                         if(quantity<sku_um){//可用库存小于配置值，发邮件通知
                                             contexts.add("机型"+commodityName+",库存数小于"+sku_um+"台，请注意。");
-//                                            sb.append("机型"+commodityName+",库存数小于"+sku_um+"台，请注意。").append("<br/>");
                                         }
                                     }
                                 }
@@ -1154,9 +1152,7 @@ public class GoodsService {
                         }
                     }
                 }
-//                System.out.println(StringUtils.join(contexts, "<br>"));
                 SendMailUtils.sendEmail("库存提醒",StringUtils.join(contexts, "<br>"),receiver,null);
-//                SendMailUtils.sendEmail("库存提醒",sb.toString(),receiver,null);
             }
         }
     }
