@@ -38,6 +38,7 @@ public class NumService {
     @Autowired private BossNumMapper bossNumMapper;
     @Autowired private CorpAgentMapper corpAgentMapper;
     @Autowired private NumPriceAgentMapper numPriceAgentMapper;
+    @Autowired private CorporationMapper corporationMapper;
 
     /**
      * 绑卡
@@ -48,6 +49,13 @@ public class NumService {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "绑卡订单不存在");
         if(order.getIsDel() == 1 || order.getStatus() != Constants.ORDER_STATUS_4.getIntKey()) return new Result(Result.ERROR, "订单状态异常");
+        Integer sellerId = order.getSellerId();
+        Example example = new Example(Corporation.class);
+        example.createCriteria().andEqualTo("id", sellerId);
+        List<Corporation> corporations = corporationMapper.selectByExample(example);
+        if(corporations.size() != 1) return new Result(Result.ERROR, "绑卡订单未找到卖家");
+        Corporation corporation = corporations.get(0);
+        int isValidIccid = corporation.getIsValidIccid() == null ? 0 : corporation.getIsValidIccid();
         int insertCount = 0;
         List<Map> items = iccidMapper.queryTempItemsByBatchNum(orderId);
         for (Map item:items) {
@@ -71,12 +79,14 @@ public class NumService {
                 OrderItem orderItem = orderItemMapper.selectByPrimaryKey(item_id);
                 if(orderItem == null) throw new ServiceException("未找到仓库回调的itemId["+item_id+"]");
                 if(orderItem.getIsShipment() != 1) throw new ServiceException("仓库回调的itemId["+item_id+"]在平台为不需发货，数据异常");
-                Example example = new Example(OrderItem.class);
+                example = new Example(OrderItem.class);
                 example.createCriteria().andEqualTo("pItemId", item_id);
                 List<OrderItem> list = orderItemMapper.selectByExample(example);
                 if(count != list.size()) throw new ServiceException("仓库回调的itemId["+item_id+"]数量["+count+"]与平台数量["+list.size()+"]不一致");
-                List errors = iccidMapper.matchOrderItem(item_id);
-                if(errors.size() > 0) throw new ServiceException("itemId["+item_id+"]回调匹配存在号段不匹配或号码状态异常");
+                if(isValidIccid == 1) {//验证iccid是否与号码匹配
+                    List errors = iccidMapper.matchOrderItem(item_id);
+                    if(errors.size() > 0) throw new ServiceException("itemId["+item_id+"]回调匹配存在号段不匹配或号码状态异常");
+                }
                 //捆绑
                 example = new Example(Iccid.class);
                 example.createCriteria().andEqualTo("orderId", item_id);

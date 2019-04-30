@@ -42,4 +42,8 @@ public interface GoodsMapper extends Mapper<Goods>,BaseMapper<Goods>{
      * @param goods
      */
     void updateGoodStatus(Goods goods);
+
+    List findSkuNumCount(@Param("sellerId") Integer sellerId);
+
+    List isPutAwayGoodsCorpList();
 }
