@@ -1109,44 +1109,57 @@ public class GoodsService {
     public void skuNumTimer(){
         if(!"true".equals(SystemParam.get("skunum_timer"))) return;
         log.info("开始执行判断商品是否过期定时器");
-        List list = goodsMapper.findSkuNumCount();
-        if(list.size()==0){
-//            log.info(String.format("暂无过期的上架商品"));return;
+        List corpList = goodsMapper.isPutAwayGoodsCorpList();
+        if(corpList.size()==0){
         }else {
             int sku_um=NumberUtils.toInt(SystemParam.get("sku_um")) ;//系统规定数值
-            for(int i=0;i<list.size();i++){
-                Map map = (Map) list.get(i);
+            for(int i=0;i<corpList.size();i++){
+                Map map = (Map) corpList.get(i);
+                Integer sellerId = NumberUtils.toInt(String.valueOf(map.get("sellerId"))) ;
                 String company_id = String.valueOf(map.get("companyId"));
                 String storage_id = String.valueOf(map.get("storageId"));
                 String email = String.valueOf(map.get("email"));
+                String names = String.valueOf(map.get("names"));
                 Result res = new Result(Result.ERROR, "请求异常");
-                try {
-                    Map param = new HashMap();
-                    param.put("storage_id", storage_id);
-                    param.put("company_id", company_id);
-                    res = StorageApiCallUtil.storageApiCall(param, "HK0001");
-                    if(res.getCode()==200){
-                        StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
-                        if ("00000".equals(sir.getCode())) {
-                            List li  =(List)sir.getPlatresponse();
-                            int quantity =0;
-                            for(int j=0; j<li.size(); j++){
-                                Map m = (Map) li.get(j);
-                                quantity =NumberUtils.toInt(String.valueOf(m.get("active_quantity"))) ;
-                                quantity++;
+                Parameter receiver=new Parameter(email,email.substring(0,email.indexOf("@")));
+                List contexts = new ArrayList();
+                StringBuffer sb = new StringBuffer();
+                Map param = new HashMap();
+                param.put("storage_id", storage_id);
+                param.put("company_id", company_id);
+                res = StorageApiCallUtil.storageApiCall(param, "HK0001");
+                if(res.getCode()==200){
+                    StorageInterfaceResponse sir = StorageInterfaceResponse.create(res.getData().toString(), SystemParam.get("key"));
+                    if ("00000".equals(sir.getCode())) {
+                        List li  =(List)sir.getPlatresponse();
+                        int quantity=0;
+                        for(int j=0; j<li.size(); j++){   //获取仓库库存接口，循环取出库存的机型数量
+                            Map m = (Map) li.get(j);
+                            quantity =NumberUtils.toInt(String.valueOf(m.get("active_quantity")));
+                            String commodityName = String.valueOf(m.get("commodity_name"));
+
+                            List skuCount = goodsMapper.findSkuNumCount(sellerId);
+                            if(quantity>0){
+                                for(int k=0; k<skuCount.size(); k++){
+                                    Map skumap = (Map) skuCount.get(k);
+                                    String skuRepoGoodsName = String.valueOf(skumap.get("sku_repo_goods_name"));
+                                    if(commodityName.equals(skuRepoGoodsName) ){
+                                        if(quantity<sku_um){//可用库存小于配置值，发邮件通知
+                                            contexts.add("机型"+commodityName+",库存数小于"+sku_um+"台，请注意。");
+//                                            sb.append("机型"+commodityName+",库存数小于"+sku_um+"台，请注意。").append("<br/>");
+                                        }
+                                    }
+                                }
+
                             }
-                            if(quantity<sku_um){//可用库存小于配置值，发邮件通知
-                                Parameter receiver=new Parameter(email,email.substring(0,email.indexOf("@")));
-                                SendMailUtils.sendEmail("库存提醒","您仓库可用库存数小于"+sku_um+"台，请注意。",receiver,null);
-                            }
-//
+
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+//                System.out.println(StringUtils.join(contexts, "<br>"));
+                SendMailUtils.sendEmail("库存提醒",StringUtils.join(contexts, "<br>"),receiver,null);
+//                SendMailUtils.sendEmail("库存提醒",sb.toString(),receiver,null);
             }
-
         }
     }
 }

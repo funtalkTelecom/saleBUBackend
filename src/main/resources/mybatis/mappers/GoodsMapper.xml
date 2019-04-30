@@ -362,9 +362,19 @@
 
 
     <select id="findSkuNumCount" resultType="java.util.HashMap">
-        select n.id id,sum(s.sku_num) skuNum,n.storage_id storageId,n.company_id companyId,max(n.email) email
-        from tb_goods g,tb_sku s,tb_corporation n   where g.g_id = s.g_id and g.g_seller_id = n.id  and g.`status`=1 and s.`status`=1
-        GROUP BY n.id ,n.storage_id,n.company_id
+        select g.g_seller_id gsellerId,
+        substring(s.sku_repo_goods_name,1,LOCATE('[',s.sku_repo_goods_name)-1) sku_repo_goods_name,sum(s.sku_num)  sku_num
+        from tb_sku s,tb_goods g
+        where s.g_id = g.g_id   and g.`status`=1 and  s.`status`=1
+        and s.sku_repo_goods_name <![CDATA[ <> ]]> ''
+        and g.g_seller_id=#{sellerId}
+        group by g.g_seller_id,substring(s.sku_repo_goods_name,1,LOCATE('[',s.sku_repo_goods_name)-1)
+    </select>
+
+    <select id="isPutAwayGoodsCorpList" resultType="java.util.HashMap">
+        select g.g_seller_id sellerId,n.company_id companyId,n.storage_id storageId,max(n.email) email,max(n.name) names
+        from tb_goods g, tb_corporation n where g.g_seller_id = n.id and n.`status`=1
+        GROUP BY g.g_seller_id,n.storage_id
     </select>
 
 </mapper>
