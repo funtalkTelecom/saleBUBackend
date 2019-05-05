@@ -3,6 +3,7 @@ package com.hrtx.web.pojo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import sun.misc.Version;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -11,9 +12,10 @@ import java.util.Date;
 @Table(name = "tb_system")
 public class System extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
-	@Id
-	@JsonSerialize(using = ToStringSerializer.class)
-	private Integer id;
+    public static Version out;
+    @Id
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Integer id;
     private String keyId;
     private String keyValue;
     private String tempKeyValue;
