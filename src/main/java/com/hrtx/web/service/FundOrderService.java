@@ -548,6 +548,7 @@ public class FundOrderService extends BaseService {
         payeeList.add(map);
         String orderName=Constants.contantsToMap("PROMOTION_PLAN_FEETYPE").get(orderSettle.getFeeType());
         log.info(String.format("结算单[%s]正式结算[%s],[%s],[%s],[%s],[%s]",orderSettle.getId(),orderNo,payer,orderSettle.getSettleUser(),total,orderName));
+        if(orderSettle.getSettleAmt().doubleValue()==0d)return new Result(Result.OK,"结算金额为0元，无需结算");
         Result result=this.payHrPayOrder(orderNo,payer,payeeList,total,null,orderName,null,Pay001.PAY_MENTHOD_TYPE_5,Pay001.ORDER_TRADE_TYPE_2);
         log.info(String.format("结算单[%s]结算结果[%s],[%s]",orderSettle.getId(),result.getCode(),result.getData()));
         if(result.getCode()==Result.OK){
