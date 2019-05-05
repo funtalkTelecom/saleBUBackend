@@ -1141,7 +1141,7 @@ public class GoodsService {
                                     String skuRepoGoodsName = String.valueOf(skumap.get("sku_repo_goods_name"));
                                     if(commodityName.equals(skuRepoGoodsName) ){
                                         if(quantity<sku_um){//可用库存小于配置值，发邮件通知
-                                            contexts.add("机型"+commodityName+",库存数小于"+sku_um+"台，请注意。");
+                                            contexts.add("机型"+commodityName+",库存数:"+sku_um+"台，请注意及时入库。");
                                         }
                                     }
                                 }

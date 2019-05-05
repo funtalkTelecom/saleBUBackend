@@ -373,7 +373,7 @@ public class OrderService extends BaseService {
         //应收
         String receivable = ((Double)Arith.add(order.getTotal()*100, 0.0)).toString();//request.getParameter("receivable");
         if(StringUtils.isBlank(receivable)) return new Result(Result.ERROR, "获取应收金额失败");
-        if(receivable.indexOf(".")!=-1 && receivable.split("\\.")[1].length()>2) return new Result(Result.ERROR, "应收金额格式错误");
+//        if(receivable.indexOf(".")!=-1 && receivable.split("\\.")[1].length()>2) return new Result(Result.ERROR, "应收金额格式错误");
         //实收
         String receipts = request.getParameter("receipts");
         if(StringUtils.isBlank(receipts)) return new Result(Result.ERROR, "实收不能为空");
