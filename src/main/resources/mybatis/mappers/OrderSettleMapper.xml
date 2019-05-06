@@ -19,7 +19,7 @@
 
     <select id="queryMonthSettle" resultType="java.util.HashMap">
         select os.settle_user,date_format(os.add_date,'%Y%m') settle_month,count(1) sign_count,group_concat(os.id) settle_ids
-        from tb_order_settle os where os.fee_type=#{fee_type} and date_format(os.add_date,'%Y%m')=#{settle_month}
+        from tb_order_settle os left join tb_order o on o.order_id=os.order_id where o.status not in (7) and os.fee_type=#{fee_type} and date_format(os.add_date,'%Y%m')=#{settle_month}
         <if test="settle_user >0"> and os.settle_user=#{settle_user} </if>
         group by os.settle_user,date_format(os.add_date,'%Y%m')
         <if test="limit_count >=0"> having count(1)&lt;#{limit_count}</if>
