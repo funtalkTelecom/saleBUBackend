@@ -57,6 +57,9 @@
         <include refid="col_list"/>
         from tb_num a
         where 1=1
+        <if test="@com.hrtx.global.SessionUtil@hasPower(@com.hrtx.global.PowerConsts@SYSTEMMOUULE_USERLIST_ALL)==false">
+            and a.seller_id = ${@com.hrtx.global.SessionUtil@getUser().getCorpId()}
+        </if>
         <if test="param.tags!=null and param.tags!='' and param.tags !='\'\''">
             and a.id in (
             select d.num_id from tb_num_rule d where d.`value` in (${param.tags}) and d.rule_type = 'tag'

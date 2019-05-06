@@ -142,6 +142,9 @@
         select
         <include refid="col_list"/>
         from tb_order a where 1=1 and a.is_del=0
+        <if test="@com.hrtx.global.SessionUtil@hasPower(@com.hrtx.global.PowerConsts@SYSTEMMOUULE_USERLIST_ALL)==false">
+            and a.seller_id = ${@com.hrtx.global.SessionUtil@getUser().getCorpId()}
+        </if>
         <if test="param.orderId!=null and param.orderId!=''">
             and a.order_id = #{param.orderId}
         </if>

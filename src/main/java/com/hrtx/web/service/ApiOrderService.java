@@ -1408,6 +1408,11 @@ public class ApiOrderService {
 	public Result CancelOrder(String orderIds,String reason){
 		int orderId =NumberUtils.toInt(orderIds);
 		Order order = orderMapper.findOrderInfo(orderId);
+		if(order.getStatus()!=Constants.ORDER_STATUS_1.getIntKey()
+				&& order.getStatus()!=Constants.ORDER_STATUS_2.getIntKey()
+				&& order.getStatus()!=Constants.ORDER_STATUS_3.getIntKey()
+				&& order.getStatus()!=Constants.ORDER_STATUS_21.getIntKey() )
+			return new Result(Result.ERROR, "该订单的状态不能取消，请稍后");
 		if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
 			log.info("更新订单状态为7:已取消");
 			CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);

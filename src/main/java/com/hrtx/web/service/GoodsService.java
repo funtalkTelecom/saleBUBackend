@@ -1121,7 +1121,6 @@ public class GoodsService {
                 String email = String.valueOf(map.get("email"));
                 String names = String.valueOf(map.get("names"));
                 Result res = new Result(Result.ERROR, "请求异常");
-                Parameter receiver=new Parameter(email,email.substring(0,email.indexOf("@")));
                 List contexts = new ArrayList();
                 Map param = new HashMap();
                 param.put("storage_id", storage_id);
@@ -1144,7 +1143,7 @@ public class GoodsService {
                                     String skuRepoGoodsName = String.valueOf(skumap.get("sku_repo_goods_name"));
                                     if(commodityName.equals(skuRepoGoodsName) ){
                                         if(quantity<sku_um){//可用库存小于配置值，发邮件通知
-                                            contexts.add("机型"+commodityName+",库存数小于"+sku_um+"台，请注意。");
+                                            contexts.add("机型"+commodityName+",库存数:"+sku_um+"台，请注意及时入库。");
                                         }
                                     }
                                 }
@@ -1154,7 +1153,10 @@ public class GoodsService {
                         }
                     }
                 }
-                SendMailUtils.sendEmail("库存提醒",StringUtils.join(contexts, "<br>"),receiver,null);
+                if(!email.equals("") && !email.equals("null")){
+                    Parameter receiver=new Parameter(email,email.substring(0,email.indexOf("@")));
+                    SendMailUtils.sendEmail("库存提醒",StringUtils.join(contexts, "<br>"),receiver,null);
+                }
             }
         }
     }
