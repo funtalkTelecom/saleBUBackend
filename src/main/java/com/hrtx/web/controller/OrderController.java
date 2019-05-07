@@ -93,7 +93,12 @@ public class OrderController extends BaseReturn{
 	@RequestMapping("/order-cancel")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_CANCEL})
 	public Result orderCancel( String orderId,String reason){
-		return orderService.orderCancel(orderId,reason);
+		if (!LockUtils.tryLock(orderId)) return new Result(Result.ERROR, "请稍后再试!");
+		try {
+			return apiOrderService.CancelOrderAllCase(orderId,reason);
+		}finally {
+			LockUtils.unLock(orderId);
+		}
 	}
 
 	@RequestMapping("/order-yPayAmt")

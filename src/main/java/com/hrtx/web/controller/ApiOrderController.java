@@ -132,11 +132,16 @@ public class ApiOrderController extends BaseReturn {
         return apiOrderService.getOrderAndItemsByOrderId(request, id);
     }
 
-    @GetMapping("/cancel-order")
+    @RequestMapping("/cancel-order")
 //  @Powers(PowerConsts.NOPOWER)
     @Powers(PowerConsts.NOLOGINPOWER)
     public Result CancelOrder(@RequestParam("orderId") String orderId,@RequestParam("reason") String reason){
-        return apiOrderService.CancelOrderAllCase(orderId,reason);
+        if (!LockUtils.tryLock(orderId)) return new Result(Result.ERROR, "请稍后再试!");
+        try {
+            return apiOrderService.CancelOrderAllCase(orderId,reason);
+        }finally {
+            LockUtils.unLock(orderId);
+        }
     }
 
     }

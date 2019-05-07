@@ -298,4 +298,13 @@ public class ActivityService {
 
     }
 
+    public Result isActivityNum(String num) {
+        int is_num = activityItemMapper.isActivityNum(num);
+        if(is_num>0){
+            return new Result(Result.OK, "success");
+        }else {
+            return new Result(Result.ERROR, "error");
+        }
+    }
+
 }
