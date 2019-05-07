@@ -1380,8 +1380,7 @@ public class ApiOrderService {
 	public Result CancelOrderAllCase(String orderIds,String reason){
 		Consumer consumer= this.apiSessionUtil.getConsumer();
 		long consumerId = consumer.getId();
-//		String a = "1014426510456520704";
-//		long consumerId = Long.valueOf(a);
+//		long consumerId = 1222;
 		Example example = new Example(Order.class);
 		if("null".equals(orderIds)) return new Result(Result.ERROR, "参数异常");
 		Long orderId =Long.parseLong(orderIds);

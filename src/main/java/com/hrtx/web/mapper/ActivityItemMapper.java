@@ -17,4 +17,6 @@ public interface ActivityItemMapper extends Mapper<ActivityItem>,BaseMapper<Acti
 
     void updateItem(@Param("activityId") Integer activityId);
 
+    int isActivityNum(@Param("num") String num);
+
 }

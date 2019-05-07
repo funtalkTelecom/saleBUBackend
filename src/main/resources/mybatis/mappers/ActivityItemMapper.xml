@@ -29,4 +29,11 @@
         where m.activity_id=#{activityId}
     </update>
 
+    <select id="isActivityNum" resultType="java.lang.Integer">
+        select count(1)
+        from tb_activity_item ai ,tb_activity a where ai.activity_id = a.id
+        and a.`status`=1 and a.type = 1 and ai.num=#{num}
+        and a.begin_date &lt;=SYSDATE()	and SYSDATE() &lt;= a.end_date
+    </select>
+
 </mapper>
