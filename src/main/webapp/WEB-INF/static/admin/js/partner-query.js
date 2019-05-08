@@ -33,7 +33,7 @@ $(function() {
                     "renderer":function(v,record){
                         if(v==1)return "已通过";
                         if(v==2)return "已拒绝";
-                        else return "待申请";
+                        else return "待审核";
                     }
                 },{
 					"header" : "操作",
@@ -73,6 +73,16 @@ $(function() {
 	window.reload = function(){
 		dataList.reload();
 	}
+
+    var soption = {
+        url:"",
+        key:"keyId",
+        value:"keyValue",
+        onchange:"",
+        onclick:"",
+        param:{t:new Date().getTime()}
+    };
+    dictSelect($("#qstatus"), "partner-status", soption, false);
 
 	$(".check_audit").click(function(){
 	    var _id=$("#partnerInfo input[name='id']").val();

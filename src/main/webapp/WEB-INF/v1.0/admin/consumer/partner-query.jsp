@@ -46,6 +46,11 @@
 											<label class="control-label">电话</label>
 											<input type="text" class="form-control" style="width:130px;" name="phone">
 										</div>
+										<div class="form-group">
+											<label class="control-label">状态</label>
+											<select class="form-control" name="qstatus" id="qstatus">
+											</select>
+										</div>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus pull-right" id="reset">重置</button>
 									</form><!-- /form-panel -->

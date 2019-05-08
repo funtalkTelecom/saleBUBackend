@@ -199,12 +199,38 @@ public class ConsumerService extends BaseService {
 	}
 
 	/**
+	 * 用昵称查询，当查询人多过多时禁止输出
+	 * @param nickName
+	 * @return
+	 */
+	public Result queryConsumerByNick(String nickName) {
+		if(StringUtils.isEmpty(nickName))return new Result(Result.ERROR,"请输入昵称关键字查询");
+		Example example=new Example(Consumer.class);
+		Example.Criteria criteria=example.createCriteria();
+		criteria.andEqualTo("isPartner",1);
+		criteria.andLike("nickName","%"+nickName+"%");
+		example.setOrderByClause("id desc");
+		List<Consumer> list=this.consumerMapper.selectByExample(example);
+		if(list.size()>5)return new Result(Result.ERROR,"查询用户太多，请输入更多昵称关键字");
+		if(list.isEmpty())return new Result(Result.ERROR,"未找到相关昵称用户，请确认信息是否正确");
+		//含敏感信息，只取需要的几个数据
+		List<Consumer> list1=new ArrayList<>();
+		for (Consumer consumer:list){
+			Consumer consumer1=new Consumer();
+			consumer1.setId(consumer.getId());
+			consumer1.setNickName(consumer.getNickName());
+			consumer1.setImg(consumer.getImg());
+			list1.add(consumer1);
+		}
+		return new Result(Result.OK,list1);
+	}
+	/**
 	 *
 	 * @param start
 	 * @param limit
 	 * @return
 	 */
-	public PageInfo partnerPage(int start,int limit,String name,String phone) {
+	public PageInfo partnerPage(int start,int limit,String name,String phone,int qstatus) {
 		Consumer pp=new Consumer();
 		pp.setStart(start);
 		pp.setLimit(limit);
@@ -214,6 +240,7 @@ public class ConsumerService extends BaseService {
 		criteria.andEqualTo("isPartner",1);
 		if(StringUtils.isNotEmpty(name))criteria.andLike("name","%"+name+"%");
 		if(StringUtils.isNotEmpty(phone))criteria.andLike("phone","%"+phone+"%");
+		if(qstatus!=-1)criteria.andEqualTo("partnerCheck",qstatus);
 		example.setOrderByClause("id desc");
 		PageHelper.startPage(pp.startToPageNum(),pp.getLimit());
 		List<Consumer> _list = consumerMapper.selectByExample(example);

@@ -145,7 +145,8 @@ public class ConsumerController extends BaseReturn{
 		int limit=NumberUtils.toInt(request.getParameter("limit"),15);
 		String name=request.getParameter("name");
 		String phone=request.getParameter("phone");
-		PageInfo pageInfo= consumerService.partnerPage(start,limit,name,phone);
+		int qstatus=NumberUtils.toInt(request.getParameter("qstatus"),-1);
+		PageInfo pageInfo= consumerService.partnerPage(start,limit,name,phone,qstatus);
 		return new Result(Result.OK, pageInfo);
 	}
 	/**
@@ -159,5 +160,14 @@ public class ConsumerController extends BaseReturn{
 		String check_remark=request.getParameter("check_remark");
 		Result r=this.consumerService.partnerCheck(consumer_id,check_status,check_remark);
 		return r;
+	}
+	/**
+	 * 根据用户昵称查询
+	 */
+	@PostMapping("/consumer/list-nick")
+	@Powers({PowerConsts.PARTNER_MOUULE_QUERY})//TODO 权限
+	public Result consumerList(HttpServletRequest request){
+		String nick=request.getParameter("nick");
+		return consumerService.queryConsumerByNick(nick);
 	}
 }
