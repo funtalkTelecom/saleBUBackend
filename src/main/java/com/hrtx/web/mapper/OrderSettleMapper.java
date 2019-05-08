@@ -39,4 +39,7 @@ public interface OrderSettleMapper  extends Mapper<OrderSettle>,BaseMapper<Order
      * @return
      */
     public Page<Object> queryOrderSettle(@Param("consumer_id") int consumer_id);
+
+    public List<Map> sumCorpOrderAmt(@Param("corp_id") int corp_id);
+
 }

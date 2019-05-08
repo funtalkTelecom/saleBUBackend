@@ -52,6 +52,35 @@ public class Utils {
 		return base64Encoder.encode(md5.digest(ObjectUtils.toString(msg).getBytes("UTF-8")));
 	}
 
+	/**
+	 * 使用Sha1进行加密
+	 * @param str
+	 * @return
+	 */
+	public static String encodeBySha1(String str){
+		if(str==null||str.length()==0){
+			return null;
+		}
+		char hexDigits[] = {'0','1','2','3','4','5','6','7','8','9',
+				'a','b','c','d','e','f'};
+		try {
+			MessageDigest mdTemp = MessageDigest.getInstance("SHA1");
+			mdTemp.update(str.getBytes("UTF-8"));
+			byte[] md = mdTemp.digest();
+			int j = md.length;
+			char buf[] = new char[j*2];
+			int k = 0;
+			for (int i = 0; i < j; i++) {
+				byte byte0 = md[i];
+				buf[k++] = hexDigits[byte0 >>> 4 & 0xf];
+				buf[k++] = hexDigits[byte0 & 0xf];
+			}
+			return new String(buf);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	public final static String doHttpPost(Map<String, String> map, String post_url) throws Exception {
 		log.info("请求url:" + post_url);
 		log.info("请求参数:" + map);
@@ -340,8 +369,16 @@ public class Utils {
 	 * @return
 	 */
 	public static String sensitive(String str,int start_len,int end_len){
-		return StringUtils.substring(str,0,start_len)+"****"+StringUtils.substring(str,StringUtils.length(str)-end_len);
+		int strLen=StringUtils.length(str);
+		if(strLen>(start_len+end_len)){
+			int size=(strLen-start_len-end_len)>4?4:(strLen-start_len-end_len);
+			return StringUtils.substring(str,0,start_len)+StringUtils.leftPad("",size,"*")+StringUtils.substring(str,strLen-end_len);//eg.6226****1234；张*春
+		}else{
+			int size=(strLen-start_len);
+			return StringUtils.substring(str,0,start_len)+StringUtils.leftPad("",size,"*");//eg.张*
+		}
 	}
+
 	/**
 	 * 判断非负数的整数或者携带一位或者两位的小数
 	 *

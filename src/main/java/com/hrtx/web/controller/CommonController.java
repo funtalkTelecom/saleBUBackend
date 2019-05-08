@@ -1,23 +1,26 @@
 package com.hrtx.web.controller;
 
+import com.hrtx.config.annotation.Powers;
+import com.hrtx.config.utils.RedisUtil;
+import com.hrtx.dto.Result;
+import com.hrtx.global.*;
+import com.hrtx.web.pojo.Consumer;
+import com.hrtx.web.pojo.Corporation;
+import com.hrtx.web.service.CityService;
+import com.hrtx.web.service.CorporationService;
+import com.hrtx.web.service.DictService;
+import com.hrtx.web.service.SmsService;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.hrtx.dto.Result;
-import com.hrtx.global.Arith;
-import com.hrtx.global.SystemParam;
-import com.hrtx.web.service.CityService;
-import com.hrtx.web.service.DictService;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import com.hrtx.config.annotation.Powers;
-import com.hrtx.global.PowerConsts;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashMap;
@@ -32,6 +35,9 @@ public class CommonController extends BaseReturn{
 	private CityService cityService;
 	@Resource
 	private DictService dictService;
+    @Autowired private ApiSessionUtil apiSessionUtil;
+    @Autowired private SmsService smsService;
+    @Autowired private CorporationService corporationService;
 
     @RequestMapping("query-city")
     @Powers( { PowerConsts.NOLOGINPOWER })
@@ -191,4 +197,48 @@ public class CommonController extends BaseReturn{
         }
         return resultMap;
     }
+
+    ///////////////////短信验证码///////////////////////////////
+    /**
+     * 发送小程序等客户端用户短信验证码
+     */
+    @PostMapping("/api/sms/ack")
+    @Powers({PowerConsts.NOPOWER})
+    @ResponseBody
+    public Result sendSmsMessage(HttpServletRequest request){
+        String phone=request.getParameter("phone");
+        return smsService.sendSmsMessage(SmsService.req_type_api,phone);
+    }
+    /**
+     * 发送小程序等客户端用户短信验证码
+     */
+    @PostMapping("/api/sms/ack-consumer")
+    @Powers({PowerConsts.NOPOWER})
+    @ResponseBody
+    public Result sendSmsConsumerMessage(){
+        Consumer consumer=apiSessionUtil.getConsumer();
+        return smsService.sendSmsMessage(SmsService.req_type_api,consumer.getPhone());
+    }
+    /**
+     * 发送公司短信验证码
+     */
+    @PostMapping("/sms/ack-corp")
+    @Powers({PowerConsts.NOPOWER})
+    @ResponseBody
+    public Result sendSmsCorpMessage(){
+        Corporation corporation=corporationService.findCorporationById(SessionUtil.getUser().getCorpId());
+        return smsService.sendSmsMessage(SmsService.req_type_pc,corporation.getPhone());
+    }
+    /**
+     * 发送给pc用户的短信验证码
+     */
+    @PostMapping("/sms/ack-user")
+    @Powers({PowerConsts.NOPOWER})
+    @ResponseBody
+    public Result sendSmsUserMessage(){
+        return smsService.sendSmsMessage(SmsService.req_type_pc,SessionUtil.getUser().getPhone());
+    }
+
+
+    //
 }
