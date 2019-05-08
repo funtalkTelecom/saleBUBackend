@@ -39,4 +39,23 @@
         order by od.order_id desc
     </select>
 
+    <select id="sumCorpOrderAmt" resultType="java.util.HashMap">
+        select
+        sum(case when o.status in(3,4,5) then o.total else 0 end ) waitBalance,
+        sum(case when o.status in(6) then o.total else 0 end ) signBalance,
+        sum(ct.waitActiveBalance) waitActiveBalance,
+        sum(ct.hasActivebalance) hasActivebalance,
+        sum(ct.waitBusiBalance) waitBusiBalance,
+        sum(ct.hasBusibalance) hasBusibalance
+        from tb_order o left join (
+        select os.order_id,
+        sum(case when os.status=1 and os.fee_type=1 then os.settle_amt else 0 end ) waitActiveBalance,
+        sum(case when os.status=2 and os.fee_type=1 then os.settle_amt else 0 end ) hasActivebalance,
+        sum(case when os.status=1 and os.fee_type=6 then os.settle_amt else 0 end ) waitBusiBalance,
+        sum(case when os.status=2 and os.fee_type=6 then os.settle_amt else 0 end ) hasBusibalance
+        from tb_order_settle os
+        group by os.order_id
+        ) ct on o.order_id=ct.order_id
+        where o.`status` in (3,4,5,6) and o.is_del=0 and o.order_type=2 and o.seller_id=#{corp_id}
+  </select>
 </mapper>
