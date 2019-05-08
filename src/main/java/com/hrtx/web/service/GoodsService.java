@@ -1120,7 +1120,7 @@ public class GoodsService {
                 String storage_id = String.valueOf(map.get("storageId"));
                 String email = String.valueOf(map.get("email"));
                 String names = String.valueOf(map.get("names"));
-                Result res = new Result(Result.ERROR, "请求异常");
+                Result res =null;
                 List contexts = new ArrayList();
                 Map param = new HashMap();
                 param.put("storage_id", storage_id);
@@ -1153,9 +1153,11 @@ public class GoodsService {
                         }
                     }
                 }
-                if(!email.equals("") && !email.equals("null")){
+                if(StringUtils.isNotEmpty(email) && !contexts.isEmpty()){
                     Parameter receiver=new Parameter(email,email.substring(0,email.indexOf("@")));
-                    SendMailUtils.sendEmail("库存提醒",StringUtils.join(contexts, "<br>"),receiver,null);
+                    String contextsStr=StringUtils.join(contexts, "<br>");
+                    log.info(String.format("发送邮件提醒，提醒内容[%s]",contextsStr));
+                    SendMailUtils.sendEmail("库存提醒",contextsStr,receiver,null);
                 }
             }
         }
