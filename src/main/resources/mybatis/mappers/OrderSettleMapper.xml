@@ -51,8 +51,8 @@
         select os.order_id,
         sum(case when os.status=1 and os.fee_type=1 then os.settle_amt else 0 end ) waitActiveBalance,
         sum(case when os.status=2 and os.fee_type=1 then os.settle_amt else 0 end ) hasActivebalance,
-        sum(case when os.status=1 and os.fee_type=6 then os.settle_amt else 0 end ) waitBusiBalance,
-        sum(case when os.status=2 and os.fee_type=6 then os.settle_amt else 0 end ) hasBusibalance
+        sum(case when os.status=1 and os.fee_type=5 then os.settle_amt else 0 end ) waitBusiBalance,
+        sum(case when os.status=2 and os.fee_type=5 then os.settle_amt else 0 end ) hasBusibalance
         from tb_order_settle os
         group by os.order_id
         ) ct on o.order_id=ct.order_id
