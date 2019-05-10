@@ -179,7 +179,7 @@
 							<div class="input-group">
 								<input type="text" class="form-control" name="sms_code" placeholder="短信验证码">
 								<span class="input-group-btn">
-									<button type="button" class="btn btn-default btn-sm send-sms">获取验证码</button>
+									<button type="button" class="btn btn-info btn-sm send-sms">获取验证码</button>
 								</span>
 							</div>
 						</div>

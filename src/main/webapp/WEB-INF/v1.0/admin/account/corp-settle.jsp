@@ -199,7 +199,7 @@
 							<div class="input-group">
 								<input type="text" class="form-control search-query" name="smsCode" placeholder="请输入短信验证码">
 								<span class="input-group-btn">
-									<button type="button" class="btn btn-default send-sms" style="border: 0px">获取验证码</button>
+									<button type="button" class="btn btn-info send-sms" style="border: 0px">获取验证码</button>
 								</span>
 							</div>
 						</div>
@@ -254,8 +254,28 @@
         $(".send-sms").click(function () {
             $.post("sms/ack-corp",{},function(data){
                 alert(data.data);
+                remaining_interval=window.setInterval(refreshTime, 1000);
+                remaining_time=60;
             },"json");
         });
+
+        var remaining_time=0;
+        var remaining_interval=null;
+        function refreshTime() {
+            $(".send-sms").attr("disabled",true);
+            $(".send-sms").removeClass("btn-info");
+            $(".send-sms").addClass("btn-default");
+            $(".send-sms").html(remaining_time+"秒后获取");
+            if(remaining_time<=0){
+                window.clearInterval(remaining_interval);//去掉定时器
+                $(".send-sms").removeAttr("disabled");
+                $(".send-sms").html("获取验证码");
+                $(".send-sms").removeClass("btn-default");
+                $(".send-sms").addClass("btn-info");
+            }
+            remaining_time--;
+        };
+
         $(".all-with-draw").click(function () {
             $("input[name='withDrawAmt']").val($("input[name='canWithDrawAmt']").val());
         });

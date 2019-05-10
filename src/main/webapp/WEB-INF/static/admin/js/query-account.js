@@ -106,10 +106,26 @@ $(function() {
     $(".send-sms").click(function () {
         $.post("sms/ack-corp",{},function(data){
             alert(data.data);
+            remaining_interval=window.setInterval(refreshTime, 1000);
+            remaining_time=60;
         },"json");
     });
-
-
+    var remaining_time=0;
+    var remaining_interval=null;
+    function refreshTime() {
+        $(".send-sms").attr("disabled",true);
+        $(".send-sms").removeClass("btn-info");
+        $(".send-sms").addClass("btn-default");
+        $(".send-sms").html(remaining_time+"秒后获取");
+        if(remaining_time<=0){
+            window.clearInterval(remaining_interval);//去掉定时器
+            $(".send-sms").removeAttr("disabled");
+            $(".send-sms").html("获取验证码");
+            $(".send-sms").removeClass("btn-default");
+            $(".send-sms").addClass("btn-info");
+        }
+        remaining_time--;
+    };
 
     $(".nick-query").click(function () {
         var s_nick=$(".search-nick").val();

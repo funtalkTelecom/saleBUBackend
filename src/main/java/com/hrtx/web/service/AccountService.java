@@ -39,10 +39,10 @@ public class AccountService {
 		}
 		Result result=this.smsService.checkKey(SmsService.req_type_pc,sms_code);
 		if(result.getCode()!=Result.OK)return result;
-		if(account.getAccountType()==null)return new Result(Result.ERROR, "账号类型错误");
+		if(account.getAccountType()==null||account.getAccountType()==-1)return new Result(Result.ERROR, "请选择账号类型");
 		if(account.getAccountType()==Constants.ACCOUNT_TYPE_1.getIntKey()){//银行
 			if(StringUtils.isEmpty(account.getCardAccount()))return new Result(Result.ERROR, "请输入银行账号");
-			if(StringUtils.isEmpty(account.getBankAccount()))return new Result(Result.ERROR, "请输入户主");
+			if(StringUtils.isEmpty(account.getBankAccount()))return new Result(Result.ERROR, "请输入户名");
 			if(StringUtils.isEmpty(account.getCardBankName()))return new Result(Result.ERROR, "请选择银行");
 		}else if(account.getAccountType()==Constants.ACCOUNT_TYPE_2.getIntKey()){//微信
 			Consumer consumer=consumerMapper.selectByPrimaryKey(NumberUtils.toInt(consumer_id));
