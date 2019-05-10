@@ -10,7 +10,7 @@
 
 
   <select id="queryPageList" resultType="java.util.HashMap" useCache="false">
-    select np.id,np.city_name cityName,np.resource, np.net_type netType,ch.channel,np.price,np.low_consume lowConsume,n.num_level numLevel,ifnull(a.commpay_name,'默认') commpayName,DATE_FORMAT(np.add_date,'%Y-%m-%d %H:%i:%s') addDate
+    select np.id,np.province_name provinceName,np.city_name cityName,np.resource, np.net_type netType,ch.channel,np.price,np.low_consume lowConsume,n.num_level numLevel,ifnull(a.commpay_name,'默认') commpayName,DATE_FORMAT(np.add_date,'%Y-%m-%d %H:%i:%s') addDate
     from tb_num_price np
     inner join  tb_num n on np.num_id = n.id
     left join tb_channel ch on np.channel=ch.channel_id and ch.corp_id=np.corp_id
@@ -19,7 +19,8 @@
     where np.is_del=0 and ch.is_del=0 and n.status = 2 and np.corp_id=#{param.corpId}
     <if test="param.channel!=null and param.channel > 0"> and np.channel = #{param.channel}</if>
     <if test="param.resource!=null and param.resource!=''"> and np.resource like "%"#{param.resource}"%"</if>
-    <if test="param.agentId!=null"> and (np.agent_id = -1 or np.agent_id = #{param.agentId})</if>
+    <if test="param.agentId!=null and param.agentId > 0"> and np.agent_id = #{param.agentId}</if>
+    <if test="param.temp!=null and param.temp!=''"> and n.city_id in (${param.temp})</if>
     order by np.num_id
   </select>
 
@@ -34,6 +35,7 @@
       from tb_num_price_agent a  where a.status = 2
 
     <if test="param.agentId!=null and param.agentId > 0"> and a.agent_id = #{param.agentId}</if>
+    <if test="param.corpId!=null and param.corpId > 0"> and a.corp_id = #{param.corpId}</if>
     <if test="param.provinceCode!=null and param.provinceCode > 0"> and a.province_code = #{param.provinceCode}</if>
     <if test="param.cityCode!=null and param.cityCode > 0"> and a.city_code = #{param.cityCode}</if>
     <if test="param.netType!=null and param.netType != ''"> and a.net_type = #{param.netType}</if>

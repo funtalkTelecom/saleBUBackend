@@ -7,6 +7,11 @@
 		<script type="text/javascript" src="<%=basePath %>project/js/jquery-ui-1.9.2.custom.js"></script>
 		<script type="text/javascript" src="<%=basePath %>project/css/jquery-ui-1.9.2.custom.css"></script>
 		<script type="text/javascript" src="<%=basePath %>admin/js/numprice-query.js"></script>
+		<link rel="stylesheet" href="<%=basePath %>project/js/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
+		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/checkboxTree.js"></script>
+		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.core.js"></script>
+		<script type="text/javascript" src="<%=basePath %>project/js/zTree_v3/js/jquery.ztree.excheck.js"></script>
+		<script type="text/javascript" src="<%=basePath %>project/js/chosen.jquery.min.js"></script>
         <style>
             .ui-helper-hidden-accessible {
                 display: none;
@@ -69,6 +74,21 @@
                                                 </c:forEach>
                                             </select>
                                         </div>
+                                        <div class="form-group" style="">
+                                            <label class="control-label">代理商</label>
+                                            <input type="text" class="form-control name"  placeholder="请输入代理商" id="commpayNameQ" >
+                                            <input type="hidden" class="form-control" name="agentId" >
+                                        </div>
+										<div class="form-group" style="">
+											<label class="control-label">地市</label>
+											<input type="text" class="form-control" id="gSaleCityStr" readonly>
+											<input type="hidden" class="form-control" name="gSaleCity" id="gSaleCity">
+											<div id="gSaleCityContent" style="z-index: 999999;">
+												<div id="menuContent" class="menuContent" style="display:none; position: absolute;z-index: 999999;">
+													<ul id="cityTree" strObj="gSaleCityStr" valObj="gSaleCity" class="ztree" style="height:auto;max-height:500px;margin-top:0; width:180px; height: auto;overflow:auto;"></ul>
+												</div>
+											</div>
+										</div>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus " id="query">查询</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus " id="reset">重置</button>
 										<button type="button" class="btn btn-info btn-small fa fa-user-plus " id="export">导出</button>

@@ -54,6 +54,7 @@ public class LiangHaoController extends BaseReturn{
         if(result.getCode()!=200) return result;
         Agent data = (Agent) result.getData();
         numPrice.setAgentId(data.getId());
+        numPrice.setCorpId(u.getCorpId());
         PageInfo<Object> objectPageInfo = numService.queryNumPrice(numPrice);
         objectPageInfo =numService.queryFreeze(objectPageInfo);
         return new Result(Result.OK, objectPageInfo);

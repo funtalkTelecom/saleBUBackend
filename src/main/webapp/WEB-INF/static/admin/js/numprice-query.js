@@ -6,7 +6,10 @@ $(function() {
 		"url" : 'numprice/numprice-list',
 		"ct" : "#result",
 		"cm" : [{
-					"header" : "地市名称",
+					"header" : "省份名称",
+					"dataIndex" : "provinceName"
+				},{
+		            "header" : "地市名称",
 					"dataIndex" : "cityName"
 				},{
 					"header" : "号码",
@@ -61,6 +64,38 @@ $(function() {
 		dataList.reload();
 	}
 
+	//地市下拉框
+    var getpos=function(str){
+        //获取元素绝对位置
+        var Left=0,Top=0;
+        do{Left+=str.offsetLeft,Top+=str.offsetTop;}
+        while(str=str.offsetParent);
+        var scr=document.getElementById('scrollDiv');//减去图层滚动条
+
+        if(scr!=null && scr!=undefined){
+            Left=Left-scr.scrollLeft;
+        }
+        return {"Left":Left,"Top":Top};
+    };
+    function showMenu(){
+        //处理地市下拉位置偏移问题
+        var xy = getpos($("#gSaleCityStr").get(0));
+        var option = {
+            "menuContentCss":'{"left":"'+(Number(xy.Left)-Number($("#sidebar").css("height")=="1px"?0:$("#sidebar").css("width").replace("px", ""))-5)+'px"}'
+        };
+        showCityMenu(option);
+    }
+    var zNodes;
+    $.post("query-city-ztree", {pid: 0, isopen:false}, function (data) {
+        zNodes = data;
+        $.fn.zTree.init($("#cityTree"), setting, zNodes);
+        $("#gSaleCityStr").off("click").on("click", showMenu);
+    }, "json");
+    $("#reset").click(function(){
+        $.fn.zTree.init($("#cityTree"), setting, zNodes);
+    });
+
+    $('.chosen-select').chosen({allow_single_deselect:true, search_contains:true});
 
 });
 
@@ -84,6 +119,30 @@ $(function() {
 //         minLength:2
 //     });
 // });
+
+$(document).on("focus","#commpayNameQ",function(){
+    autocomplete(this)
+});
+function autocomplete(dom){
+    $(dom).autocomplete({
+        source:function(query, process){
+            $.post("agent/query-agent-by-CName",{commpayName:query.term,t:new Date().getTime()},function (result) {
+                if(result.code==200){
+                    return process(result.data);
+                }
+            });
+        },
+        select: function(e, ui) {
+            $(dom).siblings("input[name=agentId]").val(ui.item.id);
+        },
+        disabled:false,
+        autoFocus:true,
+        delay:500,
+        isSelect:true,
+        minLength:2
+    });
+}
+
 $(document).on("focus","#commpayNameB",function(){
     $(this).autocomplete({
         source:function(query, process){
