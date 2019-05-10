@@ -119,6 +119,30 @@ $(function() {
 //         minLength:2
 //     });
 // });
+
+$(document).on("focus","#commpayNameQ",function(){
+    autocomplete(this)
+});
+function autocomplete(dom){
+    $(dom).autocomplete({
+        source:function(query, process){
+            $.post("agent/query-agent-by-CName",{commpayName:query.term,t:new Date().getTime()},function (result) {
+                if(result.code==200){
+                    return process(result.data);
+                }
+            });
+        },
+        select: function(e, ui) {
+            $(dom).siblings("input[name=agentId]").val(ui.item.id);
+        },
+        disabled:false,
+        autoFocus:true,
+        delay:500,
+        isSelect:true,
+        minLength:2
+    });
+}
+
 $(document).on("focus","#commpayNameB",function(){
     $(this).autocomplete({
         source:function(query, process){

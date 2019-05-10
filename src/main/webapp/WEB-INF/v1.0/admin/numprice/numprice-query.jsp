@@ -74,6 +74,11 @@
                                                 </c:forEach>
                                             </select>
                                         </div>
+                                        <div class="form-group" style="">
+                                            <label class="control-label">代理商</label>
+                                            <input type="text" class="form-control name"  placeholder="请输入代理商" id="commpayNameQ" >
+                                            <input type="hidden" class="form-control" name="agentId" >
+                                        </div>
 										<div class="form-group" style="">
 											<label class="control-label">地市</label>
 											<input type="text" class="form-control" id="gSaleCityStr" readonly>

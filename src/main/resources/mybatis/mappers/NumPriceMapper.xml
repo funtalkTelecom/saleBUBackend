@@ -19,7 +19,7 @@
     where np.is_del=0 and ch.is_del=0 and n.status = 2 and np.corp_id=#{param.corpId}
     <if test="param.channel!=null and param.channel > 0"> and np.channel = #{param.channel}</if>
     <if test="param.resource!=null and param.resource!=''"> and np.resource like "%"#{param.resource}"%"</if>
-    <if test="param.agentId!=null"> and (np.agent_id = -1 or np.agent_id = #{param.agentId})</if>
+    <if test="param.agentId!=null and param.agentId > 0"> and np.agent_id = #{param.agentId}</if>
     <if test="param.temp!=null and param.temp!=''"> and n.city_id in (${param.temp})</if>
     order by np.num_id
   </select>

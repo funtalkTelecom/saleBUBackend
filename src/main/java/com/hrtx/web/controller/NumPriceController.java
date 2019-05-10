@@ -84,8 +84,12 @@ public class NumPriceController extends BaseReturn{
 
     @RequestMapping("/numprice-export")
     @Powers({PowerConsts.NUMPRICEMOUDULE_COMMON_QUEYR})
-    public void numberExport(NumPrice numPrice, HttpServletRequest request, HttpServletResponse response){
+    public void numberExport(NumPrice numPrice, HttpServletRequest request, HttpServletResponse response,String gSaleCity){
 //		int count = 200;
+        if(StringUtils.isNotEmpty(gSaleCity)){
+            gSaleCity = "'"+ gSaleCity.replaceAll(",", "','") +"'";
+            numPrice.setTemp(gSaleCity);
+        }
         JSONArray ja = new JSONArray();
         String isCurrentPage = request.getParameter("isCurrentPage");
         if("1".equals(isCurrentPage)) {
