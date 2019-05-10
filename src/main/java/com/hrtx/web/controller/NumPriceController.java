@@ -50,7 +50,11 @@ public class NumPriceController extends BaseReturn{
 
     @RequestMapping("/numprice-list")
     @Powers({PowerConsts.NUMPRICEMOUDULE_COMMON_QUEYR})
-    public Result numpriceList(NumPrice numPrice){
+    public Result numpriceList(NumPrice numPrice,String gSaleCity){
+        if(StringUtils.isNotEmpty(gSaleCity)){
+            gSaleCity = "'"+ gSaleCity.replaceAll(",", "','") +"'";
+            numPrice.setTemp(gSaleCity);
+        }
         return numPriceService.queryNumPrice(numPrice);
     }
 
@@ -93,6 +97,7 @@ public class NumPriceController extends BaseReturn{
 //            numPrice.setLimit(Integer.parseInt(request.getParameter("total")));
         }
         Map<String,String> headMap = new LinkedHashMap<String,String>();
+        headMap.put("provinceName", "省份名称");
         headMap.put("cityName", "地市名称");
         headMap.put("resource", "号码");
         headMap.put("netType", "网络制式");
