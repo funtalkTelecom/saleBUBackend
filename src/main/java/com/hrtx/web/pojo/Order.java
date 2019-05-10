@@ -60,6 +60,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date signDate;//签收时间
+    private Integer isAdjustPrice;//是否调价 0非
     private double commission;//优惠券 折扣
     private double shippingTotal;//运输费用
     private double subTotal;//子项小计
@@ -521,5 +522,13 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public void setLogisticType(String logisticType) {
         this.logisticType = logisticType;
+    }
+
+    public Integer getIsAdjustPrice() {
+        return isAdjustPrice;
+    }
+
+    public void setIsAdjustPrice(Integer isAdjustPrice) {
+        this.isAdjustPrice = isAdjustPrice;
     }
 }
