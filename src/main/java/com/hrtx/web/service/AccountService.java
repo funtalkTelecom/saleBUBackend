@@ -39,7 +39,7 @@ public class AccountService {
 		}
 		Result result=this.smsService.checkKey(SmsService.req_type_pc,sms_code);
 		if(result.getCode()!=Result.OK)return result;
-		if(account.getAccountType()==null||account.getAccountType()==-1)return new Result(Result.ERROR, "请选择账号类型");
+		if(account.getAccountType()==null||account.getAccountType()==-1)return new Result(Result.ERROR, "请选择账户类型");
 		if(account.getAccountType()==Constants.ACCOUNT_TYPE_1.getIntKey()){//银行
 			if(StringUtils.isEmpty(account.getCardAccount()))return new Result(Result.ERROR, "请输入银行账号");
 			if(StringUtils.isEmpty(account.getBankAccount()))return new Result(Result.ERROR, "请输入户名");
@@ -53,7 +53,7 @@ public class AccountService {
 			account.setCardBank(2);
 			account.setSubbranchBank(null);
 		}else{
-			return new Result(Result.ERROR, "账号类型错误");
+			return new Result(Result.ERROR, "账户类型错误");
 		}
 		account.setAddDate(new Date());
 		account.setAddUserId(SessionUtil.getUserId());

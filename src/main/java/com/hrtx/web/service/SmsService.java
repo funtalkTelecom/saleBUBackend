@@ -76,7 +76,7 @@ public class SmsService extends BaseService {
 		String session_phone=_map.get("phone");
 		if(!StringUtils.equals(session_rand,checkCode))return new Result(Result.ERROR,"短信验证码错误");
 		if(isCheckPhone&&!StringUtils.equals(checkPhone,session_phone))return new Result(Result.ERROR,"短信验证码错误");
-		this.redisUtil.del(key,key_t);
+		//this.redisUtil.del(key,key_t);//此处不能删，可能是业务错误可能产生二次验证验证码
 		return new Result(Result.OK,"短信验证码验证通过");
 	}
 
