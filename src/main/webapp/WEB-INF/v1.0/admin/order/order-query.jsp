@@ -291,6 +291,48 @@
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal -->
 		</div>
+
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="adjustInfo" tabindex="-1" style="overflow: auto" >
+			<div class="modal-dialog" style="width:700px;">
+				<div class="modal-content" style="width: 700px; max-height:300px; overflow: auto">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title">
+							调价
+						</h4>
+					</div>
+					<form role="form" class="form-horizontal">
+						<div class="modal-body">
+							<div class="form-group">
+								<input type="hidden" name="orderId">
+								<label class="col-xs-2 control-label">订单号</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" disabled="disabled" name="orderId1">
+								</div>
+								<label class="col-xs-2 control-label">订单金额</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" disabled="disabled" name="total">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-xs-2 control-label">调价金额</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control" name="adjustPrice">
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-success">确定</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+					</form>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
 		<!-- 模态框（Modal） -->
 		<div class="modal fade" id="refundInfo" tabindex="-1" style="overflow: auto" >
 			<div class="modal-dialog" style="width:700px;">
@@ -435,6 +477,7 @@
             var p_refund_live = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_REFUND_LIVE)%>;
             var p_check = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CHECK)%>;
             var p_cancel = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CANCEL)%>;
+            var p_adjust = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_ADJUST)%>;
 		</script>
 	</body>
 </html>

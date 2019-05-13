@@ -152,6 +152,9 @@ $(function() {
 						if(p_receipt && record.status=="1") {
 							node.push('<a class="btn btn-success btn-xs receipt" href="javascript:void(0);">收款</a>');
                         }
+                        if(p_adjust && record.status=="1") {
+                            node.push('<a class="btn btn-success btn-xs adjust" href="javascript:void(0);">调价</a>');
+                        }
                         if(record.status=="20") {
                             node.push('<a class="btn btn-success btn-xs order-push-storage" href="javascript:void(0);">推送</a>');
                         }
@@ -212,6 +215,15 @@ $(function() {
                             }
                             $('#receiptInfo').modal('show');
                         });
+
+                        //点击调价
+                        $operate.find(".adjust").click(function () {
+                            $("#adjustInfo input[name='orderId']").val(record.orderId);
+                            $("#adjustInfo input[name='orderId1']").val(record.orderId);
+                            $("#adjustInfo input[name='total']").val(record.total);
+                            $('#adjustInfo').modal('show');
+                        });
+
                         //点击线下退款
                         $operate.find(".refund").click(function () {
                             $("#refund-orderId").val(v);
