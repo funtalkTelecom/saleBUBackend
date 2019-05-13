@@ -41,6 +41,7 @@ public class ShareService {
 	@Autowired private OrderItemMapper orderItemMapper;
 	@Autowired private FundOrderService fundOrderService;
 	@Autowired private HrpayAccountService hrpayAccountService;
+	@Autowired private ActivityService activityService;
 
 	/**
 	 * 添加合伙人信息
@@ -257,9 +258,12 @@ public class ShareService {
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey();
 		initSettleFee(order_id,num_id,fee_type,order_price,order_payer,share_settle_user,cost_payer,false,0d,0,0d);
 
+//		if(activityService.isActivityNum())
 		//基础推广费用
-		fee_type=Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey();
-		initSettleFee(order_id,num_id,fee_type,order_price,cost_payer,share_settle_user,cost_payer,false,0d,0,0d);
+		if(order.getIsAdjustPrice()!=null&&order.getIsAdjustPrice()==0){//2019.5.10 秒杀或调价
+			fee_type=Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey();
+			initSettleFee(order_id,num_id,fee_type,order_price,cost_payer,share_settle_user,cost_payer,false,0d,0,0d);
+		}
 
 		//技术服务费
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey();

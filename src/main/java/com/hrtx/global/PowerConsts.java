@@ -121,14 +121,19 @@ public enum PowerConsts {
 	/*******************************个人中心**************************************/
 	USERCENTRE(80000,"个人中心",1,0,"",1,10),
 
-	ACCOUNTMOUDULE(80400,"收款账号管理",80000,0,"account/query-account",2,1),
+	SYSTEMMOUULE_UPDATE_PWD(80800,"修改密码",80000,1,"/update-pwd-index",2,100),
+
+
+	/********************************报表管理*************************************/
+	FINANCE(50000,"财务管理",1,0,"",1,9),
+	ACCOUNTMOUDULE(80400,"收款账号管理",50000,0,"account/query-account",2,1),
 	ACCOUNTMOUDULE_COMMON_QUEYR(80401,"查询",80400,1,"",3,1),//收款账号管理查询
-	ACCOUNTMOUDULE_COMMON_EDIT(80402,"修改",80400,1,"",3,2),//收款账号管理修改
+	ACCOUNTMOUDULE_COMMON_EDIT(80402,"添加",80400,1,"",3,2),//收款账号管理修改
 	ACCOUNTMOUDULE_COMMON_DELETE(80403,"删除",80400,1,"",3,3),//收款账号管理删除
 
-	SYSTEMMOUULE_UPDATE_PWD(80800,"修改密码",80000,1,"/update-pwd-index",2,100),
-	;
+	FINANCE_CORP(50101,"商家结算",50000,0,"corp/settle-index",2,2),
 
+	;
 	
 	public int getId() {
 		return id;

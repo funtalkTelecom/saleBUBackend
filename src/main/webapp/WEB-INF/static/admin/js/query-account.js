@@ -15,7 +15,7 @@ $(function() {
             "dataIndex" : "subbranchBank"
         },{
             "header" : "账号",
-            "dataIndex" : "cardAccount"
+            "dataIndex" : "cardAccountHidden"
         },{
             "header" : "创建时间",
             "dataIndex" : "addDate",
@@ -24,24 +24,13 @@ $(function() {
             "dataIndex" : "id",
             "renderer":function(v,record){
                 var node = [];
-                if(p_edit) {
-                    node.push('<a class="btn btn-success btn-xs update" href="javascript:void(0);">修改</a>')
-                }
                 if(p_delete) {
                     node.push('<a class="btn btn-success btn-xs delete" href="javascript:void(0);">删除</a>')
                 }
                 $operate = $("<div>"+$.trim(node.join("&nbsp;"),'--')+"</div>");
-
-                $operate.find(".update").click(function () {
-                    $.post("account/account-info",{id:v},function(data){
-                        var _data=data.data;
-                        formInit($("#accountInfo form"), _data);
-                        $('#accountInfo').modal('show');
-                    },"json");
-                })
                 $operate.find(".delete").click(function () {
                     if(confirm("确认删除？")) {
-                        $.post("account/account-delete",{id:v},function(data){
+                        $.get("account/account-delete/"+v,null,function(data){
                             dataList.reload();
                             alert("删除成功");
                         },"json");
@@ -60,7 +49,6 @@ $(function() {
                 var name=$(v2).attr("name");
                 obj[name]=$(v2).val();
             });
-            obj.addUserId =addUserId;
             return obj;
         }
     });
@@ -83,7 +71,7 @@ $(function() {
     };
     // thirdCitySelect($("#fcity"),"ly",option);
     //银行list
-    dictSelect($("#cardBankP"), "brank", option, true);
+    dictSelect($("#cardBankP"), "brank", option, false);
 
 
     $(document).on("click","#accountInfo .modal-footer .btn-success",function() {
@@ -101,4 +89,71 @@ $(function() {
         // 将options传给ajaxForm
         $('#accountInfo form').ajaxSubmit(options);
     });
+
+    $("select[name='accountType']").change(function () {
+        var accountType=$(this).val();
+        $(".wx-info").hide();
+        $(".bank-info").hide();
+        if(accountType==2)$(".wx-info").show();
+        if(accountType==1)$(".bank-info").show();
+    });
+
+    $("select[name='cardBank']").change(function () {
+        var cardBankName=$(this).find("option:selected").text();
+        $("input[name='cardBankName']").val(cardBankName);
+    });
+
+    $(".send-sms").click(function () {
+        $.post("sms/ack-corp",{},function(data){
+            alert(data.data);
+            remaining_interval=window.setInterval(refreshTime, 1000);
+            remaining_time=60;
+        },"json");
+    });
+    var remaining_time=0;
+    var remaining_interval=null;
+    function refreshTime() {
+        $(".send-sms").attr("disabled",true);
+        $(".send-sms").removeClass("btn-info");
+        $(".send-sms").addClass("btn-default");
+        $(".send-sms").html(remaining_time+"秒后获取");
+        if(remaining_time<=0){
+            window.clearInterval(remaining_interval);//去掉定时器
+            $(".send-sms").removeAttr("disabled");
+            $(".send-sms").html("获取验证码");
+            $(".send-sms").removeClass("btn-default");
+            $(".send-sms").addClass("btn-info");
+        }
+        remaining_time--;
+    };
+
+    $(".nick-query").click(function () {
+        var s_nick=$(".search-nick").val();
+        $.post("consumer/list-nick",{nick:s_nick},function(data){
+            if(data.code==200){
+                $(".wx-info ul.ace-thumbnails").empty();
+                $("input[name='consumer_id']").val(0);
+                for(var i=0;i<data.data.length;i++){
+                    var li_demo=$("li.li_demo").clone();
+                    li_demo.removeClass("hidden").removeClass("li_demo");
+                    li_demo.find(".wx-nick").html(data.data[i].nickName);
+                    li_demo.find("img").attr("src",data.data[i].img);
+                    li_demo.attr("data",data.data[i].id);
+                    $(".wx-info ul.ace-thumbnails").append(li_demo);
+                }
+                listenThumbnails();
+            }else{
+                alert(data.data);
+            }
+        },"json");
+    });
 });
+
+function listenThumbnails() {
+    $(".wx-info .ace-thumbnails li").click(function () {
+        $(".wx-info .ace-thumbnails .text").removeClass("opacity1");
+        $(this).find(".text").addClass("opacity1");
+
+        $("input[name='consumer_id']").val($(this).attr("data"));
+    });
+}

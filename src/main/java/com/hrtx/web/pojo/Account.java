@@ -4,29 +4,33 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.awt.*;
+import javax.persistence.*;
 import java.util.Date;
 
 @Table(name = "tb_account")
 public class Account extends BasePojo implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
+	public static final int card_bank_wx =-1;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Integer id;
-	private String bankAccount;
-	private Integer cardBank;
-	private String cardBankName;
-	private String subbranchBank;
-	private String cardAccount;
+	private Integer corpId;
+	private Integer accountType;//账号类型：1银行账号；2微信号
+	private String bankAccount;//户主
+	private Integer cardBank;//银行编码(字典表)
+	private String cardBankName;//银行
+	private String subbranchBank;//支行
+	private String cardAccount;//accountType=1银行账号;accountType=2 consumer_id;
 	private Integer addUserId;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	private Date addDate;
 	private Integer isDel;
+	@Transient
+	private String bankAccountHidden;//户主信息隐藏 ****代替
+	@Transient
+	private String cardAccountHidden;//账号信息隐藏 ****代替
 
 	public Account() {
 	}
@@ -113,5 +117,37 @@ public class Account extends BasePojo implements java.io.Serializable {
 
 	public void setCardBankName(String cardBankName) {
 		this.cardBankName = cardBankName;
+	}
+
+	public Integer getCorpId() {
+		return corpId;
+	}
+
+	public void setCorpId(Integer corpId) {
+		this.corpId = corpId;
+	}
+
+	public Integer getAccountType() {
+		return accountType;
+	}
+
+	public void setAccountType(Integer accountType) {
+		this.accountType = accountType;
+	}
+
+	public String getBankAccountHidden() {
+		return bankAccountHidden;
+	}
+
+	public void setBankAccountHidden(String bankAccountHidden) {
+		this.bankAccountHidden = bankAccountHidden;
+	}
+
+	public String getCardAccountHidden() {
+		return cardAccountHidden;
+	}
+
+	public void setCardAccountHidden(String cardAccountHidden) {
+		this.cardAccountHidden = cardAccountHidden;
 	}
 }

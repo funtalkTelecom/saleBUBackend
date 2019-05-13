@@ -424,7 +424,12 @@ public class FundOrderService extends BaseService {
      * @return
      */
     public Result getPayer(int loginType){
-        ConsumerLog consumerLog=consumerService.getConsumerLog(apiSessionUtil.getConsumer() == null ? 0 : apiSessionUtil.getConsumer().getId(),loginType);
+        int consumerId=apiSessionUtil.getConsumer() == null ? 0 : apiSessionUtil.getConsumer().getId();
+        return getPayer(consumerId,loginType);
+    }
+
+    public Result getPayer(int consumerId,int loginType){
+        ConsumerLog consumerLog=consumerService.getConsumerLog(consumerId,loginType);
         if(consumerLog == null || StringUtils.isBlank(consumerLog.getOpenid())) return new Result(Result.ERROR, "未找到付款账户");
         return new Result(Result.OK, consumerLog.getOpenid());
     }
@@ -586,13 +591,18 @@ public class FundOrderService extends BaseService {
      * @return
      */
     public Result payHrPayWithdrawToWx(String account_no,Double amt) {
+        int consumerId=apiSessionUtil.getConsumer().getId();
+        return payHrPayWithdrawToWx(account_no,consumerId,amt);
+    }
+
+    public Result payHrPayWithdrawToWx(String account_no,int consumerId,Double amt) {
         PayBase payBase=createPayBase();
         int withdrawType=Pay008.WITHDRAW_TYPE_2;
         String orderNo=this.fundOrderMapper.getId()+"";
         String orderName="余额提现";
         int w_amt=Double.valueOf(Utils.mul(amt,100)).intValue();//单位分
         String sub_appid = SystemParam.get("wxx_appid");
-        Result result_openid=this.getPayer(2);
+        Result result_openid=this.getPayer(consumerId,2);
         if(result_openid.getCode()!=Result.OK)return result_openid;
         String mchWxOpenid=String.valueOf(result_openid.getData());//提现的发放用户
         String remark="靓号优选费用结算";

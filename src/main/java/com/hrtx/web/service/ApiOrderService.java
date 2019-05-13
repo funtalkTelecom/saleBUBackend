@@ -464,9 +464,12 @@ public class ApiOrderService {
 			if(result.getCode()!=Result.OK)return result;
 			double num_price=ep_num?ep_price:sku.getSkuTobPrice();
 			if(super_num/*order.getOrderType()==2&&StringUtils.equals(order.getSkuGoodsType(),"4")*/){
-				Result curr_price=findNumSalePrice(number.getId());
+				Result curr_price=findNumSalePrice1(number.getId());
 				if(curr_price.getCode()!=Result.OK)return curr_price;
-				num_price=NumberUtils.toDouble(ObjectUtils.toString(curr_price.getData()));
+				Map<String,String> _map=(Map<String,String>)curr_price.getData();
+				num_price=NumberUtils.toDouble(_map.get("price_range"));
+				if(StringUtils.equals(_map.get("adjustPrice"),"1"))order.setIsAdjustPrice(1);
+				else order.setIsAdjustPrice(0);
 				/*2019.3.14update
 				Result curr_agent=this.agentService.queryCurrAgent();
 				if(curr_agent.getCode()!=Result.OK)return curr_agent;
@@ -494,6 +497,12 @@ public class ApiOrderService {
 	}
 
 	public Result findNumSalePrice(Integer num_id){
+		Result price_result=findNumSalePrice1(num_id);
+		if(price_result.getCode()!=Result.OK)return price_result;
+		Map<String,String> _map=(Map<String,String>)price_result.getData();
+		return new Result(Result.OK,NumberUtils.toDouble(_map.get("price_range")));
+	}
+	public Result findNumSalePrice1(Integer num_id){
 		Result curr_agent=this.agentService.queryCurrAgent();
 		if(curr_agent.getCode()!=Result.OK)return curr_agent;
 		Agent agent=(Agent)curr_agent.getData();
@@ -501,12 +510,23 @@ public class ApiOrderService {
 		numPrice.setAgentId(agent.getId());
 		numPrice.setNumId(num_id);
 		List aplist=this.numPriceMapper.queryList(numPrice);
-		if(aplist.size()==0||aplist.size()>1)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
+		if(aplist.size()==0||aplist.size()>1)return new Result(Result.ERROR, "抱歉，您选择的商品已被订购，无法订购");//价格错误易产生误会2019.5.9
 		Map numPrice1=(Map)aplist.get(0);
 		Object price_range=numPrice1.get("price_range");
 		if(price_range==null)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
-		Double num_price=NumberUtils.toDouble(ObjectUtils.toString(price_range));//2019.1.24增加秒杀功能，秒杀时取秒杀价格
-		return new Result(Result.OK,num_price);
+		Map<String,String> _map=new HashMap<>();
+		int activityType=NumberUtils.toInt(ObjectUtils.toString(numPrice1.get("activityType")));
+		boolean adjustPrice=false;
+		if(activityType>0){
+			Long activityEdate=((Date)numPrice1.get("activityEdate")).getTime();
+			Long activitySdate=((Date)numPrice1.get("activitySdate")).getTime();
+			Long currDate=System.currentTimeMillis();
+			if(currDate>=activitySdate&currDate<=activityEdate)adjustPrice=true;
+		}
+		_map.put("price_range",ObjectUtils.toString(numPrice1.get("price_range")));//当前销售价 //2019.1.24增加秒杀功能，秒杀时取秒杀价格
+		_map.put("price",ObjectUtils.toString(numPrice1.get("price")));//原价
+		_map.put("adjustPrice",adjustPrice?"1":"0");//是否调价 有存在活动
+		return new Result(Result.OK,_map);
 	}
 
 	private Result saveOrderInfo(Sku sku,int order_amount,Order order,OrderItem itemIccid,List<OrderItem> itemNums){
@@ -1410,9 +1430,85 @@ public class ApiOrderService {
 		if(order.getStatus()!=Constants.ORDER_STATUS_1.getIntKey()
 				&& order.getStatus()!=Constants.ORDER_STATUS_2.getIntKey()
 				&& order.getStatus()!=Constants.ORDER_STATUS_3.getIntKey()
-				&& order.getStatus()!=Constants.ORDER_STATUS_21.getIntKey() )
+				&& order.getStatus()!=Constants.ORDER_STATUS_21.getIntKey()
+				&& order.getStatus()!=Constants.ORDER_STATUS_4.getIntKey()
+				&& order.getStatus()!=Constants.ORDER_STATUS_5.getIntKey()
+				&& order.getStatus()!=Constants.ORDER_STATUS_6.getIntKey()
+				)
 			return new Result(Result.ERROR, "该订单的状态不能取消，请稍后");
-		if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
+		if(order.getStatus()==Constants.ORDER_STATUS_1.getIntKey() || order.getStatus()==Constants.ORDER_STATUS_2.getIntKey()
+				|| order.getStatus()==Constants.ORDER_STATUS_3.getIntKey()
+				|| order.getStatus()==Constants.ORDER_STATUS_21.getIntKey()){  //仓库未发货取消
+
+			if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
+				log.info("更新订单状态为7:已取消");
+				CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
+				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
+				if(ispay.getCode()==Result.OK){  //已支付
+					if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){//线上支付
+						CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
+						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
+						if(payR.getCode()==200){  //退款成功
+							orderType(orderId);
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);  //已取消
+						}else { //退款失败
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
+						}
+					}else {//线下支付
+						CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
+					}
+				}else if(ispay.getCode()==Result.ERROR) {//未支付
+					//上架涉及的表，数量，状态
+					orderType(orderId);
+				}else{//未知结果
+					CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
+				}
+			}else {
+				log.info("调用仓储取消订单接口前封装参数");
+				Map param = new HashMap();
+				String callbackUrl =SystemParam.get("domain-full")+"/order/cancel-order-callback";
+				param.put("order_id",orderId);
+				param.put("callback_url",callbackUrl);
+				param.put("reason",reason);
+
+				log.info("调用仓储接口");
+				Result res = StorageApiCallUtil.storageApiCall(param, "HK0005");
+				Map maps =  MapJsonUtils.parseJSON2Map(res.getData().toString());
+				String code =maps.get("code").toString();
+				String desc =maps.get("desc").toString();
+				if("10000".equals(code)){
+					log.info("业务受理成功,等待回调");
+					log.info("更新订单状态为11:待仓库撤销");
+					int status =11;
+					CancelOrderStatus(orderId,status,reason);
+				}else if ("00000".equals(code)){
+					log.info("成功");
+					log.info("更新订单状态为7:已取消");
+					CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
+					Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
+					if(ispay.getCode()==200){  //已支付
+						if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){ //线上支付
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
+							Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
+							if(payR.getCode()==Result.OK){  //退款成功
+								orderType(orderId);
+								CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);  //已取消
+							}else { //退款失败
+								CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
+							}
+						}else {//线下支付
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
+						}
+					}else {//未支付
+						//上架涉及的表，数量，状态
+						orderType(orderId);
+					}
+				}else { //异常或者超时
+					return new Result(Result.ERROR, desc);
+				}
+			}
+		}else if(order.getStatus()==Constants.ORDER_STATUS_4.getIntKey() || order.getStatus()==Constants.ORDER_STATUS_5.getIntKey()
+				|| order.getStatus()==Constants.ORDER_STATUS_6.getIntKey()){  //仓库已发货取消
 			log.info("更新订单状态为7:已取消");
 			CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
 			Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
@@ -1435,50 +1531,9 @@ public class ApiOrderService {
 			}else{//未知结果
 				CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 			}
-		}else {
-			log.info("调用仓储取消订单接口前封装参数");
-			Map param = new HashMap();
-			String callbackUrl =SystemParam.get("domain-full")+"/order/cancel-order-callback";
-			param.put("order_id",orderId);
-			param.put("callback_url",callbackUrl);
-			param.put("reason",reason);
 
-			log.info("调用仓储接口");
-			Result res = StorageApiCallUtil.storageApiCall(param, "HK0005");
-			Map maps =  MapJsonUtils.parseJSON2Map(res.getData().toString());
-			String code =maps.get("code").toString();
-			String desc =maps.get("desc").toString();
-			if("10000".equals(code)){
-				log.info("业务受理成功,等待回调");
-				log.info("更新订单状态为11:待仓库撤销");
-				int status =11;
-				CancelOrderStatus(orderId,status,reason);
-			}else if ("00000".equals(code)){
-				log.info("成功");
-				log.info("更新订单状态为7:已取消");
-				CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
-				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
-				if(ispay.getCode()==200){  //已支付
-					if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){ //线上支付
-						CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
-						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
-						if(payR.getCode()==Result.OK){  //退款成功
-							orderType(orderId);
-							CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);  //已取消
-						}else { //退款失败
-							CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
-						}
-					}else {//线下支付
-						CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
-					}
-				}else {//未支付
-					//上架涉及的表，数量，状态
-					orderType(orderId);
-				}
-			}else { //异常或者超时
-				return new Result(Result.ERROR, desc);
-			}
 		}
+
 		return new Result(Result.OK, "取消成功");
 	}
 
@@ -1545,7 +1600,7 @@ public class ApiOrderService {
 						Sku nowSku = skuMapper.getSkuBySkuid(Integer.valueOf(skuIds));
 						if(isShipment==0){
 							log.info("号码还原销售中");
-							Integer count= numberMapper.freezeNumbyStatus(num_id, "2","3,4");//冻结，待配卡
+							Integer count= numberMapper.freezeNumbyStatus(num_id, "2","1,2,8,10");//冻结，待配卡
 							if(count!=quantitys) quantitys=count;
 						}
 						skuMapper.updateSkuNum(nowSku.getSkuId(),quantitys);

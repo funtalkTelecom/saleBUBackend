@@ -4,10 +4,7 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
-import com.hrtx.web.pojo.Account;
 import com.hrtx.web.pojo.DeliveryAddress;
-import com.hrtx.web.service.AccountService;
-import com.hrtx.web.service.CityService;
 import com.hrtx.web.service.DeliveryAddressService;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -16,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
@@ -26,10 +22,6 @@ import java.util.Map;
 //@RequestMapping("/api")
 public class DeliveryAddressController extends BaseReturn{
 
-	@Resource
-	private CityService cityService;
-	@Autowired
-	AccountService accountService;
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private DeliveryAddressService deliveryAddressService;
@@ -101,10 +93,4 @@ public class DeliveryAddressController extends BaseReturn{
 		returnResult(deliveryAddressService.deliveryAddressDelete(deliveryAddress));
 	}
 
-	@GetMapping("/account-list/{addUserId}")
-	@Powers({PowerConsts.NOPOWER})
-	@ResponseBody
-	public Result listDeliveryAddress(Account account, @PathVariable("addUserId") String addUserId){
-		return accountService.findAccountListByUserId(NumberUtils.toInt(addUserId));
-	}
 }

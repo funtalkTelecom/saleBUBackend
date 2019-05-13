@@ -6,6 +6,13 @@
 	<%@ include file="../common/basecss.jsp" %>
 	<%--<script type="text/javascript" src="<%=basePath %>query-meal.js"></script>--%>
 	<script type="text/javascript" src="<%=basePath %>admin/js/query-account.js"></script>
+	<script type="text/javascript" src="<%=basePath %>js/sha1.js"></script>
+	<style>
+		#accountInfo .wx-info .opacity1{opacity:1;}
+		#accountInfo .wx-info .fa-check-square-o{font-size: 24px;}
+		#accountInfo .wx-info .opacity1 .fa-check-square-o{color: #00B83F;}
+		.wx-info,.bank-info{display: none}
+	</style>
 </head>
 <body class="no-skin">
 <!-- #section:basics/navbar.layout -->
@@ -95,29 +102,86 @@
 				<input name="id" type="hidden">
 				<div class="modal-body">
 					<div class="form-group">
-						<label class="col-xs-2 control-label">户名</label>
-						<div class="col-xs-10">
-							<input type="text" class="form-control input-xxlarge" name="bankAccount">
+						<label class="col-xs-2 control-label">账户类型</label>
+						<div class="col-xs-4">
+							<select class="form-control" name="accountType">
+								<option value="-1">请选择...</option>
+								<option value="1">银行账户</option>
+								<option value="2">微信账户</option>
+							</select>
 						</div>
 					</div>
-					<div class="form-group">
-
+					<div class="form-group wx-info">
+						<label class="col-xs-2 control-label">微信昵称</label>
+						<div class="col-xs-4">
+							<div class="input-group">
+								<input type="text" class="form-control search-nick" placeholder="昵称关键字">
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sm nick-query">查询</button>
+								</span>
+							</div>
+						</div>
+						<div class="col-xs-6">
+							<span class="help-inline">
+								<span class="middle">您的微信需要先关注"靓号优选"小程序并授权允许获得您的微信昵称信息方可查询昵称</span>
+							</span>
+						</div>
+					</div>
+					<div class="form-group wx-info">
+						<label class="col-xs-2 control-label">&nbsp;</label>
+						<input type="hidden" name="consumer_id" value="0">
+						<div class="col-xs-6">
+							<ul class="ace-thumbnails clearfix">
+								<li class="hidden">
+									<div data-rel="colorbox" class="cboxElement">
+										<img width="80" height="80" src="default-user.png">
+										<div class="tags">
+											<span class="label-holder">
+												<span class="label label-info arrowed">乐山啦</span>
+											</span>
+										</div>
+										<div class="text opacity1">
+											<div class="inner">
+												<i class="ace-icon fa fa-check-square-o" ></i>
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="form-group bank-info">
 						<label class="col-xs-2 control-label">银行</label>
 						<div class="col-xs-4">
 							<select class="form-control" name="cardBank" id="cardBankP">
 								<option value="-1">请选择...</option>
 							</select>
+                            <input type="hidden" class="form-control" name="cardBankName">
 						</div>
 						<label class="col-xs-2 control-label">支行</label>
 						<div class="col-xs-4">
 							<input type="text" class="form-control" name="subbranchBank">
 						</div>
 					</div>
-
-					<div class="form-group">
+					<div class="form-group bank-info">
+						<label class="col-xs-2 control-label">户名</label>
+						<div class="col-xs-4">
+							<input type="text" class="form-control input-xxlarge" name="bankAccount">
+						</div>
 						<label class="col-xs-2 control-label">账号</label>
-						<div class="col-xs-10">
+						<div class="col-xs-4">
 							<input type="text" class="form-control input-xxlarge" name="cardAccount">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">验证码</label>
+						<div class="col-xs-4">
+							<div class="input-group">
+								<input type="text" class="form-control" name="sms_code" placeholder="短信验证码">
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-info btn-sm send-sms">获取验证码</button>
+								</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -129,10 +193,25 @@
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal -->
 </div>
+
+<li class="hidden li_demo">
+<div data-rel="colorbox" class="cboxElement">
+	<img width="80" height="80" src="default-user.png">
+	<div class="tags">
+		<span class="label-holder">
+			<span class="label label-info arrowed wx-nick">乐山啦</span>
+		</span>
+	</div>
+	<div class="text">
+		<div class="inner">
+			<i class="ace-icon fa fa-check-square-o" ></i>
+		</div>
+	</div>
+</div>
+</li>
 <script type="text/javascript">
     var p_edit = <%=SessionUtil.hasPower(PowerConsts.ACCOUNTMOUDULE_COMMON_EDIT)%>;
     var p_delete = <%=SessionUtil.hasPower(PowerConsts.ACCOUNTMOUDULE_COMMON_DELETE)%>;
-    var addUserId =<%=SessionUtil.getUserId()%>
 </script>
 </body>
 </html>

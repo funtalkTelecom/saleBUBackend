@@ -7,6 +7,7 @@ import com.hrtx.dto.Result;
 import com.hrtx.global.*;
 import com.hrtx.web.service.ConsumerService;
 import com.hrtx.web.service.ShareService;
+import com.hrtx.web.service.SmsService;
 import com.hrtx.web.service.UserService;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -32,8 +33,7 @@ public class ConsumerController extends BaseReturn{
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired private ShareService shareService;
 	@Autowired private ConsumerService consumerService;
-	@Autowired private ApiSessionUtil apiSessionUtil;
-	@Autowired private RedisUtil redisUtils;
+	@Autowired private SmsService smsService;
 
     @PutMapping(value = "/api/Consumer")
     @Powers({PowerConsts.NOPOWER})
@@ -66,13 +66,8 @@ public class ConsumerController extends BaseReturn{
 		if(!RegexConsts.matches(idcard,RegexConsts.REGEX_IC_CARD))return new Result(Result.ERROR,"身份证不符合规则");
 		if(!RegexConsts.matches(phone,RegexConsts.REGEX_MOBILE_COMMON))return new Result(Result.ERROR,"手机号码不符合规则");
 		if(StringUtils.isEmpty(phone))return new Result(Result.ERROR,"请填写手机号码");
-        String key=this.apiSessionUtil.getTokenStr()+":sms-ack";
-        Object object=this.apiSessionUtil.getObject(key);
-        if(object==null)return new Result(Result.ERROR,"短信验证码错误");
-        Map<String,String> _map=(Map<String,String>)object;
-        String session_rand=_map.get("rand");
-		String session_phone=_map.get("phone");
-		if(!(StringUtils.equals(session_rand,check_code)&&StringUtils.equals(phone,session_phone)))return new Result(Result.ERROR,"短信验证码错误");
+        Result result=smsService.checkKey(SmsService.req_type_api,check_code,phone);
+        if(result.getCode()!=Result.OK)return result;
 		return this.shareService.addInfo(name,phone,idcard,idcard_face,idcard_back);
 	}
 
@@ -109,23 +104,7 @@ public class ConsumerController extends BaseReturn{
 		_map.put("sub_path",sub_path);
 		return new Result(Result.OK,_map);
 	}
-	/**
-	 * 发送短信验证码
-	 */
-	@PostMapping("/api/sms/ack")
-	@Powers({PowerConsts.NOPOWER})
-	public Result sendSmsMessage(HttpServletRequest request){
-		String phone=request.getParameter("phone");
-		String rand=Utils.randomNoByDateTime(6);
-		String key=this.apiSessionUtil.getTokenStr()+":sms-ack";
-		Map<String,String> _map=new HashMap<>();
-		_map.put("rand",rand);
-		_map.put("phone",phone);
-		this.apiSessionUtil.saveObject(key,_map,60*10l);
-		Messager.send(phone,String.format("【%s】您的短信验证码[%s],10分钟内有效，请勿转发给他人","靓号优选",rand));
-		return new Result(Result.OK,"验证码发送成功");
-	}
-	//
+
 
 	/**
 	 * 合伙人管理
