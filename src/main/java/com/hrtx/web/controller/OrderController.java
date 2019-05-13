@@ -95,7 +95,7 @@ public class OrderController extends BaseReturn{
 	public Result orderCancel( String orderId,String reason){
 		if (!LockUtils.tryLock(orderId)) return new Result(Result.ERROR, "请稍后再试!");
 		try {
-			return apiOrderService.CancelOrderAllCase(orderId,reason);
+			return apiOrderService.CancelOrder(orderId,reason);
 		}finally {
 			LockUtils.unLock(orderId);
 		}

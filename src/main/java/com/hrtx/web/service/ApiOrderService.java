@@ -1430,9 +1430,85 @@ public class ApiOrderService {
 		if(order.getStatus()!=Constants.ORDER_STATUS_1.getIntKey()
 				&& order.getStatus()!=Constants.ORDER_STATUS_2.getIntKey()
 				&& order.getStatus()!=Constants.ORDER_STATUS_3.getIntKey()
-				&& order.getStatus()!=Constants.ORDER_STATUS_21.getIntKey() )
+				&& order.getStatus()!=Constants.ORDER_STATUS_21.getIntKey()
+				&& order.getStatus()!=Constants.ORDER_STATUS_4.getIntKey()
+				&& order.getStatus()!=Constants.ORDER_STATUS_5.getIntKey()
+				&& order.getStatus()!=Constants.ORDER_STATUS_6.getIntKey()
+				)
 			return new Result(Result.ERROR, "该订单的状态不能取消，请稍后");
-		if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
+		if(order.getStatus()==Constants.ORDER_STATUS_1.getIntKey() || order.getStatus()==Constants.ORDER_STATUS_2.getIntKey()
+				|| order.getStatus()==Constants.ORDER_STATUS_3.getIntKey()
+				|| order.getStatus()==Constants.ORDER_STATUS_21.getIntKey()){  //仓库未发货取消
+
+			if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
+				log.info("更新订单状态为7:已取消");
+				CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
+				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
+				if(ispay.getCode()==Result.OK){  //已支付
+					if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){//线上支付
+						CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
+						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
+						if(payR.getCode()==200){  //退款成功
+							orderType(orderId);
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);  //已取消
+						}else { //退款失败
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
+						}
+					}else {//线下支付
+						CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
+					}
+				}else if(ispay.getCode()==Result.ERROR) {//未支付
+					//上架涉及的表，数量，状态
+					orderType(orderId);
+				}else{//未知结果
+					CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
+				}
+			}else {
+				log.info("调用仓储取消订单接口前封装参数");
+				Map param = new HashMap();
+				String callbackUrl =SystemParam.get("domain-full")+"/order/cancel-order-callback";
+				param.put("order_id",orderId);
+				param.put("callback_url",callbackUrl);
+				param.put("reason",reason);
+
+				log.info("调用仓储接口");
+				Result res = StorageApiCallUtil.storageApiCall(param, "HK0005");
+				Map maps =  MapJsonUtils.parseJSON2Map(res.getData().toString());
+				String code =maps.get("code").toString();
+				String desc =maps.get("desc").toString();
+				if("10000".equals(code)){
+					log.info("业务受理成功,等待回调");
+					log.info("更新订单状态为11:待仓库撤销");
+					int status =11;
+					CancelOrderStatus(orderId,status,reason);
+				}else if ("00000".equals(code)){
+					log.info("成功");
+					log.info("更新订单状态为7:已取消");
+					CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
+					Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
+					if(ispay.getCode()==200){  //已支付
+						if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){ //线上支付
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
+							Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
+							if(payR.getCode()==Result.OK){  //退款成功
+								orderType(orderId);
+								CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);  //已取消
+							}else { //退款失败
+								CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
+							}
+						}else {//线下支付
+							CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
+						}
+					}else {//未支付
+						//上架涉及的表，数量，状态
+						orderType(orderId);
+					}
+				}else { //异常或者超时
+					return new Result(Result.ERROR, desc);
+				}
+			}
+		}else if(order.getStatus()==Constants.ORDER_STATUS_4.getIntKey() || order.getStatus()==Constants.ORDER_STATUS_5.getIntKey()
+				|| order.getStatus()==Constants.ORDER_STATUS_6.getIntKey()){  //仓库已发货取消
 			log.info("更新订单状态为7:已取消");
 			CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
 			Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
@@ -1455,50 +1531,9 @@ public class ApiOrderService {
 			}else{//未知结果
 				CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 			}
-		}else {
-			log.info("调用仓储取消订单接口前封装参数");
-			Map param = new HashMap();
-			String callbackUrl =SystemParam.get("domain-full")+"/order/cancel-order-callback";
-			param.put("order_id",orderId);
-			param.put("callback_url",callbackUrl);
-			param.put("reason",reason);
 
-			log.info("调用仓储接口");
-			Result res = StorageApiCallUtil.storageApiCall(param, "HK0005");
-			Map maps =  MapJsonUtils.parseJSON2Map(res.getData().toString());
-			String code =maps.get("code").toString();
-			String desc =maps.get("desc").toString();
-			if("10000".equals(code)){
-				log.info("业务受理成功,等待回调");
-				log.info("更新订单状态为11:待仓库撤销");
-				int status =11;
-				CancelOrderStatus(orderId,status,reason);
-			}else if ("00000".equals(code)){
-				log.info("成功");
-				log.info("更新订单状态为7:已取消");
-				CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
-				Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
-				if(ispay.getCode()==200){  //已支付
-					if(NumberUtils.toInt(ObjectUtils.toString(ispay.getData())) == 1){ //线上支付
-						CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
-						Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
-						if(payR.getCode()==Result.OK){  //退款成功
-							orderType(orderId);
-							CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);  //已取消
-						}else { //退款失败
-							CancelOrderStatus(orderId,Constants.ORDER_STATUS_13.getIntKey(),""); //退款失败
-						}
-					}else {//线下支付
-						CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),""); //待财务退款
-					}
-				}else {//未支付
-					//上架涉及的表，数量，状态
-					orderType(orderId);
-				}
-			}else { //异常或者超时
-				return new Result(Result.ERROR, desc);
-			}
 		}
+
 		return new Result(Result.OK, "取消成功");
 	}
 

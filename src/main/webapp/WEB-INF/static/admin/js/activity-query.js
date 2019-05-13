@@ -213,6 +213,7 @@ $(function() {
                 ',"price":"'+$(obj).find(".price").val()+'"}');
         })
         $("#strjson").val("["+json.join(",")+"]");
+        $("#add").attr({ disabled: "disabled" });
         var options = {
             type: "post",
             url: "activity/activity-edit",
@@ -220,6 +221,7 @@ $(function() {
                 dataList.load();
                 $("#NumsDiv tbody tr ").remove();
                 $('#epSaleInfo').modal('hide');
+                $('#add').removeAttr("disabled");
                 alert(data.data);
             }
         };
