@@ -57,7 +57,7 @@
 										</div>
 										<div class="form-group" style="">
 											<label class="control-label">号码</label>
-											<input type="text" class="form-control" style="width:130px;" name="resource">
+											<input type="text" class="form-control" style="width:130px;" name="resource" maxlength="11">
 										</div>
 										<%--<div class="form-group" style="">--%>
 											<%--<label class="control-label">代理商</label>--%>
@@ -129,7 +129,7 @@
                                     <input type="hidden" class="form-control" name="id">
                                     <label class="col-xs-2 col-sm-2 control-label">号码</label>
                                     <div class="col-xs-4 col-sm-4">
-                                        <input type="text" class="form-control resource" name="resource" id="resourceT" placeholder="请输入完整的号码">
+                                        <input type="text" class="form-control resource" name="resource" id="resourceT" placeholder="请输入完整的号码" maxlength="11">
                                     </div>
                                     <label class="col-xs-2 col-sm-2 control-label">代理商</label>
                                     <div class="col-xs-4 col-sm-4">

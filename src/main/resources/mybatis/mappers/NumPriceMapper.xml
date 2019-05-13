@@ -166,7 +166,7 @@
   </update>
 
   <select id="queryAgentNumprice" resultType="java.util.Map" useCache="false">
-    select a.price ,ifnull(b.price,a.price) agentPrice from
+    select a.price ,ifnull(b.price,a.price) agentPrice,a.num_id  numId from
       (select np.price,np.num_id from  tb_num_price np where np.num_id=#{param.numId} and np.agent_id=-1 and np.is_del=0 and np.channel=#{param.channel}) a left join
     (select np.price,np.num_id from  tb_num_price np where np.num_id=#{param.numId} and np.agent_id=#{param.agentId} and np.is_del=0 and np.channel=#{param.channel}) b on a.num_id=b.num_id
   </select>
