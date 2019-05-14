@@ -111,6 +111,7 @@ public class Order extends BasePojo implements java.io.Serializable {
         this.total =calculateTotal(this);
         this.conment = conment;
         this.isDel =0;
+        this.adjustPrice=0d;
         this.skuGoodsType = skuGoodsType;
     }
 
