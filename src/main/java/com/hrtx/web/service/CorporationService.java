@@ -55,7 +55,7 @@ public class CorporationService {
 		Result result1 = this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_corp, corpId);
 		Map<String,String> resMap=new HashMap<>();
 		List<Map> list=orderSettleMapper.sumCorpOrderAmt(corpId);
-		if(!list.isEmpty()){
+		if(!list.isEmpty()&&list.get(0)!=null){
 			Map map=list.get(0);
 			resMap.put("waitBalance",Utils.convertFormat(NumberUtils.toDouble(ObjectUtils.toString(map.get("waitBalance"))),1));//待签收款
 			resMap.put("signBalance",Utils.convertFormat(NumberUtils.toDouble(ObjectUtils.toString(map.get("signBalance"))),1));//已签收款
