@@ -3,16 +3,13 @@
 <mapper namespace="com.hrtx.web.mapper.OrderSettleMapper" >
 
     <select id="countConsumerSettle" resultType="java.util.HashMap">
-        select ct1.wait_settle as wait_settle,ct1.has_settle as has_settle,ct1.all_settle as all_settle,ct2.sale_price as sale_price,ct2.sale_count as sale_count from (
-        select od.consumer,sum(o.settle_amt) all_settle,
+        select sum(o.settle_amt) all_settle,
+        sum(CASE WHEN o.fee_type=6 THEN od.sub_total	ELSE 0 END ) sale_price,
+	    sum(CASE WHEN o.fee_type=6 THEN 1	ELSE 0 END) sale_count,
         sum(CASE WHEN o.status=1 THEN o.settle_amt	ELSE 0 END ) wait_settle,
         sum(CASE WHEN o.status=2 THEN o.settle_amt	ELSE 0 END) has_settle
         from tb_order_settle o left join tb_order od on od.order_id=o.order_id
-        where o.`status` in (1,2) and o.fee_type in (1,6) and od.consumer=#{consumer_id} and od.`status` not in (7) group by od.consumer
-        ) ct1 left join (
-        select od.consumer,sum(od.total) sale_price,count(1) sale_count
-        from tb_order od left join tb_share s on od.share_id=s.id  where od.`status` not in (7) and od.consumer=#{consumer_id} group by od.consumer
-        ) ct2 on ct1.consumer=ct2.consumer
+        where o.`status` in (1,2) and o.fee_type in (1,6) and o.settle_user=#{consumer_id} and od.`status` not in (7)
     </select>
 
     <select id="settleUserMonthSignCount" resultType="java.util.HashMap">
