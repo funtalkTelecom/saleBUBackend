@@ -647,6 +647,7 @@ public class OrderService extends BaseService {
         if(adjustPrice <=0 || adjustPrice >= order.getTotal()) {
             return new Result(Result.ERROR, "调价金额必须大于0小于总价");
         }
+        order.setIsAdjustPrice(1);
         order.setAdjustPrice(Arith.add(order.getAdjustPrice(), adjustPrice));
         order.setTotal(Arith.sub(order.getTotal(), adjustPrice));
         orderMapper.updateByPrimaryKey(order);
