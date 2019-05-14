@@ -61,6 +61,7 @@ public class Order extends BasePojo implements java.io.Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date signDate;//签收时间
     private Integer isAdjustPrice;//是否调价 0非
+    private Double adjustPrice;
     private double commission;//优惠券 折扣
     private double shippingTotal;//运输费用
     private double subTotal;//子项小计
@@ -530,5 +531,13 @@ public class Order extends BasePojo implements java.io.Serializable {
 
     public void setIsAdjustPrice(Integer isAdjustPrice) {
         this.isAdjustPrice = isAdjustPrice;
+    }
+
+    public Double getAdjustPrice() {
+        return adjustPrice;
+    }
+
+    public void setAdjustPrice(Double adjustPrice) {
+        this.adjustPrice = adjustPrice;
     }
 }

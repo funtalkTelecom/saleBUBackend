@@ -125,6 +125,12 @@ public class OrderController extends BaseReturn{
 		return orderService.payCheck(order);
 	}
 
+	@RequestMapping("/adjust-order")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_ADJUST})
+	public Result adjustOrder(Order order){
+		return orderService.adjustOrder(order);
+	}
+
 	@RequestMapping("/item-list")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
 	public Result listItem(OrderItem orderItem){

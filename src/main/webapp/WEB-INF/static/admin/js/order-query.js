@@ -220,8 +220,11 @@ $(function() {
                         //点击调价
                         $operate.find(".adjust").click(function () {
                             $("#adjustInfo input[name='orderId']").val(record.orderId);
+                            $("#adjustInfo .msg").html("");
                             $("#adjustInfo input[name='orderId1']").val(record.orderId);
                             $("#adjustInfo input[name='total']").val(record.total);
+                            $("#adjustInfo input[name='maskId']").val("adjustInfo");
+                            $("#adjustInfo input[name='mask']").val("提交中...");
                             $('#adjustInfo').modal('show');
                         });
 
@@ -463,5 +466,23 @@ $(function() {
         },"json");
 
 
+    });
+
+    $("#adjustInfo form input[name='adjustPrice']").blur(function () {
+        var total = parseFloat($("#adjustInfo form input[name='total']").val()) || 0;
+        var adjustPrice = parseFloat($(this).val()) || 0;
+        if(adjustPrice <=0 || adjustPrice >= total) {
+            $(this).siblings(".msg").html("调价金额需大于0小于总价");
+        }else {
+            $(this).siblings(".msg").html("还需支付:"+(total-adjustPrice).toFixed(2)+"元");
+        }
+    })
+
+    $(document).on("click","#adjustInfo .modal-footer .btn-success",function() {
+        $.post("order/adjust-order",$("#adjustInfo form").serialize(),function(data){
+            alert(data.data);
+            dataList.reload();
+            $('#adjustInfo').modal('hide');
+        },"json");
     });
 });

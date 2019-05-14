@@ -307,6 +307,8 @@
 					<form role="form" class="form-horizontal">
 						<div class="modal-body">
 							<div class="form-group">
+								<input name="maskId" type="hidden" value="adjustInfo">
+								<input name="mask" type="hidden" value="提交中...">
 								<input type="hidden" name="orderId">
 								<label class="col-xs-2 control-label">订单号</label>
 								<div class="col-xs-3">
@@ -322,6 +324,7 @@
 								<label class="col-xs-2 control-label">调价金额</label>
 								<div class="col-xs-3">
 									<input type="text" class="form-control" name="adjustPrice">
+									<p class="help-block msg"></p>
 								</div>
 							</div>
 						</div>
