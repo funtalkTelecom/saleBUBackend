@@ -15,3 +15,7 @@ INSERT INTO `egt_hk`.`tb_system`(`id`, `key_id`, `key_value`, `temp_key_value`, 
 --2019.04.28
 ALTER TABLE `egt_hk`.`tb_corporation`
 ADD COLUMN `is_valid_iccid` int(1) NOT NULL DEFAULT 1 COMMENT '是否验证号码与iccid匹配  0否  1是' AFTER `email`;
+
+--2019.05.14
+ALTER TABLE `egt_hk`.`tb_order`
+ADD COLUMN `adjust_price` decimal(10, 2) NOT NULL DEFAULT 0 COMMENT '调价' AFTER `is_adjust_price`;

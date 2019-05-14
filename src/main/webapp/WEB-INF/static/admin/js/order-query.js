@@ -152,10 +152,14 @@ $(function() {
 						if(p_receipt && record.status=="1") {
 							node.push('<a class="btn btn-success btn-xs receipt" href="javascript:void(0);">收款</a>');
                         }
+                        if(p_adjust && record.status=="1") {
+                            node.push('<a class="btn btn-success btn-xs adjust" href="javascript:void(0);">调价</a>');
+                        }
                         if(record.status=="20") {
                             node.push('<a class="btn btn-success btn-xs order-push-storage" href="javascript:void(0);">推送</a>');
                         }
-                        if(p_cancel &&( record.status=="1"||record.status=="2"||record.status=="21"||record.status=="3"&&record.orderType!=3)) {
+                        if(p_cancel &&( record.status=="1"||record.status=="2"||record.status=="21"||record.status=="3"
+                            ||record.status=="4" ||record.status=="5" ||record.status=="6" && record.orderType!=3)) {
 							node.push('<a class="btn btn-danger btn-xs cancel" href="javascript:void(0);">取消订单</a>');
                         }
 						if(p_refund && record.status=="14") {
@@ -212,6 +216,18 @@ $(function() {
                             }
                             $('#receiptInfo').modal('show');
                         });
+
+                        //点击调价
+                        $operate.find(".adjust").click(function () {
+                            $("#adjustInfo input[name='orderId']").val(record.orderId);
+                            $("#adjustInfo .msg").html("");
+                            $("#adjustInfo input[name='orderId1']").val(record.orderId);
+                            $("#adjustInfo input[name='total']").val(record.total);
+                            $("#adjustInfo input[name='maskId']").val("adjustInfo");
+                            $("#adjustInfo input[name='mask']").val("提交中...");
+                            $('#adjustInfo').modal('show');
+                        });
+
                         //点击线下退款
                         $operate.find(".refund").click(function () {
                             $("#refund-orderId").val(v);
@@ -450,5 +466,23 @@ $(function() {
         },"json");
 
 
+    });
+
+    $("#adjustInfo form input[name='adjustPrice']").blur(function () {
+        var total = parseFloat($("#adjustInfo form input[name='total']").val()) || 0;
+        var adjustPrice = parseFloat($(this).val()) || 0;
+        if(adjustPrice <=0 || adjustPrice >= total) {
+            $(this).siblings(".msg").html("调价金额需大于0小于总价");
+        }else {
+            $(this).siblings(".msg").html("还需支付:"+(total-adjustPrice).toFixed(2)+"元");
+        }
+    })
+
+    $(document).on("click","#adjustInfo .modal-footer .btn-success",function() {
+        $.post("order/adjust-order",$("#adjustInfo form").serialize(),function(data){
+            alert(data.data);
+            dataList.reload();
+            $('#adjustInfo').modal('hide');
+        },"json");
     });
 });

@@ -95,7 +95,7 @@ public class OrderController extends BaseReturn{
 	public Result orderCancel( String orderId,String reason){
 		if (!LockUtils.tryLock(orderId)) return new Result(Result.ERROR, "请稍后再试!");
 		try {
-			return apiOrderService.CancelOrderAllCase(orderId,reason);
+			return apiOrderService.CancelOrder(orderId,reason);
 		}finally {
 			LockUtils.unLock(orderId);
 		}
@@ -123,6 +123,12 @@ public class OrderController extends BaseReturn{
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_CHECK})
 	public Result payCheck(Order order){
 		return orderService.payCheck(order);
+	}
+
+	@RequestMapping("/adjust-order")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_ADJUST})
+	public Result adjustOrder(Order order){
+		return orderService.adjustOrder(order);
 	}
 
 	@RequestMapping("/item-list")

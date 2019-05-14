@@ -180,7 +180,7 @@
 							</div>
 				   </div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success">提交</button>
+						<button type="button" class="btn btn-success" id="add">提交</button>
 						<button type="button" class="btn btn-default" id="modColse">关闭</button>
 					</div>
 					</form>

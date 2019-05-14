@@ -638,5 +638,20 @@ public class OrderService extends BaseService {
         if(order==null) return new Result(Result.ERROR, "该订单不存在");
         return apiOrderService.CancelOrder(orderId,reason);
     }
+
+    public Result adjustOrder(Order order) {
+        double adjustPrice = order.getAdjustPrice() == null  ? 0 : order.getAdjustPrice();
+        order = orderMapper.selectByPrimaryKey(order.getOrderId());
+        if(order==null || order.getStatus() != Constants.ORDER_STATUS_1.getIntKey()) return new Result(Result.ERROR, "该订单不存在");
+        if(!order.getSellerId().equals(SessionUtil.getUser().getCorpId())) return new Result(Result.ERROR, "该订单您无权调价");
+        if(adjustPrice <=0 || adjustPrice >= order.getTotal()) {
+            return new Result(Result.ERROR, "调价金额必须大于0小于总价");
+        }
+        order.setIsAdjustPrice(1);
+        order.setAdjustPrice(Arith.add(order.getAdjustPrice(), adjustPrice));
+        order.setTotal(Arith.sub(order.getTotal(), adjustPrice));
+        orderMapper.updateByPrimaryKey(order);
+        return new Result(Result.OK, "调价成功");
+    }
 }
 

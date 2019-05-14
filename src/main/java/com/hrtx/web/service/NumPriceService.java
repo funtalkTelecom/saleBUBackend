@@ -17,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,6 +71,7 @@ public class NumPriceService {
         Agent agent1 = new Agent();
         agent1.setId(numPrice.getAgentId());
         NumPrice numPrice1 = new NumPrice();
+        numPrice1.setNumId(NumberUtils.toInt(String.valueOf(map.get("numId"))));
         numPrice1.setChannel(agentMapper.queryAgentChannel(agent1, SessionUtil.getUser().getCorpId()));
         numPrice1.setResource(numPrice.getResource());
         numPrice1.setAgentId(-1);
@@ -87,6 +85,7 @@ public class NumPriceService {
         }
         numPrice2.setAgentId(numPrice.getAgentId());
         numPrice2.setPrice(numPrice.getPrice());
+        numPrice2.setAddDate(new Date());
         numPrice2.setId(null);
         numPriceMapper.insert(numPrice2);
         return new Result(Result.OK,"成功");
