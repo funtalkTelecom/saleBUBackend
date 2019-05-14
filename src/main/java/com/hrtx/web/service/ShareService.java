@@ -260,9 +260,9 @@ public class ShareService {
 
 //		if(activityService.isActivityNum())
 		//基础推广费用
-		boolean isAdjustPrice=order.getIsAdjustPrice()!=null&&order.getIsAdjustPrice()==0;//2019.5.10 秒杀或调价 若为true则设置订单金额为0，使得基础推广费为0
+		boolean noAdjustPrice=order.getIsAdjustPrice()!=null&&order.getIsAdjustPrice()==0;//2019.5.10 非秒杀或调价单 若为true则设置订单金额为0，使得基础推广费为0
         fee_type=Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey();
-        initSettleFee(order_id,num_id,fee_type,isAdjustPrice?0d:order_price,cost_payer,share_settle_user,cost_payer,false,0d,0,0d);
+        initSettleFee(order_id,num_id,fee_type,noAdjustPrice?order_price:0d,cost_payer,share_settle_user,cost_payer,false,0d,0,0d);
 		//技术服务费
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey();
 		result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey());
