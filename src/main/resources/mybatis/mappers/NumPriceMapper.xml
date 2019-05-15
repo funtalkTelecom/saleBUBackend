@@ -75,6 +75,7 @@
   <select id="countList" resultType="java.lang.Long">
     select count(*) from tb_num_price_agent a where a.status = 2
     <if test="param.agentId!=null and param.agentId > 0"> and a.agent_id = #{param.agentId}</if>
+    <if test="param.corpId!=null and param.corpId > 0"> and a.corp_id = #{param.corpId}</if>
     <if test="param.provinceCode!=null and param.provinceCode > 0"> and a.province_code = #{param.provinceCode}</if>
     <if test="param.cityCode!=null and param.cityCode > 0"> and a.city_code = #{param.cityCode}</if>
     <if test="param.netType!=null and param.netType != ''"> and a.net_type = #{param.netType}</if>
