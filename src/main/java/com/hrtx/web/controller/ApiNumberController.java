@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class ApiNumberController extends BaseReturn{
 	@GetMapping("/number")
     @Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public Result numberList(NumPrice numPrice, HttpServletRequest request){
+	public Result numberList(NumPrice numPrice, HttpServletRequest request)  throws ParseException {
 		return apiNumberService.numberList(numPrice, request);
 	}
 
@@ -99,7 +100,7 @@ public class ApiNumberController extends BaseReturn{
 	@GetMapping("/fand-number")
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public Result numberListByNum(NumPrice numPrice, HttpServletRequest request){
+	public Result numberListByNum(NumPrice numPrice, HttpServletRequest request) {
 		return apiNumberService.numberListByNum(numPrice, request);
 	}
 
@@ -137,7 +138,7 @@ public class ApiNumberController extends BaseReturn{
 	@GetMapping("/search-number")
 	@Powers(PowerConsts.NOLOGINPOWER)
 	@ResponseBody
-	public Result searchNumberList(NumPrice numPrice,HttpServletRequest request){
+	public Result searchNumberList(NumPrice numPrice,HttpServletRequest request) throws ParseException{
 		return apiNumberService.searchNumberList(numPrice,request);
 	}
 

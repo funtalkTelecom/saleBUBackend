@@ -1244,7 +1244,7 @@ public class ApiOrderService {
 	 * @param to   结束日期
 	 * @return
 	 */
-	private static boolean betweenCalendar(Date time, Date from, Date to) {
+	static boolean betweenCalendar(Date time, Date from, Date to) {
 		Calendar date = Calendar.getInstance();
 		date.setTime(time);
 
@@ -1253,13 +1253,13 @@ public class ApiOrderService {
 
 		Calendar before = Calendar.getInstance();
 		before.setTime(to);
-
 		if (date.after(after) && date.before(before)) {
 			return true;
 		} else {
 			return false;
 		}
 	}
+
 
 	private void deleteOrder(List<Order> orderList) {
 		log.info("删除订单");
