@@ -638,7 +638,7 @@ public class ApiOrderService {
 			Long activityEdate=activity.getEndDate().getTime();
 			Long activitySdate=activity.getBeginDate().getTime();
 			Long currDate=System.currentTimeMillis();
-			if(currDate>=activitySdate&currDate<=activityEdate)adjustPrice=true;
+			if(currDate>=activitySdate&&currDate<=activityEdate)adjustPrice=true;
 		}
 		_map.put("price_range",ObjectUtils.toString(numPrice1.get("price_range")));//当前销售价 //2019.1.24增加秒杀功能，秒杀时取秒杀价格
 		_map.put("price",ObjectUtils.toString(numPrice1.get("price")));//原价
