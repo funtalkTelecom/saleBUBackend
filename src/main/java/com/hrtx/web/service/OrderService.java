@@ -647,10 +647,13 @@ public class OrderService extends BaseService {
         if(adjustPrice <=0 || adjustPrice >= order.getTotal()) {
             return new Result(Result.ERROR, "调价金额必须大于0小于总价");
         }
+        double bprice = order.getTotal();
         order.setIsAdjustPrice(1);
         order.setAdjustPrice(Arith.add(order.getAdjustPrice(), adjustPrice));
         order.setTotal(Arith.sub(order.getTotal(), adjustPrice));
         orderMapper.updateByPrimaryKey(order);
+        log.info(SessionUtil.getUser().getLoginName()+"在"+Utils.getDate(0,"yyyy-MM-dd HH:mm:ss")
+                +"对订单["+order.getOrderId()+"]调价,调价金额["+adjustPrice+"],调价前金额["+bprice+"],调价后金额["+order.getTotal()+"]");
         return new Result(Result.OK, "调价成功");
     }
 }
