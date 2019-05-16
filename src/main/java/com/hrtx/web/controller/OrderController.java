@@ -131,6 +131,18 @@ public class OrderController extends BaseReturn{
 		return orderService.adjustOrder(order);
 	}
 
+	@RequestMapping("/again-order")
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_AGAIN})
+	public Result againOrder(Order order){
+		int orderId = order.getOrderId() == null ? 0 : order.getOrderId();
+		if(!LockUtils.tryLock("again"+orderId)) return new Result(Result.ERROR, "订单正在补发中,请稍后再试！");
+		try{
+			return apiOrderService.deliverAgainOrder(orderId);
+		}finally {
+			LockUtils.unLock("again"+orderId);
+		}
+	}
+
 	@RequestMapping("/item-list")
 	@Powers({PowerConsts.ORDERMOUDULE_COMMON_QUEYR})
 	public Result listItem(OrderItem orderItem){

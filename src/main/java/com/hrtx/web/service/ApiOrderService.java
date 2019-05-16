@@ -122,12 +122,12 @@ public class ApiOrderService {
     }
 
     public Result newCopyOrder2DeliverAgain(Integer org_order_id){
-
         Order order=this.orderMapper.selectByPrimaryKey(org_order_id);
+		if(order == null) return new Result(Result.ERROR, "订单不存在");
         int[] canStatus=new int[]{Constants.ORDER_STATUS_6.getIntKey(),Constants.ORDER_STATUS_5.getIntKey(),Constants.ORDER_STATUS_4.getIntKey()};
-        int[] canNumStatus=new int[]{Constants.NUM_STATUS_4.getIntKey(),Constants.NUM_STATUS_5.getIntKey(),Constants.NUM_STATUS_6.getIntKey(),Constants.NUM_STATUS_7.getIntKey(),Constants.NUM_STATUS_11.getIntKey()};
+        int[] canNumStatus=new int[]{Constants.NUM_STATUS_3.getIntKey(),Constants.NUM_STATUS_4.getIntKey(),Constants.NUM_STATUS_5.getIntKey(),Constants.NUM_STATUS_6.getIntKey(),Constants.NUM_STATUS_7.getIntKey(),Constants.NUM_STATUS_11.getIntKey()};
         if(!ArrayUtils.contains(canStatus,order.getStatus()))return new Result(Result.ERROR,"仅限已发货订单才能复制");
-        if(order.getOrderType()!=Constants.ORDER_TYPE_5.getIntKey())return new Result(Result.ERROR,"仅限对原单进行复制");
+        if(order.getOrderType()==Constants.ORDER_TYPE_5.getIntKey())return new Result(Result.ERROR,"仅限对原单进行复制");
 
         //如何规避上一个补发单还未完成就发起新的补发，而导致的数据混乱，另外补发单订单取消？
         //检查是否存在未完成的补发单
@@ -201,6 +201,7 @@ public class ApiOrderService {
             int update_num=this.numberMapper.updateNumStatusWithData(num.getStatus(),Constants.NUM_STATUS_3.getIntKey(),num.getId());
             if(update_num!=1)throw new ServiceException("号码数据异常，无法复制");//数据错误，回滚当前事务
         }
+		itemIccid.setOrderId(newOrder.getOrderId());
         this.orderItemMapper.insert(itemIccid);
         for (OrderItem orderItem:newOrderItems){
             orderItem.setpItemId(itemIccid.getItemId());
@@ -422,8 +423,11 @@ public class ApiOrderService {
 		}
 		if(!StringUtils.equals("00000",String.valueOf(sir.getCode()))){
 			log.info(String.format("订单[%s]库存冻结由于[%s]失败,将取消此订单",order_id,sir.getDesc()));
-			Result order_cancel=this.orderType(order_id);//取消当前的订单
-			if(order_cancel.getCode()==Result.OK){
+			Result order_cancel=null;
+			if(order.getOrderType()!=Constants.ORDER_TYPE_5.getIntKey()){
+				order_cancel=this.orderType(order_id);//取消当前的订单
+			}
+			if(order_cancel ==null || order_cancel.getCode()==Result.OK){
 				order.setStatus(Constants.ORDER_STATUS_7.getIntKey());
 				order.setIsDel(1);
 				this.orderMapper.updateByPrimaryKey(order);
