@@ -58,6 +58,7 @@ public class ApiOrderService {
 	@Autowired private LyCrmService lyCrmService;
 	@Autowired private DictMapper dictMapper;
 	@Autowired private ShareService shareService;
+	@Autowired private OrderService orderService;
 
 	public  List<Map> findOrderListByNumId(Integer numId)
 	{
@@ -98,7 +99,111 @@ public class ApiOrderService {
 		}
 	}
 //////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 对原单进行补发，复制原单，发原号码
+     * 注意：此方法将一次性生成订单、冻结库存、支付、发货
+     * @param org_order_id		商品
+     * @return
+     */
+    public Result deliverAgainOrder(Integer org_order_id){
+        Result result=this.apiOrderService.newCopyOrder2DeliverAgain(org_order_id);//20
+        if(!result.isSuccess())return result;
+        Integer order_id=NumberUtils.toInt(ObjectUtils.toString(result.getData()));
+        result=this.apiOrderService.payPushOrderToStorage(order_id);//1
+        if(!result.isSuccess())return new Result(Result.OTHER,result.getData());
+        //if(result.isSuccess())return result;//若成功,返回原生成订单的数据(主要含了订单号)
+        log.info("冻结仓储库存成功，准备将订单更新为支付成功");
+        result = this.orderService.payOrderSuccess(order_id);//2
+        if(!result.isSuccess())return result;
+        log.info("订单支付成功，准备发货");
+        result=this.orderService.payDeliverOrder(order_id);//3
+        return result;
+    }
 
+    public Result newCopyOrder2DeliverAgain(Integer org_order_id){
+
+        Order order=this.orderMapper.selectByPrimaryKey(org_order_id);
+        int[] canStatus=new int[]{Constants.ORDER_STATUS_6.getIntKey(),Constants.ORDER_STATUS_5.getIntKey(),Constants.ORDER_STATUS_4.getIntKey()};
+        int[] canNumStatus=new int[]{Constants.NUM_STATUS_4.getIntKey(),Constants.NUM_STATUS_5.getIntKey(),Constants.NUM_STATUS_6.getIntKey(),Constants.NUM_STATUS_7.getIntKey(),Constants.NUM_STATUS_11.getIntKey()};
+        if(!ArrayUtils.contains(canStatus,order.getStatus()))return new Result(Result.ERROR,"仅限已发货订单才能复制");
+        if(order.getOrderType()!=Constants.ORDER_TYPE_5.getIntKey())return new Result(Result.ERROR,"仅限对原单进行复制");
+
+        //如何规避上一个补发单还未完成就发起新的补发，而导致的数据混乱，另外补发单订单取消？
+        //检查是否存在未完成的补发单
+        Example example=new Example(Order.class);
+        example.createCriteria().andEqualTo("thirdOrder",org_order_id+"").andEqualTo("orderType",Constants.ORDER_TYPE_5.getIntKey())
+                .andNotIn("status",Arrays.asList(Constants.ORDER_STATUS_6.getIntKey(),Constants.ORDER_STATUS_7.getIntKey()));
+        List<Order> orders=this.orderMapper.selectByExample(example);
+        //确认该补发单是否已发货
+        for (Order order1:orders){
+            if(!ArrayUtils.contains(canStatus,order1.getStatus()))return new Result(Result.ERROR,"请先完成之前的补发单");
+        }
+        //都已发货了还需要补发，则将之前的补发设置成完成，避免此补发对原号码产生影响，一个号码单只能一个有效？原单怎么办呢？
+        for (Order order1:orders){
+            this.signOrder(order1.getOrderId(),3);
+        }
+
+        example=new Example(OrderItem.class);
+        example.createCriteria().andEqualTo("orderId",org_order_id);
+        List<OrderItem> orderItems=this.orderItemMapper.selectByExample(example);
+        Order newOrder=null;
+        List<Num> nums=new ArrayList<>();
+
+        List<OrderItem> newOrderItems=new ArrayList<>();
+        try {
+            log.info("复制order和orderItem信息");
+            newOrder=(Order)BeanUtils.cloneBean(order);
+            newOrder.setOrderId(null);
+            for (OrderItem orderItem:orderItems){
+                OrderItem newOrderItem=(OrderItem)BeanUtils.cloneBean(orderItem);
+                newOrderItem.setItemId(null);
+                newOrderItems.add(newOrderItem);
+                if(orderItem.getIsShipment()==Constants.ORDERITEM_SHIPMENT_0.getIntKey()){
+                    Num num=this.numberMapper.selectByPrimaryKey(orderItem.getNumId());
+                    if(!ArrayUtils.contains(canNumStatus,num.getStatus()))return new Result(Result.ERROR,"仅限已发货号码才能复制");
+                    nums.add(num);
+                }
+            }
+        }catch (Exception e){
+            log.error("复制订单失败",e);
+            return new Result(Result.ERROR,"复制订单失败");
+        }
+        newOrder.setThirdOrder(org_order_id+"");
+        newOrder.setStatus(Constants.ORDER_STATUS_0.getIntKey());
+        newOrder.setOrderType(Constants.ORDER_TYPE_5.getIntKey());
+        newOrder.setCommission(newOrder.getTotal());
+        newOrder.setTotal(0d);
+        newOrder.setAdjustPrice(0d);
+        newOrder.setAddDate(new Date());
+
+        newOrder.setPayMenthod(null);
+        newOrder.setPayMenthodId(null);
+        newOrder.setPayDate(null);
+
+        newOrder.setShippingMenthod(null);
+        newOrder.setShippingMenthodId(null);
+        newOrder.setNoticeShipmentDate(null);
+        newOrder.setPickupDate(null);
+        newOrder.setDeliverDate(null);
+        newOrder.setExpressId(null);
+        newOrder.setExpressName(null);
+        newOrder.setExpressNumber(null);
+
+        newOrder.setReason(null);
+        newOrder.setSignDate(null);
+        newOrder.setSignType(0);
+
+        this.orderMapper.insert(newOrder);
+        for (Num num:nums){
+            int update_num=this.numberMapper.updateNumStatusWithData(num.getStatus(),Constants.NUM_STATUS_3.getIntKey(),num.getId());
+            if(update_num!=1)throw new ServiceException("号码数据异常，无法复制");//数据错误，回滚当前事务
+        }
+        for (OrderItem orderItem:newOrderItems){
+            orderItem.setOrderId(newOrder.getOrderId());
+            this.orderItemMapper.insert(orderItem);
+        }
+        return new Result(Result.OK, newOrder.getOrderId());
+    }
 	/**
 	 * 提交竞拍单
 	 * @param goods_id		竞拍商品
@@ -587,7 +692,7 @@ public class ApiOrderService {
 	private OrderItem createOrderItemBean(Integer orderId,Integer parent_item_id,Integer mead_id,Goods goods,Sku sku,Number number,int quantity,double goods_price){
 		Integer num_id=number==null?null:number.getId();
 		String num=number==null?null:number.getNumResource();
-		int isShipment=number==null?1:0;//是否需要发货 1=发货
+		int isShipment=number==null?Constants.ORDERITEM_SHIPMENT_1.getIntKey():Constants.ORDERITEM_SHIPMENT_0.getIntKey();//是否需要发货 1=发货
 		List skuPropertyList = skuPropertyMapper.findSkuPropertyBySkuidForOrder(sku.getSkuId());
 		String skuProperty=JSONArray.fromObject(skuPropertyList).toString();//商品属性
 		Integer skuRepoGoods=NumberUtils.toInt(sku.getSkuRepoGoods());/*可能存在问题*/

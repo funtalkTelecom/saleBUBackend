@@ -53,6 +53,7 @@ public enum Constants {
     ORDER_TYPE_2(2, "靓号单", "NUM_STATUS"),
     ORDER_TYPE_3(3, "竞拍单", "NUM_STATUS"),
     ORDER_TYPE_4(4, "客服单", "NUM_STATUS"),
+    ORDER_TYPE_5(5, "补发单", "NUM_STATUS"),
 
     //是否需要发货
     ORDERITEM_SHIPMENT_1(1, "是", "ORDERITEM_SHIPMENT"),

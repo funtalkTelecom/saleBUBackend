@@ -38,4 +38,8 @@ public class Result {
 		this.data = data;
 	}
 
+	public boolean isSuccess() {
+		return this.code == OK;
+	}
+
 }
