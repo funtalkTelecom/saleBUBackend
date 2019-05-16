@@ -148,7 +148,7 @@ public class ApiOrderService {
         List<OrderItem> orderItems=this.orderItemMapper.selectByExample(example);
         Order newOrder=null;
         List<Num> nums=new ArrayList<>();
-
+        OrderItem itemIccid=null;
         List<OrderItem> newOrderItems=new ArrayList<>();
         try {
             log.info("复制order和orderItem信息");
@@ -157,11 +157,13 @@ public class ApiOrderService {
             for (OrderItem orderItem:orderItems){
                 OrderItem newOrderItem=(OrderItem)BeanUtils.cloneBean(orderItem);
                 newOrderItem.setItemId(null);
-                newOrderItems.add(newOrderItem);
                 if(orderItem.getIsShipment()==Constants.ORDERITEM_SHIPMENT_0.getIntKey()){
                     Num num=this.numberMapper.selectByPrimaryKey(orderItem.getNumId());
                     if(!ArrayUtils.contains(canNumStatus,num.getStatus()))return new Result(Result.ERROR,"仅限已发货号码才能复制");
                     nums.add(num);
+                    newOrderItems.add(newOrderItem);
+                }else{
+                    itemIccid=newOrderItem;
                 }
             }
         }catch (Exception e){
@@ -198,7 +200,9 @@ public class ApiOrderService {
             int update_num=this.numberMapper.updateNumStatusWithData(num.getStatus(),Constants.NUM_STATUS_3.getIntKey(),num.getId());
             if(update_num!=1)throw new ServiceException("号码数据异常，无法复制");//数据错误，回滚当前事务
         }
+        this.orderItemMapper.insert(itemIccid);
         for (OrderItem orderItem:newOrderItems){
+            orderItem.setpItemId(itemIccid.getItemId());
             orderItem.setOrderId(newOrder.getOrderId());
             this.orderItemMapper.insert(orderItem);
         }
@@ -1349,7 +1353,7 @@ public class ApiOrderService {
 	 * @param to   结束日期
 	 * @return
 	 */
-	private static boolean betweenCalendar(Date time, Date from, Date to) {
+	static boolean betweenCalendar(Date time, Date from, Date to) {
 		Calendar date = Calendar.getInstance();
 		date.setTime(time);
 
@@ -1358,13 +1362,13 @@ public class ApiOrderService {
 
 		Calendar before = Calendar.getInstance();
 		before.setTime(to);
-
 		if (date.after(after) && date.before(before)) {
 			return true;
 		} else {
 			return false;
 		}
 	}
+
 
 	private void deleteOrder(List<Order> orderList) {
 		log.info("删除订单");
