@@ -59,6 +59,7 @@ public class ApiOrderService {
 	@Autowired private DictMapper dictMapper;
 	@Autowired private ShareService shareService;
 	@Autowired private OrderService orderService;
+	@Autowired private ActivityMapper activityMapper;
 
 	public  List<Map> findOrderListByNumId(Integer numId)
 	{
@@ -629,12 +630,15 @@ public class ApiOrderService {
 		if(price_range==null)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
 		Map<String,String> _map=new HashMap<>();
 		int activityType=NumberUtils.toInt(ObjectUtils.toString(numPrice1.get("activityType")));
+		int activityId=NumberUtils.toInt(ObjectUtils.toString(numPrice1.get("activityId")));
 		boolean adjustPrice=false;
-		if(activityType>0){
-			Long activityEdate=((Date)numPrice1.get("activityEdate")).getTime();
-			Long activitySdate=((Date)numPrice1.get("activitySdate")).getTime();
+		if(activityType>0&&activityId>0){
+			Activity activity=activityMapper.selectByPrimaryKey(activityId);
+			if(activity==null)return new Result(Result.ERROR, "抱歉，活动错误，无法订购");
+			Long activityEdate=activity.getEndDate().getTime();
+			Long activitySdate=activity.getBeginDate().getTime();
 			Long currDate=System.currentTimeMillis();
-			if(currDate>=activitySdate&currDate<=activityEdate)adjustPrice=true;
+			if(currDate>=activitySdate&&currDate<=activityEdate)adjustPrice=true;
 		}
 		_map.put("price_range",ObjectUtils.toString(numPrice1.get("price_range")));//当前销售价 //2019.1.24增加秒杀功能，秒杀时取秒杀价格
 		_map.put("price",ObjectUtils.toString(numPrice1.get("price")));//原价
