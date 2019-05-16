@@ -121,12 +121,12 @@ public class ApiOrderService {
     }
 
     public Result newCopyOrder2DeliverAgain(Integer org_order_id){
-
         Order order=this.orderMapper.selectByPrimaryKey(org_order_id);
+		if(order == null) return new Result(Result.ERROR, "订单不存在");
         int[] canStatus=new int[]{Constants.ORDER_STATUS_6.getIntKey(),Constants.ORDER_STATUS_5.getIntKey(),Constants.ORDER_STATUS_4.getIntKey()};
         int[] canNumStatus=new int[]{Constants.NUM_STATUS_4.getIntKey(),Constants.NUM_STATUS_5.getIntKey(),Constants.NUM_STATUS_6.getIntKey(),Constants.NUM_STATUS_7.getIntKey(),Constants.NUM_STATUS_11.getIntKey()};
         if(!ArrayUtils.contains(canStatus,order.getStatus()))return new Result(Result.ERROR,"仅限已发货订单才能复制");
-        if(order.getOrderType()!=Constants.ORDER_TYPE_5.getIntKey())return new Result(Result.ERROR,"仅限对原单进行复制");
+        if(order.getOrderType()==Constants.ORDER_TYPE_5.getIntKey())return new Result(Result.ERROR,"仅限对原单进行复制");
 
         //如何规避上一个补发单还未完成就发起新的补发，而导致的数据混乱，另外补发单订单取消？
         //检查是否存在未完成的补发单
