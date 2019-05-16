@@ -158,8 +158,10 @@ $(function() {
                         if(record.status=="20") {
                             node.push('<a class="btn btn-success btn-xs order-push-storage" href="javascript:void(0);">推送</a>');
                         }
-                        if(p_cancel &&( record.status=="1"||record.status=="2"||record.status=="21"||record.status=="3"
-                            ||record.status=="4" ||record.status=="5" ||record.status=="6" && record.orderType!=3)) {
+                        if(p_cancel &&( (record.status=="1"||record.status=="2"||record.status=="21"||record.status=="3") && record.orderType!=3)) {
+							node.push('<a class="btn btn-danger btn-xs cancel" href="javascript:void(0);">取消订单</a>');
+                        }
+                        if(p_cancel_out &&( (record.status=="4" ||record.status=="5" ||record.status=="6") && record.orderType!=3)) {
 							node.push('<a class="btn btn-danger btn-xs cancel" href="javascript:void(0);">取消订单</a>');
                         }
 						if(p_refund && record.status=="14") {
