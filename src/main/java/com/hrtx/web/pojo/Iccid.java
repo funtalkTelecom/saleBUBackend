@@ -31,6 +31,8 @@ public class Iccid {
 
     private Date outStockDate;
 
+    private Integer sellerId;
+
     public Iccid(Integer id, Integer cityId, String cityName, String sections, String netType, String iccid, Integer dealStatus, Integer orderId, Integer consumerId, Integer stockStatus, Date inStockDate, Date outStockDate) {
         this.id = id;
         this.cityId = cityId;
@@ -144,5 +146,13 @@ public class Iccid {
 
     public void setOutStockDate(Date outStockDate) {
         this.outStockDate = outStockDate;
+    }
+
+    public Integer getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Integer sellerId) {
+        this.sellerId = sellerId;
     }
 }

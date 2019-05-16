@@ -56,4 +56,9 @@
 				)
         and i.order_id = #{item_id};
     </select>
+    <insert id="insertFromTemp">
+        INSERT INTO `egt_hk`.`tb_iccid`(`id`, `city_id`, `city_name`, `sections`, `net_type`, `iccid`, `deal_status`, `order_id`, `consumer_id`, `stock_status`,
+         `in_stock_date`, `out_stock_date`, `seller_id`)
+         select `nextval`('hk'), 0, '不限', '不限', '不限', t.iccid, '1', NULL, NULL, 1, now(), NULL, #{sellerId} from tb_iccid_temp t where t.order_id = #{orderId}
+    </insert>
 </mapper>

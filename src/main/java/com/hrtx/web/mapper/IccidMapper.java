@@ -52,4 +52,11 @@ public interface IccidMapper extends Mapper<Iccid>,BaseMapper<Iccid>{
      * @return
      */
     List matchOrderItem(@Param("item_id") Integer item_id);
+
+    /**
+     * 从临时表插入到正式表（iccid）
+     * @param orderId
+     * @param selllerId
+     */
+    void insertFromTemp(@Param("orderId") Integer orderId, @Param("sellerId") Integer selllerId);
 }

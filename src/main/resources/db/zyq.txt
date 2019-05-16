@@ -19,3 +19,9 @@ ADD COLUMN `is_valid_iccid` int(1) NOT NULL DEFAULT 1 COMMENT '是否验证号�
 --2019.05.14
 ALTER TABLE `egt_hk`.`tb_order`
 ADD COLUMN `adjust_price` decimal(10, 2) NOT NULL DEFAULT 0 COMMENT '调价' AFTER `is_adjust_price`;
+
+
+--2019.05.16
+ALTER TABLE `egt_hk`.`tb_iccid`
+ADD COLUMN `seller_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属卖家id' AFTER `out_stock_date`;
+update tb_iccid i set i.seller_id = 10 ;

@@ -3,6 +3,7 @@ package com.hrtx.web.service;
 import com.github.abel533.entity.Example;
 import com.github.pagehelper.PageInfo;
 import com.hrtx.config.advice.ServiceException;
+import com.hrtx.config.advice.WarmException;
 import com.hrtx.dto.Result;
 import com.hrtx.global.Constants;
 import com.hrtx.global.EgtPage;
@@ -56,6 +57,8 @@ public class NumService {
         if(corporations.size() != 1) return new Result(Result.ERROR, "绑卡订单未找到卖家");
         Corporation corporation = corporations.get(0);
         int isValidIccid = corporation.getIsValidIccid() == null ? 0 : corporation.getIsValidIccid();
+        //不验证iccid
+        if(isValidIccid != 1) iccidMapper.insertFromTemp(orderId, corporation.getId());
         int insertCount = 0;
         List<Map> items = iccidMapper.queryTempItemsByBatchNum(orderId);
         for (Map item:items) {
@@ -65,11 +68,12 @@ public class NumService {
 //        int noFundCount = iccidMapper.batchInsertNoFund(order.getConsumer(), orderId);
         int noFundCount = iccidMapper.queryNoFund(order.getConsumer(), orderId).size();
         //回调卡中有["+noFundCount+"]个在卡库中未找到
-        if(noFundCount != 0) throw new ServiceException("回调卡中有["+noFundCount+"]个在卡库中未找到");
+        if(noFundCount != 0) throw new WarmException("回调卡中有["+noFundCount+"]个在卡库中未找到");
 
         int updateCount  = iccidMapper.batchUpdate(order.getConsumer(), orderId);
         log.info("得到本地卡和回调卡的匹配信息[回调数量"+insertCount+", 未找到数量"+noFundCount+", 更新数量"+updateCount+"]");
-        if(updateCount != insertCount) throw new ServiceException("卡库中更新数量与回调数量不一致，数据异常");
+        if(updateCount != insertCount) throw new WarmException("卡库中更新数量与回调数量不一致，数据异常");
+
         String goodsType = order.getSkuGoodsType();
         if("2".equals(goodsType) || "4".equals(goodsType)) {//普号 或者 超靓
             //绑卡
@@ -77,21 +81,22 @@ public class NumService {
                 int count = NumberUtils.toInt(ObjectUtils.toString(item.get("count")));
                 Integer item_id = Integer.parseInt(ObjectUtils.toString(item.get("itemId")));
                 OrderItem orderItem = orderItemMapper.selectByPrimaryKey(item_id);
-                if(orderItem == null) throw new ServiceException("未找到仓库回调的itemId["+item_id+"]");
-                if(orderItem.getIsShipment() != 1) throw new ServiceException("仓库回调的itemId["+item_id+"]在平台为不需发货，数据异常");
+                if(orderItem == null) throw new WarmException("未找到仓库回调的itemId["+item_id+"]");
+                if(orderItem.getIsShipment() != 1) throw new WarmException("仓库回调的itemId["+item_id+"]在平台为不需发货，数据异常");
                 example = new Example(OrderItem.class);
                 example.createCriteria().andEqualTo("pItemId", item_id);
                 List<OrderItem> list = orderItemMapper.selectByExample(example);
-                if(count != list.size()) throw new ServiceException("仓库回调的itemId["+item_id+"]数量["+count+"]与平台数量["+list.size()+"]不一致");
+                if(count != list.size()) throw new WarmException("仓库回调的itemId["+item_id+"]数量["+count+"]与平台数量["+list.size()+"]不一致");
                 if(isValidIccid == 1) {//验证iccid是否与号码匹配
                     List errors = iccidMapper.matchOrderItem(item_id);
-                    if(errors.size() > 0) throw new ServiceException("itemId["+item_id+"]回调匹配存在号段不匹配或号码状态异常");
+                    if(errors.size() > 0) throw new WarmException("itemId["+item_id+"]回调匹配存在号段不匹配或号码状态异常");
                 }
                 //捆绑
                 example = new Example(Iccid.class);
                 example.createCriteria().andEqualTo("orderId", item_id);
                 List<Iccid> iccids = iccidMapper.selectByExample(example);
-                if(iccids.size() != list.size())  throw new ServiceException("itemId["+item_id+"]iccid与号码数量不一致");
+                if(iccids.size() != list.size())  throw new WarmException("itemId["+item_id+"]iccid与号码数量不一致");
+
                 for (int i = 0; i <list.size() ; i++) {
                     OrderItem item1 = list.get(i);
                     Iccid iccid = iccids.get(i);
@@ -101,12 +106,12 @@ public class NumService {
                     num.setIccid(iccid.getIccid());
                     num.setStatus(5);
                     if("4".equals(goodsType)) {//超靓
-                        if(orderItem.getMealId() == null) throw new ServiceException("订单中未找到套餐");
+                        if(orderItem.getMealId() == null) throw new WarmException("订单中未找到套餐");
                         num.setMealMid(orderItem.getMealId());
                     }
                     if("2".equals(goodsType)) {//谱号
                         List<Meal> meals = mealMapper.getMealListByNum(String.valueOf(item1.getNumId()));
-                        if(meals.size()<=0) throw new ServiceException("未找到普号的基础套餐");
+                        if(meals.size()<=0) throw new WarmException("未找到普号的基础套餐");
                         num.setMealMid(meals.get(0).getMid());
                     }
                     numMapper.updateByPrimaryKeySelective(num);
