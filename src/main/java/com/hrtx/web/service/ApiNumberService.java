@@ -102,6 +102,8 @@ public class ApiNumberService {
 				}else{
 					obj.put("is_ms",0);
 				}
+			}else {
+				obj.put("is_ms",0);
 			}
 		}
 		return new Result(Result.OK, pm);
@@ -393,6 +395,8 @@ public class ApiNumberService {
 					}else{
 						obj.put("is_ms",0);
 					}
+				}else {
+					obj.put("is_ms",0);
 				}
 			}
 		}
