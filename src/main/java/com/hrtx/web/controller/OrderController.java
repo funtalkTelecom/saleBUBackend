@@ -91,7 +91,7 @@ public class OrderController extends BaseReturn{
 	 * @return
 	 */
 	@RequestMapping("/order-cancel")
-	@Powers({PowerConsts.ORDERMOUDULE_COMMON_CANCEL})
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_CANCEL,PowerConsts.ORDERMOUDULE_COMMON_CANCEL_OUT})
 	public Result orderCancel( String orderId,String reason){
 		if (!LockUtils.tryLock(orderId)) return new Result(Result.ERROR, "请稍后再试!");
 		try {
