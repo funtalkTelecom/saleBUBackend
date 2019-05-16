@@ -12,6 +12,7 @@ import com.hrtx.web.pojo.Agent;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.NumPrice;
 import com.hrtx.web.pojo.Number;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -22,6 +23,8 @@ import sun.rmi.server.InactiveGroupException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -48,13 +51,15 @@ public class ApiNumberService {
 	private ActivityService activityService;
 	@Autowired
 	private ShareService shareService ;
+	@Autowired
+	private ApiOrderService apiOrderService ;
 	/**
 	 * 根据tags获取号码
 	 * @param numPrice
 	 * @param request
 	 * @return
 	 */
-	public Result numberList(NumPrice numPrice, HttpServletRequest request){
+	public Result numberList(NumPrice numPrice, HttpServletRequest request) throws ParseException {
 		PageInfo<Object> pm = null;
 		int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
 		int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
@@ -71,10 +76,7 @@ public class ApiNumberService {
 		Agent agent = (Agent) reagent.getData();
 		numPrice.setNumTags(tags);
 		//-----zdh
-//		Date[] queryActiveDate = activityService.queryActiveDate(1);
-//		numPrice.setFalg(1);
-//		numPrice.setBeginDate(Utils.getDate(queryActiveDate[0],"yyyy-MM-dd HH:mm:ss"));
-//		numPrice.setEndDate(Utils.getDate(queryActiveDate[2],"yyyy-MM-dd HH:mm:ss"));
+
 		//------zdh
 		numPrice.setAgentId(agent.getId());
 		pm = numService.queryNumPrice(numPrice);
@@ -82,9 +84,25 @@ public class ApiNumberService {
 		List ob =pm.getList();
 		for (int i = 0; i < ob.size(); i++) {
 			Map obj= (Map) ob.get(i);
-			obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+			obj.put("numBlock", getNumBlock(ObjectUtils.toString( obj.get("resource"))));
 			Map<String,String> promotionMap = shareService.findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(), Integer.parseInt(String.valueOf(obj.get("id"))),Double.parseDouble(String.valueOf(obj.get("price_range"))));
 			obj.put("is_pp",promotionMap.get("is_pp")); //是否进行推广1是0否
+			//判断是否当前正在进行秒杀
+			Integer activityType = NumberUtils.toInt(ObjectUtils.toString(obj.get("activityType"))) ;
+			if(activityType==1){
+				String time = ObjectUtils.toString( obj.get("activitySdate"));
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				Date[] queryActiveDate = activityService.queryActiveDate(1);
+				Date startTime = queryActiveDate[0];
+				String startTimeStr = Utils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
+				Date endTime = queryActiveDate[2];
+				String endTimeStr = Utils.getDate(endTime,"yyyy-MM-dd HH:mm:ss");
+				if(time.compareTo(startTimeStr) >=0 && time.compareTo(endTimeStr) <= 0){
+					obj.put("is_ms",1);  //当前正在进行秒杀
+				}else{
+					obj.put("is_ms",0);
+				}
+			}
 		}
 		return new Result(Result.OK, pm);
 	}
@@ -289,7 +307,7 @@ public class ApiNumberService {
 	 * @param request
 	 * @return
 	 */
-	public Result numberListByNum(NumPrice numPrice, HttpServletRequest request){
+	public Result numberListByNum(NumPrice numPrice, HttpServletRequest request) {
 		PageInfo<Object> pm = null;
 		numPrice.setPageNum(numPrice.startToPageNum());
 		String num = request.getParameter("num")==null?"": request.getParameter("num");
@@ -315,7 +333,7 @@ public class ApiNumberService {
 	}
 
 
-	public Result searchNumberList( NumPrice numPrice,HttpServletRequest request){
+	public Result searchNumberList( NumPrice numPrice,HttpServletRequest request) throws ParseException {
 		PageInfo<Object> pm = null;
 		int pageNum = request.getParameter("pageNum")==null?1: Integer.parseInt(request.getParameter("pageNum"));
 		int limit = request.getParameter("limit")==null?15: Integer.parseInt(request.getParameter("limit"));
@@ -360,6 +378,22 @@ public class ApiNumberService {
 				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
 				Map<String,String> promotionMap = shareService.findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(), Integer.parseInt(String.valueOf(obj.get("id"))),Double.parseDouble(String.valueOf(obj.get("price_range"))));
 				obj.put("is_pp",promotionMap.get("is_pp")); //是否进行推广1是0否
+				//判断是否当前正在进行秒杀
+				Integer activityType = NumberUtils.toInt(ObjectUtils.toString(obj.get("activityType"))) ;
+				if(activityType==1){
+					String time = ObjectUtils.toString( obj.get("activitySdate"));
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					Date[] queryActiveDate = activityService.queryActiveDate(1);
+					Date startTime = queryActiveDate[0];
+					String startTimeStr = Utils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
+					Date endTime = queryActiveDate[2];
+					String endTimeStr = Utils.getDate(endTime,"yyyy-MM-dd HH:mm:ss");
+					if(time.compareTo(startTimeStr) >=0 && time.compareTo(endTimeStr) <= 0){
+						obj.put("is_ms",1);  //当前正在进行秒杀
+					}else{
+						obj.put("is_ms",0);
+					}
+				}
 			}
 		}
 		pm = new PageInfo<Object>(ob);
