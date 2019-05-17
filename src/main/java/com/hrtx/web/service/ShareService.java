@@ -596,7 +596,7 @@ public class ShareService {
 					if(!result_img.isSuccess())return result_img;
 					String head_img_file=String.valueOf(result_img.getData());
 					String promotion_tip="";
-					String share_page="/pages/index/index?share_id="+bean.getId();
+					String share_page="/pages/index/index?share_id="+bean.getId()+"&userid="+consumer.getId();
 					result=imageService.createShareCardFile(head_img_file,nick_name,promotion_tip,share_page);
 				}
 			}catch (Exception e){
