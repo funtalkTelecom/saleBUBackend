@@ -36,7 +36,7 @@ public class ImageService {
 		if(StringUtils.isEmpty(ACCESS_TOKEN))return  new Result(Result.ERROR,"小程序码创建失败");
 		JSONObject json=new JSONObject();
 		json.put("path",path);
-		json.put("width",180);
+		json.put("width",300);
 		json.put("is_hyaline",true);
 		String root_path=SystemParam.get("upload_root_path")+"/temp/";
 		String suffix="png";
@@ -85,7 +85,43 @@ public class ImageService {
 		createIcon(g,xcx_qr_path,230,200,880);
 		g.dispose();
 		ImageIO.write(bufferedImage, "JPEG",new File(new_file));
-		System.out.println(System.currentTimeMillis()-_start);
+		log.info(String.format("创建卡片分享耗时[%s]ms",(System.currentTimeMillis()-_start)));
+		return new Result(Result.OK, shareLink);
+	}
+	public Result createShareCardFile(String head_img_file,String nick_name,String promotion_tip,String share_page) throws Exception{
+		long _start=System.currentTimeMillis();
+		Result result=downloadXcxQr("",share_page);
+		if(result.getCode()!=Result.OK)return result;
+		String xcx_qr_path=String.valueOf(result.getData());
+		String root_path = SystemParam.get("upload_root_path");
+		String shareLinkDemo=SystemParam.get("alone-demo-file");
+		String suffix_v = shareLinkDemo.substring(shareLinkDemo.lastIndexOf(".") + 1).toLowerCase();//获得原文件的后缀
+		String new_file_name ="card_"+Utils.randomNoByDateTime();//获得图片文件随机文件名
+		String shareLink=new_file_name + "."+suffix_v;//获得新图片名称
+		File shareCardDemoFile=new File(root_path+"/"+Constants.UPLOAD_PATH_SHARE.getStringKey()+"/"+shareLinkDemo);
+		String new_file=root_path+"/"+Constants.UPLOAD_PATH_SHARE.getStringKey()+"/"+shareLink;
+		Image image = ImageIO.read(shareCardDemoFile);
+		int width = image.getWidth(null);
+		int height = image.getHeight(null);
+		BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = bufferedImage.createGraphics();
+		g.drawImage(image,0,0, width, height, null);
+		int padding_left=200;//左侧偏移
+		//写入头像
+		createIcon(g,head_img_file,80,96,80);
+		//写入昵称
+		g.setFont(new Font("宋体",Font.PLAIN,24));
+		g.setColor(new Color(67,67,67));//颜色
+		g.drawString(nick_name,padding_left,110);
+		//写入推广语
+		g.setFont(new Font("宋体",Font.PLAIN,20));
+		g.setColor(new Color(100,100,100));//颜色
+		g.drawString(promotion_tip,padding_left,140);
+		//写入小程序码
+		createIcon(g,xcx_qr_path,230,255,750);
+		g.dispose();
+		ImageIO.write(bufferedImage, "JPEG",new File(new_file));
+		log.info(String.format("创建专享分享卡耗时[%s]ms",(System.currentTimeMillis()-_start)));
 		return new Result(Result.OK, shareLink);
 	}
 	public static Graphics2D createIcon(Graphics2D g,String icon_path,int incon_width,int icon_x,int icon_y) throws IOException{
@@ -132,7 +168,7 @@ public class ImageService {
 
 		g.dispose();
 		ImageIO.write(bufferedImage, "JPEG",new File(new_file));
-		System.out.println(System.currentTimeMillis()-_start);
+		log.info(String.format("创建链接图片分享耗时[%s]ms",(System.currentTimeMillis()-_start)));
 		return new Result(Result.OK, shareLink);
 	}
 

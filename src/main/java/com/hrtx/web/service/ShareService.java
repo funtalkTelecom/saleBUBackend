@@ -175,23 +175,11 @@ public class ShareService {
 		Consumer consumer=apiSessionUtil.getConsumer();
 		try {
 			if(StringUtils.isEmpty(head_img_file)){//下载默认头像，否则用系统logo
-				String root_path = SystemParam.get("upload_root_path");
 				if(StringUtils.isEmpty(nick_name))nick_name=consumer.getNickName();
 				if(StringUtils.isEmpty(nick_name))nick_name=SystemParam.get("system_name");
-				head_img_file=root_path+"/headimg/"+String.valueOf(consumer.getId())+".jpg";
-				java.io.File file=new java.io.File(root_path+"/headimg/"+String.valueOf(consumer.getId())+".jpg");
-				if(!file.exists()){
-//					ConsumerLog consumerLog=consumerService.getConsumerLog(consumer.getId(),2);
-					String head_img_url=consumer.getImg();//获取用的头像地址
-					if(StringUtils.isEmpty(head_img_url)){
-						head_img_file=root_path+"/headimg/default.jpg";
-					}else{
-						Result result=HttpUtil.doHttpPost2Download(head_img_url,"","application/json","utf-8",-1,root_path,".jpg");
-						if(result.getCode()!=Result.OK)return result;
-						String new_head_img=String.valueOf(result.getData());
-						FileUtils.copyFile(new java.io.File(new_head_img),file);
-					}
-				}
+				Result result=getConsumerHeadImg(consumer.getId());
+				if(!result.isSuccess())return result;
+				head_img_file=String.valueOf(result.getData());
 			}
 			Result result=imageService.createShareCardFile(head_img_file,nick_name,promotion_tip,share_page,num.getNumResource(),num.getCityName(),num.getNetType(),num.getTeleType(),String.valueOf(num.getLowConsume()));
 			if(result.getCode()!=Result.OK)return result;
@@ -203,6 +191,38 @@ public class ShareService {
 			return new Result(Result.ERROR,"分享图片创建失败");
 		}
 
+	}
+
+	/**
+	 * 获取用户本地头像信息
+	 * 	若存在本地头像，则直接使用
+	 * 	若用户无网络头像，则使用默认头像
+	 * 	若有有网络头像，则下载到本地再使用
+	 * @param consumerId
+	 * @return
+	 */
+	public Result getConsumerHeadImg(Integer consumerId){
+		try {
+			String root_path = SystemParam.get("upload_root_path");
+			String head_img_file=root_path+"/headimg/"+consumerId+".jpg";
+			java.io.File file=new java.io.File(root_path+"/headimg/"+consumerId+".jpg");
+			if(!file.exists()){
+				Consumer consumer=this.consumerMapper.selectByPrimaryKey(consumerId);
+				String head_img_url=consumer.getImg();//获取用的头像地址
+				if(StringUtils.isEmpty(head_img_url)){
+					head_img_file=root_path+"/headimg/default.jpg";
+				}else{
+					Result result=HttpUtil.doHttpPost2Download(head_img_url,"","application/json","utf-8",-1,root_path,".jpg");
+					if(result.getCode()!=Result.OK)return result;
+					head_img_file=String.valueOf(result.getData());
+					FileUtils.copyFile(new java.io.File(head_img_file),file);//文件重命名
+				}
+			}
+			return new Result(Result.OK,head_img_file);
+		}catch (Exception e){
+			log.error("分享图片创建失败",e);
+			return new Result(Result.ERROR,"分享图片创建失败");
+		}
 	}
 	/**
 	 * 创建订单结算数据(只生成数据不实际结算)
@@ -227,11 +247,15 @@ public class ShareService {
 		double order_price=order.getTotal();
 		int[] ok_order_status=new int[]{Constants.ORDER_STATUS_2.getIntKey(),Constants.ORDER_STATUS_3.getIntKey()};
 		if(!ArrayUtils.contains(ok_order_status,order.getStatus()))return new Result(Result.ERROR,"订单状态非可结算状态");
+		//梧桐支付的推广费
+		double award_feetype_6=order_price>OrderSettle.base_pp_price?OrderSettle.base_pp_price_more_fee:OrderSettle.base_pp_price_low_fee;
 		if(order.getShareId()!=null&&order.getShareId()!=0){
 			Share share=this.shareMapper.selectByPrimaryKey(order.getShareId());
 			Result result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,share.getConsumerId());
 			if(result_settle.getCode()!=Result.OK)return new Result(Result.ERROR,"收款账号不存在");
 			share_settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
+			//若是全平台的推广，则使用其他计费规则
+			if(share.getShareSource()==Constants.SHARE_SOURCE_1.getIntKey())award_feetype_6=OrderSettle.base_pp_price_all_fee;
 		}
 
 		Example example = new Example(OrderItem.class);
@@ -260,9 +284,10 @@ public class ShareService {
 
 //		if(activityService.isActivityNum())
 		//基础推广费用
-		boolean noAdjustPrice=order.getIsAdjustPrice()!=null&&order.getIsAdjustPrice()==0;//2019.5.10 非秒杀或调价单 若为true则设置订单金额为0，使得基础推广费为0
-        fee_type=Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey();
-        initSettleFee(order_id,num_id,fee_type,noAdjustPrice?order_price:0d,cost_payer,share_settle_user,cost_payer,false,0d,0,0d);
+		fee_type=Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey();
+		boolean noAdjustPrice=order.getIsAdjustPrice()!=null&&order.getIsAdjustPrice()==0;//2019.5.10 非秒杀或调价单
+		if(!noAdjustPrice)award_feetype_6=0d;//秒杀或调价单 时费率为0
+        initSettleFee(order_id,num_id,fee_type,order_price,cost_payer,share_settle_user,cost_payer,false,award_feetype_6,0,0d);
 		//技术服务费
 		fee_type=Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey();
 		result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_sys,Constants.PROMOTION_PLAN_FEETYPE_2.getIntKey());
@@ -375,6 +400,21 @@ public class ShareService {
 		return new Result(Result.OK,"ok");
 	}
 
+	/**
+	 *
+	 * @param order_id 订单号
+	 * @param num_id	号码
+	 * @param fee_type	费用类型
+	 * @param order_price	订单金额
+	 * @param settler	付款方
+	 * @param settle_user	收款方1
+	 * @param cost_settler	收款方2
+	 * @param emptyAndInit	若不存在结算规则时是否创建
+	 * @param init_award	奖励比例
+	 * @param init_limit	是否限制
+	 * @param init_limit_award	限制金额
+	 * @return
+	 */
 	private Result initSettleFee(int order_id,int num_id,int fee_type,double order_price,int settler,int settle_user,int cost_settler,boolean emptyAndInit,double init_award,int init_limit,double init_limit_award){
         if(settle_user==-1)return new Result(Result.OK,"结算用户不存在");
         Example example = new Example(OrderSettle.class);
@@ -384,7 +424,8 @@ public class ShareService {
 		Map<String,String> _map=findNumPromotionInfo(fee_type,num_id,order_price);
 		Double income=0d;
 		if(fee_type==Constants.PROMOTION_PLAN_FEETYPE_6.getIntKey()){//基础推广，订单金额小于等于1000 按10%；大于1000 按10%； 且无上限
-			income=Arith.mul(order_price,order_price>OrderSettle.base_pp_price?OrderSettle.base_pp_price_more_fee:OrderSettle.base_pp_price_low_fee);
+//			income=Arith.mul(order_price,order_price>OrderSettle.base_pp_price?OrderSettle.base_pp_price_more_fee:OrderSettle.base_pp_price_low_fee);
+			income=Arith.mul(order_price,init_award);
 		}else{
 			if(emptyAndInit&&StringUtils.equals(_map.get("is_pp"),"0")){
 				Num num=numMapper.selectByPrimaryKey(num_id);
@@ -478,47 +519,102 @@ public class ShareService {
 		this.shareMapper.updateByPrimaryKey(share);
 		return new Result(Result.OK,"删除成功");
 	}
+
 	/**
-	 * 生成分享地址
+	 * 创建号码的分享
+	 * @param num_id
+	 * @return
 	 */
 	public Result shareUrl(Integer num_id){
+		return shareUrl(Constants.SHARE_SOURCE_4.getIntKey(),num_id);
+	}
+
+	/**
+	 * 创建平台的分享
+	 * @return
+	 */
+	public Result shareUrl(){
+		return shareUrl(Constants.SHARE_SOURCE_1.getIntKey(),0);
+	}
+
+	/**
+	 *创建分享
+	 *
+	 * @param share_source 分享的页面(首页、号码)
+	 * @param num_id 号码
+	 * @return
+	 */
+	private Result shareUrl(int share_source,Integer num_id){
+		//个人资质检查
 		String req_path=SessionUtil.getRequestPath(SessionUtil.getRequest());
-		Num num=numMapper.selectByPrimaryKey(num_id);
-		if(num==null)return new Result(Result.ERROR,"号码不存在");
 		Consumer consumer=apiSessionUtil.getConsumer();
 		Consumer consumer1=this.consumerMapper.selectByPrimaryKey(consumer.getId());
 		if(consumer1.getIsPartner()==null||consumer1.getIsPartner()!=1)return new Result(Result.ERROR,"抱歉您还不是平台合伙人，请先申请");
-		List<Share> _share_list=this.shareMapper.findNumShare(consumer.getId(),num_id);
+
+		Map<String,String> _map=new HashMap<>();
+		//是否号码及号码信息确认
+		String shareNum=null;
+		Num num=null;
+        if(share_source==Constants.SHARE_SOURCE_4.getIntKey()&&num_id<=0)return new Result(Result.ERROR,"数据错误");
+		boolean isNumShare=share_source==Constants.SHARE_SOURCE_4.getIntKey()&&num_id>0;
+		if(isNumShare){
+			num=this.numMapper.selectByPrimaryKey(num_id);
+			if(num==null)return new Result(Result.ERROR,"分享的号码不存在");
+			Map<String,String> _promotion_map=findNumPromotionInfoToSharer(num_id);
+			_map.putAll(_promotion_map);
+			_map.put("num_id",num.getId()+"");//号码编码
+			_map.put("num_resource",num.getNumResource());//号码
+			_map.put("city_name",num.getCityName());//地市
+			_map.put("net_type",num.getNetType());//网络制式
+			_map.put("tele_type",num.getTeleType());//运营商
+			_map.put("low_consume",num.getLowConsume()+"");//最低消费
+			shareNum=num.getNumResource();
+		}
+		//检查是否已创建过
+		Share share=new Share();
+		share.setIsDel(0);
+		share.setConsumerId(consumer.getId());
+		share.setShareSource(share_source);
+		if(isNumShare)share.setShareNumId(num_id);
+		List<Share> _share_list=this.shareMapper.select(share);
 		Share bean=null;
 		if(_share_list.size()<=0){
-			String share_image="";
-			String share_url="";
-			try{
-				Result result=imageService.createShareLinkFile(num.getNumResource(),num.getCityName(),num.getNetType(),num.getTeleType(),String.valueOf(num.getLowConsume()));
-				share_image=String.valueOf(result.getData());
-			}catch (IOException e){
-				log.error("分享图片创建失败",e);
-				return new Result(Result.ERROR,"分享图片创建失败");
-			}
-			bean=new Share(consumer.getId(),Constants.SHARE_SOURCE_4.getIntKey(),num.getNumResource(),num_id,share_image,share_url);
+			bean=new Share(consumer.getId(),share_source,shareNum,num_id,null,null);
 			this.shareMapper.insert(bean);
 		}else{
 			bean=_share_list.get(0);
 		}
-		Map<String,String> _map=new HashMap<>();
-		Map<String,String> _map_num=findNumPromotionInfoToSharer(num_id);
-		_map.put("num_id",num.getId()+"");//号码编码
-		_map.put("num_resource",num.getNumResource());//号码
-		_map.put("city_name",num.getCityName());//地市
-		_map.put("net_type",num.getNetType());//网络制式
-		_map.put("tele_type",num.getTeleType());//运营商
-		_map.put("low_consume",num.getLowConsume()+"");//最低消费
+		//确认是否已创建过分享图片，未创建过则提交创建
+		if(StringUtils.isEmpty(bean.getShareImage())){
+			Result result=null;
+			try{
+				if(isNumShare){
+					result=imageService.createShareLinkFile(num.getNumResource(),num.getCityName(),num.getNetType(),num.getTeleType(),String.valueOf(num.getLowConsume()));
+				}else {
+					String nick_name =consumer.getName();
+					Result result_img=getConsumerHeadImg(consumer.getId());
+					if(!result_img.isSuccess())return result_img;
+					String head_img_file=String.valueOf(result_img.getData());
+					String promotion_tip="";
+					String share_page="/pages/index/index?share_id="+bean.getId();
+					result=imageService.createShareCardFile(head_img_file,nick_name,promotion_tip,share_page);
+				}
+			}catch (Exception e){
+				log.error("分享图片创建失败",e);
+				return new Result(Result.ERROR,"分享图片创建失败");
+			}
+			if(result==null || !result.isSuccess())return new Result(Result.ERROR,"分享图片创建失败");
+			bean.setShareImage(String.valueOf(result.getData()));
+			this.shareMapper.updateByPrimaryKey(bean);
+		}
+
 		_map.put("share_id",bean.getId()+"");//推广编号
 		_map.put("share_image",req_path+"get-img/"+Constants.UPLOAD_PATH_SHARE.getStringKey()+"/"+StringUtils.defaultIfEmpty(bean.getShareImage(),""));//推广图片
 		_map.put("share_url", req_path+StringUtils.defaultIfEmpty(bean.getShareUrl(),""));//推广URL地址
-		_map.putAll(_map_num);
+
 		return new Result(Result.OK,_map);
 	}
+
 
 	/**
 	 * 号码浏览记录

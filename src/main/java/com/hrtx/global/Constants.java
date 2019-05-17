@@ -99,12 +99,13 @@ public enum Constants {
     UPLOAD_PATH_IDCARD("idcard", "身份证", "UPLOAD_PATH"),
     UPLOAD_PATH_SHARE("share", "分享", "UPLOAD_PATH"),
     /**分享的资源*/
-    SHARE_SOURCE_4(4, "号码详情", "UPLOAD_PATH"),
-    /**分享的资源*/
+    SHARE_SOURCE_4(4, "号码详情", "SHARE_SOURCE"),
+    SHARE_SOURCE_1(1, "首页", "SHARE_SOURCE"),
+    /*号码浏览状态*/
     NUMBROWSE_ACTTYPE_1(1, "浏览", "NUMBROWSE_ACTTYPE"),
     NUMBROWSE_ACTTYPE_2(2, "购买", "NUMBROWSE_ACTTYPE"),
 
-    /**分享的资源*/
+    /**订单结算状态*/
     ORDERSETTLE_STATUS_1(1, "待结算", "ORDERSETTLE_STATUS"),
     ORDERSETTLE_STATUS_2(2, "已结算", "ORDERSETTLE_STATUS"),
     ORDERSETTLE_STATUS_3(3, "过期失效", "ORDERSETTLE_STATUS"),
