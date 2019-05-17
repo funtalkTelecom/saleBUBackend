@@ -591,13 +591,13 @@ public class ShareService {
 				if(isNumShare){
 					result=imageService.createShareLinkFile(num.getNumResource(),num.getCityName(),num.getNetType(),num.getTeleType(),String.valueOf(num.getLowConsume()));
 				}else {
-					String nick_name =consumer.getName();
+					/*String nick_name =consumer.getName();
 					Result result_img=getConsumerHeadImg(consumer.getId());
 					if(!result_img.isSuccess())return result_img;
 					String head_img_file=String.valueOf(result_img.getData());
-					String promotion_tip="";
+					String promotion_tip="";*/
 					String share_page="/pages/index/index?share_id="+bean.getId()+"&userid="+consumer.getId();
-					result=imageService.createShareCardFile(head_img_file,nick_name,promotion_tip,share_page);
+					result=imageService.createShareCardFile(/*head_img_file,nick_name,promotion_tip,*/share_page);
 				}
 			}catch (Exception e){
 				log.error("分享图片创建失败",e);
