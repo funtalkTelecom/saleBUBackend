@@ -1553,10 +1553,10 @@ public class ApiOrderService {
 				&& order.getStatus()!=Constants.ORDER_STATUS_6.getIntKey()
 				)
 			return new Result(Result.ERROR, "该订单的状态不能取消，请稍后");
-		if( (order.getStatus()==Constants.ORDER_STATUS_1.getIntKey()
+		if( order.getStatus()==Constants.ORDER_STATUS_1.getIntKey()
 				|| order.getStatus()==Constants.ORDER_STATUS_2.getIntKey()
 				|| order.getStatus()==Constants.ORDER_STATUS_3.getIntKey()
-				|| order.getStatus()==Constants.ORDER_STATUS_21.getIntKey()) && SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CANCEL)){  //仓库未发货取消
+				|| order.getStatus()==Constants.ORDER_STATUS_21.getIntKey()){  //仓库未发货取消
 
 			if(order.getSkuGoodsType().equals("3")){  //普靓没有冻结库存，不调用仓库接口
 				log.info("更新订单状态为7:已取消");
@@ -1625,8 +1625,8 @@ public class ApiOrderService {
 					return new Result(Result.ERROR, desc);
 				}
 			}
-		}else if((order.getStatus()==Constants.ORDER_STATUS_4.getIntKey() || order.getStatus()==Constants.ORDER_STATUS_5.getIntKey()
-				|| order.getStatus()==Constants.ORDER_STATUS_6.getIntKey()) && SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CANCEL_OUT)
+		}else if(order.getStatus()==Constants.ORDER_STATUS_4.getIntKey() || order.getStatus()==Constants.ORDER_STATUS_5.getIntKey()
+				|| order.getStatus()==Constants.ORDER_STATUS_6.getIntKey()
 				){  //仓库已发货取消
 			log.info("更新订单状态为7:已取消");
 			CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
@@ -1651,8 +1651,6 @@ public class ApiOrderService {
 				CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
 			}
 
-		}else {
-			return new Result(Result.ERROR, "您没有权限取消订单");
 		}
 
 		return new Result(Result.OK, "取消成功");
@@ -1915,4 +1913,5 @@ public class ApiOrderService {
 		}
 		return new Result(Result.OK,pram);
 	}
+
 }
