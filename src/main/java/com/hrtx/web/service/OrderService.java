@@ -349,7 +349,7 @@ public class OrderService extends BaseService {
         if(payR.getCode()==Result.OK){  //退款成功
             apiOrderService.CancelOrderStatus(orderId, Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
             apiOrderService.orderType(orderId);
-            return new Result(Result.OK,  payR.getData());
+            return new Result(Result.OK,  " 退款成功！");
         }else { //退款失败
             return new Result(Result.OK, payR.getData());
         }
