@@ -656,5 +656,10 @@ public class OrderService extends BaseService {
                 +"对订单["+order.getOrderId()+"]调价,调价金额["+adjustPrice+"],调价前金额["+bprice+"],调价后金额["+order.getTotal()+"]");
         return new Result(Result.OK, "调价成功");
     }
+
+    public Order findOrderInfo(Integer orderId) {
+        Order order = orderMapper.findOrderInfo(orderId);
+        return order;
+    }
 }
 
