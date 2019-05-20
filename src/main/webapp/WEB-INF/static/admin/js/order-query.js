@@ -250,7 +250,7 @@ $(function() {
                             if(confirm("是否确认再次退款？")){
                                 $.post("order/order-refund-live", {orderId: v}, function (data) {
                                     dataList.reload();
-                                    alert(data.data);
+                                    alert(data.data.data);
                                 }, "json");
                             }
                         });
