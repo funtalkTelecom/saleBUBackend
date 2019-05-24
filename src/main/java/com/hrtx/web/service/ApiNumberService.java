@@ -75,9 +75,6 @@ public class ApiNumberService {
 		}
 		Agent agent = (Agent) reagent.getData();
 		numPrice.setNumTags(tags);
-		//-----zdh
-
-		//------zdh
 		numPrice.setAgentId(agent.getId());
 		pm = numService.queryNumPrice(numPrice);
 		//处理号码,生成号码块字段(numBlock)
@@ -90,14 +87,11 @@ public class ApiNumberService {
 			//判断是否当前正在进行秒杀
 			Integer activityType = NumberUtils.toInt(ObjectUtils.toString(obj.get("activityType"))) ;
 			if(activityType==1){
-				String time = ObjectUtils.toString( obj.get("activitySdate"));
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				Date[] queryActiveDate = activityService.queryActiveDate(1);
-				Date startTime = queryActiveDate[0];
-				String startTimeStr = Utils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
-				Date endTime = queryActiveDate[2];
-				String endTimeStr = Utils.getDate(endTime,"yyyy-MM-dd HH:mm:ss");
-				if(time.compareTo(startTimeStr) >=0 && time.compareTo(endTimeStr) <= 0){
+				String startTimeStr = ObjectUtils.toString( obj.get("activitySdate"));
+				String endTimeStr = ObjectUtils.toString( obj.get("activityEdate"));
+				Date date = new Date();
+				String newDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date);
+				if(newDate.compareTo(startTimeStr) >=0 && newDate.compareTo(endTimeStr) <= 0){
 					obj.put("is_ms",1);  //当前正在进行秒杀
 				}else{
 					obj.put("is_ms",0);
@@ -383,14 +377,11 @@ public class ApiNumberService {
 				//判断是否当前正在进行秒杀
 				Integer activityType = NumberUtils.toInt(ObjectUtils.toString(obj.get("activityType"))) ;
 				if(activityType==1){
-					String time = ObjectUtils.toString( obj.get("activitySdate"));
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					Date[] queryActiveDate = activityService.queryActiveDate(1);
-					Date startTime = queryActiveDate[0];
-					String startTimeStr = Utils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
-					Date endTime = queryActiveDate[2];
-					String endTimeStr = Utils.getDate(endTime,"yyyy-MM-dd HH:mm:ss");
-					if(time.compareTo(startTimeStr) >=0 && time.compareTo(endTimeStr) <= 0){
+					String startTimeStr = ObjectUtils.toString( obj.get("activitySdate"));
+					String endTimeStr = ObjectUtils.toString( obj.get("activityEdate"));
+					Date date = new Date();
+					String newDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+					if(newDate.compareTo(startTimeStr) >=0 && newDate.compareTo(endTimeStr) <= 0){
 						obj.put("is_ms",1);  //当前正在进行秒杀
 					}else{
 						obj.put("is_ms",0);

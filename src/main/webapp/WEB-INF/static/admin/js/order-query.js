@@ -158,8 +158,10 @@ $(function() {
                         if(record.status=="20") {
                             node.push('<a class="btn btn-success btn-xs order-push-storage" href="javascript:void(0);">推送</a>');
                         }
-                        if(p_cancel &&( record.status=="1"||record.status=="2"||record.status=="21"||record.status=="3"
-                            ||record.status=="4" ||record.status=="5" ||record.status=="6") && record.orderType!=3 && record.orderType!=5) {
+                        if(p_cancel &&( (record.status=="1"||record.status=="2"||record.status=="21"||record.status=="3") && record.orderType!=3)) {
+							node.push('<a class="btn btn-danger btn-xs cancel" href="javascript:void(0);">取消订单</a>');
+                        }
+                        if(p_cancel_out &&( (record.status=="4" ||record.status=="5" ||record.status=="6") && record.orderType!=3)) {
 							node.push('<a class="btn btn-danger btn-xs cancel" href="javascript:void(0);">取消订单</a>');
                         }
 						if(p_refund && record.status=="14") {
@@ -170,9 +172,6 @@ $(function() {
                         }
 						if(p_receipt && record.status=="2") {
 							node.push('<a class="btn btn-success btn-xs payDeliver" href="javascript:void(0);">发货</a>');
-                        }
-						if(p_again && (record.status=="4" || record.status=="5" || record.status=="6") && record.orderType != 5) {
-							node.push('<a class="btn btn-success btn-xs again" href="javascript:void(0);">补发</a>');
                         }
                         //普号进入“待配卡”状态，应该不允许管理员绑定
                         var bk_gtypes = ['1','2','4'];
@@ -229,17 +228,6 @@ $(function() {
                             $("#adjustInfo input[name='maskId']").val("adjustInfo");
                             $("#adjustInfo input[name='mask']").val("提交中...");
                             $('#adjustInfo').modal('show');
-                        });
-
-                        //点击补发
-                        $operate.find(".again").click(function () {
-                            $("#adjustInfo input[name='orderId']").val(record.orderId);
-                            if(confirm("确定对订单["+record.orderId+"]机型补发操作？")) {
-                                $.post("order/again-order", {orderId: v, mask:"提交中..."}, function (data) {
-                                    dataList.reload();
-                                    alert(data.data);
-                                }, "json");
-                            }
                         });
 
                         //点击线下退款

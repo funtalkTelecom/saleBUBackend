@@ -349,7 +349,7 @@ public class OrderService extends BaseService {
         if(payR.getCode()==Result.OK){  //退款成功
             apiOrderService.CancelOrderStatus(orderId, Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
             apiOrderService.orderType(orderId);
-            return new Result(Result.OK,  payR.getData());
+            return new Result(Result.OK,  " 退款成功！");
         }else { //退款失败
             return new Result(Result.OK, payR.getData());
         }
@@ -655,6 +655,11 @@ public class OrderService extends BaseService {
         log.info(SessionUtil.getUser().getLoginName()+"在"+Utils.getDate(0,"yyyy-MM-dd HH:mm:ss")
                 +"对订单["+order.getOrderId()+"]调价,调价金额["+adjustPrice+"],调价前金额["+bprice+"],调价后金额["+order.getTotal()+"]");
         return new Result(Result.OK, "调价成功");
+    }
+
+    public Order findOrderInfo(Integer orderId) {
+        Order order = orderMapper.findOrderInfo(orderId);
+        return order;
     }
 }
 

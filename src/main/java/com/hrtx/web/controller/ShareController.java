@@ -85,6 +85,14 @@ public class ShareController extends BaseReturn{
 		return this.shareService.shareUrl(NumberUtils.toInt(num_id));
 	}
 	/**
+	 * 生成分享地址  独享(无号码)
+	 */
+	@PostMapping("/api/partner/share-url-alone")
+	@Powers({PowerConsts.NOPOWER})
+	public Result shareUrl(){
+		return this.shareService.shareUrl();
+	}
+	/**
 	 * 生成推广卡片
 	 */
 	@PostMapping("/api/partner/share-card")

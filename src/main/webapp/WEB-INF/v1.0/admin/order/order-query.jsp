@@ -481,7 +481,7 @@
             var p_check = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CHECK)%>;
             var p_cancel = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CANCEL)%>;
             var p_adjust = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_ADJUST)%>;
-            var p_again = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_AGAIN)%>;
+            var p_cancel_out = <%=SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CANCEL_OUT)%>;
 		</script>
 	</body>
 </html>

@@ -25,3 +25,33 @@ ADD COLUMN `adjust_price` decimal(10, 2) NOT NULL DEFAULT 0 COMMENT '调价' AFT
 ALTER TABLE `egt_hk`.`tb_iccid`
 ADD COLUMN `seller_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属卖家id' AFTER `out_stock_date`;
 update tb_iccid i set i.seller_id = 10 ;
+
+
+--2019.05.23
+CREATE TABLE `egt_hk`.`tb_pay_serial`  (
+  `id` int(0) NOT NULL,
+  `amt` int(10) NOT NULL COMMENT '交易金额',
+  `payer` varchar(36) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '付款账号/提现账号',
+  `status` smallint(1) UNSIGNED ZEROFILL NOT NULL COMMENT '状态 1初始，2进行中 3成功；',
+  `order_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '订单名称 多个取其中一个',
+  `before_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户前端地址',
+  `after_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户后端地址',
+  `pay_trade_type` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付交易类型',
+  `sub_app_id` varchar(60) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '使用第三方的微信支付的  子appid',
+  `sub_open_id` varchar(60) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '使用第三方的微信支付的  子appid对应的openid',
+  `add_date` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `order_trade_type` int(2) NULL DEFAULT 0 COMMENT '订单交易类型(1 担保支付  2 直接支付) ',
+  `pay_type` int(2) NOT NULL DEFAULT 1 COMMENT '支付方式',
+  `mer_param` varchar(600) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户参数（回调时原值返回）',
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `egt_hk`.`tb_pay_serial_item`  (
+  `id` int(11) NOT NULL,
+  `pay_serial_id` int(11) NOT NULL COMMENT 'tb_pay_serial的id',
+  `item_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '付款子流水',
+  `payee` varchar(36) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '收款账号',
+  `amt` int(11) NOT NULL COMMENT '金额',
+  `add_date` timestamp(0) NOT NULL DEFAULT now() COMMENT '添加时间',
+  PRIMARY KEY (`id`)
+);

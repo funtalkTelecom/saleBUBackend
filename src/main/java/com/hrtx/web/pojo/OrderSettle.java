@@ -13,6 +13,7 @@ public class OrderSettle  extends BasePojo{
     public static Double base_pp_price=1000d;//基础推广 销售价格点
     public static Double base_pp_price_low_fee=0.2d;//基础推广  低于等于销售价格点的费率
     public static Double base_pp_price_more_fee=0.1d;//基础推广  大于销售价格点的费率
+    public static Double base_pp_price_all_fee=0.05d;//基础推广 全平台的推广
     public static int base_pp_price_month_count=5;//基础推广  每月最低单数
 
     @Id

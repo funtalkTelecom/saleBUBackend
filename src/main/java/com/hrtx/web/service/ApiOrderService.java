@@ -59,6 +59,7 @@ public class ApiOrderService {
 	@Autowired private DictMapper dictMapper;
 	@Autowired private ShareService shareService;
 	@Autowired private OrderService orderService;
+	@Autowired private ActivityMapper activityMapper;
 
 	public  List<Map> findOrderListByNumId(Integer numId)
 	{
@@ -629,12 +630,15 @@ public class ApiOrderService {
 		if(price_range==null)return new Result(Result.ERROR, "抱歉，号码价格错误，无法订购");
 		Map<String,String> _map=new HashMap<>();
 		int activityType=NumberUtils.toInt(ObjectUtils.toString(numPrice1.get("activityType")));
+		int activityId=NumberUtils.toInt(ObjectUtils.toString(numPrice1.get("activityId")));
 		boolean adjustPrice=false;
-		if(activityType>0){
-			Long activityEdate=((Date)numPrice1.get("activityEdate")).getTime();
-			Long activitySdate=((Date)numPrice1.get("activitySdate")).getTime();
+		if(activityType>0&&activityId>0){
+			Activity activity=activityMapper.selectByPrimaryKey(activityId);
+			if(activity==null)return new Result(Result.ERROR, "抱歉，活动错误，无法订购");
+			Long activityEdate=activity.getEndDate().getTime();
+			Long activitySdate=activity.getBeginDate().getTime();
 			Long currDate=System.currentTimeMillis();
-			if(currDate>=activitySdate&currDate<=activityEdate)adjustPrice=true;
+			if(currDate>=activitySdate&&currDate<=activityEdate)adjustPrice=true;
 		}
 		_map.put("price_range",ObjectUtils.toString(numPrice1.get("price_range")));//当前销售价 //2019.1.24增加秒杀功能，秒杀时取秒杀价格
 		_map.put("price",ObjectUtils.toString(numPrice1.get("price")));//原价
@@ -1549,7 +1553,8 @@ public class ApiOrderService {
 				&& order.getStatus()!=Constants.ORDER_STATUS_6.getIntKey()
 				)
 			return new Result(Result.ERROR, "该订单的状态不能取消，请稍后");
-		if(order.getStatus()==Constants.ORDER_STATUS_1.getIntKey() || order.getStatus()==Constants.ORDER_STATUS_2.getIntKey()
+		if( order.getStatus()==Constants.ORDER_STATUS_1.getIntKey()
+				|| order.getStatus()==Constants.ORDER_STATUS_2.getIntKey()
 				|| order.getStatus()==Constants.ORDER_STATUS_3.getIntKey()
 				|| order.getStatus()==Constants.ORDER_STATUS_21.getIntKey()){  //仓库未发货取消
 
@@ -1621,7 +1626,8 @@ public class ApiOrderService {
 				}
 			}
 		}else if(order.getStatus()==Constants.ORDER_STATUS_4.getIntKey() || order.getStatus()==Constants.ORDER_STATUS_5.getIntKey()
-				|| order.getStatus()==Constants.ORDER_STATUS_6.getIntKey()){  //仓库已发货取消
+				|| order.getStatus()==Constants.ORDER_STATUS_6.getIntKey()
+				){  //仓库已发货取消
 			log.info("更新订单状态为7:已取消");
 			CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason);
 			Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
@@ -1907,4 +1913,5 @@ public class ApiOrderService {
 		}
 		return new Result(Result.OK,pram);
 	}
+
 }

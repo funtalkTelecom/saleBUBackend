@@ -7,7 +7,7 @@
 
     <select id="queryShareList" resultType="java.util.HashMap">
         select s.id,s.share_num_id,s.share_num,s.share_date,n.city_name,n.net_type,n.tele_type,n.low_consume
-        from tb_share s left join tb_num n on s.share_num_id=n.id where s.is_del=0 and s.consumer_id=#{consumer_id}
+        from tb_share s left join tb_num n on s.share_num_id=n.id where s.is_del=0 and s.share_source=4 and s.consumer_id=#{consumer_id}
         order by s.id desc
     </select>
 

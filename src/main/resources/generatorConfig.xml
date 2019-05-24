@@ -67,14 +67,14 @@
         </javaClientGenerator>
 
 
-        <table tableName="tb_corp_agent" domainObjectName="CorpAgent"
+        <table tableName="tb_pay_serial" domainObjectName="PaySerial"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false" enableDeleteByPrimaryKey="true"
                enableInsert="false" enableSelectByPrimaryKey="false"
                enableUpdateByPrimaryKey="false"  >
         </table>
-        <table tableName="tb_boss_num" domainObjectName="BossNum"
+        <table tableName="tb_pay_serial_item" domainObjectName="PaySerialItem"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false" enableDeleteByPrimaryKey="true"

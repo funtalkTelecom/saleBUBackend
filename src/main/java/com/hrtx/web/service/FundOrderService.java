@@ -39,6 +39,8 @@ public class FundOrderService extends BaseService {
     @Autowired private OrderItemMapper orderItemMapper;
     @Autowired private OrderMapper orderMapper;
     @Autowired private OrderSettleMapper orderSettleMapper;
+    @Autowired private PaySerialMapper paySerialMapper;
+    @Autowired private PaySerialItemMapper paySerialItemMapper;
 
     /**
      * 平台订单支付（线下支付方式）
@@ -536,7 +538,10 @@ public class FundOrderService extends BaseService {
             map.put("item_id",order.getOrderId());
             payeeList.add(map);
         }
-        return this.payHrPayOrder(orderNo,payer,payeeList,order.getTotal(),openid,orderName,Pay001.PAY_TRADE_TYPE_XCX,Pay001.PAY_MENTHOD_TYPE_1,Pay001.ORDER_TRADE_TYPE_1);
+        //2019.05.24 update by zyq (改用orderSettle作为支付流水)
+        OrderSettle orderSettle = new OrderSettle(order.getOrderId(), Integer feeType, NumberUtils.toInt(payer), NumberUtils.toInt(payee), order.getTotal(), Constants.ORDERSETTLE_STATUS_1.getIntKey());
+        orderSettleMapper.insertSelective(orderSettle);
+        return this.payHrPayOrder(/*orderNo*/orderSettle.getId()+"",payer,payeeList,order.getTotal(),openid,orderName,Pay001.PAY_TRADE_TYPE_XCX,Pay001.PAY_MENTHOD_TYPE_1,Pay001.ORDER_TRADE_TYPE_1);
     }
 
     public Result payHrOrderSettle(Integer settle_id) {
@@ -740,13 +745,21 @@ public class FundOrderService extends BaseService {
             arrayList.add(pay001Payee);
             orderName=String.format("号码[%s]",bean.getNum());
         }*/
+       /* PaySerial paySerial = new PaySerial(amt, payer, orderName, beforeUrl, afterUrl, pay_trade_type, subAppId, payer_openid, order_trade_type, pay_type, "");
+        paySerialMapper.insertSelective(paySerial);
+        for(Map map:payeeList){
+            int item_amt=Double.valueOf(Utils.mul(NumberUtils.toDouble(ObjectUtils.toString(map.get("item_amt"))),100)).intValue();//单位分
+            PaySerialItem paySerialItem = new PaySerialItem(paySerial.getId(), ObjectUtils.toString(map.get("item_id")), ObjectUtils.toString(map.get("payee")), item_amt);
+            paySerialItemMapper.insertSelective(paySerialItem);
+        }
         for(Map map:payeeList){
             int item_amt=Double.valueOf(Utils.mul(NumberUtils.toDouble(ObjectUtils.toString(map.get("item_amt"))),100)).intValue();//单位分
             Pay001Payee pay001Payee=new Pay001Payee(ObjectUtils.toString(map.get("item_id")),ObjectUtils.toString(map.get("payee")),item_amt);//收款方公司id  需确保不会存在
             arrayList.add(pay001Payee);
-        }
-        Pay001 pay001=new Pay001(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(), orderNo, payer,orderName,beforeUrl,afterUrl,subAppId,payer_openid,pay_trade_type,pay_type,amt,order_trade_type);
+        }*/
+        Pay001 pay001=new Pay001(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(), /*paySerial.getId()+""*/orderNo, payer,orderName,beforeUrl,afterUrl,subAppId,payer_openid,pay_trade_type,pay_type,amt,order_trade_type);
         pay001.setOrders(arrayList);
+
         com.hrtx.common.dto.Result result=PayClient.callPay001(pay001);
         if(result.getCode()== com.hrtx.common.dto.Result.OK){
             return new Result(Result.OK,result.getData());

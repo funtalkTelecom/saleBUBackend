@@ -4,6 +4,7 @@ import com.hrtx.config.advice.ServiceException;
 import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.dto.StorageInterfaceRequest;
+import com.hrtx.global.*;
 import com.hrtx.global.Constants;
 import com.hrtx.global.LockUtils;
 import com.hrtx.global.PowerConsts;
@@ -12,6 +13,7 @@ import com.hrtx.web.pojo.Order;
 import com.hrtx.web.pojo.OrderItem;
 import com.hrtx.web.service.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,11 +94,24 @@ public class OrderController extends BaseReturn{
 	 * @return
 	 */
 	@RequestMapping("/order-cancel")
-	@Powers({PowerConsts.ORDERMOUDULE_COMMON_CANCEL})
+	@Powers({PowerConsts.ORDERMOUDULE_COMMON_CANCEL,PowerConsts.ORDERMOUDULE_COMMON_CANCEL_OUT})
 	public Result orderCancel( String orderId,String reason){
 		if (!LockUtils.tryLock(orderId)) return new Result(Result.ERROR, "请稍后再试!");
 		try {
-			return apiOrderService.CancelOrder(orderId,reason);
+			Order order  = orderService.findOrderInfo(NumberUtils.toInt(orderId));
+			if( (order.getStatus()==Constants.ORDER_STATUS_1.getIntKey()
+					|| order.getStatus()==Constants.ORDER_STATUS_2.getIntKey()
+					|| order.getStatus()==Constants.ORDER_STATUS_3.getIntKey()
+					|| order.getStatus()==Constants.ORDER_STATUS_21.getIntKey()) && SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CANCEL)) {
+				return apiOrderService.CancelOrder(orderId,reason);
+				//仓库未发货取消
+			} else if((order.getStatus()==Constants.ORDER_STATUS_4.getIntKey() || order.getStatus()==Constants.ORDER_STATUS_5.getIntKey()
+					|| order.getStatus()==Constants.ORDER_STATUS_6.getIntKey()) && SessionUtil.hasPower(PowerConsts.ORDERMOUDULE_COMMON_CANCEL_OUT)
+					) {  //仓库已发货取消
+				return apiOrderService.CancelOrder(orderId,reason);
+			}else {
+				return new Result(Result.ERROR, "您没有权限取消订单");
+			}
 		}finally {
 			LockUtils.unLock(orderId);
 		}
