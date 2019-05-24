@@ -333,6 +333,7 @@ public class ShareService {
 		Example example = new Example(OrderSettle.class);
 		example.createCriteria().andEqualTo("orderId", order_id).andEqualTo("feeType",Constants.PROMOTION_PLAN_FEETYPE_7.getIntKey())
 				.andEqualTo("status", Constants.ORDERSETTLE_STATUS_2.getIntKey());
+		example.setOrderByClause(" id desc");
 		List<OrderSettle> orderSettles = orderSettleMapper.selectByExample(example);
 		if(orderSettles.size()<=0) return new Result(Result.ERROR, "未找到成功支付的流水");
 		Result result=fundOrderService.payHrPayOrderSign(orderSettles.get(0).getOrderId()+"");

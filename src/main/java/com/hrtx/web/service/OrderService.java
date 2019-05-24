@@ -542,10 +542,11 @@ public class OrderService extends BaseService {
         if(order.getStatus() != Constants.ORDER_STATUS_11.getIntKey()) return new Result(Result.ERROR, "非待仓库撤销状态的订单");
         if(cancel_res==1) {
             //确认取消
-            Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
-            if(ispay.getCode()==Result.OK){
-                //已支付
-                if("1".equals(String.valueOf(ispay.getData()))){//线上支付
+//            Result ispay =fundOrderService.queryPayOrderInfo(String.valueOf(orderId));
+            if(ArrayUtils.contains(Constants.getKeyObject("PAY_MENTHOD_TYPE"), order.getPayMenthodId())){  //已支付
+                if(order.getPayMenthodId().equals(Constants.PAY_MENTHOD_TYPE_1.getStringKey()) || order.getPayMenthodId().equals(Constants.PAY_MENTHOD_TYPE_2.getStringKey())
+                        || order.getPayMenthodId().equals(Constants.PAY_MENTHOD_TYPE_4.getStringKey())){//线上支付
+//                if("1".equals(String.valueOf(ispay.getData()))){//线上支付
                     Result payR = fundOrderService.payOrderRefund(String.valueOf(orderId),reason);
                     if(payR.getCode()==Result.OK){  //退款成功
                         apiOrderService.CancelOrderStatus(orderId, Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
@@ -559,13 +560,13 @@ public class OrderService extends BaseService {
                     apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_14.getIntKey(),reason); //待财务退款
                     return new Result(Result.OK, "线下支付,待财务退款");
                 }
-            }else if(ispay.getCode()==Result.ERROR) {//未支付
+            }else/* if(ispay.getCode()==Result.ERROR)*/ {//未支付
                 apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_7.getIntKey(),reason); //取消
                 //上架涉及的表，数量，状态
                 apiOrderService.orderType(orderId);
-            }else{//未知结果
+            }/*else{//未知结果
                 this.apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_12.getIntKey(),""); //退款中
-            }
+            }*/
         }else if (cancel_res==2){//撤销取消,还原订单状态
             apiOrderService.CancelOrderStatus(orderId,Constants.ORDER_STATUS_3.getIntKey(),reason);
         }
