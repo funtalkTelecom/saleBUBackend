@@ -236,7 +236,7 @@ public class ShareService {
 	 * 		3.交易费
 	 * 		4.发展人员
 	 */
-	public Result createOrderSettle(int order_id){
+	public Result newCreateOrderSettle(int order_id){
 		log.info(String.format("开始创建订单[%s]的结算清单",order_id));
 		int share_settle_user=-1;
 		Order order=orderMapper.selectByPrimaryKey(order_id);
