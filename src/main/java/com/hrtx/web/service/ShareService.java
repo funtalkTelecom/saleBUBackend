@@ -322,9 +322,14 @@ public class ShareService {
 	 */
 	public Result orderSettle(int order_id){
 		//结算需要有先后顺序(重要)
-		Result result=fundOrderService.payHrPayOrderSign(order_id+"");
-		log.info(String.format("订单签收结果[%s],[%s]",result.getCode(),result.getData()));
 		Example example = new Example(OrderSettle.class);
+		example.createCriteria().andEqualTo("orderId", order_id).andEqualTo("feeType",Constants.PROMOTION_PLAN_FEETYPE_7.getIntKey())
+				.andEqualTo("status", Constants.ORDERSETTLE_STATUS_2.getIntKey());
+		List<OrderSettle> orderSettles = orderSettleMapper.selectByExample(example);
+		if(orderSettles.size()<=0) return new Result(Result.ERROR, "未找到成功支付的流水");
+		Result result=fundOrderService.payHrPayOrderSign(orderSettles.get(0).getOrderId()+"");
+		log.info(String.format("订单签收结果[%s],[%s]",result.getCode(),result.getData()));
+		example = new Example(OrderSettle.class);
 		example.createCriteria().andEqualTo("orderId",order_id).andEqualTo("status",Constants.ORDERSETTLE_STATUS_1.getIntKey());
 		List<OrderSettle> _list=this.orderSettleMapper.selectByExample(example);
 		if(_list.isEmpty()) return new Result(Result.ERROR,"暂无需要结算的费用");

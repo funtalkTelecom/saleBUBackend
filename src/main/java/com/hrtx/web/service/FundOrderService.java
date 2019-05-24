@@ -298,14 +298,29 @@ public class FundOrderService extends BaseService {
     private Result updateBusiPayResult(String busi_type,int busi_order_id,boolean pay_result){
         Result result=null;
         try {
+            OrderSettle orderSettle = orderSettleMapper.selectByPrimaryKey(busi_order_id);
+            if(orderSettle == null || orderSettle.getFeeType() != Constants.PROMOTION_PLAN_FEETYPE_7.getIntKey()) return new Result(Result.ERROR, "支付订单不存在");
+            if(orderSettle.getStatus() != Constants.ORDERSETTLE_STATUS_1.getIntKey()) return new Result(Result.ERROR, "支付状态不可处理回调");
+            if(pay_result) {//支付成功后 流水更新为“支付成功”， 将该订单其它的支付流水更新为“支付失败”
+                OrderSettle uOrderSettle = new OrderSettle();
+                uOrderSettle.setStatus(Constants.ORDERSETTLE_STATUS_3.getIntKey());
+                Example example = new Example(OrderSettle.class);
+                example.createCriteria().andEqualTo("status", Constants.ORDERSETTLE_STATUS_1.getIntKey()).andEqualTo("orderId", orderSettle.getOrderId())
+                        .andEqualTo("feeType",orderSettle.getFeeType());
+                orderSettleMapper.updateByExampleSelective(uOrderSettle, example);
+                orderSettle.setStatus(Constants.ORDERSETTLE_STATUS_2.getIntKey());
+                orderSettle.setSettleDate(new Date());
+                orderSettleMapper.updateByPrimaryKeySelective(orderSettle);
+            }
+            int orderId = orderSettle.getOrderId();
             if(FundOrder.BUSI_TYPE_PAYORDER.equals(busi_type)&&pay_result){
-                result = orderService.payOrderSuccess(busi_order_id);
+                result = orderService.payOrderSuccess(orderId);
                 if(result.getCode() == Result.OK) {
-                    orderService.payDeliverOrder(busi_order_id);//发货成功与否不与支付结果挂钩
-                    shareService.createOrderSettle(busi_order_id);//2019.3.26 结算费用
+                    orderService.payDeliverOrder(orderId);//发货成功与否不与支付结果挂钩
+                    shareService.createOrderSettle(orderId);//2019.3.26 结算费用
                 }
             }else if(FundOrder.BUSI_TYPE_PAYDEPOSIT.equals(busi_type)){
-                auctionDepositService.newAuctionDepositPay(busi_order_id, pay_result, Utils.getDate(0,"yyyyMMddHHmmss"));//payTime
+                auctionDepositService.newAuctionDepositPay(orderId, pay_result, Utils.getDate(0,"yyyyMMddHHmmss"));//payTime
                 result=new Result(Result.OK,"success");
             }
         }catch (Exception e) {
@@ -539,7 +554,7 @@ public class FundOrderService extends BaseService {
             payeeList.add(map);
         }
         //2019.05.24 update by zyq (改用orderSettle作为支付流水)
-        OrderSettle orderSettle = new OrderSettle(order.getOrderId(), Integer feeType, NumberUtils.toInt(payer), NumberUtils.toInt(payee), order.getTotal(), Constants.ORDERSETTLE_STATUS_1.getIntKey());
+        OrderSettle orderSettle = new OrderSettle(order.getOrderId(), Constants.PROMOTION_PLAN_FEETYPE_7.getIntKey(), NumberUtils.toInt(payer), NumberUtils.toInt(payee), order.getTotal(), Constants.ORDERSETTLE_STATUS_1.getIntKey());
         orderSettleMapper.insertSelective(orderSettle);
         return this.payHrPayOrder(/*orderNo*/orderSettle.getId()+"",payer,payeeList,order.getTotal(),openid,orderName,Pay001.PAY_TRADE_TYPE_XCX,Pay001.PAY_MENTHOD_TYPE_1,Pay001.ORDER_TRADE_TYPE_1);
     }
