@@ -16,7 +16,7 @@ public enum Constants {
 
     //支付方式
     PAY_MENTHOD_TYPE_1("1", "微信支付", "PAY_MENTHOD_TYPE"),
-//    PAY_MENTHOD_TYPE_2("2", "支付宝支付", "PAY_MENTHOD_TYPE"),
+    PAY_MENTHOD_TYPE_2("2", "支付宝支付", "PAY_MENTHOD_TYPE"),
     PAY_MENTHOD_TYPE_3("3", "线下支付", "PAY_MENTHOD_TYPE"),
     PAY_MENTHOD_TYPE_4("4", "分期付款", "PAY_MENTHOD_TYPE"),
     PAY_MENTHOD_TYPE_5("5", "免支付", "PAY_MENTHOD_TYPE"),
@@ -111,6 +111,7 @@ public enum Constants {
     ORDERSETTLE_STATUS_1(1, "待结算", "ORDERSETTLE_STATUS"),
     ORDERSETTLE_STATUS_2(2, "已结算", "ORDERSETTLE_STATUS"),
     ORDERSETTLE_STATUS_3(3, "过期失效", "ORDERSETTLE_STATUS"),
+    ORDERSETTLE_STATUS_4(4, "已退款", "ORDERSETTLE_STATUS"),
 
 
     ACCOUNT_TYPE_1(1, "银行卡", "ACCOUNT_TYPE"),

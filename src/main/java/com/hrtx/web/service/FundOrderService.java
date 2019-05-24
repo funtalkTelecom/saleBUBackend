@@ -343,12 +343,26 @@ public class FundOrderService extends BaseService {
         }else{
             Order order=orderMapper.selectByPrimaryKey(Integer.valueOf(sourceId));
             Integer order_id=order.getOrderId();
-//            String orderNo=String.valueOf(this.orderMapper.getId());
-            String orderNo=String.valueOf(order_id);
-            String orgOrderNo=String.valueOf(order_id);
+//            String orderNo=String.valueOf(order_id);
+
+//            String orgOrderNo=String.valueOf(order_id);
+            Example example = new Example(OrderSettle.class);
+            example.createCriteria().andEqualTo("orderId", order_id).andEqualTo("feeType",Constants.PROMOTION_PLAN_FEETYPE_7.getIntKey())
+                    .andEqualTo("status", Constants.ORDERSETTLE_STATUS_2.getIntKey());
+            example.setOrderByClause(" id desc");
+            List<OrderSettle> orderSettles = orderSettleMapper.selectByExample(example);
+            if(orderSettles.size()<=0) return new Result(Result.ERROR, "未找到成功支付的流水");
+            OrderSettle orderSettle = orderSettles.get(0);
+            String orgOrderNo = orderSettle.getId()+"";
+            String orderNo=orgOrderNo;
             String orgOrderNoChild=String.valueOf(order_id);
             Double refund_amt=order.getTotal();
-            return this.payHrPayRefund(orderNo,orgOrderNo,orgOrderNoChild,refund_amt,remark);
+            result = this.payHrPayRefund(orderNo,orgOrderNo,orgOrderNoChild,refund_amt,remark);
+            if(result.isSuccess()) {
+                orderSettle.setStatus(Constants.ORDERSETTLE_STATUS_4.getIntKey());
+                orderSettleMapper.updateByPrimaryKeySelective(orderSettle);
+            }
+            return result;
         }
     }
 
