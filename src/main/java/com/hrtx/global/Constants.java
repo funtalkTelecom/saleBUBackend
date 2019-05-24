@@ -113,6 +113,11 @@ public enum Constants {
     ACCOUNT_TYPE_1(1, "银行卡", "ACCOUNT_TYPE"),
     ACCOUNT_TYPE_2(2, "微信", "ACCOUNT_TYPE"),
 
+    /**支付流水状态**/
+    PAY_SERIAL_STATUS_1(1, "初始", " PAY_SERIAL_STATUS"),
+    PAY_SERIAL_STATUS_2(2, "支付中", " PAY_SERIAL_STATUS"),
+    PAY_SERIAL_STATUS_3(3, "支付成功", " PAY_SERIAL_STATUS"),
+
     ;
 
     private Object key;
