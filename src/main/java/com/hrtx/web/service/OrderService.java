@@ -163,12 +163,14 @@ public class OrderService extends BaseService {
      * @return
      */
     @NoRepeat
-    public Result payOrderSuccess(Integer orderId) {
+    public Result payOrderSuccess(Integer orderId, String payMethodId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() == 1 || (order.getStatus() != Constants.ORDER_STATUS_1.getIntKey() && order.getStatus() != Constants.ORDER_STATUS_21.getIntKey())) return new Result(Result.ERROR, "订单状态异常");
         order.setPayDate(new Date());
         order.setStatus(Constants.ORDER_STATUS_2.getIntKey());
+        order.setPayMenthodId(payMethodId);
+        order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payMethodId));
         orderMapper.updateByPrimaryKey(order);
         return new Result(Result.OK, "success");
     }
@@ -229,8 +231,8 @@ public class OrderService extends BaseService {
         if(order == null) return new Result(Result.ERROR, "订单不存在");
         if(order.getIsDel() != 0) return new Result(Result.ERROR, "订单已删除");
         if(order.getStatus() != Constants.ORDER_STATUS_1.getIntKey() ) return new Result(Result.ERROR, "订单已支付");
-        order.setPayMenthodId(payType);
-        order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payType));
+//        order.setPayMenthodId(payType);
+//        order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payType));
         orderMapper.updateByPrimaryKey(order);
         //转换成支付通道
         if(Constants.PAY_MENTHOD_TYPE_1.getStringKey().equals(payType)){
@@ -287,8 +289,8 @@ public class OrderService extends BaseService {
         City city = cityMapper.selectByPrimaryKey(districtId);
         if(city == null) return new Result(Result.ERROR, "所选地址区县不存在");
         orderItemMapper.updateMeal(orderId, mealId);
-        order.setPayMenthodId(payMenthod);
-        order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payMenthod));
+//        order.setPayMenthodId(payMenthod);
+//        order.setPayMenthod(Constants.contantsToMap("PAY_MENTHOD_TYPE").get(payMenthod));
         order.setAddressId(addresId);
         order.setAddress(city.getFullName()+String.valueOf(addressmap.get("address")));
         order.setPersonName( String.valueOf(addressmap.get("personName")));
@@ -308,7 +310,7 @@ public class OrderService extends BaseService {
             double deposit = NumberUtils.toDouble(ObjectUtils.toString(map.get("deposit")));
             int amt = ((Double)Arith.mul(Arith.sub(order.getTotal(), deposit), 100)).intValue();
             if(amt<=0) {
-                Result result = this.payOrderSuccess(orderId);
+                Result result = this.payOrderSuccess(orderId, payMenthod);
                 if(result.getCode() == Result.OK) {
                     result = this.payDeliverOrder(orderId);
                     return new Result(Result.OK, CommonMap.create("paySuccess", true).getData());
@@ -407,16 +409,16 @@ public class OrderService extends BaseService {
         }
         result = fundOrderService.payOffLineOrder(amt, receivableAccount, payAccount, order.getOrderId()+"线下支付", String.valueOf(order.getOrderId()));
 
-        Order parm = orderMapper.selectByPrimaryKey(order.getOrderId());
-        parm.setPayMenthodId("3");
-        parm.setPayMenthod("线下支付");
-        orderMapper.updateByPrimaryKey(parm);
+//        Order parm = orderMapper.selectByPrimaryKey(order.getOrderId());
+//        parm.setPayMenthodId(Constants.PAY_MENTHOD_TYPE_3.getStringKey());
+//        parm.setPayMenthod("线下支付");
+//        orderMapper.updateByPrimaryKey(parm);
 
         if(result.getCode()==200){
             //竞拍订单判断
             if(order.getOrderType()==3){
                 if (amt + aamt + deposit == receivableInt){
-                    result = this.payOrderSuccess(order.getOrderId());
+                    result = this.payOrderSuccess(order.getOrderId(), Constants.PAY_MENTHOD_TYPE_3.getStringKey());
                     if (result.getCode() == 200) {
                         result = this.payDeliverOrder(order.getOrderId());
                         if (result.getCode() == 200) {
@@ -430,7 +432,7 @@ public class OrderService extends BaseService {
                 }
             }else {
                 if (amt + aamt == receivableInt) {
-                    result = this.payOrderSuccess(order.getOrderId());
+                    result = this.payOrderSuccess(order.getOrderId(), Constants.PAY_MENTHOD_TYPE_3.getStringKey());
                     if (result.getCode() == 200) {
                         result = this.payDeliverOrder(order.getOrderId());
                         if (result.getCode() == 200) {
@@ -483,7 +485,7 @@ public class OrderService extends BaseService {
                 order.setCheckConment(checkConment);
                 orderMapper.updateByPrimaryKey(order);
                 if(status == Constants.ORDER_STATUS_2.getIntKey()) {//审核通过
-                    Result result = this.payOrderSuccess(orderId);
+                    Result result = this.payOrderSuccess(orderId, Constants.PAY_MENTHOD_TYPE_3.getStringKey());
                     if(result.getCode() != Result.OK) {
                         list.add(id+String.valueOf(result.getData()));
                         continue;

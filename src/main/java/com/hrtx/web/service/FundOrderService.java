@@ -235,8 +235,8 @@ public class FundOrderService extends BaseService {
         String busi_type = FundOrder.BUSI_TYPE_PAYORDER;
         String busi_order_id = ObjectUtils.toString(platrequest.get("order_no"));
         int pay_status =NumberUtils.toInt(ObjectUtils.toString(platrequest.get("status"))); //状态 2等待付款，3已支付
-
-        Result result= this.updateBusiPayResult(busi_type,NumberUtils.toInt(busi_order_id),pay_status==3);
+        String payMethodId = ObjectUtils.toString(platrequest.get("pay_type")); //
+        Result result= this.updateBusiPayResult(busi_type,NumberUtils.toInt(busi_order_id),pay_status==3, payMethodId);
 
         return result;
     }
@@ -285,7 +285,7 @@ public class FundOrderService extends BaseService {
 //        String payTime = params.get("pay_time");
         String busiType = fundOrder.getBusi();
         Integer orderId = NumberUtils.toInt(fundOrder.getSourceId());
-        return this.updateBusiPayResult(busiType,orderId,status == 3);
+        return this.updateBusiPayResult(busiType,orderId,status == 3, Constants.PAY_MENTHOD_TYPE_1.getStringKey());
     }
 
     /**
@@ -295,7 +295,7 @@ public class FundOrderService extends BaseService {
      * @param pay_result
      * @return
      */
-    private Result updateBusiPayResult(String busi_type,int busi_order_id,boolean pay_result){
+    private Result updateBusiPayResult(String busi_type,int busi_order_id,boolean pay_result, String payMethodId){
         Result result=null;
         try {
             OrderSettle orderSettle = orderSettleMapper.selectByPrimaryKey(busi_order_id);
@@ -314,7 +314,7 @@ public class FundOrderService extends BaseService {
             }
             int orderId = orderSettle.getOrderId();
             if(FundOrder.BUSI_TYPE_PAYORDER.equals(busi_type)&&pay_result){
-                result = orderService.payOrderSuccess(orderId);
+                result = orderService.payOrderSuccess(orderId, payMethodId);
                 if(result.getCode() == Result.OK) {
                     orderService.payDeliverOrder(orderId);//发货成功与否不与支付结果挂钩
                     shareService.createOrderSettle(orderId);//2019.3.26 结算费用
@@ -519,7 +519,7 @@ public class FundOrderService extends BaseService {
     //////////////////////////////////////////////////////////////////
 
     public Result payHrPayOrder(Order order) {
-        String orderNo=String.valueOf(order.getOrderId());//订单号
+//        String orderNo=String.valueOf(order.getOrderId());//订单号
         Result result1=hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,order.getConsumer());
         if(result1.getCode()!=Result.OK)return new Result(Result.ERROR,"付款账户不存在");
         String payer=String.valueOf(result1.getData());//用户id
@@ -766,12 +766,12 @@ public class FundOrderService extends BaseService {
             int item_amt=Double.valueOf(Utils.mul(NumberUtils.toDouble(ObjectUtils.toString(map.get("item_amt"))),100)).intValue();//单位分
             PaySerialItem paySerialItem = new PaySerialItem(paySerial.getId(), ObjectUtils.toString(map.get("item_id")), ObjectUtils.toString(map.get("payee")), item_amt);
             paySerialItemMapper.insertSelective(paySerialItem);
-        }
+        }*/
         for(Map map:payeeList){
             int item_amt=Double.valueOf(Utils.mul(NumberUtils.toDouble(ObjectUtils.toString(map.get("item_amt"))),100)).intValue();//单位分
             Pay001Payee pay001Payee=new Pay001Payee(ObjectUtils.toString(map.get("item_id")),ObjectUtils.toString(map.get("payee")),item_amt);//收款方公司id  需确保不会存在
             arrayList.add(pay001Payee);
-        }*/
+        }
         Pay001 pay001=new Pay001(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(), /*paySerial.getId()+""*/orderNo, payer,orderName,beforeUrl,afterUrl,subAppId,payer_openid,pay_trade_type,pay_type,amt,order_trade_type);
         pay001.setOrders(arrayList);
 

@@ -114,7 +114,7 @@ public class ApiOrderService {
         if(!result.isSuccess())return new Result(Result.OTHER,result.getData());
         //if(result.isSuccess())return result;//若成功,返回原生成订单的数据(主要含了订单号)
         log.info("冻结仓储库存成功，准备将订单更新为支付成功");
-        result = this.orderService.payOrderSuccess(order_id);//2
+        result = this.orderService.payOrderSuccess(order_id, Constants.PAY_MENTHOD_TYPE_5.getStringKey());//2
         if(!result.isSuccess())return result;
         log.info("订单支付成功，准备发货");
         result=this.orderService.payDeliverOrder(order_id);//3

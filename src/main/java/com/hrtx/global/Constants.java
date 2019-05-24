@@ -19,6 +19,7 @@ public enum Constants {
 //    PAY_MENTHOD_TYPE_2("2", "支付宝支付", "PAY_MENTHOD_TYPE"),
     PAY_MENTHOD_TYPE_3("3", "线下支付", "PAY_MENTHOD_TYPE"),
     PAY_MENTHOD_TYPE_4("4", "分期付款", "PAY_MENTHOD_TYPE"),
+    PAY_MENTHOD_TYPE_5("5", "免支付", "PAY_MENTHOD_TYPE"),
 
     //订单状态
     ORDER_STATUS_0(0, "创建订单", "ORDER_STATUS"),
