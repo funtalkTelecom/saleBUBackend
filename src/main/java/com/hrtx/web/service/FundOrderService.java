@@ -317,7 +317,7 @@ public class FundOrderService extends BaseService {
                 result = orderService.payOrderSuccess(orderId, payMethodId);
                 if(result.getCode() == Result.OK) {
                     orderService.payDeliverOrder(orderId);//发货成功与否不与支付结果挂钩
-                    shareService.newCreateOrderSettle(orderId);//2019.3.26 结算费用
+                    shareService.createOrderSettle(orderId);//2019.3.26 结算费用
                 }
             }else if(FundOrder.BUSI_TYPE_PAYDEPOSIT.equals(busi_type)){
                 auctionDepositService.newAuctionDepositPay(orderId, pay_result, Utils.getDate(0,"yyyyMMddHHmmss"));//payTime
