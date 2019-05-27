@@ -140,7 +140,7 @@ public class ShareController extends BaseReturn{
 	public Result createOrderSettle(HttpServletRequest request){
 		int order_id=NumberUtils.toInt(request.getParameter("order_id"));
 		int opt=NumberUtils.toInt(request.getParameter("opt"));
-		if(opt==1)return this.shareService.newCreateOrderSettle(order_id);
+		if(opt==1)return this.shareService.createOrderSettle(order_id);
 		else return this.shareService.orderSettle(order_id);
 	}
 	/**

@@ -236,7 +236,7 @@ public class ShareService {
 	 * 		3.交易费
 	 * 		4.发展人员
 	 */
-	public Result newCreateOrderSettle(int order_id){
+	public Result createOrderSettle(int order_id){
 		log.info(String.format("开始创建订单[%s]的结算清单",order_id));
 		int share_settle_user=-1;
 		Order order=orderMapper.selectByPrimaryKey(order_id);
@@ -245,8 +245,16 @@ public class ShareService {
 		int order_payer=NumberUtils.toInt(ObjectUtils.toString(result.getData()));
 
 		double order_price=order.getTotal();
-		int[] ok_order_status=new int[]{Constants.ORDER_STATUS_2.getIntKey(),Constants.ORDER_STATUS_3.getIntKey()};
-		if(!ArrayUtils.contains(ok_order_status,order.getStatus()))return new Result(Result.ERROR,"订单状态非可结算状态");
+//		若在不同的事务更新，可能导致更新后的状态无法查询
+//		int[] ok_order_status=new int[]{Constants.ORDER_STATUS_2.getIntKey(),Constants.ORDER_STATUS_3.getIntKey()};
+//      if(!ArrayUtils.contains(ok_order_status,order.getStatus()))return new Result(Result.ERROR,"订单状态非可结算状态");
+
+        OrderSettle orderSettle=new OrderSettle();
+        orderSettle.setStatus(Constants.ORDERSETTLE_STATUS_2.getIntKey());
+        orderSettle.setFeeType(Constants.PROMOTION_PLAN_FEETYPE_7.getIntKey());
+        orderSettle.setOrderId(order_id);
+        List<OrderSettle> orderSettles=this.orderSettleMapper.select(orderSettle);
+		if(orderSettles.isEmpty())return new Result(Result.ERROR,"订单尚未支付");
 		//梧桐支付的推广费
 		double award_feetype_6=order_price>OrderSettle.base_pp_price?OrderSettle.base_pp_price_more_fee:OrderSettle.base_pp_price_low_fee;
 		if(order.getShareId()!=null&&order.getShareId()!=0){
