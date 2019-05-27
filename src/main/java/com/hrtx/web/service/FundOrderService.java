@@ -670,9 +670,9 @@ public class FundOrderService extends BaseService {
             return new Result(result.getCode(),result.getDesc());
         }
     }
-    public Result payHrPayOrderSign(String order_id) {
+    public Result payHrPayOrderSign(String orderNo, String orderNoChild) {
         PayBase payBase=createPayBase();
-        Pay007 pay007=new Pay007(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),order_id,order_id);
+        Pay007 pay007=new Pay007(payBase.getUrl(),payBase.getSerial(),payBase.getMerid(),payBase.getKey(),orderNo,orderNoChild);
         com.hrtx.common.dto.Result result=PayClient.callPay007(pay007);
         if(result.getCode()== com.hrtx.common.dto.Result.OK){
             return new Result(Result.OK,result.getData());

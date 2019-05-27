@@ -328,7 +328,7 @@ public class ShareService {
 		example.setOrderByClause(" id desc");
 		List<OrderSettle> orderSettles = orderSettleMapper.selectByExample(example);
 		if(orderSettles.size()<=0) return new Result(Result.ERROR, "未找到成功支付的流水");
-		Result result=fundOrderService.payHrPayOrderSign(orderSettles.get(0).getOrderId()+"");
+		Result result=fundOrderService.payHrPayOrderSign(orderSettles.get(0).getId()+"", orderSettles.get(0).getOrderId()+"");
 		log.info(String.format("订单签收结果[%s],[%s]",result.getCode(),result.getData()));
 		example = new Example(OrderSettle.class);
 		example.createCriteria().andEqualTo("orderId",order_id).andEqualTo("status",Constants.ORDERSETTLE_STATUS_1.getIntKey());
