@@ -48,8 +48,10 @@ public class ReqLimitUtils {
             }else{
                 bean=(LimitBean)object;
                 //if(bean.isExpire()&&bean.getNum()<=0)res_int=0;//尚未过期而次数已用完，则说明超限
-                if(!bean.isExpire()&&bean.isCanReqTime()){//若已过期，则恢复访问次数
-                    bean=new ReqLimitUtils.LimitBean(expire,expire+slog.getLimitReqTime()*1000,(reqNum+1)-1);
+                if(!bean.isExpire()){//若已过期，则恢复访问次数
+                    if(bean.getNum()>0||bean.isCanReqTime()){
+                        bean=new ReqLimitUtils.LimitBean(expire,expire+slog.getLimitReqTime()*1000,reqNum);
+                    }
                 }else{
                     bean.setNum(bean.getNum()-1);
                 }
