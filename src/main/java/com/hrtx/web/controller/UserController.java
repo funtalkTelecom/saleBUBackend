@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.github.pagehelper.PageInfo;
+import com.hrtx.global.AuthCodeUtil;
+import com.hrtx.global.ReqLimitUtils;
 import com.hrtx.web.pojo.Agent;
 import com.hrtx.web.pojo.Corporation;
 import com.hrtx.web.service.AgentService;
@@ -43,6 +45,8 @@ public class UserController {
 	@Autowired private CorporationService corporationService;
 	@Autowired private AgentService agentService;
 
+	public static String RANK_AUTH_CODE = "rankAuthCode";
+
 	@GetMapping("/")
 	@Powers({PowerConsts.NOLOGINPOWER})
 	public ModelAndView redirectIndex(HttpServletRequest request) {
@@ -65,7 +69,27 @@ public class UserController {
     @RequestMapping("/login")
     @Powers({PowerConsts.NOLOGINPOWER})
     public ModelAndView login(User user, HttpServletRequest request, HttpServletResponse response) throws IOException, NoSuchAlgorithmException{
+		int limitResult=ReqLimitUtils.residualReqNum("login",new ReqLimitUtils.ReqLimit("yes","login",1L,5,0L));//每秒请求超过100次后限制访问30分钟
+		if(limitResult<=0){
+			return new ModelAndView("/admin/login").addObject("errormsg","您登陆过于频繁，请稍后在登。");
+		}
 		int remMe = NumberUtils.toInt(request.getParameter("rem-me"));
+		String loginName=request.getParameter("loginName");
+		String pwd=request.getParameter("pwd");
+		if(!StringUtils.defaultString(loginName,"").matches("^[a-zA-Z0-9_]{5,20}$")){
+			log.warn("帐号不符合规范");
+			return new ModelAndView("/admin/login").addObject("errormsg","帐号不符合规范");
+		}
+		if(StringUtils.defaultString(pwd,"").length() != 24){
+			log.warn("密码不符合规范");
+			return new ModelAndView("/admin/login").addObject("errormsg","密码不符合规范");
+		}
+		String validCode = request.getParameter("validCode");
+		Object rand = request.getSession().getAttribute(RANK_AUTH_CODE);
+		request.getSession().removeAttribute(RANK_AUTH_CODE);
+		if (/*StringUtils.isNotEmpty(isValid) && */!String.valueOf(rand).equals(validCode)) {
+			return new ModelAndView("/admin/login").addObject("errormsg","验证码错误");
+		}
 		Map<String, Object> map = userService.login(user.getLoginName(), user.getPwd());
 		if (map.get("user") == null) {
 			return new ModelAndView("/admin/login").addObject("errormsg",(String) map.get("error"));
@@ -88,6 +112,16 @@ public class UserController {
 		}
     	
     }
+
+	/**
+	 * 生成验证码
+	 * @return
+	 */
+	@RequestMapping("/auth-code-image")
+	@Powers( { PowerConsts.NOLOGINPOWER })
+	public void authCodeImage(HttpServletRequest request, HttpServletResponse response){
+		new AuthCodeUtil().downLoadAuthCode(request, response);
+	}
     
     @GetMapping("/login-out")
     @Powers({PowerConsts.NOLOGINPOWER})

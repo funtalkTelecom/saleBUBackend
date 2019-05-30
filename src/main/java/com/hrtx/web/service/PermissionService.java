@@ -174,7 +174,7 @@ public class PermissionService {
 	public Result updatePermission(PermissionAllocateForm permissionAllocateForm) {
 		int roleId = permissionAllocateForm.getRoleId();
 		int property = permissionAllocateForm.getProperty();
-		if(roleId == 0l || (property != 1 && property != 2)) throw new ServiceException("参数异常");
+		if(roleId == 0L || (property != 1 && property != 2)) throw new ServiceException("参数异常");
 		if(property == 1){
 			permissionMapper.deleByRoleId(roleId);
 			String permissionIds = permissionAllocateForm.getPermissionIds();

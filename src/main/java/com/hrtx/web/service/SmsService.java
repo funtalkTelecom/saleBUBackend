@@ -22,7 +22,7 @@ public class SmsService extends BaseService {
 	@Autowired private RedisUtil redisUtil;
 	public static String req_type_pc="pc";
 	public static String req_type_api="api";
-	public static long cache_time=60*10l;//1分钟
+	public static long cache_time=60* 10L;//1分钟
 
 	private String createKey(String type){
 		String key=null;

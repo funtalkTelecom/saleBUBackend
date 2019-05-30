@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.hrtx.dto.Result;
+import com.hrtx.global.ReqLimitUtils;
 import com.hrtx.global.SystemParam;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -25,14 +26,21 @@ import com.hrtx.global.SessionUtil;
 @Component
 public class PowerInterceptor implements HandlerInterceptor {
 	public final Logger log = LoggerFactory.getLogger(this.getClass());
-	
 	private static final String[] no_redirect =new String[]{"flogout"};//不用重定向地址，部分地址重定向会产生死循环
     public static final String COOKIE_NAME = "TT_TOKEN";
-
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler)throws Exception {
     	request.setAttribute("_t_start_time",System.currentTimeMillis());
 		String path=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
 		boolean _bool=Utils.isAjax(request);
+		int limitResult=ReqLimitUtils.residualReqNum("interceptor",new ReqLimitUtils.ReqLimit("yes","plat",1L,100,30*60L));//每秒请求超过100次后限制访问30分钟
+		if(limitResult<=0){
+			if(_bool) {
+				Utils.returnResult(new Result(Result.ERROR,"抱歉，您的请求过于频繁，请稍候再试!"));
+			} else {
+				response.sendRedirect(path+"error-page?errormsg=抱歉，您的请求过于频繁，请稍候再试!");
+			}
+			return false;
+		}
 		if(!this.isOpenStressTest(handler)) {
 			if(_bool)Utils.returnResult(new Result(Result.ERROR,"未开启压力测试"));
 			else {

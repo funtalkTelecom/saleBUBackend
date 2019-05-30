@@ -148,6 +148,13 @@
                                         <label class="sr-only" >密码</label>
                                         <input type="password" name="pwd" placeholder="请输入密码..." class="form-password form-control inputFrm" id="pwd">
                                     </div>
+                                    <div class="form-group" style="display:flex;">
+                                        <label class="sr-only" >验证码</label>
+                                        <input type="text" id="validCode" name="validCode" maxlength="4" onkeyup="this.value = this.value.replace(/[^\d]/g,'')" class="form-password form-control inputFrm" style="width:130px;margin-right: 10px;" />
+                                        <span class="text">
+                                            <img src="auth-code-image" id="validCode_id" title='看不清楚？换一张' />
+                                        </span>
+                                    </div>
                                     <button type="submit" class="btn" id="login">登录</button>
                                     <%--<p style="color:red" class="warm"></p>--%>
                                 </form>
@@ -184,16 +191,19 @@
             //     });
             // });
             jQuery(function ($) {
-            $("#login").click(function () {
-            var loginName = $("#loginName").val();
-            var pwd = $("#pwd").val();
-            if($.trim(loginName) == '' || $.trim(pwd) == '') {
-            $("#errormsg").html("用户名密码不能为空");
-            return;
-            }
-            if(!(pwd.length == 24 && pwd.substring(22,24) == "==")) $("#pwd").val(b64_md5(pwd));
-            $("#loginForm")[0].submit();
-            })
+                $("#login").click(function () {
+                    var loginName = $("#loginName").val();
+                    var pwd = $("#pwd").val();
+                    if($.trim(loginName) == '' || $.trim(pwd) == '') {
+                        $("#errormsg").html("用户名密码不能为空");
+                        return;
+                    }
+                if(!(pwd.length == 24 && pwd.substring(22,24) == "==")) $("#pwd").val(b64_md5(pwd));
+                    $("#loginForm")[0].submit();
+                })
+                $("#validCode_id").on('click',function() {
+                    $(this).attr("src", "auth-code-image?r"+Math.random());
+                });
             });
         </script>
 </body>

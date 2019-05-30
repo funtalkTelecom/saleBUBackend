@@ -120,7 +120,7 @@ public final class SessionUtil {
 	 * @return
 	 */
 	public final static boolean isSuperAdmin(){
-		return getUserId() == 1l;
+		return getUserId() == 1L;
 	}
 	
 	/**

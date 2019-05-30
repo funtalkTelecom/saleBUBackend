@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ApiSessionUtil {
     @Autowired private RedisUtil redisUtils;
     public static final String JESSION_ID_NAME = "__sessid";
-    private Long expire_time=7200l;
+    private Long expire_time= 7200L;
 
     public static String getApiKey(String key){
         return "egt-kh:api:" + key;

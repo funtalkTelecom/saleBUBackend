@@ -5,6 +5,7 @@ import com.hrtx.config.annotation.Powers;
 import com.hrtx.dto.Result;
 import com.hrtx.global.ApiSessionUtil;
 import com.hrtx.global.PowerConsts;
+import com.hrtx.global.ReqLimitUtils;
 import com.hrtx.global.SessionUtil;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.User;
@@ -32,6 +33,11 @@ public class APIInterceptor implements HandlerInterceptor {
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler)throws Exception {
     	request.setAttribute("_t_start_time",System.currentTimeMillis());
+		int limitResult=ReqLimitUtils.residualReqNum("interceptor",new ReqLimitUtils.ReqLimit("yes","plat",1L,100,30*60L));//每秒请求超过100次后限制访问30分钟
+		if(limitResult<=0){
+			Utils.returnResult(new Result(Result.ERROR,"抱歉，您的请求过于频繁，请稍候再试!"));
+			return false;
+		}
     	boolean _need_login=PowerInterceptor.hasNologin(handler);
 		if(_need_login) return true;//有非登陆注解      直接通过
 		Consumer user=apiSessionUtil.getConsumer();
