@@ -82,9 +82,9 @@
 
     <select id="queryDslNum" resultType="java.util.HashMap">
 
-    select n.id, c.third_id, n.num_resource, n.iccid, m.meal_id, o.boss_num, o.person_name, o.person_tel,oi.item_id from tb_num n, tb_third_city c, tb_meal m,
+    select n.id, c.third_id, n.num_resource, n.iccid, m.meal_id, o.boss_num, o.person_name, o.person_tel from tb_num n, tb_third_city c, tb_meal m,
     tb_order o , tb_order_item oi where n.city_id = c.city_id and c.third = 'ly' and n.meal_mid = m.mid and n.id = oi.num_id and oi.is_shipment = 0
-    and oi.order_id = o.order_id and n.seller_id = 10 and n.`status` = 5 and o.`status` in (5,6) and o.is_del=0  order by n.id limit 100000;
+    and oi.order_id = o.order_id and n.seller_id = 10 and n.`status` = 5 and o.`status` in (5,6) and o.order_type != 5 and o.is_del=0  order by n.id limit 100000;
 
     </select>
 
