@@ -329,7 +329,10 @@ public class GoodsService {
                         ||((JSONObject) obj.get("skuTobPrice")).get("value").equals("")?"": (String) ((JSONObject) obj.get("skuTobPrice")).get("value");
                 if("".equals(price)) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return new Result(Result.OTHER, "第"+(i+1)+"行2B价格为空");
+                    return new Result(Result.OTHER, "第"+(i+1)+"行2B价格不能为空");
+                }else if(price.equals("0")){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return new Result(Result.OTHER, "第"+(i+1)+"行2B价格不能为0");
                 }else{
                     String pattern = "[1-9]\\d*.?\\d*|0.\\d*[1-9]\\d*";
                     Pattern r = Pattern.compile(pattern);

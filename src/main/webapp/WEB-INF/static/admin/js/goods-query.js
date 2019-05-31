@@ -881,13 +881,13 @@ var titleStrObj = {
     "skuTobPrice":{
         "isShow":true,
         "title":"2B价格",
-        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
+        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" onkeyup="this.value=this.value.replace(/\\D/g,\'\')" class="col-xs-12">',
         "titleClass":"col-xs-1"
     },
     "skuTocPrice":{
         "isShow":false,
         "title":"2C价格",
-        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" class="col-xs-12">',
+        "type":'<input tag="sku_skuindex" type="text" name="skukey" value="skuvalue" onkeyup="this.value=this.value.replace(/\\D/g,\'\')" class="col-xs-12">',
         "titleClass":"col-xs-1"
     },
     // "skuIsNum":{
