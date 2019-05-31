@@ -110,7 +110,7 @@
     <select id="findThirdOrder" resultType="java.lang.String">
         select o.third_order from tb_num n, tb_order o, tb_order_item oi
         where n.id = oi.num_id and oi.order_id = o.order_id and n.iccid = #{iccid} and n.num_resource = #{num} and n.`status` = #{status}
-        and o.status not in (7)
+        and o.status not in (7) and o.order_type != 5
     </select>
 
 </mapper>
