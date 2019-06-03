@@ -245,9 +245,11 @@ public class LyCrmService {
             String fileName = yFileName+".ok";
             log.info("开始解析["+fileName+"]结果");
             try {
-                this.downloadFileToSftp("download", "download", fileName);
                 File dir = new File(this.getLyRootPath()+"download"+File.separator);
-                List<String> datas = this.readFile(dir.getPath()+File.separator+fileName);
+                String tFileName = dir.getPath()+File.separator+fileName;
+                File file = new File(tFileName);
+                if(!file.exists()) this.downloadFileToSftp("download", "download", fileName);
+                List<String> datas = this.readFile(tFileName);
                 if(datas != null) {
                     log.info("解析到数据["+datas.size()+"]条");
                     for (int j = 0, len = datas.size(); j < len; j++) {
