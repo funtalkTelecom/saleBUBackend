@@ -293,6 +293,7 @@ public class ApiOrderService {
 		Result result = numService.findBossNum(number.getCityId(),agent.getId(),number.getSellerId());
 		if(result.getCode() != Result.OK)return result;
 		order_ext_param.put("bossNum",String.valueOf(result.getData()));
+		share_id=share_id>0?share_id:NumberUtils.toInt(SystemParam.get("default-sharer"));
         order_ext_param.put("shareId",share_id);
         order_ext_param.put("logisticType",logisticType);
 		return this.submitOrder(Constants.ORDER_TYPE_2.getIntKey(),sku_id,num_id,1,0d,user,address,shippingMenthodId,mead_id,conment,"","",order_ext_param);

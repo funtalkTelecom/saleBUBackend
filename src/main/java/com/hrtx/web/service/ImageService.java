@@ -36,8 +36,8 @@ public class ImageService {
 		if(StringUtils.isEmpty(ACCESS_TOKEN))return  new Result(Result.ERROR,"小程序码创建失败");
 		JSONObject json=new JSONObject();
 		json.put("path",path);
-		json.put("width",300);
-		json.put("is_hyaline",true);
+		json.put("width",230);
+		json.put("is_hyaline",false);
 		String root_path=SystemParam.get("upload_root_path")+"/temp/";
 		String suffix="png";
 		Result result=HttpUtil.doHttpPost2Download("https://api.weixin.qq.com/wxa/getwxacode?access_token="+ACCESS_TOKEN,json.toString(),"application/json","utf-8",512,root_path,suffix);
