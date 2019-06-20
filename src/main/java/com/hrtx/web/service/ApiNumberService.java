@@ -23,6 +23,7 @@ import sun.rmi.server.InactiveGroupException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.sql.SQLTransactionRollbackException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -275,6 +276,24 @@ public class ApiNumberService {
 			for (int i = 0; i < ob.size(); i++) {
 				obj= (Map) ob.get(i);
 				obj.put("numBlock", getNumBlock((String) obj.get("resource")));
+
+				try {
+					Object activityEdate= obj.get("activityEdate");
+					if(activityEdate instanceof Date){
+						obj.put("activityEdate", ((Date)activityEdate).getTime());
+					}else if(activityEdate instanceof String){
+						obj.put("activityEdate", Utils.stringToDate(String.valueOf(activityEdate),"yyyy-MM-dd HH:mm:ss").getTime());
+					}
+					Object activitySdate= obj.get("activitySdate");
+					if(activitySdate instanceof Date){
+						obj.put("activitySdate", ((Date)activitySdate).getTime());
+					}else if(activitySdate instanceof String){
+						obj.put("activitySdate", Utils.stringToDate(String.valueOf(activitySdate),"yyyy-MM-dd HH:mm:ss").getTime());
+					}
+				}catch (Exception e){
+
+				}
+
 			}
 		 	 Map<String,String> promotionMap =	shareService.findNumPromotionInfo(Constants.PROMOTION_PLAN_FEETYPE_1.getIntKey(),unmId,Double.parseDouble(String.valueOf(obj.get("price_range"))));
 			obj.put("promotionMap",promotionMap);
@@ -283,7 +302,7 @@ public class ApiNumberService {
 			if(obj==null) return new Result(Result.OTHER, "未找到号码");
 			obj.put("numBlock", getNumBlock((String) obj.get("numResource")));
 		}
-		obj.put("newDate",new Date());
+		obj.put("newDate",new Date().getTime());
 		//存储浏览记录
 	    shareService.addBrowse(num_id,chennel,open_url,share_id);
 		return new Result(Result.OK, obj);
