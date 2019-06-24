@@ -34,6 +34,12 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 	private Long agentDistrict;
 	private String agentAddress;
 	private String tradingImg;
+	/**合伙人单号码推广1000元以上时的百分比*/
+	private Double awardThsPlus;
+	/**合伙人单号码推广1000元及以下时的百分比*/
+	private Double awardThs;
+	/**合伙人单号码推广平台百分比*/
+	private Double awardPlat;
 
 	public Consumer() {
 	}
@@ -233,5 +239,29 @@ public class Consumer extends BasePojo implements java.io.Serializable {
 
 	public void setUpConsumer(Integer upConsumer) {
 		this.upConsumer = upConsumer;
+	}
+
+	public Double getAwardThsPlus() {
+		return awardThsPlus;
+	}
+
+	public void setAwardThsPlus(Double awardThsPlus) {
+		this.awardThsPlus = awardThsPlus;
+	}
+
+	public Double getAwardThs() {
+		return awardThs;
+	}
+
+	public void setAwardThs(Double awardThs) {
+		this.awardThs = awardThs;
+	}
+
+	public Double getAwardPlat() {
+		return awardPlat;
+	}
+
+	public void setAwardPlat(Double awardPlat) {
+		this.awardPlat = awardPlat;
 	}
 }

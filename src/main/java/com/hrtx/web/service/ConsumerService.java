@@ -12,6 +12,7 @@ import com.hrtx.web.mapper.ConsumerMapper;
 import com.hrtx.web.mapper.UserMapper;
 import com.hrtx.web.pojo.Consumer;
 import com.hrtx.web.pojo.ConsumerLog;
+import com.hrtx.web.pojo.OrderSettle;
 import com.hrtx.web.pojo.User;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -272,6 +273,9 @@ public class ConsumerService extends BaseService {
 		Consumer consumer=this.consumerMapper.selectByPrimaryKey(consumer_id);
 		if(consumer==null)return new Result(Result.ERROR,"数据错误");
 		if(StringUtils.equals(check_status,"1")){
+			consumer.setAwardThsPlus(OrderSettle.base_pp_price_more_fee);
+			consumer.setAwardThs(OrderSettle.base_pp_price_low_fee);
+			consumer.setAwardPlat(OrderSettle.base_pp_price_all_fee);
 			consumer.setPartnerCheck(1);
 		}else{
 			consumer.setPartnerCheck(2);

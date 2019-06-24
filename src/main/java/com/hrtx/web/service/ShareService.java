@@ -256,14 +256,19 @@ public class ShareService {
         List<OrderSettle> orderSettles=this.orderSettleMapper.select(orderSettle);
 		if(orderSettles.isEmpty())return new Result(Result.ERROR,"订单尚未支付");
 		//梧桐支付的推广费
-		double award_feetype_6=order_price>OrderSettle.base_pp_price?OrderSettle.base_pp_price_more_fee:OrderSettle.base_pp_price_low_fee;
+		double award_feetype_6=0d;
 		if(order.getShareId()!=null&&order.getShareId()!=0){
 			Share share=this.shareMapper.selectByPrimaryKey(order.getShareId());
 			Result result_settle=this.hrpayAccountService.hrPayAccount(HrpayAccount.acctoun_type_consumer,share.getConsumerId());
 			if(result_settle.getCode()!=Result.OK)return new Result(Result.ERROR,"收款账号不存在");
 			share_settle_user=NumberUtils.toInt(String.valueOf(result_settle.getData()));
+			Consumer consumer=this.consumerMapper.selectByPrimaryKey(share.getConsumerId());
+			double awardThsPlus=consumer.getAwardThsPlus()==null?OrderSettle.base_pp_price_more_fee:consumer.getAwardThsPlus();
+			double awardThs=consumer.getAwardThs()==null?OrderSettle.base_pp_price_low_fee:consumer.getAwardThs();
+			double awardPlat=consumer.getAwardPlat()==null?OrderSettle.base_pp_price_all_fee:consumer.getAwardPlat();
+			award_feetype_6=order_price>OrderSettle.base_pp_price?awardThsPlus:awardThs;
 			//若是全平台的推广，则使用其他计费规则
-			if(share.getShareSource()==Constants.SHARE_SOURCE_1.getIntKey())award_feetype_6=OrderSettle.base_pp_price_all_fee;
+			if(share.getShareSource()==Constants.SHARE_SOURCE_1.getIntKey())award_feetype_6=awardPlat;
 		}
 
 		Example example = new Example(OrderItem.class);
